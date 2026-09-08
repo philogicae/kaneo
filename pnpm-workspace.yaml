@@ -32,8 +32,10 @@ overrides:
   undici: '>=7.29.0 <8'
   js-yaml: '>=4.2.0 <5'
   '@babel/core': '>=7.29.6 <8'
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - bcrypt
-  - better-sqlite3
-  - esbuild
+allowBuilds:
+  '@prisma/engines': true
+  '@sentry/cli': true
+  '@sentry/node-cpu-profiler': true
+  esbuild: true
+  msw: true
+  prisma: true
