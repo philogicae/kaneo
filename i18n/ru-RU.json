@@ -434,7 +434,14 @@
           "amber": "Янтарь",
           "terracotta": "Терракота",
           "rose": "Роза",
-          "crimson": "Малиновый"
+          "crimson": "Малиновый",
+          "sky": "Небо",
+          "ocean": "Океан",
+          "cyan": "Циан",
+          "indigo": "Индиго",
+          "fuchsia": "Фуксия",
+          "lime": "Лайм",
+          "emerald": "Изумруд"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "Создать рабочую область",
       "lightTheme": "Светлая тема",
       "darkTheme": "Тёмная тема",
+      "voltTheme": "Тема Вольт",
       "systemTheme": "Системная тема",
       "keyboardShortcuts": "Сочетания клавиш",
       "inputPlaceholder": "Поиск приложений и команд...",
@@ -525,7 +533,12 @@
       "deleteConfirmTitle": "Удалить проект?",
       "deleteConfirmDescription": "Проект и все его данные будут безвозвратно удалены. Это действие нельзя отменить.",
       "deletedToast": "Проект удалён",
-      "deleteProject": "Удалить проект"
+      "deleteProject": "Удалить проект",
+      "sortProjects": "Сортировать проекты",
+      "sortCustom": "Свой порядок",
+      "sortName": "Название",
+      "sortDate": "Дата создания",
+      "sortCompletion": "Завершённость"
     },
     "search": {
       "inputPlaceholder": "Поиск задач, проектов, комментариев...",
@@ -555,7 +568,8 @@
       "workspaces": "Рабочие области",
       "switching": "Переключение...",
       "addWorkspace": "Добавить рабочую область",
-      "selectWorkspace": "Выберите рабочую область"
+      "selectWorkspace": "Выберите рабочую область",
+      "sortWorkspaces": "Сортировать пространства"
     },
     "page": {
       "projectsTitle": "Проекты",
@@ -1244,6 +1258,7 @@
       "selectTheme": "Выберите тему",
       "themeLight": "Светлая",
       "themeDark": "Тёмная",
+      "themeVolt": "Вольт",
       "themeSystem": "Системная",
       "language": "Язык",
       "languageDescription": "Выберите предпочтительный язык интерфейса",
@@ -2094,18 +2109,7 @@
         "removeSuccess": "Метка удалена",
         "updateError": "Не удалось обновить метку",
         "createSuccess": "Метка создана и добавлена",
-        "createError": "Не удалось создать метку",
-        "colors": {
-          "stone": "Камень",
-          "slate": "Сланец",
-          "lavender": "Лаванда",
-          "sage": "Шалфей",
-          "forest": "Лес",
-          "amber": "Янтарь",
-          "terracotta": "Терракота",
-          "rose": "Роза",
-          "crimson": "Малиновый"
-        }
+        "createError": "Не удалось создать метку"
       }
     },
     "pr": {
@@ -2263,7 +2267,6 @@
       "description": "Как только вы создадите проект, проекты из всех ваших рабочих пространств появятся здесь.",
       "title": "Пока нет проектов"
     },
-    "pageDescription": "Все проекты из всех ваших рабочих пространств в одном месте.",
     "pageTitle": "Все проекты",
     "section": {
       "projectCount_few": "{{count}} проекта",

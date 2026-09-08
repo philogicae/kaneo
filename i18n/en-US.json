@@ -158,7 +158,14 @@
 					"amber": "Amber",
 					"terracotta": "Terracotta",
 					"rose": "Rose",
-					"crimson": "Crimson"
+					"crimson": "Crimson",
+					"sky": "Sky",
+					"ocean": "Ocean",
+					"cyan": "Cyan",
+					"indigo": "Indigo",
+					"fuchsia": "Fuchsia",
+					"lime": "Lime",
+					"emerald": "Emerald"
 				}
 			}
 		}
@@ -503,6 +510,7 @@
 			"selectTheme": "Select a theme",
 			"themeLight": "Light",
 			"themeDark": "Dark",
+			"themeVolt": "Volt",
 			"themeSystem": "System",
 			"language": "Language",
 			"languageDescription": "Choose your preferred interface language",
@@ -1360,6 +1368,7 @@
 			"createWorkspace": "Create workspace",
 			"lightTheme": "Light theme",
 			"darkTheme": "Dark theme",
+			"voltTheme": "Volt theme",
 			"systemTheme": "System theme",
 			"keyboardShortcuts": "Keyboard shortcuts",
 			"inputPlaceholder": "Search for apps and commands...",
@@ -1388,7 +1397,12 @@
 			"deleteConfirmTitle": "Delete Project?",
 			"deleteConfirmDescription": "This will permanently remove the project and all its data. You can't undo this action.",
 			"deletedToast": "Project deleted",
-			"deleteProject": "Delete Project"
+			"deleteProject": "Delete Project",
+			"sortProjects": "Sort projects",
+			"sortCustom": "Custom order",
+			"sortName": "Name",
+			"sortDate": "Date created",
+			"sortCompletion": "Completion"
 		},
 		"search": {
 			"inputPlaceholder": "Search tasks, projects, comments...",
@@ -1418,7 +1432,8 @@
 			"workspaces": "Workspaces",
 			"switching": "Switching...",
 			"addWorkspace": "Add workspace",
-			"selectWorkspace": "Select workspace"
+			"selectWorkspace": "Select workspace",
+			"sortWorkspaces": "Sort workspaces"
 		},
 		"page": {
 			"projectsTitle": "Projects",
@@ -1857,18 +1872,7 @@
 				"removeSuccess": "Label removed",
 				"updateError": "Failed to update label",
 				"createSuccess": "Label created and added",
-				"createError": "Failed to create label",
-				"colors": {
-					"stone": "Stone",
-					"slate": "Slate",
-					"lavender": "Lavender",
-					"sage": "Sage",
-					"forest": "Forest",
-					"amber": "Amber",
-					"terracotta": "Terracotta",
-					"rose": "Rose",
-					"crimson": "Crimson"
-				}
+				"createError": "Failed to create label"
 			}
 		},
 		"backlog": {
@@ -2097,7 +2101,6 @@
 	},
 	"unified": {
 		"pageTitle": "All projects",
-		"pageDescription": "A single view of every project across your workspaces.",
 		"stats": {
 			"projects": "Projects",
 			"tasks": "Tasks",

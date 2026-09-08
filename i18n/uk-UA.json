@@ -434,7 +434,14 @@
           "amber": "Бурштин",
           "terracotta": "Теракота",
           "rose": "Троянда",
-          "crimson": "Багряний"
+          "crimson": "Багряний",
+          "sky": "Небо",
+          "ocean": "Океан",
+          "cyan": "Бірюзовий",
+          "indigo": "Індиго",
+          "fuchsia": "Фуксія",
+          "lime": "Лайм",
+          "emerald": "Смарагд"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "Створити робочий простір",
       "lightTheme": "Світла тема",
       "darkTheme": "Темна тема",
+      "voltTheme": "Тема Вольт",
       "systemTheme": "Системна тема",
       "keyboardShortcuts": "Гарячі клавіші",
       "inputPlaceholder": "Пошук застосунків та команд...",
@@ -525,7 +533,12 @@
       "deleteConfirmTitle": "Видалити проєкт?",
       "deleteConfirmDescription": "Це назавжди видалить проєкт та всі його дані. Цю дію неможливо скасувати.",
       "deletedToast": "Проєкт видалено",
-      "deleteProject": "Видалити проєкт"
+      "deleteProject": "Видалити проєкт",
+      "sortProjects": "Сортувати проєкти",
+      "sortCustom": "Власний порядок",
+      "sortName": "Назва",
+      "sortDate": "Дата створення",
+      "sortCompletion": "Завершеність"
     },
     "search": {
       "inputPlaceholder": "Пошук завдань, проєктів, коментарів...",
@@ -555,7 +568,8 @@
       "workspaces": "Робочі простори",
       "switching": "Перемикання...",
       "addWorkspace": "Додати робочий простір",
-      "selectWorkspace": "Обрати робочий простір"
+      "selectWorkspace": "Обрати робочий простір",
+      "sortWorkspaces": "Сортувати простори"
     },
     "page": {
       "projectsTitle": "Проєкти",
@@ -1244,6 +1258,7 @@
       "selectTheme": "Обрати тему",
       "themeLight": "Світла",
       "themeDark": "Темна",
+      "themeVolt": "Вольт",
       "themeSystem": "Системна",
       "language": "Мова",
       "languageDescription": "Оберіть бажану мову інтерфейсу",
@@ -2038,18 +2053,7 @@
         "removeSuccess": "Мітку видалено",
         "updateError": "Не вдалося оновити мітку",
         "createSuccess": "Мітку створено та додано",
-        "createError": "Не вдалося створити мітку",
-        "colors": {
-          "stone": "Камінь",
-          "slate": "Сланець",
-          "lavender": "Лаванда",
-          "sage": "Шавлія",
-          "forest": "Ліс",
-          "amber": "Бурштин",
-          "terracotta": "Теракота",
-          "rose": "Троянда",
-          "crimson": "Багряний"
-        }
+        "createError": "Не вдалося створити мітку"
       }
     },
     "pr": {
@@ -2207,7 +2211,6 @@
       "description": "Щойно ви створите проєкт, проєкти з усіх ваших робочих просторів з'являться тут.",
       "title": "Поки немає проєктів"
     },
-    "pageDescription": "Усі проєкти з усіх ваших робочих просторів в одному місці.",
     "pageTitle": "Усі проєкти",
     "section": {
       "projectCount_few": "{{count}} проєкти",

@@ -152,7 +152,14 @@
 					"amber": "アンバー",
 					"terracotta": "テラコッタ",
 					"rose": "ローズ",
-					"crimson": "クリムゾン"
+					"crimson": "クリムゾン",
+					"sky": "空",
+					"ocean": "海",
+					"cyan": "シアン",
+					"indigo": "藍",
+					"fuchsia": "フクシア",
+					"lime": "ライム",
+					"emerald": "エメラルド"
 				}
 			}
 		},
@@ -503,6 +510,7 @@
 			"selectTheme": "テーマを選択",
 			"themeLight": "ライト",
 			"themeDark": "ダーク",
+			"themeVolt": "ボルト",
 			"themeSystem": "システム",
 			"language": "言語",
 			"languageDescription": "表示言語を選択してください",
@@ -1359,6 +1367,7 @@
 			"createWorkspace": "ワークスペースを作成",
 			"lightTheme": "ライトテーマ",
 			"darkTheme": "ダークテーマ",
+			"voltTheme": "ボルトテーマ",
 			"systemTheme": "システムテーマ",
 			"keyboardShortcuts": "キーボードショートカット",
 			"inputPlaceholder": "アプリやコマンドを検索...",
@@ -1387,7 +1396,12 @@
 			"deleteConfirmTitle": "プロジェクトを削除しますか？",
 			"deleteConfirmDescription": "これにより、プロジェクトとそのすべてのデータが完全に削除されます。この操作は取り消せません。",
 			"deletedToast": "プロジェクトを削除しました",
-			"deleteProject": "プロジェクトを削除"
+			"deleteProject": "プロジェクトを削除",
+			"sortProjects": "プロジェクトを並べ替え",
+			"sortCustom": "カスタム順",
+			"sortName": "名前",
+			"sortDate": "作成日",
+			"sortCompletion": "進捗率"
 		},
 		"search": {
 			"inputPlaceholder": "タスク、プロジェクト、コメントを検索...",
@@ -1417,7 +1431,8 @@
 			"workspaces": "ワークスペース",
 			"switching": "切り替え中...",
 			"addWorkspace": "ワークスペースを追加",
-			"selectWorkspace": "ワークスペースを選択"
+			"selectWorkspace": "ワークスペースを選択",
+			"sortWorkspaces": "ワークスペースを並べ替え"
 		},
 		"page": {
 			"projectsTitle": "プロジェクト",
@@ -1852,18 +1867,7 @@
 				"removeSuccess": "ラベルを削除しました",
 				"updateError": "ラベルの更新に失敗しました",
 				"createSuccess": "ラベルを作成して追加しました",
-				"createError": "ラベルの作成に失敗しました",
-				"colors": {
-					"stone": "ストーン",
-					"slate": "スレート",
-					"lavender": "ラベンダー",
-					"sage": "セージ",
-					"forest": "フォレスト",
-					"amber": "アンバー",
-					"terracotta": "テラコッタ",
-					"rose": "ローズ",
-					"crimson": "クリムゾン"
-				}
+				"createError": "ラベルの作成に失敗しました"
 			}
 		},
 		"backlog": {
@@ -2243,7 +2247,6 @@
 			"description": "プロジェクトを作成すると、すべてのワークスペースのプロジェクトがここに表示されます。",
 			"title": "プロジェクトはまだありません"
 		},
-		"pageDescription": "すべてのワークスペースのプロジェクトをひとつの画面で確認できます。",
 		"pageTitle": "すべてのプロジェクト",
 		"section": {
 			"projectCount_other": "{{count}}件のプロジェクト"

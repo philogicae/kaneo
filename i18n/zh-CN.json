@@ -434,7 +434,14 @@
           "amber": "琥珀",
           "terracotta": "赤陶",
           "rose": "玫红",
-          "crimson": "深红"
+          "crimson": "深红",
+          "sky": "天空",
+          "ocean": "海洋",
+          "cyan": "青色",
+          "indigo": "靛蓝",
+          "fuchsia": "紫红",
+          "lime": "青柠",
+          "emerald": "祖母绿"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "创建工作区",
       "lightTheme": "浅色主题",
       "darkTheme": "深色主题",
+      "voltTheme": "闪电主题",
       "systemTheme": "跟随系统主题",
       "keyboardShortcuts": "键盘快捷键",
       "inputPlaceholder": "搜索应用和命令…",
@@ -507,43 +515,14 @@
         "close": "关闭"
       }
     },
-    "keyboardShortcuts": {
-      "categories": {
-        "general": "通用",
-        "create": "创建",
-        "views": "视图",
-        "navigation": "导航",
-        "quickSelect": "快速选择（在弹层中）"
-      },
-      "footer": "按 <kbd>Esc</kbd> 关闭",
-      "items": {
-        "backlogView": "切换到待办视图",
-        "boardView": "切换到看板视图",
-        "calendarView": "切换到日历视图",
-        "closeModal": "关闭弹窗/弹层",
-        "createProject": "创建项目",
-        "createTask": "创建任务",
-        "createWorkspace": "创建工作区",
-        "globalSearch": "全局搜索",
-        "listView": "切换到列表视图",
-        "nextTask": "下一任务",
-        "openCommandPalette": "打开命令面板",
-        "openTask": "打开所选任务",
-        "prevTask": "上一任务",
-        "quickSelectNumber": "按数字选择选项",
-        "showShortcuts": "显示键盘快捷键",
-        "toggleSidebar": "切换侧边栏"
-      },
-      "searchPlaceholder": "搜索快捷键…",
-      "subtitle": "使用键盘快捷键提升效率",
-      "title": "键盘快捷键"
-    },
     "notifications": "通知",
-    "page": {
-      "projectsTitle": "项目",
-      "settingsTitle": "设置",
-      "backToWorkspace": "返回工作区",
-      "settingsWorkspaceTab": "工作区"
+    "sidebar": {
+      "overview": "概览",
+      "projects": "项目",
+      "members": "成员",
+      "invitations": "邀请",
+      "more": "更多",
+      "backToBoard": "返回看板"
     },
     "projectList": {
       "viewProject": "查看项目",
@@ -554,10 +533,12 @@
       "deleteConfirmTitle": "删除项目？",
       "deleteConfirmDescription": "这将永久删除项目及其所有数据，此操作不可撤销。",
       "deletedToast": "项目已删除",
-      "deleteProject": "删除项目"
-    },
-    "projectSettings": {
-      "projectLabel": "项目"
+      "deleteProject": "删除项目",
+      "sortProjects": "项目排序",
+      "sortCustom": "自定义顺序",
+      "sortName": "名称",
+      "sortDate": "创建日期",
+      "sortCompletion": "完成度"
     },
     "search": {
       "inputPlaceholder": "搜索任务、项目、评论…",
@@ -575,14 +556,6 @@
       "toggleSidebar": "切换侧边栏",
       "back": "返回"
     },
-    "sidebar": {
-      "overview": "概览",
-      "projects": "项目",
-      "members": "成员",
-      "invitations": "邀请",
-      "more": "更多",
-      "backToBoard": "返回看板"
-    },
     "userMenu": {
       "signedOutSuccess": "已成功退出登录",
       "signOutFailed": "退出登录失败",
@@ -595,7 +568,48 @@
       "workspaces": "工作区",
       "switching": "切换中…",
       "addWorkspace": "添加工作区",
-      "selectWorkspace": "选择工作区"
+      "selectWorkspace": "选择工作区",
+      "sortWorkspaces": "工作区排序"
+    },
+    "page": {
+      "projectsTitle": "项目",
+      "settingsTitle": "设置",
+      "backToWorkspace": "返回工作区",
+      "settingsWorkspaceTab": "工作区"
+    },
+    "projectSettings": {
+      "projectLabel": "项目"
+    },
+    "keyboardShortcuts": {
+      "title": "键盘快捷键",
+      "subtitle": "使用键盘快捷键提升效率",
+      "searchPlaceholder": "搜索快捷键…",
+      "footer": "按 <kbd>Esc</kbd> 关闭",
+      "categories": {
+        "general": "通用",
+        "create": "创建",
+        "views": "视图",
+        "navigation": "导航",
+        "quickSelect": "快速选择（在弹层中）"
+      },
+      "items": {
+        "openCommandPalette": "打开命令面板",
+        "globalSearch": "全局搜索",
+        "toggleSidebar": "切换侧边栏",
+        "showShortcuts": "显示键盘快捷键",
+        "closeModal": "关闭弹窗/弹层",
+        "createTask": "创建任务",
+        "createProject": "创建项目",
+        "createWorkspace": "创建工作区",
+        "boardView": "切换到看板视图",
+        "listView": "切换到列表视图",
+        "backlogView": "切换到待办视图",
+        "nextTask": "下一任务",
+        "prevTask": "上一任务",
+        "openTask": "打开所选任务",
+        "quickSelectNumber": "按数字选择选项",
+        "calendarView": "切换到日历视图"
+      }
     }
   },
   "notifications": {
@@ -1232,6 +1246,7 @@
       "selectTheme": "选择主题",
       "themeLight": "浅色",
       "themeDark": "深色",
+      "themeVolt": "闪电",
       "themeSystem": "跟随系统",
       "language": "语言",
       "languageDescription": "选择你偏好的界面语言",
@@ -2023,18 +2038,7 @@
         "removeSuccess": "标签已移除",
         "updateError": "更新标签失败",
         "createSuccess": "标签已创建并添加",
-        "createError": "创建标签失败",
-        "colors": {
-          "stone": "石板灰",
-          "slate": "石板蓝",
-          "lavender": "薰衣草",
-          "sage": "鼠尾草绿",
-          "forest": "森林绿",
-          "amber": "琥珀",
-          "terracotta": "赤陶",
-          "rose": "玫红",
-          "crimson": "深红"
-        }
+        "createError": "创建标签失败"
       }
     },
     "pr": {
@@ -2189,7 +2193,6 @@
       "description": "创建项目后，所有工作区的项目都会显示在这里。",
       "title": "还没有项目"
     },
-    "pageDescription": "在同一个视图中查看所有工作区的项目。",
     "pageTitle": "所有项目",
     "section": {
       "projectCount_other": "{{count}} 个项目"

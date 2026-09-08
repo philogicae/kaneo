@@ -807,6 +807,144 @@ export function registerMcpTools(
   );
 
   registerTool(
+    "create_column",
+    {
+      description:
+        "Create a board/backlog column in a project. The slug is derived from the name.",
+      inputSchema: z.object({
+        projectId: nonEmptyString,
+        name: nonEmptyString,
+        icon: optionalNonEmptyString,
+        color: hexColorSchema.optional(),
+        isFinal: z.boolean().optional(),
+      }),
+    },
+    async (args) =>
+      run(() => {
+        const body: Record<string, unknown> = { name: args.name };
+        if (args.icon !== undefined) body.icon = args.icon;
+        if (args.color !== undefined) body.color = args.color;
+        if (args.isFinal !== undefined) body.isFinal = args.isFinal;
+        return client.json(
+          `/api/column/${encodeURIComponent(args.projectId)}`,
+          {
+            method: "POST",
+            body: JSON.stringify(body),
+          },
+        );
+      }),
+  );
+
+  registerTool(
+    "update_column",
+    {
+      description:
+        "Rename or restyle a column. Omit icon/color to keep them; pass null to clear.",
+      inputSchema: z.object({
+        columnId: nonEmptyString,
+        name: optionalNonEmptyString,
+        icon: nullableOptionalNonEmptyString,
+        color: hexColorSchema.nullable().optional(),
+        isFinal: z.boolean().optional(),
+      }),
+    },
+    async (args) =>
+      run(() => {
+        const body: Record<string, unknown> = {};
+        if (args.name !== undefined) body.name = args.name;
+        if (args.icon !== undefined) body.icon = args.icon;
+        if (args.color !== undefined) body.color = args.color;
+        if (args.isFinal !== undefined) body.isFinal = args.isFinal;
+        return client.json(`/api/column/${encodeURIComponent(args.columnId)}`, {
+          method: "PUT",
+          body: JSON.stringify(body),
+        });
+      }),
+  );
+
+  registerTool(
+    "reorder_columns",
+    {
+      description:
+        "Set the order of a project's columns. Every column must be listed with its new position.",
+      inputSchema: z.object({
+        projectId: nonEmptyString,
+        columns: z
+          .array(
+            z.object({
+              id: nonEmptyString,
+              position: z.number().int().nonnegative(),
+            }),
+          )
+          .min(1),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/column/reorder/${encodeURIComponent(args.projectId)}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ columns: args.columns }),
+          },
+        ),
+      ),
+  );
+
+  registerTool(
+    "delete_column",
+    {
+      description:
+        "Delete a column. It must be empty — move or delete its tasks first.",
+      inputSchema: z.object({ columnId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/column/${encodeURIComponent(args.columnId)}`, {
+          method: "DELETE",
+        }),
+      ),
+  );
+
+  registerTool(
+    "bulk_update_tasks",
+    {
+      description:
+        "Apply one operation to many tasks at once (backlog triage, bulk triage of a calendar or Gantt selection). All tasks must belong to the same workspace.",
+      inputSchema: z.object({
+        taskIds: z.array(nonEmptyString).min(1),
+        operation: z.enum([
+          "updateStatus",
+          "updatePriority",
+          "updateAssignee",
+          "delete",
+          "addLabel",
+          "removeLabel",
+          "updateDueDate",
+        ]),
+        value: z
+          .string()
+          .nullable()
+          .optional()
+          .describe(
+            "New value for the operation. Unused by delete; null clears an assignee or due date.",
+          ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json("/api/task/bulk", {
+          method: "PATCH",
+          body: JSON.stringify({
+            taskIds: args.taskIds,
+            operation: args.operation,
+            ...(args.value !== undefined ? { value: args.value } : {}),
+          }),
+        }),
+      ),
+  );
+
+  registerTool(
     "delete_task",
     {
       description: "Delete a task by ID.",

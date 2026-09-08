@@ -434,7 +434,14 @@
           "amber": "Bernstein",
           "terracotta": "Terrakotta",
           "rose": "Rosa",
-          "crimson": "Karmesinrot"
+          "crimson": "Karmesinrot",
+          "sky": "Himmel",
+          "ocean": "Ozean",
+          "cyan": "Cyan",
+          "indigo": "Indigo",
+          "fuchsia": "Fuchsia",
+          "lime": "Limette",
+          "emerald": "Smaragd"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "Workspace erstellen",
       "lightTheme": "Helles Design",
       "darkTheme": "Dunkles Design",
+      "voltTheme": "Volt-Design",
       "systemTheme": "Systemdesign",
       "keyboardShortcuts": "Tastenkürzel",
       "inputPlaceholder": "Nach Apps und Befehlen suchen...",
@@ -525,7 +533,12 @@
       "deleteConfirmTitle": "Projekt löschen?",
       "deleteConfirmDescription": "Dadurch wird das Projekt und alle zugehörigen Daten dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
       "deletedToast": "Projekt gelöscht",
-      "deleteProject": "Projekt löschen"
+      "deleteProject": "Projekt löschen",
+      "sortProjects": "Projekte sortieren",
+      "sortCustom": "Benutzerdefiniert",
+      "sortName": "Name",
+      "sortDate": "Erstellungsdatum",
+      "sortCompletion": "Fortschritt"
     },
     "search": {
       "inputPlaceholder": "Aufgaben, Projekte, Kommentare suchen...",
@@ -555,7 +568,8 @@
       "workspaces": "Arbeitsbereiche",
       "switching": "Wechseln...",
       "addWorkspace": "Workspace hinzufügen",
-      "selectWorkspace": "Workspace auswählen"
+      "selectWorkspace": "Workspace auswählen",
+      "sortWorkspaces": "Arbeitsbereiche sortieren"
     },
     "page": {
       "projectsTitle": "Projekte",
@@ -1236,6 +1250,7 @@
       "selectTheme": "Design auswählen",
       "themeLight": "Hell",
       "themeDark": "Dunkel",
+      "themeVolt": "Volt",
       "themeSystem": "System",
       "language": "Sprache",
       "languageDescription": "Wähle deine bevorzugte Oberflächensprache",
@@ -2028,18 +2043,7 @@
         "removeSuccess": "Label entfernt",
         "updateError": "Label konnte nicht aktualisiert werden",
         "createSuccess": "Label erstellt und hinzugefügt",
-        "createError": "Label konnte nicht erstellt werden",
-        "colors": {
-          "stone": "Stein",
-          "slate": "Schiefer",
-          "lavender": "Lavendel",
-          "sage": "Salbei",
-          "forest": "Wald",
-          "amber": "Bernstein",
-          "terracotta": "Terrakotta",
-          "rose": "Rosa",
-          "crimson": "Karmesinrot"
-        }
+        "createError": "Label konnte nicht erstellt werden"
       }
     },
     "pr": {
@@ -2195,7 +2199,6 @@
       "description": "Sobald du ein Projekt erstellst, erscheinen hier die Projekte aus allen deinen Arbeitsbereichen.",
       "title": "Noch keine Projekte"
     },
-    "pageDescription": "Alle Projekte aus allen deinen Arbeitsbereichen auf einen Blick.",
     "pageTitle": "Alle Projekte",
     "section": {
       "projectCount_one": "{{count}} Projekt",

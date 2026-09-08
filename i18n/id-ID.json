@@ -434,7 +434,14 @@
           "amber": "Kuning Ambar",
           "terracotta": "Merah Bata",
           "rose": "Merah Mawar",
-          "crimson": "Merah Tua"
+          "crimson": "Merah Tua",
+          "sky": "Langit",
+          "ocean": "Samudra",
+          "cyan": "Sian",
+          "indigo": "Nila",
+          "fuchsia": "Fusia",
+          "lime": "Jeruk nipis",
+          "emerald": "Zamrud"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "Buat ruang kerja",
       "lightTheme": "Tema terang",
       "darkTheme": "Tema gelap",
+      "voltTheme": "Tema Volt",
       "systemTheme": "Tema sistem",
       "keyboardShortcuts": "Pintasan keyboard",
       "inputPlaceholder": "Cari aplikasi dan perintah...",
@@ -525,7 +533,12 @@
       "deleteConfirmTitle": "Hapus Proyek?",
       "deleteConfirmDescription": "Ini akan menghapus proyek dan semua datanya secara permanen. Anda tidak dapat membatalkan tindakan ini.",
       "deletedToast": "Proyek dihapus",
-      "deleteProject": "Hapus Proyek"
+      "deleteProject": "Hapus Proyek",
+      "sortProjects": "Urutkan proyek",
+      "sortCustom": "Urutan khusus",
+      "sortName": "Nama",
+      "sortDate": "Tanggal dibuat",
+      "sortCompletion": "Penyelesaian"
     },
     "search": {
       "inputPlaceholder": "Cari tugas, proyek, komentar...",
@@ -555,7 +568,8 @@
       "workspaces": "Ruang kerja",
       "switching": "Beralih...",
       "addWorkspace": "Tambah ruang kerja",
-      "selectWorkspace": "Pilih ruang kerja"
+      "selectWorkspace": "Pilih ruang kerja",
+      "sortWorkspaces": "Urutkan ruang kerja"
     },
     "page": {
       "projectsTitle": "Proyek",
@@ -1232,6 +1246,7 @@
       "selectTheme": "Pilih tema",
       "themeLight": "Terang",
       "themeDark": "Gelap",
+      "themeVolt": "Volt",
       "themeSystem": "Sistem",
       "language": "Bahasa",
       "languageDescription": "Pilih bahasa antarmuka yang Anda inginkan",
@@ -2023,18 +2038,7 @@
         "removeSuccess": "Label dihapus",
         "updateError": "Gagal memperbarui label",
         "createSuccess": "Label dibuat dan ditambahkan",
-        "createError": "Gagal membuat label",
-        "colors": {
-          "stone": "Batu",
-          "slate": "Slate",
-          "lavender": "Lavender",
-          "sage": "Sage",
-          "forest": "Forest",
-          "amber": "Amber",
-          "terracotta": "Terracotta",
-          "rose": "Rose",
-          "crimson": "Crimson"
-        }
+        "createError": "Gagal membuat label"
       }
     },
     "pr": {
@@ -2189,7 +2193,6 @@
       "description": "Begitu Anda membuat proyek, proyek dari semua ruang kerja Anda akan muncul di sini.",
       "title": "Belum ada proyek"
     },
-    "pageDescription": "Satu tampilan untuk semua proyek di semua ruang kerja Anda.",
     "pageTitle": "Semua proyek",
     "section": {
       "projectCount_other": "{{count}} proyek"

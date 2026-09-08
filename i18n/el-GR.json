@@ -152,7 +152,14 @@
 					"amber": "Κεχριμπάρι",
 					"terracotta": "Τερακότα",
 					"rose": "Ροζ",
-					"crimson": "Βυσσινί"
+					"crimson": "Βυσσινί",
+					"sky": "Ουρανός",
+					"ocean": "Ωκεανός",
+					"cyan": "Κυανό",
+					"indigo": "Ινδικό",
+					"fuchsia": "Φούξια",
+					"lime": "Λάιμ",
+					"emerald": "Σμαράγδι"
 				}
 			}
 		},
@@ -503,6 +510,7 @@
 			"selectTheme": "Επιλέξτε θέμα",
 			"themeLight": "Ανοιχτό",
 			"themeDark": "Σκούρο",
+			"themeVolt": "Βολτ",
 			"themeSystem": "Σύστημα",
 			"language": "Γλώσσα",
 			"languageDescription": "Επιλέξτε τη γλώσσα διεπαφής που προτιμάτε",
@@ -1360,6 +1368,7 @@
 			"createWorkspace": "Δημιουργία χώρου εργασίας",
 			"lightTheme": "Ανοιχτό θέμα",
 			"darkTheme": "Σκούρο θέμα",
+			"voltTheme": "Θέμα Volt",
 			"systemTheme": "Θέμα συστήματος",
 			"keyboardShortcuts": "Συντομεύσεις πληκτρολογίου",
 			"inputPlaceholder": "Αναζήτηση εφαρμογών και εντολών...",
@@ -1388,7 +1397,12 @@
 			"deleteConfirmTitle": "Διαγραφή έργου;",
 			"deleteConfirmDescription": "Αυτό θα αφαιρέσει οριστικά το έργο και όλα τα δεδομένα του. Δεν μπορείτε να αναιρέσετε αυτήν την ενέργεια.",
 			"deletedToast": "Το έργο διαγράφηκε",
-			"deleteProject": "Διαγραφή έργου"
+			"deleteProject": "Διαγραφή έργου",
+			"sortProjects": "Ταξινόμηση έργων",
+			"sortCustom": "Προσαρμοσμένη σειρά",
+			"sortName": "Όνομα",
+			"sortDate": "Ημερομηνία δημιουργίας",
+			"sortCompletion": "Ολοκλήρωση"
 		},
 		"search": {
 			"inputPlaceholder": "Αναζήτηση εργασιών, έργων, σχολίων...",
@@ -1418,7 +1432,8 @@
 			"workspaces": "Χώροι εργασίας",
 			"switching": "Γίνεται εναλλαγή...",
 			"addWorkspace": "Προσθήκη χώρου εργασίας",
-			"selectWorkspace": "Επιλέξτε χώρο εργασίας"
+			"selectWorkspace": "Επιλέξτε χώρο εργασίας",
+			"sortWorkspaces": "Ταξινόμηση χώρων"
 		},
 		"page": {
 			"projectsTitle": "Έργα",
@@ -1857,18 +1872,7 @@
 				"removeSuccess": "Η ετικέτα αφαιρέθηκε",
 				"updateError": "Αποτυχία ενημέρωσης ετικέτας",
 				"createSuccess": "Η ετικέτα δημιουργήθηκε και προστέθηκε",
-				"createError": "Αποτυχία δημιουργίας ετικέτας",
-				"colors": {
-					"stone": "Πέτρα",
-					"slate": "Σχιστόλιθος",
-					"lavender": "Λεβάντα",
-					"sage": "Φασκόμηλο",
-					"forest": "Δάσος",
-					"amber": "Κεχριμπάρι",
-					"terracotta": "Τερακότα",
-					"rose": "Ροζ",
-					"crimson": "Βυσσινί"
-				}
+				"createError": "Αποτυχία δημιουργίας ετικέτας"
 			}
 		},
 		"backlog": {
@@ -2250,7 +2254,6 @@
 			"description": "Μόλις δημιουργήσετε ένα έργο, τα έργα από όλους τους χώρους εργασίας σας θα εμφανιστούν εδώ.",
 			"title": "Δεν υπάρχουν ακόμη έργα"
 		},
-		"pageDescription": "Μια ενιαία προβολή όλων των έργων στους χώρους εργασίας σας.",
 		"pageTitle": "Όλα τα έργα",
 		"section": {
 			"projectCount_one": "{{count}} έργο",

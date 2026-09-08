@@ -434,7 +434,14 @@
           "amber": "Ambre",
           "terracotta": "Terre cuite",
           "rose": "Rose",
-          "crimson": "Cramoisi"
+          "crimson": "Cramoisi",
+          "sky": "Azur",
+          "ocean": "Océan",
+          "cyan": "Cyan",
+          "indigo": "Indigo",
+          "fuchsia": "Fuchsia",
+          "lime": "Citron vert",
+          "emerald": "Émeraude"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "Créer un espace de travail",
       "lightTheme": "Thème clair",
       "darkTheme": "Thème sombre",
+      "voltTheme": "Thème Éclair",
       "systemTheme": "Thème système",
       "keyboardShortcuts": "Raccourcis clavier",
       "inputPlaceholder": "Rechercher des applications et des commandes...",
@@ -525,7 +533,12 @@
       "deleteConfirmTitle": "Supprimer le projet?",
       "deleteConfirmDescription": "Cela supprimera définitivement le projet et toutes ses données. Vous ne pouvez pas annuler cette action.",
       "deletedToast": "Projet supprimé",
-      "deleteProject": "Supprimer le projet"
+      "deleteProject": "Supprimer le projet",
+      "sortProjects": "Trier les projets",
+      "sortCustom": "Ordre personnalisé",
+      "sortName": "Nom",
+      "sortDate": "Date de création",
+      "sortCompletion": "Complétion"
     },
     "search": {
       "inputPlaceholder": "Rechercher des tâches, projets, commentaires...",
@@ -555,7 +568,8 @@
       "workspaces": "Espaces de travail",
       "switching": "Changement...",
       "addWorkspace": "Ajouter un espace de travail",
-      "selectWorkspace": "Sélectionner un espace de travail"
+      "selectWorkspace": "Sélectionner un espace de travail",
+      "sortWorkspaces": "Trier les espaces"
     },
     "page": {
       "projectsTitle": "Projets",
@@ -1240,6 +1254,7 @@
       "selectTheme": "Sélectionnez un thème",
       "themeLight": "Clair",
       "themeDark": "Sombre",
+      "themeVolt": "Éclair",
       "themeSystem": "Système",
       "language": "Langue",
       "languageDescription": "Choisissez la langue de l'interface",
@@ -2033,18 +2048,7 @@
         "removeSuccess": "Label supprimé",
         "updateError": "Échec de la mise à jour du label",
         "createSuccess": "Label créé et ajouté",
-        "createError": "Échec de la création du label",
-        "colors": {
-          "stone": "Pierre",
-          "slate": "Ardoise",
-          "lavender": "Lavande",
-          "sage": "Sauge",
-          "forest": "Forêt",
-          "amber": "Ambre",
-          "terracotta": "Terre cuite",
-          "rose": "Rose",
-          "crimson": "Cramoisi"
-        }
+        "createError": "Échec de la création du label"
       }
     },
     "pr": {
@@ -2198,7 +2202,6 @@
   },
   "unified": {
     "pageTitle": "Tous les projets",
-    "pageDescription": "Une vue unique de tous les projets de vos espaces de travail.",
     "stats": {
       "projects": "Projets",
       "tasks": "Tâches",

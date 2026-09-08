@@ -434,7 +434,14 @@
           "amber": "Kehribar",
           "terracotta": "Terakota",
           "rose": "Gül Kurusu",
-          "crimson": "Koyu Kırmızı"
+          "crimson": "Koyu Kırmızı",
+          "sky": "Gökyüzü",
+          "ocean": "Okyanus",
+          "cyan": "Camgöbeği",
+          "indigo": "Çivit",
+          "fuchsia": "Fuşya",
+          "lime": "Limon",
+          "emerald": "Zümrüt"
         }
       }
     },
@@ -497,6 +504,7 @@
       "createWorkspace": "Çalışma alanı oluştur",
       "lightTheme": "Açık tema",
       "darkTheme": "Koyu tema",
+      "voltTheme": "Volt teması",
       "systemTheme": "Sistem teması",
       "keyboardShortcuts": "Klavye kısayolları",
       "inputPlaceholder": "Uygulama ve komut ara...",
@@ -525,7 +533,12 @@
       "deleteConfirmTitle": "Proje Silinsin mi?",
       "deleteConfirmDescription": "Bu, projeyi ve tüm verilerini kalıcı olarak kaldıracak. Bu işlemi geri alamazsınız.",
       "deletedToast": "Proje silindi",
-      "deleteProject": "Projeyi Sil"
+      "deleteProject": "Projeyi Sil",
+      "sortProjects": "Projeleri sırala",
+      "sortCustom": "Özel sıralama",
+      "sortName": "Ad",
+      "sortDate": "Oluşturma tarihi",
+      "sortCompletion": "Tamamlanma"
     },
     "search": {
       "inputPlaceholder": "Talep, proje, yorum ara...",
@@ -555,7 +568,8 @@
       "workspaces": "Çalışma Alanları",
       "switching": "Geçiliyor...",
       "addWorkspace": "Çalışma alanı ekle",
-      "selectWorkspace": "Çalışma alanı seç"
+      "selectWorkspace": "Çalışma alanı seç",
+      "sortWorkspaces": "Çalışma alanlarını sırala"
     },
     "page": {
       "projectsTitle": "Projeler",
@@ -1236,6 +1250,7 @@
       "selectTheme": "Tema seçin",
       "themeLight": "Açık",
       "themeDark": "Koyu",
+      "themeVolt": "Volt",
       "themeSystem": "Sistem",
       "language": "Dil",
       "languageDescription": "Tercih ettiğiniz arayüz dilini seçin",
@@ -2028,18 +2043,7 @@
         "removeSuccess": "Etiket kaldırıldı",
         "updateError": "Etiket güncellenemedi",
         "createSuccess": "Etiket oluşturuldu ve eklendi",
-        "createError": "Etiket oluşturulamadı",
-        "colors": {
-          "stone": "Taş",
-          "slate": "Arduvaz",
-          "lavender": "Lavanta",
-          "sage": "Adaçayı",
-          "forest": "Orman",
-          "amber": "Kehribar",
-          "terracotta": "Terakota",
-          "rose": "Gül Kurusu",
-          "crimson": "Koyu Kırmızı"
-        }
+        "createError": "Etiket oluşturulamadı"
       }
     },
     "pr": {
@@ -2195,7 +2199,6 @@
       "description": "Bir proje oluşturduğunuzda tüm çalışma alanlarınızdaki projeler burada görünecek.",
       "title": "Henüz proje yok"
     },
-    "pageDescription": "Tüm çalışma alanlarınızdaki projeler tek bir ekranda.",
     "pageTitle": "Tüm projeler",
     "section": {
       "projectCount_one": "{{count}} project",

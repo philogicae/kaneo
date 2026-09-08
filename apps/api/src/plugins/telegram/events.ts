@@ -178,7 +178,7 @@ async function sendTelegramMessage(
       chat_id: config.chatId,
       text: lines.join("\n"),
       parse_mode: "HTML",
-      disable_web_page_preview: false,
+      link_preview_options: { is_disabled: true },
       message_thread_id: config.threadId,
     });
   } catch (error) {

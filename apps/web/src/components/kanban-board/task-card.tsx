@@ -73,7 +73,6 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
   const navigate = useNavigate();
   const {
     showAssignees,
-    showPriority,
     showDueDates,
     showLabels,
     showTaskNumbers,
@@ -234,8 +233,13 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
               </div>
             )}
 
-            {showAssignees && task.userId ? (
-              <div className="absolute top-3 right-3">
+            {/*
+              Top-right cluster: assignee first, then the priority mark. The
+              old bottom priority chip is gone — this is the only priority
+              indicator on the card now.
+             */}
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              {showAssignees && task.userId && (
                 <Avatar className="h-5 w-5">
                   <AvatarImage
                     src={assignee?.user?.image ?? ""}
@@ -245,12 +249,9 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
                     {getInitials(assignee?.user?.name)}
                   </AvatarFallback>
                 </Avatar>
-              </div>
-            ) : (
-              <div className="absolute top-3 right-3">
-                {getPriorityIcon(task.priority ?? "")}
-              </div>
-            )}
+              )}
+              {getPriorityIcon(task.priority ?? "")}
+            </div>
 
             <div className="mb-2.5 pr-6">
               <div
@@ -274,12 +275,6 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
             )}
 
             <div className="flex items-center gap-1.5">
-              {showPriority && (
-                <span className="inline-flex items-center gap-1 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground h-5.5">
-                  {getPriorityIcon(task.priority ?? "")}
-                </span>
-              )}
-
               {activeCustomFieldValues.length > 0 && (
                 <HoverCard openDelay={200} closeDelay={100}>
                   <HoverCardTrigger asChild>
@@ -326,7 +321,6 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
                   </HoverCardContent>
                 </HoverCard>
               )}
-
               {showTaskItemCounts && taskItemStats.total > 0 && (
                 <span
                   className={cn(

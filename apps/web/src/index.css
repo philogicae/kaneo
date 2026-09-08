@@ -11,7 +11,7 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, .volt *));
 
 /* Reduced motion: keep opacity feedback, drop movement (scale/translate) and
    container morphs. Tailwind v4 scale/translate utilities use the standalone
@@ -224,6 +224,52 @@ input:-webkit-autofill:active {
   --code: color-mix(in srgb, var(--background) 98%, var(--color-white));
   --code-foreground: var(--foreground);
   --code-highlight: --alpha(var(--color-white) / 4%);
+}
+
+/* Volt: hardcore cyberpunk — near-pitch-black base, high-contrast neon
+   accents (cyan/magenta/purple) straight out of a Tokyo night. */
+.volt {
+  --accent: #1c1c2e;
+  --accent-foreground: #e6e9ff;
+  --background: #060609;
+  --border: #34345a;
+  --card: #0d0d15;
+  --card-foreground: #e6e9ff;
+  --destructive: #ff2d6f;
+  --destructive-foreground: #060609;
+  --foreground: #e6e9ff;
+  --info: #00e5ff;
+  --info-foreground: #00e5ff;
+  --input: #26263f;
+  --muted: #1c1c2e;
+  --muted-foreground: #9a9ac0;
+  --popover: #0d0d15;
+  --popover-foreground: #e6e9ff;
+  --primary: #00e5ff;
+  --primary-foreground: #060609;
+  --ring: #ff2d95;
+  --secondary: #1c1c2e;
+  --secondary-foreground: #e6e9ff;
+  --success: #00ff9d;
+  --success-foreground: #00ff9d;
+  --warning: #ffe14d;
+  --warning-foreground: #ffe14d;
+  --chart-1: #00e5ff;
+  --chart-2: #ff2d95;
+  --chart-3: #a855f7;
+  --chart-4: #00ff9d;
+  --chart-5: #ffe14d;
+  --sidebar: #040406;
+  --sidebar-foreground: #b8bce0;
+  --sidebar-primary: #00e5ff;
+  --sidebar-primary-foreground: #060609;
+  --sidebar-accent: #1c1c2e;
+  --sidebar-accent-foreground: #e6e9ff;
+  --sidebar-border: #26263f;
+  --sidebar-ring: #ff2d95;
+  --code: #0d0d15;
+  --code-foreground: #e6e9ff;
+  --code-highlight: --alpha(var(--color-white) / 6%);
 }
 
 @layer base {
