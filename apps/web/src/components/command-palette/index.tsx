@@ -176,6 +176,11 @@ function CommandPalette() {
             onRun: () => setTheme("dark"),
           },
           {
+            value: "theme-volt",
+            label: t("navigation:commandPalette.voltTheme"),
+            onRun: () => setTheme("volt"),
+          },
+          {
             value: "theme-system",
             label: t("navigation:commandPalette.systemTheme"),
             onRun: () => setTheme("system"),

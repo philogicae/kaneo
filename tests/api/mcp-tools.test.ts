@@ -91,6 +91,99 @@ describe("MCP tool catalog", () => {
     expect(lastRequest().url).toBe("http://api.test/api/column/p1");
   });
 
+  it("creates a column with optional styling", async () => {
+    await call("create_column", {
+      projectId: "p1",
+      name: "In review",
+      isFinal: false,
+    });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/column/p1",
+      method: "POST",
+      body: { name: "In review", isFinal: false },
+    });
+
+    await call("create_column", {
+      projectId: "p1",
+      name: "Done",
+      color: "red",
+    });
+    expect(apiFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates a column and clears optional fields with null", async () => {
+    await call("update_column", { columnId: "c1", name: "Backlog" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/column/c1",
+      method: "PUT",
+      body: { name: "Backlog" },
+    });
+
+    await call("update_column", { columnId: "c1", color: null, icon: null });
+    expect(lastRequest().body).toEqual({ color: null, icon: null });
+  });
+
+  it("reorders columns by position", async () => {
+    await call("reorder_columns", {
+      projectId: "p1",
+      columns: [
+        { id: "c2", position: 0 },
+        { id: "c1", position: 1 },
+      ],
+    });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/column/reorder/p1",
+      method: "PUT",
+      body: {
+        columns: [
+          { id: "c2", position: 0 },
+          { id: "c1", position: 1 },
+        ],
+      },
+    });
+  });
+
+  it("deletes an empty column", async () => {
+    await call("delete_column", { columnId: "c1" });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/column/c1",
+      method: "DELETE",
+    });
+  });
+
+  it("bulk updates tasks", async () => {
+    await call("bulk_update_tasks", {
+      taskIds: ["t1", "t2"],
+      operation: "updateStatus",
+      value: "done",
+    });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/task/bulk",
+      method: "PATCH",
+      body: { taskIds: ["t1", "t2"], operation: "updateStatus", value: "done" },
+    });
+
+    await call("bulk_update_tasks", { taskIds: ["t1"], operation: "delete" });
+    expect(lastRequest().body).toEqual({
+      taskIds: ["t1"],
+      operation: "delete",
+    });
+  });
+
+  it("rejects an unknown bulk operation before calling the API", async () => {
+    const result = await call("bulk_update_tasks", {
+      taskIds: ["t1"],
+      operation: "archive",
+    });
+
+    expect(result.isError).toBe(true);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
   it("deletes a task", async () => {
     await call("delete_task", { taskId: "t1" });
 

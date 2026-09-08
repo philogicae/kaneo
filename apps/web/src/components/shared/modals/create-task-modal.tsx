@@ -46,6 +46,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import labelColorPalette, {
+  type LabelColorValue,
+} from "@/constants/label-colors";
 import useCreateLabel from "@/hooks/mutations/label/use-create-label";
 import useCreateTask from "@/hooks/mutations/task/use-create-task";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
@@ -72,17 +75,6 @@ type CreateTaskModalProps = {
 };
 
 type Priority = "no-priority" | "low" | "medium" | "high" | "urgent";
-
-type LabelColor =
-  | "gray"
-  | "dark-gray"
-  | "purple"
-  | "teal"
-  | "green"
-  | "yellow"
-  | "orange"
-  | "pink"
-  | "red";
 
 type Label = {
   id: string;
@@ -127,55 +119,9 @@ function CreateTaskModal({
 
   const labelColors = useMemo(
     () =>
-      [
-        {
-          value: "gray" as LabelColor,
-          labelKey: "stone" as const,
-          color: "var(--color-stone-500)",
-        },
-        {
-          value: "dark-gray" as LabelColor,
-          labelKey: "slate" as const,
-          color: "var(--color-slate-500)",
-        },
-        {
-          value: "purple" as LabelColor,
-          labelKey: "lavender" as const,
-          color: "var(--color-violet-500)",
-        },
-        {
-          value: "teal" as LabelColor,
-          labelKey: "sage" as const,
-          color: "var(--color-emerald-600)",
-        },
-        {
-          value: "green" as LabelColor,
-          labelKey: "forest" as const,
-          color: "var(--color-green-600)",
-        },
-        {
-          value: "yellow" as LabelColor,
-          labelKey: "amber" as const,
-          color: "var(--color-amber-600)",
-        },
-        {
-          value: "orange" as LabelColor,
-          labelKey: "terracotta" as const,
-          color: "var(--color-orange-600)",
-        },
-        {
-          value: "pink" as LabelColor,
-          labelKey: "rose" as const,
-          color: "var(--color-rose-600)",
-        },
-        {
-          value: "red" as LabelColor,
-          labelKey: "crimson" as const,
-          color: "var(--color-red-600)",
-        },
-      ].map(({ labelKey, ...rest }) => ({
+      labelColorPalette.map(({ key, ...rest }) => ({
         ...rest,
-        label: t(`common:modals.createTask.labelColors.${labelKey}`),
+        label: t(`common:modals.createTask.labelColors.${key}`),
       })),
     [t],
   );
@@ -206,7 +152,7 @@ function CreateTaskModal({
   const [labelsOpen, setLabelsOpen] = useState(false);
   const [labelsStep, setLabelsStep] = useState<PopoverStep>("select");
   const [searchValue, setSearchValue] = useState("");
-  const [selectedColor, setSelectedColor] = useState<LabelColor>("gray");
+  const [selectedColor, setSelectedColor] = useState<LabelColorValue>("gray");
   const [newLabelName, setNewLabelName] = useState("");
 
   const routeProjectId =
@@ -591,7 +537,7 @@ function CreateTaskModal({
     setLabelsStep("color");
   };
 
-  const handleColorSelect = async (color: LabelColor) => {
+  const handleColorSelect = async (color: LabelColorValue) => {
     setSelectedColor(color);
 
     if (!newLabelName.trim() || !workspace?.id) return;
@@ -1078,9 +1024,7 @@ function CreateTaskModal({
                               "w-full flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-accent/50 text-left",
                               selectedColor === color.value && "bg-accent/30",
                             )}
-                            onClick={() =>
-                              handleColorSelect(color.value as LabelColor)
-                            }
+                            onClick={() => handleColorSelect(color.value)}
                           >
                             <span
                               className="w-2 h-2 rounded-full flex-shrink-0"

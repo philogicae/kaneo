@@ -152,7 +152,14 @@
 					"amber": "Килибар",
 					"terracotta": "Теракота",
 					"rose": "Роза",
-					"crimson": "Гримизна"
+					"crimson": "Гримизна",
+					"sky": "Небо",
+					"ocean": "Океан",
+					"cyan": "Циан",
+					"indigo": "Индиго",
+					"fuchsia": "Фуксија",
+					"lime": "Лимета",
+					"emerald": "Смарагд"
 				}
 			}
 		}
@@ -497,6 +504,7 @@
 			"selectTheme": "Избери тема",
 			"themeLight": "Светла",
 			"themeDark": "Темна",
+			"themeVolt": "Волт",
 			"themeSystem": "Системска",
 			"language": "Јазик",
 			"languageDescription": "Избери го претпочитаниот јазик на интерфејсот",
@@ -1326,6 +1334,7 @@
 			"createWorkspace": "Креирај работен простор",
 			"lightTheme": "Светла тема",
 			"darkTheme": "Темна тема",
+			"voltTheme": "Волт тема",
 			"systemTheme": "Системска тема",
 			"keyboardShortcuts": "Кратенки на тастатура",
 			"inputPlaceholder": "Пребарај апликации и команди...",
@@ -1354,7 +1363,12 @@
 			"deleteConfirmTitle": "Избриши проект?",
 			"deleteConfirmDescription": "Ова трајно ќе го отстрани проектот и сите негови податоци. Не можеш да ја вратиш оваа акција.",
 			"deletedToast": "Проектот е избришан",
-			"deleteProject": "Избриши проект"
+			"deleteProject": "Избриши проект",
+			"sortProjects": "Подреди проекти",
+			"sortCustom": "Прилагоден ред",
+			"sortName": "Име",
+			"sortDate": "Датум на создавање",
+			"sortCompletion": "Завршеност"
 		},
 		"search": {
 			"inputPlaceholder": "Пребарај задачи, проекти, коментари...",
@@ -1384,7 +1398,8 @@
 			"workspaces": "Работни простори",
 			"switching": "Се префрлува...",
 			"addWorkspace": "Додади работен простор",
-			"selectWorkspace": "Избери работен простор"
+			"selectWorkspace": "Избери работен простор",
+			"sortWorkspaces": "Подреди простори"
 		},
 		"page": {
 			"projectsTitle": "Проекти",
@@ -1820,18 +1835,7 @@
 				"removeSuccess": "Етикетата е отстранета",
 				"updateError": "Неуспешно ажурирање на етикета",
 				"createSuccess": "Етикетата е креирана и додадена",
-				"createError": "Неуспешно креирање на етикета",
-				"colors": {
-					"stone": "Камен",
-					"slate": "Плочест",
-					"lavender": "Лаванда",
-					"sage": "Жалфија",
-					"forest": "Шума",
-					"amber": "Килибар",
-					"terracotta": "Теракота",
-					"rose": "Роза",
-					"crimson": "Гримизна"
-				}
+				"createError": "Неуспешно креирање на етикета"
 			}
 		},
 		"backlog": {
@@ -2209,7 +2213,6 @@
 			"description": "Штом ќе создадете проект, проектите од сите ваши работни простори ќе се појават тука.",
 			"title": "Сè уште нема проекти"
 		},
-		"pageDescription": "Еден приказ на сите проекти во вашите работни простори.",
 		"pageTitle": "Сите проекти",
 		"section": {
 			"projectCount_one": "{{count}} проект",

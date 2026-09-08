@@ -152,7 +152,14 @@
 					"amber": "Bursztyn",
 					"terracotta": "Terakota",
 					"rose": "Róża",
-					"crimson": "Karmazyn"
+					"crimson": "Karmazyn",
+					"sky": "Niebo",
+					"ocean": "Ocean",
+					"cyan": "Cyjan",
+					"indigo": "Indigo",
+					"fuchsia": "Fuksja",
+					"lime": "Limonka",
+					"emerald": "Szmaragd"
 				}
 			}
 		}
@@ -348,6 +355,7 @@
 			"createWorkspace": "Utwórz obszar roboczy",
 			"lightTheme": "Jasny motyw",
 			"darkTheme": "Ciemny motyw",
+			"voltTheme": "Motyw Volt",
 			"systemTheme": "Motyw systemowy",
 			"keyboardShortcuts": "Skróty klawiszowe",
 			"inputPlaceholder": "Szukaj aplikacji i poleceń...",
@@ -376,7 +384,12 @@
 			"deleteConfirmTitle": "Usunąć projekt?",
 			"deleteConfirmDescription": "Spowoduje to trwałe usunięcie projektu i wszystkich jego danych. Nie można tego cofnąć.",
 			"deletedToast": "Projekt usunięty",
-			"deleteProject": "Usuń projekt"
+			"deleteProject": "Usuń projekt",
+			"sortProjects": "Sortuj projekty",
+			"sortCustom": "Kolejność własna",
+			"sortName": "Nazwa",
+			"sortDate": "Data utworzenia",
+			"sortCompletion": "Ukończenie"
 		},
 		"search": {
 			"inputPlaceholder": "Szukaj zadań, projektów i komentarzy...",
@@ -406,7 +419,8 @@
 			"workspaces": "Obszary robocze",
 			"switching": "Przełączanie...",
 			"addWorkspace": "Dodaj obszar roboczy",
-			"selectWorkspace": "Wybierz obszar roboczy"
+			"selectWorkspace": "Wybierz obszar roboczy",
+			"sortWorkspaces": "Sortuj obszary robocze"
 		},
 		"page": {
 			"projectsTitle": "Projekty",
@@ -1312,6 +1326,7 @@
 			"taskNumbersDescription": "Pokaż identyfikatory i numery zadań",
 			"theme": "Motyw",
 			"themeDark": "Ciemny",
+			"themeVolt": "Volt",
 			"themeDescription": "Wybierz preferowany schemat kolorów",
 			"themeLight": "Jasny",
 			"themeSystem": "Systemowy",
@@ -2096,17 +2111,6 @@
 			"labels": {
 				"addSuccess": "Dodano etykietę",
 				"chooseColor": "Wybierz kolor",
-				"colors": {
-					"amber": "Bursztyn",
-					"crimson": "Karmazyn",
-					"forest": "Las",
-					"lavender": "Lawenda",
-					"rose": "Róża",
-					"sage": "Szałwia",
-					"slate": "Łupek",
-					"stone": "Kamień",
-					"terracotta": "Terakota"
-				},
 				"create": "Utwórz „{{name}}”",
 				"createError": "Nie udało się utworzyć etykiety",
 				"createSuccess": "Utworzono i dodano etykietę",
@@ -2223,7 +2227,6 @@
 			"description": "Gdy utworzysz projekt, projekty ze wszystkich Twoich przestrzeni roboczych pojawią się tutaj.",
 			"title": "Nie ma jeszcze projektów"
 		},
-		"pageDescription": "Wszystkie projekty ze wszystkich Twoich przestrzeni roboczych w jednym miejscu.",
 		"pageTitle": "Wszystkie projekty",
 		"section": {
 			"projectCount_few": "{{count}} projekty",

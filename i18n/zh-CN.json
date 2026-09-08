@@ -152,7 +152,14 @@
 					"amber": "琥珀",
 					"terracotta": "赤陶",
 					"rose": "玫红",
-					"crimson": "深红"
+					"crimson": "深红",
+					"sky": "天空",
+					"ocean": "海洋",
+					"cyan": "青色",
+					"indigo": "靛蓝",
+					"fuchsia": "紫红",
+					"lime": "青柠",
+					"emerald": "祖母绿"
 				}
 			}
 		}
@@ -497,6 +504,7 @@
 			"selectTheme": "选择主题",
 			"themeLight": "浅色",
 			"themeDark": "深色",
+			"themeVolt": "闪电",
 			"themeSystem": "跟随系统",
 			"language": "语言",
 			"languageDescription": "选择你偏好的界面语言",
@@ -1325,6 +1333,7 @@
 			"createWorkspace": "创建工作区",
 			"lightTheme": "浅色主题",
 			"darkTheme": "深色主题",
+			"voltTheme": "闪电主题",
 			"systemTheme": "跟随系统主题",
 			"keyboardShortcuts": "键盘快捷键",
 			"inputPlaceholder": "搜索应用和命令…",
@@ -1353,7 +1362,12 @@
 			"deleteConfirmTitle": "删除项目？",
 			"deleteConfirmDescription": "这将永久删除项目及其所有数据，此操作不可撤销。",
 			"deletedToast": "项目已删除",
-			"deleteProject": "删除项目"
+			"deleteProject": "删除项目",
+			"sortProjects": "项目排序",
+			"sortCustom": "自定义顺序",
+			"sortName": "名称",
+			"sortDate": "创建日期",
+			"sortCompletion": "完成度"
 		},
 		"search": {
 			"inputPlaceholder": "搜索任务、项目、评论…",
@@ -1383,7 +1397,8 @@
 			"workspaces": "工作区",
 			"switching": "切换中…",
 			"addWorkspace": "添加工作区",
-			"selectWorkspace": "选择工作区"
+			"selectWorkspace": "选择工作区",
+			"sortWorkspaces": "工作区排序"
 		},
 		"page": {
 			"projectsTitle": "项目",
@@ -1815,18 +1830,7 @@
 				"removeSuccess": "标签已移除",
 				"updateError": "更新标签失败",
 				"createSuccess": "标签已创建并添加",
-				"createError": "创建标签失败",
-				"colors": {
-					"stone": "石板灰",
-					"slate": "石板蓝",
-					"lavender": "薰衣草",
-					"sage": "鼠尾草绿",
-					"forest": "森林绿",
-					"amber": "琥珀",
-					"terracotta": "赤陶",
-					"rose": "玫红",
-					"crimson": "深红"
-				}
+				"createError": "创建标签失败"
 			}
 		},
 		"backlog": {
@@ -2202,7 +2206,6 @@
 			"description": "创建项目后，所有工作区的项目都会显示在这里。",
 			"title": "还没有项目"
 		},
-		"pageDescription": "在同一个视图中查看所有工作区的项目。",
 		"pageTitle": "所有项目",
 		"section": {
 			"projectCount_other": "{{count}} 个项目"

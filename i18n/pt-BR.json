@@ -152,7 +152,14 @@
 					"amber": "Âmbar",
 					"terracotta": "Terracota",
 					"rose": "Rosa",
-					"crimson": "Carmesim"
+					"crimson": "Carmesim",
+					"sky": "Céu",
+					"ocean": "Oceano",
+					"cyan": "Ciano",
+					"indigo": "Índigo",
+					"fuchsia": "Fúcsia",
+					"lime": "Limão",
+					"emerald": "Esmeralda"
 				}
 			}
 		}
@@ -497,6 +504,7 @@
 			"selectTheme": "Selecione um tema",
 			"themeLight": "Claro",
 			"themeDark": "Escuro",
+			"themeVolt": "Volt",
 			"themeSystem": "Sistema",
 			"language": "Idioma",
 			"languageDescription": "Escolha o idioma preferido da interface",
@@ -1327,6 +1335,7 @@
 			"createWorkspace": "Criar espaço de trabalho",
 			"lightTheme": "Tema claro",
 			"darkTheme": "Tema escuro",
+			"voltTheme": "Tema Volt",
 			"systemTheme": "Tema do sistema",
 			"keyboardShortcuts": "Atalhos de teclado",
 			"inputPlaceholder": "Buscar aplicativos e comandos...",
@@ -1355,7 +1364,12 @@
 			"deleteConfirmTitle": "Excluir projeto?",
 			"deleteConfirmDescription": "Isso removerá permanentemente o projeto e todos os seus dados. Você não pode desfazer esta ação.",
 			"deletedToast": "Projeto excluído",
-			"deleteProject": "Excluir projeto"
+			"deleteProject": "Excluir projeto",
+			"sortProjects": "Ordenar projetos",
+			"sortCustom": "Ordem personalizada",
+			"sortName": "Nome",
+			"sortDate": "Data de criação",
+			"sortCompletion": "Progresso"
 		},
 		"search": {
 			"inputPlaceholder": "Buscar tarefas, projetos, comentários...",
@@ -1385,7 +1399,8 @@
 			"workspaces": "Espaços de trabalho",
 			"switching": "Alternando...",
 			"addWorkspace": "Adicionar espaço de trabalho",
-			"selectWorkspace": "Selecionar espaço de trabalho"
+			"selectWorkspace": "Selecionar espaço de trabalho",
+			"sortWorkspaces": "Ordenar espaços"
 		},
 		"page": {
 			"projectsTitle": "Projetos",
@@ -1825,18 +1840,7 @@
 				"removeSuccess": "Etiqueta removida",
 				"updateError": "Falha ao atualizar etiqueta",
 				"createSuccess": "Etiqueta criada e adicionada",
-				"createError": "Falha ao criar etiqueta",
-				"colors": {
-					"stone": "Pedra",
-					"slate": "Ardósia",
-					"lavender": "Lavanda",
-					"sage": "Sálvia",
-					"forest": "Floresta",
-					"amber": "Âmbar",
-					"terracotta": "Terracota",
-					"rose": "Rosa",
-					"crimson": "Carmesim"
-				}
+				"createError": "Falha ao criar etiqueta"
 			}
 		},
 		"backlog": {
@@ -2216,7 +2220,6 @@
 			"description": "Assim que você criar um projeto, os de todos os seus espaços de trabalho aparecerão aqui.",
 			"title": "Ainda não há projetos"
 		},
-		"pageDescription": "Uma visão única de todos os projetos dos seus espaços de trabalho.",
 		"pageTitle": "Todos os projetos",
 		"section": {
 			"projectCount_many": "{{count}} projetos",

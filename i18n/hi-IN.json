@@ -152,7 +152,14 @@
 					"amber": "एम्बर",
 					"terracotta": "टेराकोटा",
 					"rose": "गुलाब",
-					"crimson": "किरमिज़ी"
+					"crimson": "किरमिज़ी",
+					"sky": "आकाश",
+					"ocean": "महासागर",
+					"cyan": "सियान",
+					"indigo": "नील",
+					"fuchsia": "फ्यूशिया",
+					"lime": "नींबू",
+					"emerald": "पन्ना"
 				}
 			}
 		}
@@ -497,6 +504,7 @@
 			"selectTheme": "थीम चुनें",
 			"themeLight": "लाइट",
 			"themeDark": "डार्क",
+			"themeVolt": "वोल्ट",
 			"themeSystem": "सिस्टम",
 			"language": "भाषा",
 			"languageDescription": "अपनी पसंदीदा इंटरफ़ेस भाषा चुनें",
@@ -1326,6 +1334,7 @@
 			"createWorkspace": "वर्कस्पेस बनाएँ",
 			"lightTheme": "लाइट थीम",
 			"darkTheme": "डार्क थीम",
+			"voltTheme": "वोल्ट थीम",
 			"systemTheme": "सिस्टम थीम",
 			"keyboardShortcuts": "कीबोर्ड शॉर्टकट",
 			"inputPlaceholder": "ऐप्स और कमांड खोजें...",
@@ -1354,7 +1363,12 @@
 			"deleteConfirmTitle": "प्रोजेक्ट हटाएँ?",
 			"deleteConfirmDescription": "यह प्रोजेक्ट और इसका सभी डेटा स्थायी रूप से हटा दिया जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।",
 			"deletedToast": "प्रोजेक्ट हटाया गया",
-			"deleteProject": "प्रोजेक्ट हटाएँ"
+			"deleteProject": "प्रोजेक्ट हटाएँ",
+			"sortProjects": "प्रोजेक्ट क्रमबद्ध करें",
+			"sortCustom": "कस्टम क्रम",
+			"sortName": "नाम",
+			"sortDate": "बनाने की तारीख",
+			"sortCompletion": "प्रगति"
 		},
 		"search": {
 			"inputPlaceholder": "कार्य, प्रोजेक्ट, टिप्पणियाँ खोजें...",
@@ -1384,7 +1398,8 @@
 			"workspaces": "वर्कस्पेस",
 			"switching": "बदल रहे हैं...",
 			"addWorkspace": "वर्कस्पेस जोड़ें",
-			"selectWorkspace": "वर्कस्पेस चुनें"
+			"selectWorkspace": "वर्कस्पेस चुनें",
+			"sortWorkspaces": "कार्यक्षेत्र क्रमबद्ध करें"
 		},
 		"page": {
 			"projectsTitle": "प्रोजेक्ट",
@@ -1820,18 +1835,7 @@
 				"removeSuccess": "लेबल हटाया गया",
 				"updateError": "लेबल अपडेट करने में विफल",
 				"createSuccess": "लेबल बनाया और जोड़ा गया",
-				"createError": "लेबल बनाने में विफल",
-				"colors": {
-					"stone": "पत्थर",
-					"slate": "स्लेट",
-					"lavender": "लैवेंडर",
-					"sage": "सेज",
-					"forest": "वन",
-					"amber": "एम्बर",
-					"terracotta": "टेराकोटा",
-					"rose": "गुलाब",
-					"crimson": "किरमिज़ी"
-				}
+				"createError": "लेबल बनाने में विफल"
 			}
 		},
 		"backlog": {
@@ -2209,7 +2213,6 @@
 			"description": "जैसे ही आप कोई प्रोजेक्ट बनाएंगे, आपके सभी कार्यक्षेत्रों के प्रोजेक्ट यहाँ दिखाई देंगे।",
 			"title": "अभी कोई प्रोजेक्ट नहीं"
 		},
-		"pageDescription": "आपके सभी कार्यक्षेत्रों के सभी प्रोजेक्ट का एक एकीकृत दृश्य।",
 		"pageTitle": "सभी प्रोजेक्ट",
 		"section": {
 			"projectCount_one": "{{count}} प्रोजेक्ट",

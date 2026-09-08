@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { BlogAuthor } from "@/lib/blog/types";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +20,12 @@ export function BlogAvatar({
 }) {
   if (author.avatar) {
     return (
-      <img
+      <Image
         alt=""
         className={cn("size-8 shrink-0 rounded-full object-cover", className)}
         src={author.avatar}
+        width={32}
+        height={32}
       />
     );
   }

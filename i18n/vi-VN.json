@@ -152,7 +152,14 @@
 					"amber": "Hổ phách",
 					"terracotta": "Đất nung",
 					"rose": "Hồng",
-					"crimson": "Đỏ thẫm"
+					"crimson": "Đỏ thẫm",
+					"sky": "Bầu trời",
+					"ocean": "Đại dương",
+					"cyan": "Xanh lơ",
+					"indigo": "Chàm",
+					"fuchsia": "Hồng đậm",
+					"lime": "Chanh",
+					"emerald": "Lục bảo"
 				}
 			}
 		}
@@ -497,6 +504,7 @@
 			"selectTheme": "Chọn một chủ đề",
 			"themeLight": "Sáng",
 			"themeDark": "Tối",
+			"themeVolt": "Volt",
 			"themeSystem": "Theo hệ thống",
 			"language": "Ngôn ngữ",
 			"languageDescription": "Chọn ngôn ngữ giao diện ưa thích của bạn",
@@ -1325,6 +1333,7 @@
 			"createWorkspace": "Tạo không gian làm việc",
 			"lightTheme": "Chủ đề sáng",
 			"darkTheme": "Chủ đề tối",
+			"voltTheme": "Chủ đề Volt",
 			"systemTheme": "Chủ đề hệ thống",
 			"keyboardShortcuts": "Phím tắt",
 			"inputPlaceholder": "Tìm ứng dụng và lệnh...",
@@ -1353,7 +1362,12 @@
 			"deleteConfirmTitle": "Xóa dự án?",
 			"deleteConfirmDescription": "Thao tác này sẽ xóa vĩnh viễn dự án và toàn bộ dữ liệu của nó. Bạn không thể hoàn tác hành động này.",
 			"deletedToast": "Đã xóa dự án",
-			"deleteProject": "Xóa dự án"
+			"deleteProject": "Xóa dự án",
+			"sortProjects": "Sắp xếp dự án",
+			"sortCustom": "Thứ tự tùy chỉnh",
+			"sortName": "Tên",
+			"sortDate": "Ngày tạo",
+			"sortCompletion": "Tiến độ"
 		},
 		"search": {
 			"inputPlaceholder": "Tìm công việc, dự án, bình luận...",
@@ -1383,7 +1397,8 @@
 			"workspaces": "Không gian làm việc",
 			"switching": "Đang chuyển...",
 			"addWorkspace": "Thêm không gian làm việc",
-			"selectWorkspace": "Chọn không gian làm việc"
+			"selectWorkspace": "Chọn không gian làm việc",
+			"sortWorkspaces": "Sắp xếp không gian làm việc"
 		},
 		"page": {
 			"projectsTitle": "Dự án",
@@ -1815,18 +1830,7 @@
 				"removeSuccess": "Đã gỡ nhãn",
 				"updateError": "Không thể cập nhật nhãn",
 				"createSuccess": "Đã tạo và thêm nhãn",
-				"createError": "Không thể tạo nhãn",
-				"colors": {
-					"stone": "Đá",
-					"slate": "Xám đá phiến",
-					"lavender": "Oải hương",
-					"sage": "Xanh xô thơm",
-					"forest": "Xanh rừng",
-					"amber": "Hổ phách",
-					"terracotta": "Đất nung",
-					"rose": "Hồng",
-					"crimson": "Đỏ thẫm"
-				}
+				"createError": "Không thể tạo nhãn"
 			}
 		},
 		"backlog": {
@@ -2202,7 +2206,6 @@
 			"description": "Ngay khi bạn tạo một dự án, các dự án từ mọi không gian làm việc sẽ hiển thị tại đây.",
 			"title": "Chưa có dự án nào"
 		},
-		"pageDescription": "Mọi dự án từ mọi không gian làm việc của bạn trong một màn hình duy nhất.",
 		"pageTitle": "Tất cả dự án",
 		"section": {
 			"projectCount_other": "{{count}} dự án"

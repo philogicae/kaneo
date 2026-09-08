@@ -152,7 +152,14 @@
 					"amber": "앰버",
 					"terracotta": "테라코타",
 					"rose": "로즈",
-					"crimson": "크림슨"
+					"crimson": "크림슨",
+					"sky": "하늘",
+					"ocean": "바다",
+					"cyan": "시안",
+					"indigo": "남색",
+					"fuchsia": "후크시아",
+					"lime": "라임",
+					"emerald": "에메랄드"
 				}
 			}
 		}
@@ -497,6 +504,7 @@
 			"selectTheme": "테마 선택",
 			"themeLight": "라이트",
 			"themeDark": "다크",
+			"themeVolt": "볼트",
 			"themeSystem": "시스템",
 			"language": "언어",
 			"languageDescription": "선호하는 인터페이스 언어를 선택합니다",
@@ -1325,6 +1333,7 @@
 			"createWorkspace": "워크스페이스 만들기",
 			"lightTheme": "라이트 테마",
 			"darkTheme": "다크 테마",
+			"voltTheme": "볼트 테마",
 			"systemTheme": "시스템 테마",
 			"keyboardShortcuts": "키보드 단축키",
 			"inputPlaceholder": "앱과 명령 검색...",
@@ -1353,7 +1362,12 @@
 			"deleteConfirmTitle": "프로젝트를 삭제하시겠습니까?",
 			"deleteConfirmDescription": "프로젝트와 모든 데이터가 영구적으로 제거됩니다. 이 작업은 취소할 수 없습니다.",
 			"deletedToast": "프로젝트가 삭제되었습니다",
-			"deleteProject": "프로젝트 삭제"
+			"deleteProject": "프로젝트 삭제",
+			"sortProjects": "프로젝트 정렬",
+			"sortCustom": "사용자 지정 순서",
+			"sortName": "이름",
+			"sortDate": "생성일",
+			"sortCompletion": "진행률"
 		},
 		"search": {
 			"inputPlaceholder": "작업, 프로젝트, 댓글 검색...",
@@ -1383,7 +1397,8 @@
 			"workspaces": "워크스페이스",
 			"switching": "전환 중...",
 			"addWorkspace": "워크스페이스 추가",
-			"selectWorkspace": "워크스페이스 선택"
+			"selectWorkspace": "워크스페이스 선택",
+			"sortWorkspaces": "워크스페이스 정렬"
 		},
 		"page": {
 			"projectsTitle": "프로젝트",
@@ -1815,18 +1830,7 @@
 				"removeSuccess": "라벨이 제거되었습니다",
 				"updateError": "라벨 업데이트에 실패했습니다",
 				"createSuccess": "라벨이 생성되어 추가되었습니다",
-				"createError": "라벨 생성에 실패했습니다",
-				"colors": {
-					"stone": "스톤",
-					"slate": "슬레이트",
-					"lavender": "라벤더",
-					"sage": "세이지",
-					"forest": "포레스트",
-					"amber": "앰버",
-					"terracotta": "테라코타",
-					"rose": "로즈",
-					"crimson": "크림슨"
-				}
+				"createError": "라벨 생성에 실패했습니다"
 			}
 		},
 		"backlog": {
@@ -2202,7 +2206,6 @@
 			"description": "프로젝트를 만들면 모든 워크스페이스의 프로젝트가 여기에 표시됩니다.",
 			"title": "아직 프로젝트가 없습니다"
 		},
-		"pageDescription": "모든 워크스페이스의 프로젝트를 한 화면에서 확인하세요.",
 		"pageTitle": "모든 프로젝트",
 		"section": {
 			"projectCount_other": "프로젝트 {{count}}개"

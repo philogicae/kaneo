@@ -557,6 +557,27 @@
 										},
 										"crimson": {
 											"type": "string"
+										},
+										"sky": {
+											"type": "string"
+										},
+										"ocean": {
+											"type": "string"
+										},
+										"cyan": {
+											"type": "string"
+										},
+										"indigo": {
+											"type": "string"
+										},
+										"fuchsia": {
+											"type": "string"
+										},
+										"lime": {
+											"type": "string"
+										},
+										"emerald": {
+											"type": "string"
 										}
 									},
 									"required": [
@@ -568,7 +589,14 @@
 										"amber",
 										"terracotta",
 										"rose",
-										"crimson"
+										"crimson",
+										"sky",
+										"ocean",
+										"cyan",
+										"indigo",
+										"fuchsia",
+										"lime",
+										"emerald"
 									]
 								}
 							},
@@ -1968,6 +1996,9 @@
 						"themeDark": {
 							"type": "string"
 						},
+						"themeVolt": {
+							"type": "string"
+						},
 						"themeSystem": {
 							"type": "string"
 						},
@@ -2069,6 +2100,7 @@
 						"selectTheme",
 						"themeLight",
 						"themeDark",
+						"themeVolt",
 						"themeSystem",
 						"language",
 						"languageDescription",
@@ -5349,6 +5381,9 @@
 						"darkTheme": {
 							"type": "string"
 						},
+						"voltTheme": {
+							"type": "string"
+						},
 						"systemTheme": {
 							"type": "string"
 						},
@@ -5389,6 +5424,7 @@
 						"createWorkspace",
 						"lightTheme",
 						"darkTheme",
+						"voltTheme",
 						"systemTheme",
 						"keyboardShortcuts",
 						"inputPlaceholder",
@@ -5461,6 +5497,21 @@
 						},
 						"deleteProject": {
 							"type": "string"
+						},
+						"sortProjects": {
+							"type": "string"
+						},
+						"sortCustom": {
+							"type": "string"
+						},
+						"sortName": {
+							"type": "string"
+						},
+						"sortDate": {
+							"type": "string"
+						},
+						"sortCompletion": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -5472,7 +5523,12 @@
 						"deleteConfirmTitle",
 						"deleteConfirmDescription",
 						"deletedToast",
-						"deleteProject"
+						"deleteProject",
+						"sortProjects",
+						"sortCustom",
+						"sortName",
+						"sortDate",
+						"sortCompletion"
 					]
 				},
 				"search": {
@@ -5580,13 +5636,17 @@
 						},
 						"selectWorkspace": {
 							"type": "string"
+						},
+						"sortWorkspaces": {
+							"type": "string"
 						}
 					},
 					"required": [
 						"workspaces",
 						"switching",
 						"addWorkspace",
-						"selectWorkspace"
+						"selectWorkspace",
+						"sortWorkspaces"
 					]
 				},
 				"page": {
@@ -7321,50 +7381,6 @@
 								},
 								"createError": {
 									"type": "string"
-								},
-								"colors": {
-									"type": "object",
-									"additionalProperties": false,
-									"properties": {
-										"stone": {
-											"type": "string"
-										},
-										"slate": {
-											"type": "string"
-										},
-										"lavender": {
-											"type": "string"
-										},
-										"sage": {
-											"type": "string"
-										},
-										"forest": {
-											"type": "string"
-										},
-										"amber": {
-											"type": "string"
-										},
-										"terracotta": {
-											"type": "string"
-										},
-										"rose": {
-											"type": "string"
-										},
-										"crimson": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"stone",
-										"slate",
-										"lavender",
-										"sage",
-										"forest",
-										"amber",
-										"terracotta",
-										"rose",
-										"crimson"
-									]
 								}
 							},
 							"required": [
@@ -7376,8 +7392,7 @@
 								"removeSuccess",
 								"updateError",
 								"createSuccess",
-								"createError",
-								"colors"
+								"createError"
 							]
 						}
 					},
@@ -8519,9 +8534,6 @@
 				"pageTitle": {
 					"type": "string"
 				},
-				"pageDescription": {
-					"type": "string"
-				},
 				"stats": {
 					"type": "object",
 					"additionalProperties": false,
@@ -8548,9 +8560,6 @@
 						"project": {
 							"type": "string"
 						},
-						"workspace": {
-							"type": "string"
-						},
 						"progress": {
 							"type": "string"
 						},
@@ -8564,14 +8573,7 @@
 							"type": "string"
 						}
 					},
-					"required": [
-						"project",
-						"workspace",
-						"progress",
-						"tasks",
-						"dueDate",
-						"status"
-					]
+					"required": ["project", "progress", "tasks", "dueDate", "status"]
 				},
 				"section": {
 					"type": "object",
@@ -8612,14 +8614,7 @@
 					"required": ["title", "description"]
 				}
 			},
-			"required": [
-				"pageTitle",
-				"pageDescription",
-				"stats",
-				"table",
-				"section",
-				"empty"
-			]
+			"required": ["pageTitle", "stats", "table", "section", "empty"]
 		},
 		"workspace": {
 			"type": "object",

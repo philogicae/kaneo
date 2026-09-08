@@ -8,10 +8,37 @@ export function isWeekStartDay(value: number): value is WeekStartDay {
   return WEEK_START_DAYS.some((day) => day === value);
 }
 
+export const PROJECT_SORT_MODES = [
+  "custom",
+  "name",
+  "date",
+  "completion",
+] as const;
+export type ProjectSortMode = (typeof PROJECT_SORT_MODES)[number];
+
+export function isProjectSortMode(value: unknown): value is ProjectSortMode {
+  return (
+    typeof value === "string" &&
+    (PROJECT_SORT_MODES as readonly string[]).includes(value)
+  );
+}
+
+export const WORKSPACE_SORT_MODES = ["custom", "name", "date"] as const;
+export type WorkspaceSortMode = (typeof WORKSPACE_SORT_MODES)[number];
+
+export function isWorkspaceSortMode(
+  value: unknown,
+): value is WorkspaceSortMode {
+  return (
+    typeof value === "string" &&
+    (WORKSPACE_SORT_MODES as readonly string[]).includes(value)
+  );
+}
+
 type UserPreferencesStore = {
-  theme: "light" | "dark" | "system";
+  theme: "light" | "dark" | "volt" | "system";
   setTheme: (
-    theme: "light" | "dark" | "system",
+    theme: "light" | "dark" | "volt" | "system",
     coordinates?: { x: number; y: number },
   ) => void;
 
@@ -46,6 +73,14 @@ type UserPreferencesStore = {
 
   weekStartsOn: WeekStartDay;
   setWeekStartsOn: (weekStartsOn: WeekStartDay) => void;
+
+  projectsSort: ProjectSortMode;
+  setProjectsSort: (mode: ProjectSortMode) => void;
+
+  workspaceSort: WorkspaceSortMode;
+  setWorkspaceSort: (mode: WorkspaceSortMode) => void;
+  workspaceOrder: string[];
+  setWorkspaceOrder: (ids: string[]) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -53,7 +88,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     (set) => ({
       theme: "dark",
       setTheme: (
-        theme: "light" | "dark" | "system",
+        theme: "light" | "dark" | "volt" | "system",
         coordinates?: { x: number; y: number },
       ) => {
         if (coordinates) {
@@ -123,6 +158,16 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
 
       weekStartsOn: 0,
       setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
+
+      // Alphabetical by default; the stored custom order only applies once
+      // the user explicitly picks it.
+      projectsSort: "name",
+      setProjectsSort: (mode) => set({ projectsSort: mode }),
+
+      workspaceSort: "name",
+      setWorkspaceSort: (mode) => set({ workspaceSort: mode }),
+      workspaceOrder: [],
+      setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
     }),
     {
       name: "user-preferences",
@@ -130,6 +175,15 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       onRehydrateStorage: () => (state) => {
         if (state && !isWeekStartDay(state.weekStartsOn)) {
           state.setWeekStartsOn(0);
+        }
+        if (state && !isProjectSortMode(state.projectsSort)) {
+          state.setProjectsSort("name");
+        }
+        if (state && !isWorkspaceSortMode(state.workspaceSort)) {
+          state.setWorkspaceSort("name");
+        }
+        if (state && !Array.isArray(state.workspaceOrder)) {
+          state.setWorkspaceOrder([]);
         }
       },
     },

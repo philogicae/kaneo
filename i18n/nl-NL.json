@@ -152,7 +152,14 @@
 					"amber": "Amber",
 					"terracotta": "Terracotta",
 					"rose": "Roos",
-					"crimson": "Karmozijn"
+					"crimson": "Karmozijn",
+					"sky": "Hemel",
+					"ocean": "Oceaan",
+					"cyan": "Cyaan",
+					"indigo": "Indigo",
+					"fuchsia": "Fuchsia",
+					"lime": "Limoen",
+					"emerald": "Smaragd"
 				}
 			}
 		}
@@ -394,6 +401,7 @@
 			"selectTheme": "Selecteer een thema",
 			"themeLight": "Licht",
 			"themeDark": "Donker",
+			"themeVolt": "Volt",
 			"themeSystem": "Systeem",
 			"language": "Taal",
 			"languageDescription": "Kies je gewenste taal voor de interface",
@@ -1326,6 +1334,7 @@
 			"createWorkspace": "Werkruimte aanmaken",
 			"lightTheme": "Licht thema",
 			"darkTheme": "Donker thema",
+			"voltTheme": "Volt-thema",
 			"systemTheme": "Systeemthema",
 			"keyboardShortcuts": "Sneltoetsen",
 			"inputPlaceholder": "Zoek naar apps en commando's...",
@@ -1354,7 +1363,12 @@
 			"deleteConfirmTitle": "Project verwijderen?",
 			"deleteConfirmDescription": "Dit zal het project en alle data permanent verwijderen. Dit kan niet ongedaan worden gemaakt.",
 			"deletedToast": "Project verwijderd",
-			"deleteProject": "Project verwijderen"
+			"deleteProject": "Project verwijderen",
+			"sortProjects": "Projecten sorteren",
+			"sortCustom": "Aangepaste volgorde",
+			"sortName": "Naam",
+			"sortDate": "Aanmaakdatum",
+			"sortCompletion": "Voortgang"
 		},
 		"search": {
 			"inputPlaceholder": "Zoek taken, projecten, reacties...",
@@ -1384,7 +1398,8 @@
 			"workspaces": "Werkruimtes",
 			"switching": "Wisselen...",
 			"addWorkspace": "Werkruimte toevoegen",
-			"selectWorkspace": "Werkruimte selecteren"
+			"selectWorkspace": "Werkruimte selecteren",
+			"sortWorkspaces": "Werkruimten sorteren"
 		},
 		"page": {
 			"projectsTitle": "Projecten",
@@ -1809,18 +1824,7 @@
 				"removeSuccess": "Label verwijderd",
 				"updateError": "Bijwerken label mislukt",
 				"createSuccess": "Label aangemaakt en toegevoegd",
-				"createError": "Aanmaken label mislukt",
-				"colors": {
-					"stone": "Steen",
-					"slate": "Leisteen",
-					"lavender": "Lavendel",
-					"sage": "Salie",
-					"forest": "Woud",
-					"amber": "Amber",
-					"terracotta": "Terracotta",
-					"rose": "Roos",
-					"crimson": "Karmozijn"
-				}
+				"createError": "Aanmaken label mislukt"
 			}
 		},
 		"backlog": {
@@ -2209,7 +2213,6 @@
 			"description": "Zodra je een project aanmaakt, verschijnen de projecten uit al je werkruimten hier.",
 			"title": "Nog geen projecten"
 		},
-		"pageDescription": "Eén overzicht van alle projecten in al je werkruimten.",
 		"pageTitle": "Alle projecten",
 		"section": {
 			"projectCount_one": "{{count}} project",
