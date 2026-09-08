@@ -2,6 +2,7 @@ import type * as React from "react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
+import { NavUnified } from "@/components/nav-unified";
 import { ThemeToggleDropdown } from "@/components/theme-toggle-dropdown";
 import { TrialCard } from "@/components/trial-card";
 import {
@@ -40,6 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className="overflow-hidden gap-1 py-1">
         <Search />
+        <NavUnified />
         <NavMain />
         <NavProjects />
       </SidebarContent>
