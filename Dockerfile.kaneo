@@ -1,8 +1,7 @@
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS api-builder
+FROM --platform=$BUILDPLATFORM platformatic/node-caged:26-alpine AS api-builder
 
 RUN apk add --no-cache python3 make g++ && \
-  corepack enable && \
-  corepack prepare pnpm@10.32.1 --activate
+  npm install --global pnpm@12.3.4
 
 WORKDIR /app
 
@@ -34,7 +33,7 @@ RUN pnpm run build
 # Assembles the production node_modules on the BUILD platform (native, no QEMU emulation).
 # All API runtime deps are pure JavaScript (bcrypt was replaced with bcryptjs), so this
 # node_modules is architecture-independent and is copied into the runtime stage below.
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS api-runtime
+FROM --platform=$BUILDPLATFORM platformatic/node-caged:26-alpine AS api-runtime
 
 WORKDIR /app
 
@@ -46,8 +45,7 @@ COPY --from=api-builder /app/packages/email/package.json ./packages/email/
 COPY --from=api-builder /app/packages/permissions/package.json ./packages/permissions/
 
 RUN sed -i 's/"prepare": "husky"/"prepare": ""/g' package.json && \
-  corepack enable && \
-  corepack prepare pnpm@10.32.1 --activate && \
+  npm install --global pnpm@12.3.4 && \
   HUSKY=0 NODE_ENV=production pnpm install --prod --frozen-lockfile --no-optional
 
 COPY --from=api-builder /app/apps/api/dist ./apps/api/dist
@@ -55,11 +53,10 @@ COPY --from=api-builder /app/apps/api/drizzle ./apps/api/drizzle
 COPY --from=api-builder /app/packages/email ./packages/email
 COPY --from=api-builder /app/packages/permissions ./packages/permissions
 
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS web-builder
+FROM --platform=$BUILDPLATFORM platformatic/node-caged:26-alpine AS web-builder
 
 RUN apk add --no-cache python3 make g++ && \
-  corepack enable && \
-  corepack prepare pnpm@10.32.1 --activate
+  npm install --global pnpm@12.3.4
 
 WORKDIR /app
 
@@ -81,9 +78,13 @@ RUN pnpm run build
 WORKDIR /app/apps/web
 RUN pnpm run build
 
-FROM node:24.19.0-alpine AS runtime
+FROM platformatic/node-caged:26-alpine AS runtime
 
-RUN apk add --no-cache nginx=~1.30.4 && \
+RUN apk add --no-cache ca-certificates openssl curl && \
+  echo "@nginx https://nginx.org/packages/mainline/alpine/v3.21/main" >> /etc/apk/repositories && \
+  curl -fsSLo /etc/apk/keys/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub && \
+  apk del openssl curl && \
+  apk add --no-cache nginx@nginx && \
   addgroup -g 1001 appuser && \
   adduser -u 1001 -G appuser -D appuser && \
   mkdir -p /app /app/apps/api/data /var/cache/nginx /var/run/nginx /var/log/nginx /var/lib/nginx/logs /var/lib/nginx/tmp /usr/share/nginx/html /docker-entrypoint.d && \
