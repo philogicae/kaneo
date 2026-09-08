@@ -57,27 +57,27 @@
 			"tryAgain": "पुनः प्रयास करें",
 			"viewDeploymentGuide": "डिप्लॉयमेंट गाइड देखें",
 			"refreshPage": "पेज रिफ़्रेश करें",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "पेज अचानक क्रैश हो गया। पुनः लोड करने से आमतौर पर यह ठीक हो जाता है।",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "प्रमाणीकरण विफल। कृपया दोबारा साइन इन करें।",
+				"cors": "सर्वर से कनेक्ट नहीं हो सका। यह CORS कॉन्फ़िगरेशन समस्या के कारण हो सकता है।",
+				"network": "नेटवर्क त्रुटि। कृपया अपना इंटरनेट कनेक्शन जांचें और फिर से प्रयास करें।",
+				"server": "सर्वर त्रुटि। कृपया बाद में फिर से प्रयास करें।",
+				"unknown": "एक अप्रत्याशित त्रुटि हुई।"
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "जांचें कि आपका API सर्वर ब्राउज़र से सुलभ है",
+					"checkApiRunning": "सुनिश्चित करें कि आपका API सर्वर चल रहा है",
+					"checkApiUrl": "जांचें कि आपके फ्रंटएंड के .env में VITE_API_URL आपके API सर्वर URL से मेल खाता है",
+					"checkProtocol": "सुनिश्चित करें कि फ्रंटएंड और API एक ही प्रोटोकॉल (http/https) का उपयोग करें",
+					"verifyCorsOrigins": "जांचें कि आपके API के .env में CORS_ORIGINS में आपके फ्रंटएंड का URL शामिल है"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "अपना इंटरनेट कनेक्शन जांचें",
+					"checkFirewall": "जांचें कि कोई फ़ायरवॉल या प्रॉक्सी समस्या तो नहीं है",
+					"tryRefresh": "पेज को रीफ्रेश करने का प्रयास करें",
+					"verifyApiRunning": "सुनिश्चित करें कि API सर्वर चल रहा है और सुलभ है"
 				}
 			}
 		},
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "प्रोफ़ाइल तस्वीर हटाने में विफल",
+				"removeSuccess": "प्रोफ़ाइल तस्वीर हटा दी गई",
+				"updateError": "प्रोफ़ाइल तस्वीर अपडेट करने में विफल",
+				"updateSuccess": "प्रोफ़ाइल तस्वीर अपडेट हो गई",
+				"change": "अवतार बदलें",
+				"edit": "अपनी प्रोफ़ाइल तस्वीर बदलें"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "खाता हटाएँ",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "वे कार्यक्षेत्र जिनमें केवल आप हैं, आपके खाते के साथ हटा दिए जाते हैं। अन्यत्र, आपके कार्य बने रहते हैं और बिना असाइन किए रह जाते हैं, और आपकी टिप्पणियाँ हटा दी जाती हैं।",
+				"error": "खाता हटाने में विफल",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "अपना खाता हटाएँ?",
+				"sectionSubtitle": "स्थायी कार्रवाइयाँ जो आपके पूरे खाते को प्रभावित करती हैं।",
+				"sectionTitle": "खतरनाक क्षेत्र",
+				"success": "आपका खाता हटा दिया गया है",
+				"title": "खाता हटाएँ",
+				"sessionTooOld": "सुरक्षा के लिए, खाता हटाने से पहले साइन आउट करें और दोबारा साइन इन करें।"
 			}
 		},
 		"notificationsPage": {
@@ -853,7 +853,9 @@
 			"slackSectionTitle": "Slack एकीकरण",
 			"slackSectionSubtitle": "इनकमिंग वेबहुक के साथ Slack चैनल में प्रोजेक्ट कार्य अपडेट भेजें।",
 			"telegramSectionTitle": "Telegram एकीकरण",
-			"telegramSectionSubtitle": "बॉट के साथ Telegram चैट या टॉपिक में प्रोजेक्ट कार्य अपडेट भेजें।"
+			"telegramSectionSubtitle": "बॉट के साथ Telegram चैट या टॉपिक में प्रोजेक्ट कार्य अपडेट भेजें।",
+			"mattermostSectionSubtitle": "इनकमिंग webhook के साथ प्रोजेक्ट कार्य अपडेट एक Mattermost चैनल में भेजें।",
+			"mattermostSectionTitle": "Mattermost इंटीग्रेशन"
 		},
 		"projectVisibility": {
 			"pageTitle": "प्रोजेक्ट दृश्यता",
@@ -1258,7 +1260,7 @@
 			"toastUpdated": "वर्कफ़्लो नियम अपडेट किया गया",
 			"toastError": "नियम अपडेट करने में विफल",
 			"events": {
-				"branch_push": "Branch Push",
+				"branch_push": "ब्रांच पुश",
 				"pr_opened": "PR खुला",
 				"pr_merged": "PR मर्ज किया",
 				"issue_opened": "Issue खुला",
@@ -1272,6 +1274,44 @@
 			"merged": "मर्ज किया",
 			"draft": "ड्राफ़्ट",
 			"open": "खुला"
+		},
+		"mattermostIntegration": {
+			"channelHint": "आपके संदर्भ के लिए वैकल्पिक लेबल। वास्तविक गंतव्य चैनल webhook सेटअप से Mattermost नियंत्रित करता है।",
+			"channelLabel": "चैनल नाम",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Mattermost कनेक्ट करें",
+			"connected": "कनेक्टेड",
+			"connectionHint": "Mattermost इनकमिंग webhook URL पेस्ट करें और चुनें कि कौन से कार्य ईवेंट पोस्ट किए जाएं।",
+			"connectionTitle": "Mattermost webhook कनेक्शन",
+			"disconnect": "डिस्कनेक्ट करें",
+			"events": {
+				"taskCommentCreated": "नई टिप्पणियाँ",
+				"taskCreated": "नए कार्य",
+				"taskDescriptionChanged": "विवरण परिवर्तन",
+				"taskPriorityChanged": "प्राथमिकता परिवर्तन",
+				"taskStatusChanged": "स्थिति परिवर्तन",
+				"taskTitleChanged": "शीर्षक परिवर्तन"
+			},
+			"eventsHint": "चुनें कि कौन से प्रोजेक्ट परिवर्तन Mattermost पर पोस्ट किए जाएं।",
+			"eventsTitle": "इवेंट सूचनाएँ",
+			"paused": "Paused",
+			"saveChanges": "परिवर्तन सहेजें",
+			"toast": {
+				"disabled": "Mattermost सूचनाएँ रुकी हुई हैं",
+				"enabled": "Mattermost सूचनाएँ सक्रिय हैं",
+				"removed": "Mattermost इंटीग्रेशन सफलतापूर्वक हटाया गया",
+				"removeError": "Mattermost इंटीग्रेशन हटाने में विफल",
+				"saved": "Mattermost इंटीग्रेशन सफलतापूर्वक सहेजा गया",
+				"saveError": "Mattermost इंटीग्रेशन सहेजने में विफल",
+				"updateError": "Mattermost इंटीग्रेशन अपडेट करने में विफल"
+			},
+			"update": "Mattermost अपडेट करें",
+			"validation": {
+				"webhookInvalid": "एक मान्य Mattermost webhook URL दर्ज करें"
+			},
+			"webhookHint": "Mattermost में एक Incoming Webhook बनाएं और जनरेटेड URL यहाँ पेस्ट करें।",
+			"webhookLabel": "इनकमिंग webhook URL",
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1383,7 +1423,7 @@
 				"prevTask": "पिछला कार्य",
 				"openTask": "चयनित कार्य खोलें",
 				"quickSelectNumber": "संख्या द्वारा विकल्प चुनें",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "कैलेंडर दृश्य पर जाएँ"
 			}
 		}
 	},
@@ -1503,8 +1543,8 @@
 				"searchTaskList": "कार्य सूची चेकलिस्ट todo to-do checklist checkbox task list",
 				"searchOrderedList": "सूची क्रमांकित list ordered numbered",
 				"searchQuote": "उद्धरण quote blockquote",
-				"searchCodeBlock": "code snippet",
-				"searchTable": "table grid",
+				"searchCodeBlock": "कोड स्निपेट",
+				"searchTable": "तालिका ग्रिड",
 				"searchFile": "फ़ाइल संलग्नक चित्र फ़ोटो अपलोड file attachment image photo upload",
 				"embedErrorInvalidUrl": "वैध URL दर्ज करें",
 				"embedErrorYoutubeOnly": "केवल YouTube लिंक एम्बेड किए जा सकते हैं।",
@@ -1870,7 +1910,7 @@
 			"resizeStart": "शुरू तारीख बदलें",
 			"resizeDue": "नियत तारीख बदलें",
 			"taskAriaLabel": "{{title}}: खोलें या ले जाने के लिए खींचें",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "आज पर जाएँ"
 		},
 		"delete": {
 			"title": "कार्य हटाएँ?",
@@ -1973,15 +2013,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "अगला महीना",
+			"noTasks": "कोई निर्धारित कार्य नहीं",
+			"noTasksSubtitle": "कैलेंडर में रखने के लिए कार्यों में प्रारंभ तिथि, नियत तिथि, या दोनों जोड़ें।",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "पिछला महीना",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "कैलेंडर",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "कार्य लोड करने में विफल।"
 		}
 	},
 	"invitations": {
@@ -2162,6 +2202,31 @@
 		},
 		"branding": {
 			"poweredBy": "द्वारा संचालित"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "जैसे ही आप कोई प्रोजेक्ट बनाएंगे, आपके सभी कार्यक्षेत्रों के प्रोजेक्ट यहाँ दिखाई देंगे।",
+			"title": "अभी कोई प्रोजेक्ट नहीं"
+		},
+		"pageDescription": "आपके सभी कार्यक्षेत्रों के सभी प्रोजेक्ट का एक एकीकृत दृश्य।",
+		"pageTitle": "सभी प्रोजेक्ट",
+		"section": {
+			"projectCount_one": "{{count}} प्रोजेक्ट",
+			"projectCount_other": "{{count}} प्रोजेक्ट"
+		},
+		"stats": {
+			"completion": "पूर्णता",
+			"nextDueDate": "अगली नियत तिथि",
+			"projects": "प्रोजेक्ट",
+			"tasks": "कार्य"
+		},
+		"table": {
+			"dueDate": "नियत तिथि",
+			"progress": "प्रगति",
+			"project": "प्रोजेक्ट",
+			"status": "स्थिति",
+			"tasks": "कार्य"
 		}
 	}
 }

@@ -57,27 +57,27 @@
 			"tryAgain": "Opnieuw proberen",
 			"viewDeploymentGuide": "Implementatiehandleiding bekijken",
 			"refreshPage": "Pagina vernieuwen",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "De pagina is onverwacht gecrasht. Vernieuwen lost dit meestal op.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Authenticatie mislukt. Log opnieuw in.",
+				"cors": "Kan geen verbinding maken met de server. Dit komt mogelijk door CORS-configuratieproblemen.",
+				"network": "Netwerkfout. Controleer je internetverbinding en probeer het opnieuw.",
+				"server": "Serverfout. Probeer het later opnieuw.",
+				"unknown": "Er is een onverwachte fout opgetreden."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Controleer of je API-server bereikbaar is vanuit de browser",
+					"checkApiRunning": "Zorg ervoor dat je API-server draait",
+					"checkApiUrl": "Controleer of VITE_API_URL in de .env van je frontend overeenkomt met de URL van je API-server",
+					"checkProtocol": "Zorg ervoor dat frontend en API hetzelfde protocol gebruiken (http/https)",
+					"verifyCorsOrigins": "Controleer of CORS_ORIGINS in de .env van je API de URL van je frontend bevat"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Controleer je internetverbinding",
+					"checkFirewall": "Controleer of er firewall- of proxy-problemen zijn",
+					"tryRefresh": "Probeer de pagina te vernieuwen",
+					"verifyApiRunning": "Controleer of de API-server draait en bereikbaar is"
 				}
 			}
 		},
@@ -363,25 +363,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Verwijderen van de profielfoto mislukt",
+				"removeSuccess": "Profielfoto verwijderd",
+				"updateError": "Bijwerken van de profielfoto mislukt",
+				"updateSuccess": "Profielfoto bijgewerkt",
+				"change": "Avatar wijzigen",
+				"edit": "Wijzig je profielfoto"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Account verwijderen",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Werkruimten waar jij de enige lid van bent, worden met je account verwijderd. Elders blijven je taken bestaan en komen zonder toewijzing te staan, en je reacties worden verwijderd.",
+				"error": "Verwijderen van het account mislukt",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Je account verwijderen?",
+				"sectionSubtitle": "Permanente acties die je hele account beïnvloeden.",
+				"sectionTitle": "Gevarenzone",
+				"success": "Je account is verwijderd",
+				"title": "Account verwijderen",
+				"sessionTooOld": "Om veiligheidsredenen: log uit en weer in voordat je je account verwijdert."
 			}
 		},
 		"preferencesPage": {
@@ -588,7 +588,9 @@
 			"giteaSectionTitle": "Gitea Integratie",
 			"giteaSectionSubtitle": "Synchroniseer taken met een zelf-gehoste Gitea-instantie (issues, PR's, webhooks).",
 			"telegramSectionTitle": "Telegram Integratie",
-			"telegramSectionSubtitle": "Verstuur updates van projecttaken naar een Telegram-chat of -topic met een bot."
+			"telegramSectionSubtitle": "Verstuur updates van projecttaken naar een Telegram-chat of -topic met een bot.",
+			"mattermostSectionSubtitle": "Stuur taakupdates van het project naar een Mattermost-kanaal met een inkomende webhook.",
+			"mattermostSectionTitle": "Mattermost-integratie"
 		},
 		"projectVisibility": {
 			"pageTitle": "Projectzichtbaarheid",
@@ -674,7 +676,7 @@
 			"repositoryHint": "Verbonden GitHub repository",
 			"commentTaskLinkTitle": "Reageer met Kaneo-link op nieuwe issues",
 			"commentTaskLinkHint": "Wanneer ingeschakeld, plaatst Kaneo een reactie op elke nieuwe GitHub issue met een link naar de taak.",
-			"appStatusTitle": "GitHub App Status",
+			"appStatusTitle": "GitHub App-status",
 			"appStatusHint": "Installatie- en permissiestatus",
 			"statusProperlyConfigured": "Correct geconfigureerd",
 			"statusMissingPermissions": "Missende permissies",
@@ -869,7 +871,7 @@
 			"toastUpdated": "Workflow-regel bijgewerkt",
 			"toastError": "Bijwerken regel mislukt",
 			"events": {
-				"branch_push": "Branch Push",
+				"branch_push": "Branch-push",
 				"pr_opened": "PR Geopend",
 				"pr_merged": "PR Samengevoegd",
 				"issue_opened": "Issue Geopend",
@@ -1179,8 +1181,8 @@
 				"settingsUpdateError": "Bijwerken Gitea-integratie mislukt",
 				"secretCopied": "Gekopieerd",
 				"unableToCopySecret": "Kopiëren van geheim mislukt",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "De URL verwijst niet naar een Gitea-instantie",
+				"redirected": "De Gitea-URL is omgeleid (meestal naar HTTPS). Gebruik de uiteindelijke URL direct."
 			},
 			"webhookShow": "Tonen",
 			"webhookHide": "Verbergen",
@@ -1272,6 +1274,44 @@
 			"connect": "Verbind Telegram",
 			"saveChanges": "Wijzigingen opslaan",
 			"disconnect": "Ontkoppelen"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Optioneel label ter referentie. Mattermost beheert het uiteindelijke doelkanaal via de webhook-instellingen.",
+			"channelLabel": "Kanaalnaam",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Mattermost verbinden",
+			"connected": "Verbonden",
+			"connectionHint": "Plak de URL van een inkomende Mattermost-webhook en kies welke taakgebeurtenissen geplaatst moeten worden.",
+			"connectionTitle": "Mattermost webhook-verbinding",
+			"disconnect": "Verbreken",
+			"events": {
+				"taskCommentCreated": "Nieuwe reacties",
+				"taskCreated": "Nieuwe taken",
+				"taskDescriptionChanged": "Beschrijvingswijzigingen",
+				"taskPriorityChanged": "Prioriteitswijzigingen",
+				"taskStatusChanged": "Statuswijzigingen",
+				"taskTitleChanged": "Titelwijzigingen"
+			},
+			"eventsHint": "Kies welke projectwijzigingen naar Mattermost geplaatst moeten worden.",
+			"eventsTitle": "Gebeurtenismeldingen",
+			"paused": "Paused",
+			"saveChanges": "Wijzigingen opslaan",
+			"toast": {
+				"disabled": "Mattermost-meldingen gepauzeerd",
+				"enabled": "Mattermost-meldingen geactiveerd",
+				"removed": "Mattermost-integratie succesvol verwijderd",
+				"removeError": "Verwijderen van de Mattermost-integratie mislukt",
+				"saved": "Mattermost-integratie succesvol opgeslagen",
+				"saveError": "Opslaan van de Mattermost-integratie mislukt",
+				"updateError": "Bijwerken van de Mattermost-integratie mislukt"
+			},
+			"update": "Mattermost bijwerken",
+			"validation": {
+				"webhookInvalid": "Voer een geldige Mattermost-webhook-URL in"
+			},
+			"webhookHint": "Maak een inkomende webhook in Mattermost en plak de gegenereerde URL hier.",
+			"webhookLabel": "URL van inkomende webhook",
+			"webhookPlaceholder": "https://jouw-mattermost-server.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1383,7 +1423,7 @@
 				"prevTask": "Vorige taak",
 				"openTask": "Geselecteerde taak openen",
 				"quickSelectNumber": "Selecteer optie via nummer",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Wisselen naar kalenderweergave"
 			}
 		}
 	},
@@ -1859,7 +1899,7 @@
 			"resizeStart": "Startdatum wijzigen",
 			"resizeDue": "Einddatum wijzigen",
 			"taskAriaLabel": "{{title}}: openen of slepen om te verplaatsen",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Naar vandaag springen"
 		},
 		"delete": {
 			"title": "Taak verwijderen?",
@@ -1973,15 +2013,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Volgende maand",
+			"noTasks": "Geen geplande taken",
+			"noTasksSubtitle": "Voeg een startdatum, vervaldatum of beide toe aan taken om ze op de kalender te plaatsen.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Vorige maand",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Kalender",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Taken konden niet worden geladen."
 		}
 	},
 	"invitations": {
@@ -2162,6 +2202,31 @@
 		},
 		"branding": {
 			"poweredBy": "Mogelijk gemaakt door"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Zodra je een project aanmaakt, verschijnen de projecten uit al je werkruimten hier.",
+			"title": "Nog geen projecten"
+		},
+		"pageDescription": "Eén overzicht van alle projecten in al je werkruimten.",
+		"pageTitle": "Alle projecten",
+		"section": {
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projecten"
+		},
+		"stats": {
+			"completion": "Voltooiing",
+			"nextDueDate": "Eerstvolgende vervaldatum",
+			"projects": "Projecten",
+			"tasks": "Taken"
+		},
+		"table": {
+			"dueDate": "Vervaldatum",
+			"progress": "Voortgang",
+			"project": "Project",
+			"status": "Status",
+			"tasks": "Taken"
 		}
 	}
 }

@@ -57,27 +57,27 @@
 			"tryAgain": "Réessayer",
 			"viewDeploymentGuide": "Voir le guide de déploiement",
 			"refreshPage": "Rafraîchir la page",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "La page a planté de manière inattendue. La rafraîchir corrige généralement le problème.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Échec de l'authentification. Reconnectez-vous.",
+				"cors": "Impossible de se connecter au serveur. Cela peut venir d'un problème de configuration CORS.",
+				"network": "Erreur réseau. Vérifiez votre connexion internet et réessayez.",
+				"server": "Erreur du serveur. Réessayez plus tard.",
+				"unknown": "Une erreur inattendue s'est produite."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Vérifiez que votre serveur API est accessible depuis votre navigateur",
+					"checkApiRunning": "Assurez-vous que votre serveur API est en cours d'exécution",
+					"checkApiUrl": "Vérifiez que VITE_API_URL dans le .env de votre frontend correspond à l'URL de votre serveur API",
+					"checkProtocol": "Assurez-vous que le frontend et l'API utilisent le même protocole (http/https)",
+					"verifyCorsOrigins": "Vérifiez que CORS_ORIGINS dans le .env de votre API inclut l'URL de votre frontend"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Vérifiez votre connexion internet",
+					"checkFirewall": "Vérifiez s'il y a des problèmes de pare-feu ou de proxy",
+					"tryRefresh": "Essayez de rafraîchir la page",
+					"verifyApiRunning": "Vérifiez que le serveur API est en cours d'exécution et accessible"
 				}
 			}
 		},
@@ -260,7 +260,7 @@
 		},
 		"signUpForm": {
 			"fullName": "Nom complet",
-			"namePlaceholder": "John Doe",
+			"namePlaceholder": "Jean Dupont",
 			"failedSignUp": "Échec de l'inscription",
 			"accountCreated": "Compte créé avec succès",
 			"passwordTooShort": "Le mot de passe est trop court",
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Échec de la suppression de la photo de profil",
+				"removeSuccess": "Photo de profil supprimée",
+				"updateError": "Échec de la mise à jour de la photo de profil",
+				"updateSuccess": "Photo de profil mise à jour",
+				"change": "Changer l'avatar",
+				"edit": "Modifiez votre photo de profil"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Supprimer le compte",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Les espaces de travail dont vous êtes le seul membre sont supprimés avec votre compte. Ailleurs, vos tâches sont conservées et deviennent non assignées, et vos commentaires sont supprimés.",
+				"error": "Échec de la suppression du compte",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Supprimer votre compte ?",
+				"sectionSubtitle": "Actions permanentes qui affectent l'ensemble de votre compte.",
+				"sectionTitle": "Zone de danger",
+				"success": "Votre compte a été supprimé",
+				"title": "Supprimer le compte",
+				"sessionTooOld": "Par sécurité, déconnectez-vous puis reconnectez-vous avant de supprimer votre compte."
 			}
 		},
 		"notificationsPage": {
@@ -691,7 +691,9 @@
 			"genericWebhookSectionTitle": "Webhooks génériques",
 			"genericWebhookSectionSubtitle": "Envoyez les événements des tâches du projet vers n'importe quel point de terminaison HTTP au format JSON.",
 			"slackSectionTitle": "Intégration Slack",
-			"slackSectionSubtitle": "Envoyez les mises à jour des tâches du projet dans un canal Slack via un webhook entrant."
+			"slackSectionSubtitle": "Envoyez les mises à jour des tâches du projet dans un canal Slack via un webhook entrant.",
+			"mattermostSectionSubtitle": "Envoyez les mises à jour des tâches du projet dans un canal Mattermost avec un webhook entrant.",
+			"mattermostSectionTitle": "Intégration Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Visibilité du projet",
@@ -841,9 +843,9 @@
 			"connectionStatus": "Statut de la connexion",
 			"connectedActive": "Dépôt connecté et actif",
 			"notConnectedHint": "Aucun dépôt Gitea connecté",
-			"badgeConnected": "Connected",
+			"badgeConnected": "Connecté",
 			"badgeNotConnected": "Non connecté",
-			"repository": "Repository",
+			"repository": "Dépôt",
 			"repositoryHint": "Dépôt Gitea lié",
 			"commentTaskLinkTitle": "Commenter le lien Kaneo sur les nouvelles issues",
 			"commentTaskLinkHint": "Lorsque cette option est activée, Kaneo publie un commentaire sur chaque nouvelle issue avec un lien vers la tâche.",
@@ -854,7 +856,7 @@
 			"baseUrlHint": "URL racine de votre instance Gitea",
 			"tokenLabel": "Jeton d'accès personnel",
 			"tokenHint": "Jeton avec accès aux dépôts et aux issues",
-			"tokenPlaceholder": "Paste token",
+			"tokenPlaceholder": "Coller le jeton",
 			"tokenPlaceholderUpdate": "Collez un nouveau jeton pour le remplacer",
 			"currentToken": "stored",
 			"ownerLabel": "Owner",
@@ -866,16 +868,16 @@
 			"browse": "Browse",
 			"verify": "Verify",
 			"update": "Update",
-			"connect": "Connect",
-			"disconnect": "Disconnect",
+			"connect": "Connecter",
+			"disconnect": "Déconnecter",
 			"importSectionTitle": "Importer des issues Gitea",
 			"importSectionHint": "Importez les issues ouvertes et les pull requests depuis le dépôt",
-			"importing": "Importing…",
+			"importing": "Importation…",
 			"importIssues": "Importer les issues",
 			"importDisabledHint": "Vérifiez le dépôt ci-dessus pour activer l'importation",
 			"browseModalTitle": "Vos dépôts",
 			"browseModalHint": "Dépôts accessibles avec votre jeton",
-			"searchRepos": "Search…",
+			"searchRepos": "Rechercher…",
 			"browseNeedsCredentials": "Entrez l'URL Gitea et le jeton pour parcourir",
 			"loadingRepos": "Chargement des dépôts…",
 			"retry": "Retry"
@@ -1273,6 +1275,44 @@
 			"updateError": "Échec de la mise à jour du label",
 			"deleteError": "Échec de la suppression du label",
 			"nameRequired": "Le nom du label est requis"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Libellé facultatif pour votre référence. Mattermost contrôle le canal de destination réel via la configuration du webhook.",
+			"channelLabel": "Nom du canal",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Connecter Mattermost",
+			"connected": "Connecté",
+			"connectionHint": "Collez l'URL d'un webhook entrant Mattermost et choisissez les événements de tâches à publier.",
+			"connectionTitle": "Connexion du webhook Mattermost",
+			"disconnect": "Déconnecter",
+			"events": {
+				"taskCommentCreated": "Nouveaux commentaires",
+				"taskCreated": "Nouvelles tâches",
+				"taskDescriptionChanged": "Changements de description",
+				"taskPriorityChanged": "Changements de priorité",
+				"taskStatusChanged": "Changements de statut",
+				"taskTitleChanged": "Changements de titre"
+			},
+			"eventsHint": "Choisissez quelles modifications de projet publier dans Mattermost.",
+			"eventsTitle": "Notifications d'événements",
+			"paused": "Paused",
+			"saveChanges": "Enregistrer les modifications",
+			"toast": {
+				"disabled": "Notifications Mattermost en pause",
+				"enabled": "Notifications Mattermost activées",
+				"removed": "Intégration Mattermost supprimée avec succès",
+				"removeError": "Échec de la suppression de l'intégration Mattermost",
+				"saved": "Intégration Mattermost enregistrée avec succès",
+				"saveError": "Échec de l'enregistrement de l'intégration Mattermost",
+				"updateError": "Échec de la mise à jour de l'intégration Mattermost"
+			},
+			"update": "Mettre à jour Mattermost",
+			"validation": {
+				"webhookInvalid": "Saisissez une URL de webhook Mattermost valide"
+			},
+			"webhookHint": "Créez un webhook entrant dans Mattermost et collez l'URL générée ici.",
+			"webhookLabel": "URL du webhook entrant",
+			"webhookPlaceholder": "https://votre-serveur-mattermost.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1384,7 +1424,7 @@
 				"prevTask": "Tâche précédente",
 				"openTask": "Ouvrir la tâche sélectionnée",
 				"quickSelectNumber": "Sélectionner une option par numéro",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Passer à la vue calendrier"
 			}
 		}
 	},
@@ -1464,7 +1504,7 @@
 		"changedTitle": "a changé le titre de \"{{from}}\" à \"{{to}}\"",
 		"created": "a créé cette tâche",
 		"moved": "a déplacé la tâche de \"{{from}}\" à \"{{to}}\"",
-		"githubUser": "GitHub User",
+		"githubUser": "Utilisateur GitHub",
 		"comment": {
 			"github": "GitHub",
 			"viewGithubProfile": "Voir le profil GitHub",
@@ -1828,7 +1868,7 @@
 		"sort": {
 			"label": "Trier",
 			"by": "Trier par",
-			"direction": "Direction",
+			"direction": "Ordre",
 			"ascending": "Croissant",
 			"descending": "Décroissant",
 			"fields": {
@@ -1875,7 +1915,7 @@
 			"resizeStart": "Redimensionner la date de début",
 			"resizeDue": "Redimensionner la date d'échéance",
 			"taskAriaLabel": "{{title}} : ouvrir ou déplacer",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Aller à aujourd'hui"
 		},
 		"delete": {
 			"title": "Supprimer la tâche ?",
@@ -1979,15 +2019,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Mois suivant",
+			"noTasks": "Aucune tâche planifiée",
+			"noTasksSubtitle": "Ajoutez une date de début, une date d'échéance ou les deux aux tâches pour les placer dans le calendrier.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Mois précédent",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Calendrier",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Échec du chargement des tâches."
 		}
 	},
 	"invitations": {
@@ -2009,7 +2049,7 @@
 		"continueToSetup": "Continuer vers la configuration",
 		"skipForNow": "Ignorer pour l'instant",
 		"table": {
-			"workspace": "Workspace",
+			"workspace": "Espace de travail",
 			"invitedBy": "Invité par",
 			"expires": "Expire"
 		},
@@ -2018,6 +2058,32 @@
 			"acceptSuccess": "Invitation acceptée ! Bienvenue dans l'équipe.",
 			"rejectError": "Échec du rejet de l'invitation",
 			"rejectSuccess": "Invitation rejetée"
+		}
+	},
+	"unified": {
+		"pageTitle": "Tous les projets",
+		"pageDescription": "Une vue unique de tous les projets de vos espaces de travail.",
+		"stats": {
+			"projects": "Projets",
+			"tasks": "Tâches",
+			"completion": "Complétion",
+			"nextDueDate": "Prochaine échéance"
+		},
+		"table": {
+			"project": "Projet",
+			"progress": "Progression",
+			"tasks": "Tâches",
+			"dueDate": "Échéance",
+			"status": "Statut"
+		},
+		"section": {
+			"projectCount_one": "{{count}} projet",
+			"projectCount_other": "{{count}} projets",
+			"projectCount_many": "{{count}} projets"
+		},
+		"empty": {
+			"title": "Aucun projet pour le moment",
+			"description": "Les projets de tous vos espaces de travail apparaîtront ici dès que vous en créerez un."
 		}
 	},
 	"workspace": {

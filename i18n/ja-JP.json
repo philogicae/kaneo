@@ -852,7 +852,9 @@
 			"slackSectionTitle": "Slack 連携",
 			"slackSectionSubtitle": "Incoming Webhook を使用してプロジェクトのタスク更新を Slack チャンネルに送信します。",
 			"telegramSectionTitle": "Telegram 連携",
-			"telegramSectionSubtitle": "ボットを使用してプロジェクトのタスク更新を Telegram のチャットまたはトピックに送信します。"
+			"telegramSectionSubtitle": "ボットを使用してプロジェクトのタスク更新を Telegram のチャットまたはトピックに送信します。",
+			"mattermostSectionSubtitle": "Incoming Webhook を使ってプロジェクトのタスク更新を Mattermost チャンネルに送信します。",
+			"mattermostSectionTitle": "Mattermost 統合"
 		},
 		"projectVisibility": {
 			"pageTitle": "プロジェクトの公開設定",
@@ -1271,6 +1273,44 @@
 			"merged": "マージ済み",
 			"draft": "下書き",
 			"open": "オープン"
+		},
+		"mattermostIntegration": {
+			"channelHint": "参照用の任意ラベルです。実際の送信先チャンネルは webhook の設定によって Mattermost 側で制御されます。",
+			"channelLabel": "チャンネル名",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Mattermost を接続",
+			"connected": "接続済み",
+			"connectionHint": "Mattermost の Incoming Webhook URL を貼り付け、投稿するタスクイベントを選択してください。",
+			"connectionTitle": "Mattermost webhook 接続",
+			"disconnect": "切断",
+			"events": {
+				"taskCommentCreated": "新しいコメント",
+				"taskCreated": "新しいタスク",
+				"taskDescriptionChanged": "説明の変更",
+				"taskPriorityChanged": "優先度の変更",
+				"taskStatusChanged": "ステータスの変更",
+				"taskTitleChanged": "タイトルの変更"
+			},
+			"eventsHint": "プロジェクトのどの変更を Mattermost に投稿するかを選択してください。",
+			"eventsTitle": "イベント通知",
+			"paused": "Paused",
+			"saveChanges": "変更を保存",
+			"toast": {
+				"disabled": "Mattermost 通知を一時停止しました",
+				"enabled": "Mattermost 通知を有効にしました",
+				"removed": "Mattermost 統合を削除しました",
+				"removeError": "Mattermost 統合の削除に失敗しました",
+				"saved": "Mattermost 統合を保存しました",
+				"saveError": "Mattermost 統合の保存に失敗しました",
+				"updateError": "Mattermost 統合の更新に失敗しました"
+			},
+			"update": "Mattermost を更新",
+			"validation": {
+				"webhookInvalid": "有効な Mattermost webhook URL を入力してください"
+			},
+			"webhookHint": "Mattermost で Incoming Webhook を作成し、生成された URL をここに貼り付けてください。",
+			"webhookLabel": "Incoming Webhook URL",
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1878,7 +1918,7 @@
 			"resizeStart": "開始日を変更",
 			"resizeDue": "期限を変更",
 			"taskAriaLabel": "{{title}}: 開く、またはドラッグして移動",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "今日に移動"
 		},
 		"delete": {
 			"title": "タスクを削除しますか？",
@@ -1902,7 +1942,7 @@
 			"merged": "マージ済み",
 			"draft": "下書き",
 			"open": "オープン",
-			"label": "Pull Request",
+			"label": "プルリクエスト",
 			"count_other": "{{count}} 件の PR"
 		},
 		"assignee": {
@@ -2134,7 +2174,7 @@
 		"taskDetail": {
 			"labels": "ラベル",
 			"externalLinks": "外部リンク",
-			"pullRequestFallback": "Pull Request",
+			"pullRequestFallback": "プルリクエスト",
 			"issueFallback": "Issue",
 			"prStatusMerged": "マージ済み",
 			"prStatusDraft": "下書き",
@@ -2155,6 +2195,30 @@
 		},
 		"branding": {
 			"poweredBy": "Powered by"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "プロジェクトを作成すると、すべてのワークスペースのプロジェクトがここに表示されます。",
+			"title": "プロジェクトはまだありません"
+		},
+		"pageDescription": "すべてのワークスペースのプロジェクトをひとつの画面で確認できます。",
+		"pageTitle": "すべてのプロジェクト",
+		"section": {
+			"projectCount_other": "{{count}}件のプロジェクト"
+		},
+		"stats": {
+			"completion": "完了率",
+			"nextDueDate": "次の期日",
+			"projects": "プロジェクト",
+			"tasks": "タスク"
+		},
+		"table": {
+			"dueDate": "期日",
+			"progress": "進捗",
+			"project": "プロジェクト",
+			"status": "ステータス",
+			"tasks": "タスク"
 		}
 	}
 }

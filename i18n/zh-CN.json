@@ -57,27 +57,27 @@
 			"tryAgain": "重试",
 			"viewDeploymentGuide": "查看部署指南",
 			"refreshPage": "刷新页面",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "页面意外崩溃。刷新通常可以解决。",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "身份验证失败。请重新登录。",
+				"cors": "无法连接到服务器。这可能是由于 CORS 配置问题。",
+				"network": "网络错误。请检查网络连接后重试。",
+				"server": "服务器错误。请稍后重试。",
+				"unknown": "发生了意外错误。"
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "检查你的 API 服务器是否可以从浏览器访问",
+					"checkApiRunning": "确保你的 API 服务器正在运行",
+					"checkApiUrl": "检查前端 .env 中的 VITE_API_URL 是否与 API 服务器地址一致",
+					"checkProtocol": "确保前端和 API 使用相同的协议（http/https）",
+					"verifyCorsOrigins": "检查 API 的 .env 中 CORS_ORIGINS 是否包含你的前端地址"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "检查网络连接",
+					"checkFirewall": "检查是否存在防火墙或代理问题",
+					"tryRefresh": "尝试刷新页面",
+					"verifyApiRunning": "确认 API 服务器正在运行且可访问"
 				}
 			}
 		},
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "删除个人资料图片失败",
+				"removeSuccess": "个人资料图片已删除",
+				"updateError": "更新个人资料图片失败",
+				"updateSuccess": "个人资料图片已更新",
+				"change": "更换头像",
+				"edit": "更换你的个人资料图片"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "删除账号",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "仅属于你一个人的工作区会随账号一起删除。在其他地方，你的任务会保留并变为未分配，你的评论将被移除。",
+				"error": "删除账号失败",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "确定要删除你的账号吗？",
+				"sectionSubtitle": "影响整个账号的永久性操作。",
+				"sectionTitle": "危险区域",
+				"success": "你的账号已删除",
+				"title": "删除账号",
+				"sessionTooOld": "为安全起见，删除账号前请先退出并重新登录。"
 			}
 		},
 		"notificationsPage": {
@@ -852,7 +852,9 @@
 			"slackSectionTitle": "Slack 集成",
 			"slackSectionSubtitle": "通过 Incoming Webhook 将项目任务更新发送到 Slack 频道。",
 			"telegramSectionTitle": "Telegram 集成",
-			"telegramSectionSubtitle": "通过 Bot 将项目任务更新发送到 Telegram 聊天或话题。"
+			"telegramSectionSubtitle": "通过 Bot 将项目任务更新发送到 Telegram 聊天或话题。",
+			"mattermostSectionSubtitle": "通过传入 webhook 将项目任务更新发送到 Mattermost 频道。",
+			"mattermostSectionTitle": "Mattermost 集成"
 		},
 		"projectVisibility": {
 			"pageTitle": "项目可见性",
@@ -993,8 +995,8 @@
 				"settingsUpdateError": "更新 Gitea 集成失败",
 				"secretCopied": "已复制",
 				"unableToCopySecret": "无法复制密钥",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "该 URL 并未指向 Gitea 实例",
+				"redirected": "Gitea URL 已被重定向（通常是转到 HTTPS）。请直接使用最终 URL。"
 			},
 			"webhookShow": "显示",
 			"webhookHide": "隐藏",
@@ -1271,6 +1273,44 @@
 			"merged": "已合并",
 			"draft": "草稿",
 			"open": "打开"
+		},
+		"mattermostIntegration": {
+			"channelHint": "供您参考的可选标签。实际的目标频道由 Mattermost 在 webhook 设置中控制。",
+			"channelLabel": "频道名称",
+			"channelPlaceholder": "#team-updates",
+			"connect": "连接 Mattermost",
+			"connected": "已连接",
+			"connectionHint": "粘贴 Mattermost 传入 webhook 的 URL，并选择要发布哪些任务事件。",
+			"connectionTitle": "Mattermost webhook 连接",
+			"disconnect": "断开连接",
+			"events": {
+				"taskCommentCreated": "新评论",
+				"taskCreated": "新任务",
+				"taskDescriptionChanged": "描述变更",
+				"taskPriorityChanged": "优先级变更",
+				"taskStatusChanged": "状态变更",
+				"taskTitleChanged": "标题变更"
+			},
+			"eventsHint": "选择要将哪些项目变更发布到 Mattermost。",
+			"eventsTitle": "事件通知",
+			"paused": "Paused",
+			"saveChanges": "保存更改",
+			"toast": {
+				"disabled": "Mattermost 通知已暂停",
+				"enabled": "Mattermost 通知已启用",
+				"removed": "Mattermost 集成已成功删除",
+				"removeError": "删除 Mattermost 集成失败",
+				"saved": "Mattermost 集成已成功保存",
+				"saveError": "保存 Mattermost 集成失败",
+				"updateError": "更新 Mattermost 集成失败"
+			},
+			"update": "更新 Mattermost",
+			"validation": {
+				"webhookInvalid": "请输入有效的 Mattermost webhook URL"
+			},
+			"webhookHint": "在 Mattermost 中创建一个 Incoming Webhook，并将生成的 URL 粘贴到此处。",
+			"webhookLabel": "传入 webhook URL",
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1352,7 +1392,7 @@
 			"settingsWorkspaceTab": "工作区"
 		},
 		"projectSettings": {
-			"projectLabel": "Project"
+			"projectLabel": "项目"
 		},
 		"keyboardShortcuts": {
 			"title": "键盘快捷键",
@@ -1382,7 +1422,7 @@
 				"prevTask": "上一任务",
 				"openTask": "打开所选任务",
 				"quickSelectNumber": "按数字选择选项",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "切换到日历视图"
 			}
 		}
 	},
@@ -1550,7 +1590,7 @@
 					"deleteTable": "删除表格"
 				},
 				"mermaid": {
-					"renderFailed": "Mermaid diagram couldn't be rendered"
+					"renderFailed": "无法渲染 Mermaid 图表"
 				}
 			}
 		}
@@ -1687,7 +1727,7 @@
 					"onlyYoutubeInline": "仅支持嵌入 YouTube URL，请改用链接模式。"
 				},
 				"mermaid": {
-					"renderFailed": "Mermaid diagram couldn't be rendered"
+					"renderFailed": "无法渲染 Mermaid 图表"
 				}
 			}
 		},
@@ -1865,7 +1905,7 @@
 			"resizeStart": "调整开始日期",
 			"resizeDue": "调整截止日期",
 			"taskAriaLabel": "{{title}}：打开或拖动以移动",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "跳转到今天"
 		},
 		"delete": {
 			"title": "删除任务？",
@@ -1889,7 +1929,7 @@
 			"merged": "已合并",
 			"draft": "草稿",
 			"open": "打开",
-			"label": "Pull Request",
+			"label": "拉取请求",
 			"count_other": "{{count}} 个 PR"
 		},
 		"assignee": {
@@ -1967,15 +2007,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "下个月",
+			"noTasks": "没有已排期的任务",
+			"noTasksSubtitle": "为任务添加开始日期、截止日期或两者，以便显示在日历上。",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "上个月",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "日历",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "任务加载失败。"
 		}
 	},
 	"invitations": {
@@ -2134,7 +2174,7 @@
 		"taskDetail": {
 			"labels": "标签",
 			"externalLinks": "外部链接",
-			"pullRequestFallback": "Pull Request",
+			"pullRequestFallback": "拉取请求",
 			"issueFallback": "Issue",
 			"prStatusMerged": "已合并",
 			"prStatusDraft": "草稿",
@@ -2155,6 +2195,30 @@
 		},
 		"branding": {
 			"poweredBy": "由以下技术提供支持"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "创建项目后，所有工作区的项目都会显示在这里。",
+			"title": "还没有项目"
+		},
+		"pageDescription": "在同一个视图中查看所有工作区的项目。",
+		"pageTitle": "所有项目",
+		"section": {
+			"projectCount_other": "{{count}} 个项目"
+		},
+		"stats": {
+			"completion": "完成度",
+			"nextDueDate": "最近截止日期",
+			"projects": "项目",
+			"tasks": "任务"
+		},
+		"table": {
+			"dueDate": "截止日期",
+			"progress": "进度",
+			"project": "项目",
+			"status": "状态",
+			"tasks": "任务"
 		}
 	}
 }

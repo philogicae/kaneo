@@ -57,27 +57,27 @@
 			"tryAgain": "Δοκιμάστε ξανά",
 			"viewDeploymentGuide": "Προβολή οδηγού εγκατάστασης",
 			"refreshPage": "Ανανέωση σελίδας",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Η σελίδα κατέρρευσε απροσδόκητα. Η ανανέωση συνήθως το διορθώνει.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Η αυθεντικοποίηση απέτυχε. Συνδεθείτε ξανά.",
+				"cors": "Δεν είναι δυνατή η σύνδεση με τον διακομιστή. Πιθανόν να οφείλεται σε προβλήματα ρυθμίσεων CORS.",
+				"network": "Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας στο διαδίκτυο και δοκιμάστε ξανά.",
+				"server": "Σφάλμα διακομιστή. Δοκιμάστε ξανά αργότερα.",
+				"unknown": "Παρουσιάστηκε απροσδόκητο σφάλμα."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Ελέγξτε ότι ο διακομιστής API σας είναι προσβάσιμος από το πρόγραμμα περιήγησης",
+					"checkApiRunning": "Βεβαιωθείτε ότι ο διακομιστής API σας εκτελείται",
+					"checkApiUrl": "Ελέγξτε ότι το VITE_API_URL στο .env του frontend ταιριάζει με τη διεύθυνση του διακομιστή API",
+					"checkProtocol": "Βεβαιωθείτε ότι frontend και API χρησιμοποιούν το ίδιο πρωτόκολλο (http/https)",
+					"verifyCorsOrigins": "Ελέγξτε ότι το CORS_ORIGINS στο .env του API περιλαμβάνει τη διεύθυνση του frontend σας"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Ελέγξτε τη σύνδεσή σας στο διαδίκτυο",
+					"checkFirewall": "Ελέγξτε αν υπάρχουν προβλήματα με τείχος προστασίας ή διακομιστή μεσολάβησης",
+					"tryRefresh": "Δοκιμάστε να ανανεώσετε τη σελίδα",
+					"verifyApiRunning": "Βεβαιωθείτε ότι ο διακομιστής API εκτελείται και είναι προσβάσιμος"
 				}
 			}
 		},
@@ -260,7 +260,7 @@
 		},
 		"signUpForm": {
 			"fullName": "Ονοματεπώνυμο",
-			"namePlaceholder": "John Doe",
+			"namePlaceholder": "Γιώργος Παπαδόπουλος",
 			"failedSignUp": "Αποτυχία εγγραφής",
 			"accountCreated": "Ο λογαριασμός δημιουργήθηκε με επιτυχία",
 			"passwordTooShort": "Ο κωδικός είναι πολύ σύντομος",
@@ -364,43 +364,43 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Αποτυχία αφαίρεσης της εικόνας προφίλ",
+				"removeSuccess": "Η εικόνα προφίλ αφαιρέθηκε",
+				"updateError": "Αποτυχία ενημέρωσης της εικόνας προφίλ",
+				"updateSuccess": "Η εικόνα προφίλ ενημερώθηκε",
+				"change": "Αλλαγή avatar",
+				"edit": "Αλλάξτε την εικόνα προφίλ σας"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Διαγραφή λογαριασμού",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Οι χώροι εργασίας στους οποίους ανήκετε μόνο εσείς διαγράφονται με τον λογαριασμό σας. Αλλού, οι εργασίες σας παραμένουν και μένουν χωρίς υπεύθυνο, ενώ τα σχόλιά σας αφαιρούνται.",
+				"error": "Αποτυχία διαγραφής του λογαριασμού",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Διαγραφή του λογαριασμού σας;",
+				"sectionSubtitle": "Μόνιμες ενέργειες που επηρεάζουν ολόκληρο τον λογαριασμό σας.",
+				"sectionTitle": "Επικίνδυνη ζώνη",
+				"success": "Ο λογαριασμός σας διαγράφηκε",
+				"title": "Διαγραφή λογαριασμού",
+				"sessionTooOld": "Για λόγους ασφαλείας, αποσυνδεθείτε και συνδεθείτε ξανά πριν διαγράψετε τον λογαριασμό σας."
 			}
 		},
 		"notificationsPage": {
 			"pageTitle": "Ειδοποιήσεις",
 			"title": "Ειδοποιήσεις",
 			"subtitle": "Επιλέξτε πώς παραδίδει το Kaneo τις ειδοποιήσεις του λογαριασμού σας και ποια κανάλια θα χρησιμοποιούνται.",
-			"statusConnected": "Connected",
+			"statusConnected": "Συνδεδεμένο",
 			"statusPaused": "Paused",
 			"emailTitle": "Email",
 			"emailDescription": "Χρησιμοποιήστε το email του λογαριασμού σας ως προορισμό για τις ειδοποιήσεις.",
 			"accountEmailLabel": "Email λογαριασμού",
 			"accountEmailNoAddress": "Δεν υπάρχει διαθέσιμο email λογαριασμού",
 			"accountEmailHint": "Η παράδοση email γίνεται πάντα στο email του συνδεδεμένου λογαριασμού.",
-			"saveChanges": "Save changes",
-			"disconnect": "Disconnect",
+			"saveChanges": "Αποθήκευση αλλαγών",
+			"disconnect": "Αποσύνδεση",
 			"ntfyTitle": "ntfy",
 			"ntfyDescription": "Δημοσιεύστε τις ειδοποιήσεις λογαριασμού σε ένα θέμα ntfy.",
-			"serverUrl": "Server URL",
+			"serverUrl": "Διεύθυνση διακομιστή",
 			"topic": "Topic",
 			"token": "Token",
 			"ntfyServerPlaceholder": "https://ntfy.example.com",
@@ -408,10 +408,10 @@
 			"ntfyTokenPlaceholder": "Προαιρετικό bearer token",
 			"ntfyTokenHintConfigured": "Ένα token έχει ήδη ρυθμιστεί ({{masked}}). Εισαγάγετε νέο token για να το αντικαταστήσετε.",
 			"ntfyTokenHintOptional": "Προαιρετικό. Δώστε token αν ο διακομιστής ntfy σας απαιτεί έλεγχο ταυτότητας.",
-			"connectNtfy": "Connect ntfy",
+			"connectNtfy": "Σύνδεση ntfy",
 			"gotifyTitle": "Gotify",
 			"gotifyDescription": "Στείλτε τις ειδοποιήσεις λογαριασμού στον διακομιστή Gotify σας.",
-			"gotifyTokenLabel": "App token",
+			"gotifyTokenLabel": "Token της εφαρμογής",
 			"gotifyServerPlaceholder": "https://gotify.example.com",
 			"gotifyTokenPlaceholder": "Token εφαρμογής Gotify",
 			"gotifyTokenHintConfigured": "Ένα token εφαρμογής έχει ήδη ρυθμιστεί ({{masked}}). Εισαγάγετε νέο token για να το αντικαταστήσετε.",
@@ -419,7 +419,7 @@
 			"connectGotify": "Σύνδεση Gotify",
 			"webhookTitle": "Προσαρμοσμένο webhook",
 			"webhookDescription": "Στείλτε τις ειδοποιήσεις λογαριασμού στο δικό σας endpoint ως JSON.",
-			"endpointUrl": "Endpoint URL",
+			"endpointUrl": "Διεύθυνση endpoint",
 			"signingSecret": "Μυστικό υπογραφής",
 			"webhookUrlPlaceholder": "https://example.com/webhooks/kaneo",
 			"webhookSecretPlaceholder": "Προαιρετικό κοινόχρηστο μυστικό",
@@ -443,13 +443,13 @@
 			"webhookChannelHintDisabled": "Ρυθμίστε και ενεργοποιήστε πρώτα το webhook καθολικά.",
 			"projectScope": "Εύρος έργων",
 			"projectScopeDescription": "Όλα τα έργα περιλαμβάνονται από προεπιλογή. Περιορίστε το αν αυτός ο χώρος εργασίας πρέπει να στέλνει ειδοποιήσεις μόνο από επιλεγμένα έργα.",
-			"allProjects": "All projects",
+			"allProjects": "Όλα τα έργα",
 			"allProjectsDescription": "Παράδοση ειδοποιήσεων από κάθε έργο αυτού του χώρου εργασίας.",
 			"selectedProjects": "Επιλεγμένα έργα",
 			"selectedProjectsDescription": "Παράδοση ειδοποιήσεων μόνο από τα επιλεγμένα έργα.",
 			"noProjectsInWorkspace": "Δεν υπάρχουν ακόμα διαθέσιμα έργα για αυτόν τον χώρο εργασίας.",
-			"createRule": "Create rule",
-			"removeRule": "Remove rule",
+			"createRule": "Δημιουργία κανόνα",
+			"removeRule": "Αφαίρεση κανόνα",
 			"toastEmailSaved": "Οι ρυθμίσεις ειδοποιήσεων email αποθηκεύτηκαν",
 			"toastEmailSaveFailed": "Αποτυχία αποθήκευσης ρυθμίσεων email",
 			"toastNtfySaved": "Οι ρυθμίσεις ntfy αποθηκεύτηκαν",
@@ -691,7 +691,9 @@
 			"genericWebhookSectionTitle": "Γενικά Webhooks",
 			"genericWebhookSectionSubtitle": "Στείλτε γεγονότα εργασιών έργου σε οποιοδήποτε HTTP endpoint ως JSON.",
 			"slackSectionTitle": "Ενσωμάτωση Slack",
-			"slackSectionSubtitle": "Στείλτε ενημερώσεις εργασιών έργου σε κανάλι Slack μέσω εισερχόμενου webhook."
+			"slackSectionSubtitle": "Στείλτε ενημερώσεις εργασιών έργου σε κανάλι Slack μέσω εισερχόμενου webhook.",
+			"mattermostSectionSubtitle": "Στείλτε ενημερώσεις εργασιών έργου σε ένα κανάλι Mattermost με ένα incoming webhook.",
+			"mattermostSectionTitle": "Ενσωμάτωση Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Ορατότητα έργου",
@@ -841,9 +843,9 @@
 			"connectionStatus": "Κατάσταση σύνδεσης",
 			"connectedActive": "Το αποθετήριο είναι συνδεδεμένο και ενεργό",
 			"notConnectedHint": "Δεν έχει συνδεθεί αποθετήριο Gitea",
-			"badgeConnected": "Connected",
+			"badgeConnected": "Συνδεδεμένο",
 			"badgeNotConnected": "Μη συνδεδεμένο",
-			"repository": "Repository",
+			"repository": "Αποθετήριο",
 			"repositoryHint": "Συνδεδεμένο αποθετήριο Gitea",
 			"commentTaskLinkTitle": "Σχολιασμός με σύνδεσμο Kaneo σε νέα issues",
 			"commentTaskLinkHint": "Όταν είναι ενεργό, το Kaneo δημοσιεύει σχόλιο σε κάθε νέο issue με σύνδεσμο προς την εργασία.",
@@ -854,28 +856,28 @@
 			"baseUrlHint": "Το ριζικό URL της εγκατάστασης Gitea σας",
 			"tokenLabel": "Προσωπικό token πρόσβασης",
 			"tokenHint": "Token με πρόσβαση σε αποθετήρια και issues",
-			"tokenPlaceholder": "Paste token",
+			"tokenPlaceholder": "Επικολλήστε το token",
 			"tokenPlaceholderUpdate": "Επικολλήστε νέο token για αντικατάσταση",
 			"currentToken": "stored",
 			"ownerLabel": "Owner",
 			"ownerHint": "Όνομα χρήστη ή οργανισμού",
 			"repoNameLabel": "Όνομα αποθετηρίου",
 			"repoNameHint": "Μόνο το όνομα του αποθετηρίου (χωρίς κάτοχο)",
-			"actionsTitle": "Actions",
+			"actionsTitle": "Ενέργειες",
 			"actionsHint": "Επαληθεύστε την πρόσβαση και συνδεθείτε",
 			"browse": "Browse",
 			"verify": "Verify",
 			"update": "Update",
-			"connect": "Connect",
-			"disconnect": "Disconnect",
+			"connect": "Σύνδεση",
+			"disconnect": "Αποσύνδεση",
 			"importSectionTitle": "Εισαγωγή issues Gitea",
 			"importSectionHint": "Εισαγάγετε ανοιχτά issues και pull requests από το αποθετήριο",
-			"importing": "Importing…",
+			"importing": "Γίνεται εισαγωγή…",
 			"importIssues": "Εισαγωγή issues",
 			"importDisabledHint": "Επαληθεύστε το αποθετήριο παραπάνω για να ενεργοποιήσετε την εισαγωγή",
 			"browseModalTitle": "Τα αποθετήριά σας",
 			"browseModalHint": "Αποθετήρια στα οποία έχει πρόσβαση το token σας",
-			"searchRepos": "Search…",
+			"searchRepos": "Αναζήτηση…",
 			"browseNeedsCredentials": "Εισαγάγετε URL και token Gitea για περιήγηση",
 			"loadingRepos": "Φόρτωση αποθετηρίων…",
 			"retry": "Retry"
@@ -1272,6 +1274,44 @@
 			"updateError": "Αποτυχία ενημέρωσης ετικέτας",
 			"deleteError": "Αποτυχία διαγραφής ετικέτας",
 			"nameRequired": "Το όνομα ετικέτας είναι υποχρεωτικό"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Προαιρετική ετικέτα για αναφορά. Ο πραγματικός κανόνας προορισμού καθορίζεται από το Mattermost μέσω της ρύθμισης webhook.",
+			"channelLabel": "Όνομα καναλιού",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Σύνδεση Mattermost",
+			"connected": "Συνδεδεμένο",
+			"connectionHint": "Επικολλήστε τη διεύθυνση ενός incoming webhook του Mattermost και επιλέξτε ποια γεγονότα εργασιών θα δημοσιεύονται.",
+			"connectionTitle": "Σύνδεση webhook Mattermost",
+			"disconnect": "Αποσύνδεση",
+			"events": {
+				"taskCommentCreated": "Νέα σχόλια",
+				"taskCreated": "Νέες εργασίες",
+				"taskDescriptionChanged": "Αλλαγές περιγραφής",
+				"taskPriorityChanged": "Αλλαγές προτεραιότητας",
+				"taskStatusChanged": "Αλλαγές κατάστασης",
+				"taskTitleChanged": "Αλλαγές τίτλου"
+			},
+			"eventsHint": "Επιλέξτε ποιες αλλαγές έργου θα δημοσιεύονται στο Mattermost.",
+			"eventsTitle": "Ειδοποιήσεις συμβάντων",
+			"paused": "Paused",
+			"saveChanges": "Αποθήκευση αλλαγών",
+			"toast": {
+				"disabled": "Οι ειδοποιήσεις Mattermost τέθηκαν σε παύση",
+				"enabled": "Οι ειδοποιήσεις Mattermost ενεργοποιήθηκαν",
+				"removed": "Η ενσωμάτωση Mattermost αφαιρέθηκε με επιτυχία",
+				"removeError": "Αποτυχία αφαίρεσης της ενσωμάτωσης Mattermost",
+				"saved": "Η ενσωμάτωση Mattermost αποθηκεύτηκε με επιτυχία",
+				"saveError": "Αποτυχία αποθήκευσης της ενσωμάτωσης Mattermost",
+				"updateError": "Αποτυχία ενημέρωσης της ενσωμάτωσης Mattermost"
+			},
+			"update": "Ενημέρωση Mattermost",
+			"validation": {
+				"webhookInvalid": "Εισάγετε μια έγκυρη διεύθυνση webhook Mattermost"
+			},
+			"webhookHint": "Δημιουργήστε ένα Incoming Webhook στο Mattermost και επικολλήστε τη δημιουργημένη διεύθυνση εδώ.",
+			"webhookLabel": "Διεύθυνση incoming webhook",
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1383,7 +1423,7 @@
 				"prevTask": "Προηγούμενη εργασία",
 				"openTask": "Άνοιγμα επιλεγμένης εργασίας",
 				"quickSelectNumber": "Επιλογή επιλογής με αριθμό",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Μετάβαση στην προβολή ημερολογίου"
 			}
 		}
 	},
@@ -1870,7 +1910,7 @@
 			"resizeStart": "Αλλαγή μεγέθους ημερομηνίας έναρξης",
 			"resizeDue": "Αλλαγή μεγέθους ημερομηνίας λήξης",
 			"taskAriaLabel": "{{title}}: άνοιγμα ή σύρσιμο για μετακίνηση",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Μετάβαση στη σημερινή ημέρα"
 		},
 		"delete": {
 			"title": "Διαγραφή εργασίας;",
@@ -1973,15 +2013,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Επόμενος μήνας",
+			"noTasks": "Δεν υπάρχουν προγραμματισμένες εργασίες",
+			"noTasksSubtitle": "Προσθέστε ημερομηνία έναρξης, προθεσμία ή και τα δύο στις εργασίες για να εμφανιστούν στο ημερολόγιο.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Προηγούμενος μήνας",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Ημερολόγιο",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Αποτυχία φόρτωσης εργασιών."
 		}
 	},
 	"invitations": {
@@ -2162,6 +2202,31 @@
 		},
 		"branding": {
 			"poweredBy": "Υποστηρίζεται από"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Μόλις δημιουργήσετε ένα έργο, τα έργα από όλους τους χώρους εργασίας σας θα εμφανιστούν εδώ.",
+			"title": "Δεν υπάρχουν ακόμη έργα"
+		},
+		"pageDescription": "Μια ενιαία προβολή όλων των έργων στους χώρους εργασίας σας.",
+		"pageTitle": "Όλα τα έργα",
+		"section": {
+			"projectCount_one": "{{count}} έργο",
+			"projectCount_other": "{{count}} έργα"
+		},
+		"stats": {
+			"completion": "Ολοκλήρωση",
+			"nextDueDate": "Επόμενη προθεσμία",
+			"projects": "Έργα",
+			"tasks": "Εργασίες"
+		},
+		"table": {
+			"dueDate": "Προθεσμία",
+			"progress": "Πρόοδος",
+			"project": "Έργο",
+			"status": "Κατάσταση",
+			"tasks": "Εργασίες"
 		}
 	}
 }

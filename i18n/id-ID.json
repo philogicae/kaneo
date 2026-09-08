@@ -57,27 +57,27 @@
 			"tryAgain": "Coba lagi",
 			"viewDeploymentGuide": "Lihat panduan deployment",
 			"refreshPage": "Muat ulang halaman",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Halaman mengalami kegagalan tak terduga. Memuat ulang biasanya memperbaikinya.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Autentikasi gagal. Silakan masuk kembali.",
+				"cors": "Tidak dapat terhubung ke server. Ini mungkin karena masalah konfigurasi CORS.",
+				"network": "Kesalahan jaringan. Silakan periksa koneksi internet Anda dan coba lagi.",
+				"server": "Kesalahan server. Silakan coba lagi nanti.",
+				"unknown": "Terjadi kesalahan tak terduga."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Pastikan server API Anda dapat diakses dari browser",
+					"checkApiRunning": "Pastikan server API Anda sedang berjalan",
+					"checkApiUrl": "Pastikan VITE_API_URL di .env frontend Anda cocok dengan URL server API",
+					"checkProtocol": "Pastikan frontend dan API menggunakan protokol yang sama (http/https)",
+					"verifyCorsOrigins": "Pastikan CORS_ORIGINS di .env API Anda menyertakan URL frontend Anda"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Periksa koneksi internet Anda",
+					"checkFirewall": "Periksa apakah ada masalah firewall atau proxy",
+					"tryRefresh": "Coba muat ulang halaman",
+					"verifyApiRunning": "Pastikan server API sedang berjalan dan dapat diakses"
 				}
 			}
 		},
@@ -260,7 +260,7 @@
 		},
 		"signUpForm": {
 			"fullName": "Nama Lengkap",
-			"namePlaceholder": "John Doe",
+			"namePlaceholder": "Budi Santoso",
 			"failedSignUp": "Gagal mendaftar",
 			"accountCreated": "Akun berhasil dibuat",
 			"passwordTooShort": "Kata sandi terlalu pendek",
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Gagal menghapus foto profil",
+				"removeSuccess": "Foto profil dihapus",
+				"updateError": "Gagal memperbarui foto profil",
+				"updateSuccess": "Foto profil diperbarui",
+				"change": "Ganti avatar",
+				"edit": "Ubah foto profil Anda"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Hapus akun",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Ruang kerja yang hanya Anda anggotanya akan dihapus bersama akun Anda. Di tempat lain, tugas Anda tetap ada dan menjadi tanpa penugasan, dan komentar Anda dihapus.",
+				"error": "Gagal menghapus akun",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Hapus akun Anda?",
+				"sectionSubtitle": "Tindakan permanen yang memengaruhi seluruh akun Anda.",
+				"sectionTitle": "Zona berbahaya",
+				"success": "Akun Anda telah dihapus",
+				"title": "Hapus akun",
+				"sessionTooOld": "Untuk keamanan, keluar lalu masuk kembali sebelum menghapus akun Anda."
 			}
 		},
 		"notificationsPage": {
@@ -566,7 +566,7 @@
 				"delete": "Hapus",
 				"deleting": "Menghapus...",
 				"deleteAria": "Hapus {{name}}",
-				"deleteAriaFallback": "API key",
+				"deleteAriaFallback": "Kunci API",
 				"toastDeleted": "API key berhasil dihapus",
 				"toastDeleteError": "Gagal menghapus API key"
 			},
@@ -691,7 +691,9 @@
 			"slackSectionTitle": "Integrasi Slack",
 			"slackSectionSubtitle": "Kirim pembaruan tugas proyek ke kanal Slack dengan incoming webhook.",
 			"telegramSectionTitle": "Integrasi Telegram",
-			"telegramSectionSubtitle": "Kirim pembaruan tugas proyek ke chat atau topik Telegram dengan bot."
+			"telegramSectionSubtitle": "Kirim pembaruan tugas proyek ke chat atau topik Telegram dengan bot.",
+			"mattermostSectionSubtitle": "Kirim pembaruan tugas proyek ke kanal Mattermost dengan incoming webhook.",
+			"mattermostSectionTitle": "Integrasi Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Visibilitas Proyek",
@@ -1024,14 +1026,14 @@
 			"botTokenPlaceholder": "123456789:AAExampleBotToken",
 			"botTokenHint": "Buat bot dengan BotFather dan tempel tokennya di sini.",
 			"botTokenHintConfigured": "Token bot sudah dikonfigurasi ({{token}}). Masukkan yang baru untuk menggantinya.",
-			"chatIdLabel": "Chat ID",
+			"chatIdLabel": "ID Obrolan",
 			"chatIdPlaceholder": "-1001234567890 atau @team_updates",
 			"chatIdHint": "Masukkan chat ID Telegram atau username kanal tempat pembaruan akan diposting.",
 			"threadIdLabel": "ID thread topik",
 			"threadIdPlaceholder": "ID topik opsional",
 			"threadIdHint": "Opsional. Gunakan ini untuk topik forum di dalam grup Telegram.",
 			"chatLabelLabel": "Label chat",
-			"chatLabelPlaceholder": "Engineering Updates",
+			"chatLabelPlaceholder": "Pembaruan Engineering",
 			"chatLabelHint": "Label opsional untuk referensi Anda di Kaneo.",
 			"eventsTitle": "Notifikasi event",
 			"eventsHint": "Pilih perubahan proyek yang harus diposting ke Telegram.",
@@ -1271,6 +1273,44 @@
 			"updateError": "Gagal memperbarui label",
 			"deleteError": "Gagal menghapus label",
 			"nameRequired": "Nama label wajib diisi"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Label opsional untuk referensi Anda. Kanal tujuan yang sebenarnya dikendalikan oleh Mattermost melalui pengaturan webhook.",
+			"channelLabel": "Nama kanal",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Hubungkan Mattermost",
+			"connected": "Terhubung",
+			"connectionHint": "Tempel URL incoming webhook Mattermost dan pilih peristiwa tugas mana yang akan diposting.",
+			"connectionTitle": "Koneksi webhook Mattermost",
+			"disconnect": "Putuskan",
+			"events": {
+				"taskCommentCreated": "Komentar baru",
+				"taskCreated": "Tugas baru",
+				"taskDescriptionChanged": "Perubahan deskripsi",
+				"taskPriorityChanged": "Perubahan prioritas",
+				"taskStatusChanged": "Perubahan status",
+				"taskTitleChanged": "Perubahan judul"
+			},
+			"eventsHint": "Pilih perubahan proyek mana yang akan diposting ke Mattermost.",
+			"eventsTitle": "Notifikasi peristiwa",
+			"paused": "Paused",
+			"saveChanges": "Simpan perubahan",
+			"toast": {
+				"disabled": "Notifikasi Mattermost dijeda",
+				"enabled": "Notifikasi Mattermost diaktifkan",
+				"removed": "Integrasi Mattermost berhasil dihapus",
+				"removeError": "Gagal menghapus integrasi Mattermost",
+				"saved": "Integrasi Mattermost berhasil disimpan",
+				"saveError": "Gagal menyimpan integrasi Mattermost",
+				"updateError": "Gagal memperbarui integrasi Mattermost"
+			},
+			"update": "Perbarui Mattermost",
+			"validation": {
+				"webhookInvalid": "Masukkan URL webhook Mattermost yang valid"
+			},
+			"webhookHint": "Buat Incoming Webhook di Mattermost dan tempel URL yang dihasilkan di sini.",
+			"webhookLabel": "URL webhook masuk",
+			"webhookPlaceholder": "https://server-mattermost-anda.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1382,7 +1422,7 @@
 				"prevTask": "Tugas sebelumnya",
 				"openTask": "Buka tugas terpilih",
 				"quickSelectNumber": "Pilih opsi berdasarkan nomor",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Beralih ke tampilan kalender"
 			}
 		}
 	},
@@ -1484,7 +1524,7 @@
 				"slashGroupLists": "Daftar",
 				"slashGroupInsert": "Sisipkan",
 				"slashParagraph": "Teks",
-				"slashHeading": "Heading",
+				"slashHeading": "Judul",
 				"slashBulletList": "Daftar berpoin",
 				"slashTaskList": "Daftar tugas",
 				"slashOrderedList": "Daftar bernomor",
@@ -1622,7 +1662,7 @@
 					"empty": "Tidak ada perintah",
 					"commands": {
 						"paragraph": "Teks",
-						"heading-2": "Heading",
+						"heading-2": "Judul",
 						"bullet-list": "Daftar berpoin",
 						"task-list": "Daftar tugas",
 						"ordered-list": "Daftar bernomor",
@@ -1865,7 +1905,7 @@
 			"resizeStart": "Ubah ukuran tanggal mulai",
 			"resizeDue": "Ubah ukuran tenggat",
 			"taskAriaLabel": "{{title}}: buka atau seret untuk memindahkan",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Lompat ke hari ini"
 		},
 		"delete": {
 			"title": "Hapus Tugas?",
@@ -1967,15 +2007,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Bulan berikutnya",
+			"noTasks": "Tidak ada tugas terjadwal",
+			"noTasksSubtitle": "Tambahkan tanggal mulai, tanggal jatuh tempo, atau keduanya pada tugas untuk menempatkannya di kalender.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Bulan sebelumnya",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Kalender",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Gagal memuat tugas."
 		}
 	},
 	"invitations": {
@@ -2155,6 +2195,30 @@
 		},
 		"branding": {
 			"poweredBy": "Didukung oleh"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Begitu Anda membuat proyek, proyek dari semua ruang kerja Anda akan muncul di sini.",
+			"title": "Belum ada proyek"
+		},
+		"pageDescription": "Satu tampilan untuk semua proyek di semua ruang kerja Anda.",
+		"pageTitle": "Semua proyek",
+		"section": {
+			"projectCount_other": "{{count}} proyek"
+		},
+		"stats": {
+			"completion": "Penyelesaian",
+			"nextDueDate": "Jatuh tempo berikutnya",
+			"projects": "Proyek",
+			"tasks": "Tugas"
+		},
+		"table": {
+			"dueDate": "Tanggal jatuh tempo",
+			"progress": "Progres",
+			"project": "Proyek",
+			"status": "Status",
+			"tasks": "Tugas"
 		}
 	}
 }

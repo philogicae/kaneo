@@ -2054,6 +2054,31 @@
 			"rejectSuccess": "Invitation rejected"
 		}
 	},
+	"unified": {
+		"pageTitle": "All projects",
+		"pageDescription": "A single view of every project across your workspaces.",
+		"stats": {
+			"projects": "Projects",
+			"tasks": "Tasks",
+			"completion": "Completion",
+			"nextDueDate": "Next due date"
+		},
+		"table": {
+			"project": "Project",
+			"progress": "Progress",
+			"tasks": "Tasks",
+			"dueDate": "Due date",
+			"status": "Status"
+		},
+		"section": {
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects"
+		},
+		"empty": {
+			"title": "No projects yet",
+			"description": "Projects from all your workspaces will show up here as soon as you create one."
+		}
+	},
 	"workspace": {
 		"projects": {
 			"pageTitle": "Projects",

@@ -57,27 +57,27 @@
 			"tryAgain": "Tentar novamente",
 			"viewDeploymentGuide": "Ver guia de implantação",
 			"refreshPage": "Atualizar página",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "A página falhou inesperadamente. Atualizá-la geralmente resolve o problema.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Falha na autenticação. Faça login novamente.",
+				"cors": "Não foi possível conectar ao servidor. Isso pode ser devido a problemas de configuração de CORS.",
+				"network": "Erro de rede. Verifique sua conexão com a internet e tente novamente.",
+				"server": "Erro do servidor. Tente novamente mais tarde.",
+				"unknown": "Ocorreu um erro inesperado."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Verifique se o seu servidor de API está acessível pelo navegador",
+					"checkApiRunning": "Certifique-se de que o seu servidor de API está em execução",
+					"checkApiUrl": "Verifique se VITE_API_URL no .env do seu frontend corresponde à URL do servidor de API",
+					"checkProtocol": "Certifique-se de que o frontend e a API usem o mesmo protocolo (http/https)",
+					"verifyCorsOrigins": "Verifique se CORS_ORIGINS no .env da sua API inclui a URL do seu frontend"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Verifique sua conexão com a internet",
+					"checkFirewall": "Verifique se há problemas de firewall ou proxy",
+					"tryRefresh": "Tente atualizar a página",
+					"verifyApiRunning": "Verifique se o servidor de API está em execução e acessível"
 				}
 			}
 		},
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Falha ao remover a foto de perfil",
+				"removeSuccess": "Foto de perfil removida",
+				"updateError": "Falha ao atualizar a foto de perfil",
+				"updateSuccess": "Foto de perfil atualizada",
+				"change": "Alterar avatar",
+				"edit": "Altere sua foto de perfil"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Excluir conta",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Os espaços de trabalho dos quais apenas você faz parte são excluídos com sua conta. Nos demais, suas tarefas permanecem e ficam sem responsável, e seus comentários são removidos.",
+				"error": "Falha ao excluir a conta",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Excluir sua conta?",
+				"sectionSubtitle": "Ações permanentes que afetam toda a sua conta.",
+				"sectionTitle": "Zona de perigo",
+				"success": "Sua conta foi excluída",
+				"title": "Excluir conta",
+				"sessionTooOld": "Por segurança, encerre a sessão e entre novamente antes de excluir sua conta."
 			}
 		},
 		"notificationsPage": {
@@ -854,7 +854,9 @@
 			"slackSectionTitle": "Integração com Slack",
 			"slackSectionSubtitle": "Envie atualizações de tarefas do projeto para um canal do Slack com um webhook de entrada.",
 			"telegramSectionTitle": "Integração com Telegram",
-			"telegramSectionSubtitle": "Envie atualizações de tarefas do projeto para um chat ou tópico do Telegram com um bot."
+			"telegramSectionSubtitle": "Envie atualizações de tarefas do projeto para um chat ou tópico do Telegram com um bot.",
+			"mattermostSectionSubtitle": "Envie atualizações de tarefas do projeto para um canal do Mattermost com um webhook entrante.",
+			"mattermostSectionTitle": "Integração do Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Visibilidade do projeto",
@@ -995,8 +997,8 @@
 				"settingsUpdateError": "Falha ao atualizar a integração com o Gitea",
 				"secretCopied": "Copiado",
 				"unableToCopySecret": "Não foi possível copiar o segredo",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "A URL não aponta para uma instância do Gitea",
+				"redirected": "A URL do Gitea foi redirecionada (geralmente para HTTPS). Use a URL final diretamente."
 			},
 			"webhookShow": "Mostrar",
 			"webhookHide": "Ocultar",
@@ -1273,6 +1275,44 @@
 			"merged": "Mesclado",
 			"draft": "Rascunho",
 			"open": "Aberto"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Rótulo opcional para sua referência. O Mattermost controla o canal de destino real pela configuração do webhook.",
+			"channelLabel": "Nome do canal",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Conectar Mattermost",
+			"connected": "Conectado",
+			"connectionHint": "Cole a URL de um webhook entrante do Mattermost e escolha quais eventos de tarefas devem ser publicados.",
+			"connectionTitle": "Conexão de webhook do Mattermost",
+			"disconnect": "Desconectar",
+			"events": {
+				"taskCommentCreated": "Novos comentários",
+				"taskCreated": "Novas tarefas",
+				"taskDescriptionChanged": "Mudanças de descrição",
+				"taskPriorityChanged": "Mudanças de prioridade",
+				"taskStatusChanged": "Mudanças de status",
+				"taskTitleChanged": "Mudanças de título"
+			},
+			"eventsHint": "Escolha quais mudanças do projeto devem ser publicadas no Mattermost.",
+			"eventsTitle": "Notificações de eventos",
+			"paused": "Paused",
+			"saveChanges": "Salvar alterações",
+			"toast": {
+				"disabled": "Notificações do Mattermost pausadas",
+				"enabled": "Notificações do Mattermost ativadas",
+				"removed": "Integração do Mattermost removida com sucesso",
+				"removeError": "Falha ao remover a integração do Mattermost",
+				"saved": "Integração do Mattermost salva com sucesso",
+				"saveError": "Falha ao salvar a integração do Mattermost",
+				"updateError": "Falha ao atualizar a integração do Mattermost"
+			},
+			"update": "Atualizar Mattermost",
+			"validation": {
+				"webhookInvalid": "Insira uma URL de webhook do Mattermost válida"
+			},
+			"webhookHint": "Crie um webhook entrante no Mattermost e cole a URL gerada aqui.",
+			"webhookLabel": "URL do webhook entrante",
+			"webhookPlaceholder": "https://seu-servidor-mattermost.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1384,7 +1424,7 @@
 				"prevTask": "Tarefa anterior",
 				"openTask": "Abrir tarefa selecionada",
 				"quickSelectNumber": "Selecionar opção por número",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Mudar para a visualização de calendário"
 			}
 		}
 	},
@@ -1560,7 +1600,7 @@
 					"deleteTable": "Excluir tabela"
 				},
 				"mermaid": {
-					"renderFailed": "Mermaid diagram couldn't be rendered"
+					"renderFailed": "Não foi possível renderizar o diagrama Mermaid"
 				}
 			}
 		}
@@ -1697,7 +1737,7 @@
 					"onlyYoutubeInline": "Somente URLs do YouTube podem ser incorporadas. Use o modo de link."
 				},
 				"mermaid": {
-					"renderFailed": "Mermaid diagram couldn't be rendered"
+					"renderFailed": "Não foi possível renderizar o diagrama Mermaid"
 				}
 			}
 		},
@@ -1875,7 +1915,7 @@
 			"resizeStart": "Redimensionar data de início",
 			"resizeDue": "Redimensionar data de vencimento",
 			"taskAriaLabel": "{{title}}: abrir ou arrastar para mover",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Ir para hoje"
 		},
 		"delete": {
 			"title": "Excluir tarefa?",
@@ -1979,15 +2019,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Próximo mês",
+			"noTasks": "Nenhuma tarefa programada",
+			"noTasksSubtitle": "Adicione uma data de início, data de vencimento ou ambas às tarefas para colocá-las no calendário.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Mês anterior",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Calendário",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Falha ao carregar as tarefas."
 		}
 	},
 	"invitations": {
@@ -2169,6 +2209,32 @@
 		},
 		"branding": {
 			"poweredBy": "Desenvolvido por"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Assim que você criar um projeto, os de todos os seus espaços de trabalho aparecerão aqui.",
+			"title": "Ainda não há projetos"
+		},
+		"pageDescription": "Uma visão única de todos os projetos dos seus espaços de trabalho.",
+		"pageTitle": "Todos os projetos",
+		"section": {
+			"projectCount_many": "{{count}} projetos",
+			"projectCount_one": "{{count}} projeto",
+			"projectCount_other": "{{count}} projetos"
+		},
+		"stats": {
+			"completion": "Conclusão",
+			"nextDueDate": "Próximo vencimento",
+			"projects": "Projetos",
+			"tasks": "Tarefas"
+		},
+		"table": {
+			"dueDate": "Data de vencimento",
+			"progress": "Progresso",
+			"project": "Projeto",
+			"status": "Status",
+			"tasks": "Tarefas"
 		}
 	}
 }

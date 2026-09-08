@@ -57,27 +57,27 @@
 			"tryAgain": "Спробувати ще раз",
 			"viewDeploymentGuide": "Переглянути інструкцію з розгортання",
 			"refreshPage": "Оновити сторінку",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Сторінка несподівано завершилася з помилкою. Зазвичай допомагає оновлення сторінки.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Не вдалося пройти автентифікацію. Увійдіть ще раз.",
+				"cors": "Не вдалося підключитися до сервера. Можливі проблеми з конфігурацією CORS.",
+				"network": "Помилка мережі. Перевірте підключення до інтернету та спробуйте ще раз.",
+				"server": "Помилка сервера. Спробуйте пізніше.",
+				"unknown": "Сталася непередбачена помилка."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Переконайтеся, що ваш API-сервер доступний із браузера",
+					"checkApiRunning": "Переконайтеся, що ваш API-сервер запущено",
+					"checkApiUrl": "Переконайтеся, що VITE_API_URL у .env фронтенду збігається з URL вашого API-сервера",
+					"checkProtocol": "Переконайтеся, що фронтенд і API використовують той самий протокол (http/https)",
+					"verifyCorsOrigins": "Переконайтеся, що CORS_ORIGINS у .env вашого API містить URL вашого фронтенду"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Перевірте підключення до інтернету",
+					"checkFirewall": "Перевірте, чи немає проблем із брандмауером або проксі",
+					"tryRefresh": "Спробуйте оновити сторінку",
+					"verifyApiRunning": "Переконайтеся, що API-сервер запущено та він доступний"
 				}
 			}
 		},
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Не вдалося видалити фото профілю",
+				"removeSuccess": "Фото профілю видалено",
+				"updateError": "Не вдалося оновити фото профілю",
+				"updateSuccess": "Фото профілю оновлено",
+				"change": "Змінити аватар",
+				"edit": "Змініть фото профілю"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Видалити акаунт",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Робочі простори, де ви єдиний учасник, видаляються разом з акаунтом. В інших ваші завдання залишаються і стають неназначеними, а коментарі видаляються.",
+				"error": "Не вдалося видалити акаунт",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Видалити ваш акаунт?",
+				"sectionSubtitle": "Необоротні дії, що впливають на весь ваш акаунт.",
+				"sectionTitle": "Небезпечна зона",
+				"success": "Ваш акаунт видалено",
+				"title": "Видалити акаунт",
+				"sessionTooOld": "З метою безпеки вийдіть з акаунта та увійдіть знову перед його видаленням."
 			}
 		},
 		"notificationsPage": {
@@ -691,7 +691,9 @@
 			"slackSectionTitle": "Інтеґрація зі Slack",
 			"slackSectionSubtitle": "Надсилайте оновлення завдань проєкту до каналу Slack за допомогою вхідного вебхука.",
 			"telegramSectionTitle": "Інтеґрація з Telegram",
-			"telegramSectionSubtitle": "Надсилайте оновлення завдань проєкту до чату або теми Telegram за допомогою бота."
+			"telegramSectionSubtitle": "Надсилайте оновлення завдань проєкту до чату або теми Telegram за допомогою бота.",
+			"mattermostSectionSubtitle": "Надсилайте оновлення завдань проєкту в канал Mattermost через вхідний webhook.",
+			"mattermostSectionTitle": "Інтеграція Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Видимість проєкту",
@@ -832,8 +834,8 @@
 				"settingsUpdateError": "Не вдалося оновити інтеґрацію з Gitea",
 				"secretCopied": "Скопійовано",
 				"unableToCopySecret": "Не вдалося скопіювати секрет",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "URL не вказує на інстанцію Gitea",
+				"redirected": "URL Gitea перенаправлено (зазвичай на HTTPS). Використовуйте кінцеву URL безпосередньо."
 			},
 			"webhookShow": "Показати",
 			"webhookHide": "Сховати",
@@ -1274,6 +1276,44 @@
 			"updateError": "Не вдалося оновити мітку",
 			"deleteError": "Не вдалося видалити мітку",
 			"nameRequired": "Назва мітки є обов'язковою"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Необов'язкова підпис для вашої довідки. Фактичний канал призначення визначає Mattermost у налаштуваннях webhook.",
+			"channelLabel": "Назва каналу",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Підключити Mattermost",
+			"connected": "Підключено",
+			"connectionHint": "Вставте URL вхідного webhook Mattermost і виберіть, які події завдань публікувати.",
+			"connectionTitle": "Підключення webhook Mattermost",
+			"disconnect": "Відключити",
+			"events": {
+				"taskCommentCreated": "Нові коментарі",
+				"taskCreated": "Нові завдання",
+				"taskDescriptionChanged": "Зміни опису",
+				"taskPriorityChanged": "Зміни пріоритету",
+				"taskStatusChanged": "Зміни статусу",
+				"taskTitleChanged": "Зміни назви"
+			},
+			"eventsHint": "Виберіть, які зміни проєкту публікувати в Mattermost.",
+			"eventsTitle": "Сповіщення про події",
+			"paused": "Paused",
+			"saveChanges": "Зберегти зміни",
+			"toast": {
+				"disabled": "Сповіщення Mattermost призупинено",
+				"enabled": "Сповіщення Mattermost увімкнено",
+				"removed": "Інтеграцію Mattermost успішно видалено",
+				"removeError": "Не вдалося видалити інтеграцію Mattermost",
+				"saved": "Інтеграцію Mattermost успішно збережено",
+				"saveError": "Не вдалося зберегти інтеграцію Mattermost",
+				"updateError": "Не вдалося оновити інтеграцію Mattermost"
+			},
+			"update": "Оновити Mattermost",
+			"validation": {
+				"webhookInvalid": "Введіть коректний URL webhook Mattermost"
+			},
+			"webhookHint": "Створіть вхідний webhook у Mattermost і вставте згенеровану URL сюди.",
+			"webhookLabel": "URL вхідного webhook",
+			"webhookPlaceholder": "https://ваш-mattermost-сервер.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1385,7 +1425,7 @@
 				"prevTask": "Попереднє завдання",
 				"openTask": "Відкрити обране завдання",
 				"quickSelectNumber": "Обрати варіант за номером",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Перейти до вигляду календаря"
 			}
 		}
 	},
@@ -1880,7 +1920,7 @@
 			"resizeStart": "Змінити дату початку",
 			"resizeDue": "Змінити дату завершення",
 			"taskAriaLabel": "{{title}}: відкрити або перетягнути для переміщення",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Перейти на сьогодні"
 		},
 		"delete": {
 			"title": "Видалити завдання?",
@@ -1904,7 +1944,7 @@
 			"merged": "Змерджено",
 			"draft": "Чернетка",
 			"open": "Відкрито",
-			"label": "Pull Request",
+			"label": "Пул-реквест",
 			"count_one": "{{count}} PR",
 			"count_few": "{{count}} PR",
 			"count_many": "{{count}} PR",
@@ -1985,15 +2025,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Наступний місяць",
+			"noTasks": "Немає запланованих завдань",
+			"noTasksSubtitle": "Додайте до завдань дату початку, термін або обидва, щоб розмістити їх у календарі.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Попередній місяць",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Календар",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Не вдалося завантажити завдання."
 		}
 	},
 	"invitations": {
@@ -2155,7 +2195,7 @@
 		"taskDetail": {
 			"labels": "Мітки",
 			"externalLinks": "Зовнішні посилання",
-			"pullRequestFallback": "Pull Request",
+			"pullRequestFallback": "Пул-реквест",
 			"issueFallback": "Issue",
 			"prStatusMerged": "Змерджено",
 			"prStatusDraft": "Чернетка",
@@ -2176,6 +2216,33 @@
 		},
 		"branding": {
 			"poweredBy": "Працює на"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Щойно ви створите проєкт, проєкти з усіх ваших робочих просторів з'являться тут.",
+			"title": "Поки немає проєктів"
+		},
+		"pageDescription": "Усі проєкти з усіх ваших робочих просторів в одному місці.",
+		"pageTitle": "Усі проєкти",
+		"section": {
+			"projectCount_few": "{{count}} проєкти",
+			"projectCount_many": "{{count}} проєктів",
+			"projectCount_one": "{{count}} проєкт",
+			"projectCount_other": "{{count}} проєкта"
+		},
+		"stats": {
+			"completion": "Виконано",
+			"nextDueDate": "Найближчий термін",
+			"projects": "Проєкти",
+			"tasks": "Завдання"
+		},
+		"table": {
+			"dueDate": "Термін",
+			"progress": "Прогрес",
+			"project": "Проєкт",
+			"status": "Статус",
+			"tasks": "Завдання"
 		}
 	}
 }

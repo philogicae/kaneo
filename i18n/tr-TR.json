@@ -57,27 +57,27 @@
 			"tryAgain": "Tekrar dene",
 			"viewDeploymentGuide": "Dağıtım Kılavuzunu Görüntüle",
 			"refreshPage": "Sayfayı Yenile",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Sayfa beklenmedik şekilde çöktü. Yenilemek genellikle sorunu çözer.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Kimlik doğrulama başarısız. Lütfen yeniden oturum açın.",
+				"cors": "Sunucuya bağlanılamıyor. Bu, CORS yapılandırma sorunlarından kaynaklanıyor olabilir.",
+				"network": "Ağ hatası. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.",
+				"server": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
+				"unknown": "Beklenmeyen bir hata oluştu."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "API sunucunuza tarayıcınızdan erişilebildiğini kontrol edin",
+					"checkApiRunning": "API sunucunuzun çalıştığından emin olun",
+					"checkApiUrl": "Frontend .env dosyanızdaki VITE_API_URL değerinin API sunucu URL'nizle eşleştiğini kontrol edin",
+					"checkProtocol": "Frontend ve API'nin aynı protokolü (http/https) kullandığından emin olun",
+					"verifyCorsOrigins": "API .env dosyanızdaki CORS_ORIGINS değerinin frontend URL'nizi içerdiğini doğrulayın"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "İnternet bağlantınızı kontrol edin",
+					"checkFirewall": "Güvenlik duvarı veya proxy sorunları olup olmadığını kontrol edin",
+					"tryRefresh": "Sayfayı yenilemeyi deneyin",
+					"verifyApiRunning": "API sunucusunun çalıştığını ve erişilebilir olduğunu doğrulayın"
 				}
 			}
 		},
@@ -260,7 +260,7 @@
 		},
 		"signUpForm": {
 			"fullName": "Ad Soyad",
-			"namePlaceholder": "John Doe",
+			"namePlaceholder": "Ahmet Yılmaz",
 			"failedSignUp": "Kayıt başarısız",
 			"accountCreated": "Hesap başarıyla oluşturuldu",
 			"passwordTooShort": "Parola çok kısa",
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Profil fotoğrafı kaldırılamadı",
+				"removeSuccess": "Profil fotoğrafı kaldırıldı",
+				"updateError": "Profil fotoğrafı güncellenemedi",
+				"updateSuccess": "Profil fotoğrafı güncellendi",
+				"change": "Avatarı değiştir",
+				"edit": "Profil fotoğrafınızı değiştirin"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Hesabı sil",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Yalnızca sizin üye olduğunuz çalışma alanları hesabınızla birlikte silinir. Diğer yerlerde görevleriniz kalır ve atanmamış olur; yorumlarınız kaldırılır.",
+				"error": "Hesap silinemedi",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Hesabınız silinsin mi?",
+				"sectionSubtitle": "Tüm hesabınızı etkileyen kalıcı işlemler.",
+				"sectionTitle": "Tehlikeli bölge",
+				"success": "Hesabınız silindi",
+				"title": "Hesabı sil",
+				"sessionTooOld": "Güvenlik nedeniyle, hesabınızı silmeden önce oturumu kapatıp yeniden açın."
 			}
 		},
 		"notificationsPage": {
@@ -691,7 +691,9 @@
 			"slackSectionTitle": "Slack Entegrasyonu",
 			"slackSectionSubtitle": "Proje talep güncellemelerini gelen bir webhook ile Slack kanalına gönderin.",
 			"telegramSectionTitle": "Telegram Entegrasyonu",
-			"telegramSectionSubtitle": "Proje talep güncellemelerini bir bot ile Telegram sohbetine veya konusuna gönderin."
+			"telegramSectionSubtitle": "Proje talep güncellemelerini bir bot ile Telegram sohbetine veya konusuna gönderin.",
+			"mattermostSectionSubtitle": "Gelen webhook ile proje görev güncellemelerini bir Mattermost kanalına gönderin.",
+			"mattermostSectionTitle": "Mattermost entegrasyonu"
 		},
 		"projectVisibility": {
 			"pageTitle": "Proje Görünürlüğü",
@@ -832,8 +834,8 @@
 				"settingsUpdateError": "Gitea entegrasyonu güncellenemedi",
 				"secretCopied": "Kopyalandı",
 				"unableToCopySecret": "Gizli anahtar kopyalanamıyor",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "URL bir Gitea örneğine işaret etmiyor",
+				"redirected": "Gitea URL'si yönlendirildi (genellikle HTTPS'e). Son URL'yi doğrudan kullanın."
 			},
 			"webhookShow": "Göster",
 			"webhookHide": "Gizle",
@@ -1272,6 +1274,44 @@
 			"updateError": "Etiket güncellenemedi",
 			"deleteError": "Etiket silinemedi",
 			"nameRequired": "Etiket adı gereklidir"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Referansınız için isteğe bağlı etiket. Gerçek hedef kanalı webhook kurulumundan Mattermost belirler.",
+			"channelLabel": "Kanal adı",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Mattermost'a bağlan",
+			"connected": "Bağlı",
+			"connectionHint": "Bir Mattermost incoming webhook URL'si yapıştırın ve hangi görev olaylarının paylaşılacağını seçin.",
+			"connectionTitle": "Mattermost webhook bağlantısı",
+			"disconnect": "Bağlantıyı kes",
+			"events": {
+				"taskCommentCreated": "Yeni yorumlar",
+				"taskCreated": "Yeni görevler",
+				"taskDescriptionChanged": "Açıklama değişiklikleri",
+				"taskPriorityChanged": "Öncelik değişiklikleri",
+				"taskStatusChanged": "Durum değişiklikleri",
+				"taskTitleChanged": "Başlık değişiklikleri"
+			},
+			"eventsHint": "Hangi proje değişikliklerinin Mattermost'a gönderileceğini seçin.",
+			"eventsTitle": "Olay bildirimleri",
+			"paused": "Paused",
+			"saveChanges": "Değişiklikleri kaydet",
+			"toast": {
+				"disabled": "Mattermost bildirimleri duraklatıldı",
+				"enabled": "Mattermost bildirimleri etkinleştirildi",
+				"removed": "Mattermost entegrasyonu başarıyla kaldırıldı",
+				"removeError": "Mattermost entegrasyonu kaldırılamadı",
+				"saved": "Mattermost entegrasyonu başarıyla kaydedildi",
+				"saveError": "Mattermost entegrasyonu kaydedilemedi",
+				"updateError": "Mattermost entegrasyonu güncellenemedi"
+			},
+			"update": "Mattermost'u güncelle",
+			"validation": {
+				"webhookInvalid": "Geçerli bir Mattermost webhook URL'si girin"
+			},
+			"webhookHint": "Mattermost'ta bir Incoming Webhook oluşturun ve üretilen URL'yi buraya yapıştırın.",
+			"webhookLabel": "Incoming webhook URL'si",
+			"webhookPlaceholder": "https://mattermost-sunucunuz.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1383,7 +1423,7 @@
 				"prevTask": "Önceki talep",
 				"openTask": "Seçili talebi aç",
 				"quickSelectNumber": "Numarayla seçenek seç",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Takvim görünümüne geç"
 			}
 		}
 	},
@@ -1870,7 +1910,7 @@
 			"resizeStart": "Başlangıç tarihini yeniden boyutlandır",
 			"resizeDue": "Bitiş tarihini yeniden boyutlandır",
 			"taskAriaLabel": "{{title}}: açmak veya taşımak için sürükleyin",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Bugüne atla"
 		},
 		"delete": {
 			"title": "Talep Silinsin mi?",
@@ -1973,15 +2013,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Sonraki ay",
+			"noTasks": "Zamanlanmış görev yok",
+			"noTasksSubtitle": "Görevleri takvime yerleştirmek için görevlere başlangıç tarihi, bitiş tarihi veya her ikisini ekleyin.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Önceki ay",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Takvim",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Görevler yüklenemedi."
 		}
 	},
 	"invitations": {
@@ -2162,6 +2202,31 @@
 		},
 		"branding": {
 			"poweredBy": "Tarafından desteklenmektedir"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Bir proje oluşturduğunuzda tüm çalışma alanlarınızdaki projeler burada görünecek.",
+			"title": "Henüz proje yok"
+		},
+		"pageDescription": "Tüm çalışma alanlarınızdaki projeler tek bir ekranda.",
+		"pageTitle": "Tüm projeler",
+		"section": {
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} proje"
+		},
+		"stats": {
+			"completion": "Tamamlanma",
+			"nextDueDate": "Yaklaşan teslim tarihi",
+			"projects": "Projeler",
+			"tasks": "Görevler"
+		},
+		"table": {
+			"dueDate": "Teslim tarihi",
+			"progress": "İlerleme",
+			"project": "Proje",
+			"status": "Durum",
+			"tasks": "Görevler"
 		}
 	}
 }

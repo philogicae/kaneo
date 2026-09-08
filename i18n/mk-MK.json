@@ -57,27 +57,27 @@
 			"tryAgain": "Обиди се повторно",
 			"viewDeploymentGuide": "Погледни го водичот за поставување",
 			"refreshPage": "Освежи ја страницата",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Страницата се урна неочекувано. Освежувањето обично го решава проблемот.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Автентикацијата не успеа. Најавете се повторно.",
+				"cors": "Не може да се поврзе со серверот. Можеби е поради проблеми со CORS конфигурацијата.",
+				"network": "Мрежна грешка. Проверете ја интернет врската и обидете се повторно.",
+				"server": "Серверска грешка. Обидете се повторно подоцна.",
+				"unknown": "Се случи неочекувана грешка."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Проверете дали вашиот API сервер е достапен од прелистувачот",
+					"checkApiRunning": "Осигурајте дека вашиот API сервер работи",
+					"checkApiUrl": "Проверете дали VITE_API_URL во .env на фронтендот одговара на URL на вашиот API сервер",
+					"checkProtocol": "Осигурајте дека фронтендот и API користат ист протокол (http/https)",
+					"verifyCorsOrigins": "Проверете дали CORS_ORIGINS во .env на API го вклучува URL на вашиот фронтенд"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Проверете ја интернет врската",
+					"checkFirewall": "Проверете дали има проблеми со заштитен ѕид или прокси",
+					"tryRefresh": "Обидете се да ја освежите страницата",
+					"verifyApiRunning": "Проверете дали API серверот работи и е достапен"
 				}
 			}
 		},
@@ -364,43 +364,43 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Не успеа отстранување на профилната слика",
+				"removeSuccess": "Профилната слика е отстранета",
+				"updateError": "Не успеа ажурирање на профилната слика",
+				"updateSuccess": "Профилната слика е ажурирана",
+				"change": "Смени аватар",
+				"edit": "Сменете ја вашата профилна слика"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Избриши сметка",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Работните простори во кои сте само вие се бришат со вашата сметка. На друго место, вашите задачи остануваат и стануваат нераспределени, а вашите коментари се бришат.",
+				"error": "Не успеа бришење на сметката",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Да ја избришете вашата сметка?",
+				"sectionSubtitle": "Трајни дејства што ги засегаат целата ваша сметка.",
+				"sectionTitle": "Опасна зона",
+				"success": "Вашата сметка е избришана",
+				"title": "Избриши сметка",
+				"sessionTooOld": "Поради безбедност, одјавете се и најавете се повторно пред да ја избришете сметката."
 			}
 		},
 		"notificationsPage": {
 			"pageTitle": "Известувања",
 			"title": "Известувања",
 			"subtitle": "Избери како Kaneo ги доставува известувањата за твојата сметка и кои канали да се користат.",
-			"statusConnected": "Connected",
+			"statusConnected": "Поврзано",
 			"statusPaused": "Paused",
 			"emailTitle": "Email",
 			"emailDescription": "Користи ја е-поштата на твојата сметка како дестинација за известувања.",
 			"accountEmailLabel": "Е-пошта на сметката",
 			"accountEmailNoAddress": "Нема достапна е-пошта на сметката",
 			"accountEmailHint": "Доставата по е-пошта секогаш оди на е-поштата на најавената сметка.",
-			"saveChanges": "Save changes",
-			"disconnect": "Disconnect",
+			"saveChanges": "Зачувај промени",
+			"disconnect": "Исклучи",
 			"ntfyTitle": "ntfy",
 			"ntfyDescription": "Објавувај известувања за сметката на ntfy тема.",
-			"serverUrl": "Server URL",
+			"serverUrl": "URL на серверот",
 			"topic": "Topic",
 			"token": "Token",
 			"ntfyServerPlaceholder": "https://ntfy.example.com",
@@ -408,10 +408,10 @@
 			"ntfyTokenPlaceholder": "Опционален bearer токен",
 			"ntfyTokenHintConfigured": "Токен веќе е конфигуриран ({{masked}}). Внеси нов токен за да го замениш.",
 			"ntfyTokenHintOptional": "Опционално. Внеси токен ако твојот ntfy сервер бара автентикација.",
-			"connectNtfy": "Connect ntfy",
+			"connectNtfy": "Поврзи ntfy",
 			"gotifyTitle": "Gotify",
 			"gotifyDescription": "Испраќај известувања за сметката до твојот Gotify сервер.",
-			"gotifyTokenLabel": "App token",
+			"gotifyTokenLabel": "Токен на апликација",
 			"gotifyServerPlaceholder": "https://gotify.example.com",
 			"gotifyTokenPlaceholder": "Gotify токен за апликација",
 			"gotifyTokenHintConfigured": "Токен за апликација веќе е конфигуриран ({{masked}}). Внеси нов токен за да го замениш.",
@@ -419,7 +419,7 @@
 			"connectGotify": "Поврзи Gotify",
 			"webhookTitle": "Прилагоден webhook",
 			"webhookDescription": "Испраќај известувања за сметката до твој endpoint како JSON.",
-			"endpointUrl": "Endpoint URL",
+			"endpointUrl": "URL на endpoint",
 			"signingSecret": "Тајна за потпис",
 			"webhookUrlPlaceholder": "https://example.com/webhooks/kaneo",
 			"webhookSecretPlaceholder": "Опционална заедничка тајна",
@@ -443,13 +443,13 @@
 			"webhookChannelHintDisabled": "Прво конфигурирај и вклучи го webhook-от глобално.",
 			"projectScope": "Опфат на проекти",
 			"projectScopeDescription": "Стандардно се вклучени сите проекти. Ограничи го изборот ако овој работен простор треба да испраќа известувања само од избрани проекти.",
-			"allProjects": "All projects",
+			"allProjects": "Сите проекти",
 			"allProjectsDescription": "Доставувај известувања од секој проект во овој работен простор.",
 			"selectedProjects": "Избрани проекти",
 			"selectedProjectsDescription": "Доставувај известувања само од избраните проекти.",
 			"noProjectsInWorkspace": "Сè уште нема достапни проекти за овој работен простор.",
-			"createRule": "Create rule",
-			"removeRule": "Remove rule",
+			"createRule": "Креирај правило",
+			"removeRule": "Отстрани правило",
 			"toastEmailSaved": "Поставките за известувања по е-пошта се зачувани",
 			"toastEmailSaveFailed": "Неуспешно зачувување на поставките за е-пошта",
 			"toastNtfySaved": "ntfy поставките се зачувани",
@@ -691,7 +691,9 @@
 			"genericWebhookSectionTitle": "Општи webhooks",
 			"genericWebhookSectionSubtitle": "Испрати настани за задачи на проектот до кој било HTTP endpoint како JSON.",
 			"slackSectionTitle": "Slack интеграција",
-			"slackSectionSubtitle": "Испрати ажурирања за задачи на проектот во Slack канал преку дојдовен webhook."
+			"slackSectionSubtitle": "Испрати ажурирања за задачи на проектот во Slack канал преку дојдовен webhook.",
+			"mattermostSectionSubtitle": "Праќајте ажурирања на задачите од проектот во канал на Mattermost со incoming webhook.",
+			"mattermostSectionTitle": "Mattermost интеграција"
 		},
 		"projectVisibility": {
 			"pageTitle": "Видливост на проект",
@@ -832,8 +834,8 @@
 				"settingsUpdateError": "Неуспешно ажурирање на Gitea интеграцијата",
 				"secretCopied": "Copied",
 				"unableToCopySecret": "Не можеше да се копира тајната",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "URL не укажува на Gitea инстанца",
+				"redirected": "URL на Gitea беше пренасочен (обично на HTTPS). Користете ја финалната URL директно."
 			},
 			"webhookShow": "Show",
 			"webhookHide": "Hide",
@@ -841,9 +843,9 @@
 			"connectionStatus": "Статус на конекција",
 			"connectedActive": "Репозиториумот е поврзан и активен",
 			"notConnectedHint": "Нема поврзан Gitea репозиториум",
-			"badgeConnected": "Connected",
+			"badgeConnected": "Поврзано",
 			"badgeNotConnected": "Неповрзан",
-			"repository": "Repository",
+			"repository": "Репозиториум",
 			"repositoryHint": "Поврзан Gitea репозиториум",
 			"commentTaskLinkTitle": "Коментирај Kaneo линк на новите issues",
 			"commentTaskLinkHint": "Кога е вклучено, Kaneo објавува коментар на секој нов issue со линк до задачата.",
@@ -854,28 +856,28 @@
 			"baseUrlHint": "Основна URL на твојата Gitea инстанца",
 			"tokenLabel": "Личен пристапен токен",
 			"tokenHint": "Токен со пристап до repo и issues",
-			"tokenPlaceholder": "Paste token",
+			"tokenPlaceholder": "Залепете го токенот",
 			"tokenPlaceholderUpdate": "Залепи нов токен за замена",
 			"currentToken": "stored",
 			"ownerLabel": "Owner",
 			"ownerHint": "Име на корисник или организација",
 			"repoNameLabel": "Име на репозиториум",
 			"repoNameHint": "Само име на репозиториумот (без сопственик)",
-			"actionsTitle": "Actions",
+			"actionsTitle": "Дејства",
 			"actionsHint": "Провери го пристапот и поврзи",
 			"browse": "Browse",
 			"verify": "Verify",
 			"update": "Update",
-			"connect": "Connect",
-			"disconnect": "Disconnect",
+			"connect": "Поврзи",
+			"disconnect": "Исклучи",
 			"importSectionTitle": "Увези Gitea issues",
 			"importSectionHint": "Увези отворени issues и pull requests од репозиториумот",
-			"importing": "Importing…",
+			"importing": "Се увезува…",
 			"importIssues": "Увези issues",
 			"importDisabledHint": "Провери го репозиториумот погоре за да овозможиш увоз",
 			"browseModalTitle": "Твоите репозиториуми",
 			"browseModalHint": "Репозиториуми до кои твојот токен има пристап",
-			"searchRepos": "Search…",
+			"searchRepos": "Пребарај…",
 			"browseNeedsCredentials": "Внеси Gitea URL и токен за прегледување",
 			"loadingRepos": "Се вчитуваат репозиториуми…",
 			"retry": "Retry"
@@ -897,7 +899,7 @@
 			"connectionHint": "Залепи Slack incoming webhook URL и избери кои настани за задачи да се испраќаат.",
 			"connected": "Поврзано",
 			"paused": "Паузирано",
-			"webhookLabel": "Incoming webhook URL",
+			"webhookLabel": "URL на incoming webhook",
 			"webhookPlaceholder": "https://hooks.slack.com/services/...",
 			"webhookHint": "Креирај Incoming Webhook во Slack и залепи ја генерираната URL тука.",
 			"channelLabel": "Име на канал",
@@ -935,7 +937,7 @@
 			"connectionHint": "Залепи Discord webhook URL и избери кои настани за задачи да се испраќаат.",
 			"connected": "Поврзано",
 			"paused": "Паузирано",
-			"webhookLabel": "Webhook URL",
+			"webhookLabel": "URL на webhook",
 			"webhookPlaceholder": "https://discord.com/api/webhooks/...",
 			"webhookHint": "Креирај webhook за канал во Discord и залепи ја генерираната URL тука.",
 			"channelLabel": "Име на канал",
@@ -1020,11 +1022,11 @@
 			"connectionHint": "Користи Telegram bot token и chat ID за да испраќаш ажурирања за проектот во разговор или тема.",
 			"connected": "Поврзан",
 			"paused": "Паузирано",
-			"botTokenLabel": "Bot token",
+			"botTokenLabel": "Токен на бот",
 			"botTokenPlaceholder": "123456789:AAExampleBotToken",
 			"botTokenHint": "Креирај бот со BotFather и залепи го неговиот token тука.",
 			"botTokenHintConfigured": "Bot token веќе е конфигуриран ({{token}}). Внеси нов за да го замениш.",
-			"chatIdLabel": "Chat ID",
+			"chatIdLabel": "ID на разговор",
 			"chatIdPlaceholder": "-1001234567890 или @team_updates",
 			"chatIdHint": "Внеси Telegram chat ID или корисничко име на канал каде што треба да се објавуваат ажурирањата.",
 			"threadIdLabel": "ID на тема",
@@ -1272,6 +1274,44 @@
 			"updateError": "Неуспешно ажурирање на ознака",
 			"deleteError": "Неуспешно бришење на ознака",
 			"nameRequired": "Името на ознаката е задолжително"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Опционална етикета за ваша референца. Мosterman... 🇲🇰",
+			"channelLabel": "Име на каналот",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Поврзи Mattermost",
+			"connected": "Поврзано",
+			"connectionHint": "Залепете URL од incoming webhook на Mattermost и изберете кои настани за задачи ќе се објавуваат.",
+			"connectionTitle": "Поврзаност со webhook на Mattermost",
+			"disconnect": "Исклучи",
+			"events": {
+				"taskCommentCreated": "Нови коментари",
+				"taskCreated": "Нови задачи",
+				"taskDescriptionChanged": "Промени во описот",
+				"taskPriorityChanged": "Промени во приоритетот",
+				"taskStatusChanged": "Промени во статусот",
+				"taskTitleChanged": "Промени во насловот"
+			},
+			"eventsHint": "Изберете кои промени во проектот ќе се објавуваат во Mattermost.",
+			"eventsTitle": "Известувања за настани",
+			"paused": "Paused",
+			"saveChanges": "Зачувај промени",
+			"toast": {
+				"disabled": "Известувањата од Mattermost се паузирани",
+				"enabled": "Известувањата од Mattermost се овозможени",
+				"removed": "Mattermost интеграцијата е успешно отстранета",
+				"removeError": "Не успеа отстранување на Mattermost интеграцијата",
+				"saved": "Mattermost интеграцијата е успешно зачувана",
+				"saveError": "Не успеа зачувување на Mattermost интеграцијата",
+				"updateError": "Не успеа ажурирање на Mattermost интеграцијата"
+			},
+			"update": "Ажурирај Mattermost",
+			"validation": {
+				"webhookInvalid": "Внесете валидна URL на Mattermost webhook"
+			},
+			"webhookHint": "Креирајте Incoming Webhook во Mattermost и залепете ја генерираната URL тука.",
+			"webhookLabel": "URL на incoming webhook",
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1383,7 +1423,7 @@
 				"prevTask": "Претходна задача",
 				"openTask": "Отвори избрана задача",
 				"quickSelectNumber": "Избери опција по број",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Пређи на приказ на календар"
 			}
 		}
 	},
@@ -1870,7 +1910,7 @@
 			"resizeStart": "Промени почетен датум",
 			"resizeDue": "Промени краен рок",
 			"taskAriaLabel": "{{title}}: отвори или повлечи за преместување",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Оди на денешен ден"
 		},
 		"delete": {
 			"title": "Избриши задача?",
@@ -1973,15 +2013,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Следен месец",
+			"noTasks": "Нема закажани задачи",
+			"noTasksSubtitle": "Додадете датум на почеток, рок или двете на задачите за да се појават во календарот.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Претходен месец",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Календар",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Не успеа вчитување на задачите."
 		}
 	},
 	"invitations": {
@@ -2162,6 +2202,31 @@
 		},
 		"branding": {
 			"poweredBy": "Овозможено од"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Штом ќе создадете проект, проектите од сите ваши работни простори ќе се појават тука.",
+			"title": "Сè уште нема проекти"
+		},
+		"pageDescription": "Еден приказ на сите проекти во вашите работни простори.",
+		"pageTitle": "Сите проекти",
+		"section": {
+			"projectCount_one": "{{count}} проект",
+			"projectCount_other": "{{count}} проекти"
+		},
+		"stats": {
+			"completion": "Завршеност",
+			"nextDueDate": "Следен рок",
+			"projects": "Проекти",
+			"tasks": "Задачи"
+		},
+		"table": {
+			"dueDate": "Рок",
+			"progress": "Напредок",
+			"project": "Проект",
+			"status": "Статус",
+			"tasks": "Задачи"
 		}
 	}
 }

@@ -3325,6 +3325,12 @@
 						"slackSectionSubtitle": {
 							"type": "string"
 						},
+						"mattermostSectionTitle": {
+							"type": "string"
+						},
+						"mattermostSectionSubtitle": {
+							"type": "string"
+						},
 						"telegramSectionTitle": {
 							"type": "string"
 						},
@@ -3346,6 +3352,8 @@
 						"genericWebhookSectionSubtitle",
 						"slackSectionTitle",
 						"slackSectionSubtitle",
+						"mattermostSectionTitle",
+						"mattermostSectionSubtitle",
 						"telegramSectionTitle",
 						"telegramSectionSubtitle"
 					]
@@ -4405,6 +4413,159 @@
 						"disconnect"
 					]
 				},
+				"mattermostIntegration": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"validation": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"webhookInvalid": {
+									"type": "string"
+								}
+							},
+							"required": ["webhookInvalid"]
+						},
+						"toast": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"saved": {
+									"type": "string"
+								},
+								"saveError": {
+									"type": "string"
+								},
+								"enabled": {
+									"type": "string"
+								},
+								"disabled": {
+									"type": "string"
+								},
+								"updateError": {
+									"type": "string"
+								},
+								"removed": {
+									"type": "string"
+								},
+								"removeError": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"saved",
+								"saveError",
+								"enabled",
+								"disabled",
+								"updateError",
+								"removed",
+								"removeError"
+							]
+						},
+						"connectionTitle": {
+							"type": "string"
+						},
+						"connectionHint": {
+							"type": "string"
+						},
+						"connected": {
+							"type": "string"
+						},
+						"paused": {
+							"type": "string"
+						},
+						"webhookLabel": {
+							"type": "string"
+						},
+						"webhookPlaceholder": {
+							"type": "string"
+						},
+						"webhookHint": {
+							"type": "string"
+						},
+						"channelLabel": {
+							"type": "string"
+						},
+						"channelPlaceholder": {
+							"type": "string"
+						},
+						"channelHint": {
+							"type": "string"
+						},
+						"eventsTitle": {
+							"type": "string"
+						},
+						"eventsHint": {
+							"type": "string"
+						},
+						"events": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"taskCreated": {
+									"type": "string"
+								},
+								"taskStatusChanged": {
+									"type": "string"
+								},
+								"taskPriorityChanged": {
+									"type": "string"
+								},
+								"taskTitleChanged": {
+									"type": "string"
+								},
+								"taskDescriptionChanged": {
+									"type": "string"
+								},
+								"taskCommentCreated": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"taskCreated",
+								"taskStatusChanged",
+								"taskPriorityChanged",
+								"taskTitleChanged",
+								"taskDescriptionChanged",
+								"taskCommentCreated"
+							]
+						},
+						"connect": {
+							"type": "string"
+						},
+						"saveChanges": {
+							"type": "string"
+						},
+						"update": {
+							"type": "string"
+						},
+						"disconnect": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"validation",
+						"toast",
+						"connectionTitle",
+						"connectionHint",
+						"connected",
+						"paused",
+						"webhookLabel",
+						"webhookPlaceholder",
+						"webhookHint",
+						"channelLabel",
+						"channelPlaceholder",
+						"channelHint",
+						"eventsTitle",
+						"eventsHint",
+						"events",
+						"connect",
+						"saveChanges",
+						"update",
+						"disconnect"
+					]
+				},
 				"genericWebhookIntegration": {
 					"type": "object",
 					"additionalProperties": false,
@@ -5141,6 +5302,7 @@
 				"giteaIntegration",
 				"slackIntegration",
 				"discordIntegration",
+				"mattermostIntegration",
 				"genericWebhookIntegration",
 				"telegramIntegration",
 				"repositoryBrowser",
@@ -6322,6 +6484,9 @@
 			"type": "object",
 			"additionalProperties": false,
 			"properties": {
+				"title": {
+					"type": "string"
+				},
 				"status": {
 					"type": "object",
 					"additionalProperties": false,
@@ -7598,10 +7763,10 @@
 						"title": {
 							"type": "string"
 						},
-						"searchPlaceholder": {
+						"jumpToToday": {
 							"type": "string"
 						},
-						"jumpToToday": {
+						"searchPlaceholder": {
 							"type": "string"
 						},
 						"hideTasks": {
@@ -7641,8 +7806,8 @@
 					"required": [
 						"pageTitle",
 						"title",
-						"searchPlaceholder",
 						"jumpToToday",
+						"searchPlaceholder",
 						"hideTasks",
 						"showTasks",
 						"noTasks",
@@ -8195,6 +8360,7 @@
 				}
 			},
 			"required": [
+				"title",
 				"status",
 				"priority",
 				"boardSearchPlaceholder",
@@ -8344,6 +8510,115 @@
 				"skipForNow",
 				"table",
 				"toast"
+			]
+		},
+		"unified": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"pageTitle": {
+					"type": "string"
+				},
+				"pageDescription": {
+					"type": "string"
+				},
+				"stats": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"projects": {
+							"type": "string"
+						},
+						"tasks": {
+							"type": "string"
+						},
+						"completion": {
+							"type": "string"
+						},
+						"nextDueDate": {
+							"type": "string"
+						}
+					},
+					"required": ["projects", "tasks", "completion", "nextDueDate"]
+				},
+				"table": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"project": {
+							"type": "string"
+						},
+						"workspace": {
+							"type": "string"
+						},
+						"progress": {
+							"type": "string"
+						},
+						"tasks": {
+							"type": "string"
+						},
+						"dueDate": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"project",
+						"workspace",
+						"progress",
+						"tasks",
+						"dueDate",
+						"status"
+					]
+				},
+				"section": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"projectCount_one": {
+							"type": "string"
+						},
+						"projectCount_zero": {
+							"type": "string"
+						},
+						"projectCount_two": {
+							"type": "string"
+						},
+						"projectCount_few": {
+							"type": "string"
+						},
+						"projectCount_many": {
+							"type": "string"
+						},
+						"projectCount_other": {
+							"type": "string"
+						}
+					},
+					"required": []
+				},
+				"empty": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						}
+					},
+					"required": ["title", "description"]
+				}
+			},
+			"required": [
+				"pageTitle",
+				"pageDescription",
+				"stats",
+				"table",
+				"section",
+				"empty"
 			]
 		},
 		"workspace": {
@@ -8945,6 +9220,7 @@
 		"activity",
 		"tasks",
 		"invitations",
+		"unified",
 		"workspace",
 		"team",
 		"publicProject"

@@ -57,27 +57,27 @@
 			"tryAgain": "Попробовать снова",
 			"viewDeploymentGuide": "Руководство по развёртыванию",
 			"refreshPage": "Обновить страницу",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Страница неожиданно завершилась с ошибкой. Обычно помогает обновление страницы.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Не удалось пройти аутентификацию. Войдите снова.",
+				"cors": "Не удалось подключиться к серверу. Возможны проблемы с конфигурацией CORS.",
+				"network": "Ошибка сети. Проверьте подключение к интернету и повторите попытку.",
+				"server": "Ошибка сервера. Повторите попытку позже.",
+				"unknown": "Произошла непредвиденная ошибка."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Убедитесь, что ваш API-сервер доступен из браузера",
+					"checkApiRunning": "Убедитесь, что ваш API-сервер запущен",
+					"checkApiUrl": "Убедитесь, что VITE_API_URL в .env фронтенда совпадает с URL вашего API-сервера",
+					"checkProtocol": "Убедитесь, что фронтенд и API используют один протокол (http/https)",
+					"verifyCorsOrigins": "Убедитесь, что CORS_ORIGINS в .env вашего API содержит URL вашего фронтенда"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Проверьте подключение к интернету",
+					"checkFirewall": "Проверьте, нет ли проблем с брандмауэром или прокси",
+					"tryRefresh": "Попробуйте обновить страницу",
+					"verifyApiRunning": "Убедитесь, что API-сервер запущен и доступен"
 				}
 			}
 		},
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Не удалось удалить фото профиля",
+				"removeSuccess": "Фото профиля удалено",
+				"updateError": "Не удалось обновить фото профиля",
+				"updateSuccess": "Фото профиля обновлено",
+				"change": "Сменить аватар",
+				"edit": "Измените фото профиля"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Удалить аккаунт",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Рабочие пространства, где вы единственный участник, удаляются вместе с аккаунтом. В остальных ваши задачи сохраняются и становятся неназначенными, а комментарии удаляются.",
+				"error": "Не удалось удалить аккаунт",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Удалить ваш аккаунт?",
+				"sectionSubtitle": "Необратимые действия, влияющие на весь ваш аккаунт.",
+				"sectionTitle": "Опасная зона",
+				"success": "Ваш аккаунт удален",
+				"title": "Удалить аккаунт",
+				"sessionTooOld": "В целях безопасности выйдите из аккаунта и войдите снова перед его удалением."
 			}
 		},
 		"notificationsPage": {
@@ -691,7 +691,9 @@
 			"slackSectionTitle": "Интеграция со Slack",
 			"slackSectionSubtitle": "Отправка обновлений по задачам проекта в канал Slack через входящий вебхук.",
 			"telegramSectionTitle": "Интеграция с Telegram",
-			"telegramSectionSubtitle": "Отправка обновлений по задачам проекта в чат или тему Telegram через бота."
+			"telegramSectionSubtitle": "Отправка обновлений по задачам проекта в чат или тему Telegram через бота.",
+			"mattermostSectionSubtitle": "Отправляйте обновления задач проекта в канал Mattermost через входящий webhook.",
+			"mattermostSectionTitle": "Интеграция Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Видимость проекта",
@@ -832,8 +834,8 @@
 				"settingsUpdateError": "Не удалось обновить интеграцию с Gitea",
 				"secretCopied": "Скопировано",
 				"unableToCopySecret": "Не удалось скопировать секрет",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "URL не указывает на инстанцию Gitea",
+				"redirected": "URL Gitea перенаправлен (обычно на HTTPS). Используйте итоговый URL напрямую."
 			},
 			"webhookShow": "Показать",
 			"webhookHide": "Скрыть",
@@ -1282,6 +1284,44 @@
 			"updateError": "Не удалось обновить метку",
 			"deleteError": "Не удалось удалить метку",
 			"nameRequired": "Название метки обязательно"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Необязательная подпись для вашего удобства. Фактический канал назначения определяет Mattermost в настройках webhook.",
+			"channelLabel": "Название канала",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Подключить Mattermost",
+			"connected": "Подключено",
+			"connectionHint": "Вставьте URL входящего webhook Mattermost и выберите, какие события задач публиковать.",
+			"connectionTitle": "Подключение webhook Mattermost",
+			"disconnect": "Отключить",
+			"events": {
+				"taskCommentCreated": "Новые комментарии",
+				"taskCreated": "Новые задачи",
+				"taskDescriptionChanged": "Изменения описания",
+				"taskPriorityChanged": "Изменения приоритета",
+				"taskStatusChanged": "Изменения статуса",
+				"taskTitleChanged": "Изменения названия"
+			},
+			"eventsHint": "Выберите, какие изменения проекта публиковать в Mattermost.",
+			"eventsTitle": "Уведомления о событиях",
+			"paused": "Paused",
+			"saveChanges": "Сохранить изменения",
+			"toast": {
+				"disabled": "Уведомления Mattermost приостановлены",
+				"enabled": "Уведомления Mattermost включены",
+				"removed": "Интеграция Mattermost успешно удалена",
+				"removeError": "Не удалось удалить интеграцию Mattermost",
+				"saved": "Интеграция Mattermost успешно сохранена",
+				"saveError": "Не удалось сохранить интеграцию Mattermost",
+				"updateError": "Не удалось обновить интеграцию Mattermost"
+			},
+			"update": "Обновить Mattermost",
+			"validation": {
+				"webhookInvalid": "Введите корректный URL webhook Mattermost"
+			},
+			"webhookHint": "Создайте входящий webhook в Mattermost и вставьте сгенерированный URL сюда.",
+			"webhookLabel": "URL входящего webhook",
+			"webhookPlaceholder": "https://ваш-mattermost-сервер.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1393,7 +1433,7 @@
 				"prevTask": "Предыдущая задача",
 				"openTask": "Открыть выбранную задачу",
 				"quickSelectNumber": "Выбрать вариант по номеру",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Перейти к виду календаря"
 			}
 		}
 	},
@@ -1896,7 +1936,7 @@
 			"resizeStart": "Изменить дату начала",
 			"resizeDue": "Изменить срок выполнения",
 			"taskAriaLabel": "{{title}}: откройте или перетащите для перемещения",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Перейти к сегодняшнему дню"
 		},
 		"delete": {
 			"title": "Удалить задачу?",
@@ -1924,7 +1964,7 @@
 			"merged": "Влит",
 			"draft": "Черновик",
 			"open": "Открыт",
-			"label": "Pull Request",
+			"label": "Пул-реквест",
 			"count_one": "{{count}} PR",
 			"count_few": "{{count}} PR",
 			"count_many": "{{count}} PR",
@@ -2041,15 +2081,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Следующий месяц",
+			"noTasks": "Нет запланированных задач",
+			"noTasksSubtitle": "Добавьте к задачам дату начала, срок или и то, и другое, чтобы разместить их в календаре.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Предыдущий месяц",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Календарь",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Не удалось загрузить задачи."
 		}
 	},
 	"invitations": {
@@ -2211,7 +2251,7 @@
 		"taskDetail": {
 			"labels": "Метки",
 			"externalLinks": "Внешние ссылки",
-			"pullRequestFallback": "Pull Request",
+			"pullRequestFallback": "Пул-реквест",
 			"issueFallback": "Issue",
 			"prStatusMerged": "Влит",
 			"prStatusDraft": "Черновик",
@@ -2232,6 +2272,33 @@
 		},
 		"branding": {
 			"poweredBy": "Работает на"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Как только вы создадите проект, проекты из всех ваших рабочих пространств появятся здесь.",
+			"title": "Пока нет проектов"
+		},
+		"pageDescription": "Все проекты из всех ваших рабочих пространств в одном месте.",
+		"pageTitle": "Все проекты",
+		"section": {
+			"projectCount_few": "{{count}} проекта",
+			"projectCount_many": "{{count}} проектов",
+			"projectCount_one": "{{count}} проект",
+			"projectCount_other": "{{count}} проекта"
+		},
+		"stats": {
+			"completion": "Выполнено",
+			"nextDueDate": "Ближайший срок",
+			"projects": "Проекты",
+			"tasks": "Задачи"
+		},
+		"table": {
+			"dueDate": "Срок",
+			"progress": "Прогресс",
+			"project": "Проект",
+			"status": "Статус",
+			"tasks": "Задачи"
 		}
 	}
 }

@@ -1374,7 +1374,9 @@
 			"subtitle": "Połącz projekt z zewnętrznymi narzędziami i usługami, aby usprawnić obieg pracy.",
 			"telegramSectionSubtitle": "Wysyłaj aktualizacje zadań projektu do czatu lub wątku w Telegramie za pomocą bota.",
 			"telegramSectionTitle": "Integracja z Telegramem",
-			"title": "Integracje projektu"
+			"title": "Integracje projektu",
+			"mattermostSectionSubtitle": "Wysyłaj aktualizacje zadań projektu do kanału Mattermost za pomocą przychodzącego webhooka.",
+			"mattermostSectionTitle": "Integracja Mattermost"
 		},
 		"projectSwitcher": {
 			"noProjects": "Brak projektów",
@@ -1750,6 +1752,44 @@
 				"nameRequired": "Nazwa roli jest wymagana",
 				"permissionRequired": "Należy wybrać co najmniej jedno uprawnienie"
 			}
+		},
+		"mattermostIntegration": {
+			"channelHint": "Opcjonalna etykieta informacyjna. Rzeczywisty kanał docelowy kontroluje Mattermost w konfiguracji webhooka.",
+			"channelLabel": "Nazwa kanału",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Połącz Mattermost",
+			"connected": "Połączono",
+			"connectionHint": "Wklej adres przychodzącego webhooka Mattermost i wybierz, które zdarzenia zadań mają być publikowane.",
+			"connectionTitle": "Połączenie webhooka Mattermost",
+			"disconnect": "Rozłącz",
+			"events": {
+				"taskCommentCreated": "Nowe komentarze",
+				"taskCreated": "Nowe zadania",
+				"taskDescriptionChanged": "Zmiany opisu",
+				"taskPriorityChanged": "Zmiany priorytetu",
+				"taskStatusChanged": "Zmiany statusu",
+				"taskTitleChanged": "Zmiany tytułu"
+			},
+			"eventsHint": "Wybierz, które zmiany w projekcie mają być publikowane w Mattermost.",
+			"eventsTitle": "Powiadomienia o zdarzeniach",
+			"paused": "Paused",
+			"saveChanges": "Zapisz zmiany",
+			"toast": {
+				"disabled": "Powiadomienia Mattermost wstrzymane",
+				"enabled": "Powiadomienia Mattermost włączone",
+				"removed": "Integracja Mattermost została pomyślnie usunięta",
+				"removeError": "Nie udało się usunąć integracji Mattermost",
+				"saved": "Integracja Mattermost została pomyślnie zapisana",
+				"saveError": "Nie udało się zapisać integracji Mattermost",
+				"updateError": "Nie udało się zaktualizować integracji Mattermost"
+			},
+			"update": "Zaktualizuj Mattermost",
+			"validation": {
+				"webhookInvalid": "Wpisz prawidłowy adres webhooka Mattermost"
+			},
+			"webhookHint": "Utwórz przychodzący webhook w Mattermost i wklej tutaj wygenerowany adres.",
+			"webhookLabel": "Adres przychodzącego webhooka",
+			"webhookPlaceholder": "https://twoj-serwer-mattermost.com/hooks/..."
 		}
 	},
 	"tasks": {
@@ -2176,6 +2216,33 @@
 		"view": {
 			"board": "Tablica",
 			"list": "Lista"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Gdy utworzysz projekt, projekty ze wszystkich Twoich przestrzeni roboczych pojawią się tutaj.",
+			"title": "Nie ma jeszcze projektów"
+		},
+		"pageDescription": "Wszystkie projekty ze wszystkich Twoich przestrzeni roboczych w jednym miejscu.",
+		"pageTitle": "Wszystkie projekty",
+		"section": {
+			"projectCount_few": "{{count}} projekty",
+			"projectCount_many": "{{count}} projektów",
+			"projectCount_one": "{{count}} projekt",
+			"projectCount_other": "{{count}} projektu"
+		},
+		"stats": {
+			"completion": "Ukończono",
+			"nextDueDate": "Najbliższy termin",
+			"projects": "Projekty",
+			"tasks": "Zadania"
+		},
+		"table": {
+			"dueDate": "Termin",
+			"progress": "Postęp",
+			"project": "Projekt",
+			"status": "Status",
+			"tasks": "Zadania"
 		}
 	}
 }

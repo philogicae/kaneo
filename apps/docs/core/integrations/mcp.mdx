@@ -27,6 +27,20 @@ The endpoint implements OAuth 2.1 with PKCE for authentication. Discovery metada
 - `/.well-known/oauth-protected-resource/api/mcp`
 - `/.well-known/oauth-authorization-server/api`
 
+### API key authentication
+
+Clients that cannot run the OAuth consent flow can authenticate with an [API key](/api-reference/authentication) instead. Send the key either as a bearer token or in the `x-api-key` header:
+
+```http
+Authorization: Bearer <api-key>
+```
+
+```http
+x-api-key: <api-key>
+```
+
+The MCP tools then call the Kaneo API with the same key, so the key's workspace access applies exactly as it does for the REST API. Revoking the key in Settings → Account → Developer immediately revokes MCP access.
+
 The endpoint serves both MCP protocol eras: modern `2026-07-28` requests are
 stateless and self-contained, while 2025-era clients keep the sessionful
 `initialize` flow. See [MCP 2026-07-28 stateless compatibility](/core/integrations/mcp-stateless)

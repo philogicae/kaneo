@@ -57,27 +57,27 @@
 			"tryAgain": "Thử lại",
 			"viewDeploymentGuide": "Xem hướng dẫn triển khai",
 			"refreshPage": "Tải lại trang",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "Trang đã gặp sự cố ngoài dự kiến. Tải lại trang thường khắc phục được.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Xác thực thất bại. Vui lòng đăng nhập lại.",
+				"cors": "Không thể kết nối đến máy chủ. Có thể do sự cố cấu hình CORS.",
+				"network": "Lỗi mạng. Vui lòng kiểm tra kết nối internet và thử lại.",
+				"server": "Lỗi máy chủ. Vui lòng thử lại sau.",
+				"unknown": "Đã xảy ra lỗi ngoài dự kiến."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Kiểm tra xem máy chủ API của bạn có truy cập được từ trình duyệt không",
+					"checkApiRunning": "Đảm bảo máy chủ API của bạn đang chạy",
+					"checkApiUrl": "Kiểm tra VITE_API_URL trong .env của frontend khớp với URL máy chủ API",
+					"checkProtocol": "Đảm bảo frontend và API dùng cùng một giao thức (http/https)",
+					"verifyCorsOrigins": "Kiểm tra CORS_ORIGINS trong .env của API có bao gồm URL frontend của bạn"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Kiểm tra kết nối internet của bạn",
+					"checkFirewall": "Kiểm tra xem có vấn đề nào với tường lửa hoặc proxy không",
+					"tryRefresh": "Hãy thử tải lại trang",
+					"verifyApiRunning": "Xác nhận máy chủ API đang chạy và có thể truy cập"
 				}
 			}
 		},
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Xóa ảnh hồ sơ thất bại",
+				"removeSuccess": "Đã xóa ảnh hồ sơ",
+				"updateError": "Cập nhật ảnh hồ sơ thất bại",
+				"updateSuccess": "Đã cập nhật ảnh hồ sơ",
+				"change": "Đổi avatar",
+				"edit": "Thay đổi ảnh hồ sơ của bạn"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Xóa tài khoản",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Các không gian làm việc mà chỉ mình bạn thuộc về sẽ bị xóa cùng với tài khoản. Ở nơi khác, công việc của bạn vẫn còn và trở thành không được giao, còn bình luận của bạn sẽ bị xóa.",
+				"error": "Xóa tài khoản thất bại",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Xóa tài khoản của bạn?",
+				"sectionSubtitle": "Hành động vĩnh viễn ảnh hưởng đến toàn bộ tài khoản của bạn.",
+				"sectionTitle": "Vùng nguy hiểm",
+				"success": "Tài khoản của bạn đã được xóa",
+				"title": "Xóa tài khoản",
+				"sessionTooOld": "Vì lý do bảo mật, hãy đăng xuất và đăng nhập lại trước khi xóa tài khoản."
 			}
 		},
 		"notificationsPage": {
@@ -852,7 +852,9 @@
 			"slackSectionTitle": "Tích hợp Slack",
 			"slackSectionSubtitle": "Gửi cập nhật công việc dự án vào kênh Slack bằng webhook đến.",
 			"telegramSectionTitle": "Tích hợp Telegram",
-			"telegramSectionSubtitle": "Gửi cập nhật công việc dự án vào cuộc trò chuyện hoặc chủ đề Telegram bằng bot."
+			"telegramSectionSubtitle": "Gửi cập nhật công việc dự án vào cuộc trò chuyện hoặc chủ đề Telegram bằng bot.",
+			"mattermostSectionSubtitle": "Gửi cập nhật công việc của dự án vào kênh Mattermost qua webhook đến.",
+			"mattermostSectionTitle": "Tích hợp Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Chế độ hiển thị dự án",
@@ -993,8 +995,8 @@
 				"settingsUpdateError": "Không thể cập nhật tích hợp Gitea",
 				"secretCopied": "Đã sao chép",
 				"unableToCopySecret": "Không thể sao chép khóa bí mật",
-				"notGiteaInstance": "The URL does not point to a Gitea instance",
-				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
+				"notGiteaInstance": "URL không trỏ đến một phiên bản Gitea",
+				"redirected": "URL Gitea đã được chuyển hướng (thường là sang HTTPS). Hãy dùng URL cuối cùng trực tiếp."
 			},
 			"webhookShow": "Hiện",
 			"webhookHide": "Ẩn",
@@ -1013,7 +1015,7 @@
 			"webhookSecretLabel": "Khóa bí mật (phải khớp với khóa bí mật webhook trong Gitea)",
 			"baseUrlLabel": "URL Gitea",
 			"baseUrlHint": "URL gốc của phiên bản Gitea của bạn",
-			"tokenLabel": "Personal access token",
+			"tokenLabel": "Mã truy cập cá nhân",
 			"tokenHint": "Token có quyền truy cập repo và issues",
 			"tokenPlaceholder": "Dán token",
 			"tokenPlaceholderUpdate": "Dán token mới để thay thế",
@@ -1185,7 +1187,7 @@
 			"botTokenPlaceholder": "123456789:AAExampleBotToken",
 			"botTokenHint": "Tạo một bot với BotFather và dán token của nó vào đây.",
 			"botTokenHintConfigured": "Đã cấu hình token bot ({{token}}). Nhập token mới để thay thế.",
-			"chatIdLabel": "Chat ID",
+			"chatIdLabel": "ID cuộc trò chuyện",
 			"chatIdPlaceholder": "-1001234567890 hoặc @team_updates",
 			"chatIdHint": "Nhập Chat ID Telegram hoặc tên người dùng kênh nơi cập nhật sẽ được đăng.",
 			"threadIdLabel": "ID luồng chủ đề",
@@ -1271,6 +1273,44 @@
 			"merged": "Đã gộp",
 			"draft": "Bản nháp",
 			"open": "Đang mở"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Nhãn tùy chọn để bạn tham khảo. Kênh đích thực tế do Mattermost kiểm soát qua cấu hình webhook.",
+			"channelLabel": "Tên kênh",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Kết nối Mattermost",
+			"connected": "Đã kết nối",
+			"connectionHint": "Dán URL của webhook đến Mattermost và chọn sự kiện công việc nào sẽ được đăng.",
+			"connectionTitle": "Kết nối webhook Mattermost",
+			"disconnect": "Ngắt kết nối",
+			"events": {
+				"taskCommentCreated": "Bình luận mới",
+				"taskCreated": "Công việc mới",
+				"taskDescriptionChanged": "Thay đổi mô tả",
+				"taskPriorityChanged": "Thay đổi độ ưu tiên",
+				"taskStatusChanged": "Thay đổi trạng thái",
+				"taskTitleChanged": "Thay đổi tiêu đề"
+			},
+			"eventsHint": "Chọn những thay đổi dự án nào sẽ được đăng lên Mattermost.",
+			"eventsTitle": "Thông báo sự kiện",
+			"paused": "Paused",
+			"saveChanges": "Lưu thay đổi",
+			"toast": {
+				"disabled": "Đã tạm dừng thông báo Mattermost",
+				"enabled": "Đã bật thông báo Mattermost",
+				"removed": "Đã xóa tích hợp Mattermost thành công",
+				"removeError": "Xóa tích hợp Mattermost thất bại",
+				"saved": "Đã lưu tích hợp Mattermost thành công",
+				"saveError": "Lưu tích hợp Mattermost thất bại",
+				"updateError": "Cập nhật tích hợp Mattermost thất bại"
+			},
+			"update": "Cập nhật Mattermost",
+			"validation": {
+				"webhookInvalid": "Nhập URL webhook Mattermost hợp lệ"
+			},
+			"webhookHint": "Tạo một Incoming Webhook trong Mattermost và dán URL đã tạo vào đây.",
+			"webhookLabel": "URL webhook đến",
+			"webhookPlaceholder": "https://may-chu-mattermost-cua-ban.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1382,7 +1422,7 @@
 				"prevTask": "Công việc trước đó",
 				"openTask": "Mở công việc đã chọn",
 				"quickSelectNumber": "Chọn tùy chọn theo số",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Chuyển sang chế độ lịch"
 			}
 		}
 	},
@@ -1550,7 +1590,7 @@
 					"deleteTable": "Xóa bảng"
 				},
 				"mermaid": {
-					"renderFailed": "Mermaid diagram couldn't be rendered"
+					"renderFailed": "Không thể hiển thị sơ đồ Mermaid"
 				}
 			}
 		}
@@ -1687,7 +1727,7 @@
 					"onlyYoutubeInline": "Chỉ có thể nhúng URL YouTube. Hãy dùng chế độ liên kết thay thế."
 				},
 				"mermaid": {
-					"renderFailed": "Mermaid diagram couldn't be rendered"
+					"renderFailed": "Không thể hiển thị sơ đồ Mermaid"
 				}
 			}
 		},
@@ -1865,7 +1905,7 @@
 			"resizeStart": "Thay đổi kích thước ngày bắt đầu",
 			"resizeDue": "Thay đổi kích thước ngày đến hạn",
 			"taskAriaLabel": "{{title}}: mở hoặc kéo để di chuyển",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Nhảy đến hôm nay"
 		},
 		"delete": {
 			"title": "Xóa công việc?",
@@ -1967,15 +2007,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Tháng sau",
+			"noTasks": "Không có công việc được lên lịch",
+			"noTasksSubtitle": "Thêm ngày bắt đầu, ngày hết hạn hoặc cả hai vào công việc để hiển thị chúng trên lịch.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Tháng trước",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Lịch",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Không thể tải công việc."
 		}
 	},
 	"invitations": {
@@ -2155,6 +2195,30 @@
 		},
 		"branding": {
 			"poweredBy": "Được vận hành bởi"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Ngay khi bạn tạo một dự án, các dự án từ mọi không gian làm việc sẽ hiển thị tại đây.",
+			"title": "Chưa có dự án nào"
+		},
+		"pageDescription": "Mọi dự án từ mọi không gian làm việc của bạn trong một màn hình duy nhất.",
+		"pageTitle": "Tất cả dự án",
+		"section": {
+			"projectCount_other": "{{count}} dự án"
+		},
+		"stats": {
+			"completion": "Hoàn thành",
+			"nextDueDate": "Hạn tiếp theo",
+			"projects": "Dự án",
+			"tasks": "Công việc"
+		},
+		"table": {
+			"dueDate": "Hạn chót",
+			"progress": "Tiến độ",
+			"project": "Dự án",
+			"status": "Trạng thái",
+			"tasks": "Công việc"
 		}
 	}
 }

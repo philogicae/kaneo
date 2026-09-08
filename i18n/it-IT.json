@@ -57,27 +57,27 @@
 			"tryAgain": "Riprova",
 			"viewDeploymentGuide": "Visualizza guida al deployment",
 			"refreshPage": "Aggiorna pagina",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "La pagina si è bloccata in modo imprevisto. Ricaricarla di solito risolve il problema.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "Autenticazione non riuscita. Accedi di nuovo.",
+				"cors": "Impossibile connettersi al server. Potrebbe dipendere da problemi di configurazione CORS.",
+				"network": "Errore di rete. Controlla la tua connessione internet e riprova.",
+				"server": "Errore del server. Riprova più tardi.",
+				"unknown": "Si è verificato un errore imprevisto."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "Verifica che il tuo server API sia accessibile dal browser",
+					"checkApiRunning": "Assicurati che il tuo server API sia in esecuzione",
+					"checkApiUrl": "Verifica che VITE_API_URL nel .env del frontend corrisponda all'URL del server API",
+					"checkProtocol": "Assicurati che frontend e API usino lo stesso protocollo (http/https)",
+					"verifyCorsOrigins": "Verifica che CORS_ORIGINS nel .env della tua API includa l'URL del tuo frontend"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "Controlla la tua connessione internet",
+					"checkFirewall": "Verifica se ci sono problemi di firewall o proxy",
+					"tryRefresh": "Prova ad aggiornare la pagina",
+					"verifyApiRunning": "Verifica che il server API sia in esecuzione e accessibile"
 				}
 			}
 		},
@@ -88,7 +88,7 @@
 			"createProject": {
 				"title": "Crea un nuovo progetto",
 				"breadcrumbNew": "Crea un nuovo progetto",
-				"workspaceFallback": "WORKSPACE",
+				"workspaceFallback": "SPAZIO DI LAVORO",
 				"description": "Crea un nuovo progetto nel tuo workspace fornendo un nome, una chiave e selezionando un'icona.",
 				"pickIcon": "Scegli icona",
 				"searchIcons": "Cerca icone...",
@@ -364,25 +364,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "Rimozione dell'immagine del profilo non riuscita",
+				"removeSuccess": "Immagine del profilo rimossa",
+				"updateError": "Aggiornamento dell'immagine del profilo non riuscito",
+				"updateSuccess": "Immagine del profilo aggiornata",
+				"change": "Cambia avatar",
+				"edit": "Cambia la tua immagine del profilo"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "Elimina account",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "Gli spazi di lavoro di cui fai parte da solo vengono eliminati con il tuo account. Altrove, le tue attività restano e diventano non assegnate, e i tuoi commenti vengono rimossi.",
+				"error": "Eliminazione dell'account non riuscita",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "Eliminare il tuo account?",
+				"sectionSubtitle": "Azioni permanenti che riguardano l'intero account.",
+				"sectionTitle": "Zona di pericolo",
+				"success": "Il tuo account è stato eliminato",
+				"title": "Elimina account",
+				"sessionTooOld": "Per sicurezza, esci e accedi di nuovo prima di eliminare il tuo account."
 			}
 		},
 		"notificationsPage": {
@@ -672,7 +672,7 @@
 				"project": "Progetti",
 				"task": "Attività",
 				"label": "Etichette",
-				"workspace": "Workspace"
+				"workspace": "Spazio di lavoro"
 			},
 			"permissions": {
 				"project": {
@@ -854,7 +854,9 @@
 			"slackSectionTitle": "Integrazione Slack",
 			"slackSectionSubtitle": "Invia aggiornamenti delle attività del progetto in un canale Slack tramite webhook in entrata.",
 			"telegramSectionTitle": "Integrazione Telegram",
-			"telegramSectionSubtitle": "Invia aggiornamenti delle attività del progetto in una chat o topic Telegram con un bot."
+			"telegramSectionSubtitle": "Invia aggiornamenti delle attività del progetto in una chat o topic Telegram con un bot.",
+			"mattermostSectionSubtitle": "Invia gli aggiornamenti delle attività del progetto in un canale Mattermost con un webhook in ingresso.",
+			"mattermostSectionTitle": "Integrazione Mattermost"
 		},
 		"projectVisibility": {
 			"pageTitle": "Visibilità Progetto",
@@ -1273,6 +1275,44 @@
 			"merged": "Unito",
 			"draft": "Bozza",
 			"open": "Aperto"
+		},
+		"mattermostIntegration": {
+			"channelHint": "Etichetta facoltativa per tuo riferimento. Mattermost controlla il canale di destinazione effettivo dalla configurazione del webhook.",
+			"channelLabel": "Nome del canale",
+			"channelPlaceholder": "#team-updates",
+			"connect": "Connetti Mattermost",
+			"connected": "Connesso",
+			"connectionHint": "Incolla l'URL di un webhook in ingresso di Mattermost e scegli quali eventi delle attività pubblicare.",
+			"connectionTitle": "Connessione webhook Mattermost",
+			"disconnect": "Disconnetti",
+			"events": {
+				"taskCommentCreated": "Nuovi commenti",
+				"taskCreated": "Nuove attività",
+				"taskDescriptionChanged": "Modifiche alla descrizione",
+				"taskPriorityChanged": "Modifiche alla priorità",
+				"taskStatusChanged": "Modifiche allo stato",
+				"taskTitleChanged": "Modifiche al titolo"
+			},
+			"eventsHint": "Scegli quali modifiche al progetto pubblicare su Mattermost.",
+			"eventsTitle": "Notifiche di eventi",
+			"paused": "Paused",
+			"saveChanges": "Salva modifiche",
+			"toast": {
+				"disabled": "Notifiche Mattermost in pausa",
+				"enabled": "Notifiche Mattermost attivate",
+				"removed": "Integrazione Mattermost rimossa con successo",
+				"removeError": "Rimozione dell'integrazione Mattermost non riuscita",
+				"saved": "Integrazione Mattermost salvata con successo",
+				"saveError": "Salvataggio dell'integrazione Mattermost non riuscito",
+				"updateError": "Aggiornamento dell'integrazione Mattermost non riuscito"
+			},
+			"update": "Aggiorna Mattermost",
+			"validation": {
+				"webhookInvalid": "Inserisci un URL webhook Mattermost valido"
+			},
+			"webhookHint": "Crea un webhook in ingresso in Mattermost e incolla qui l'URL generato.",
+			"webhookLabel": "URL del webhook in ingresso",
+			"webhookPlaceholder": "https://il-tuo-server-mattermost.com/hooks/..."
 		}
 	},
 	"navigation": {
@@ -1351,7 +1391,7 @@
 			"projectsTitle": "Progetti",
 			"settingsTitle": "Impostazioni",
 			"backToWorkspace": "Torna al Workspace",
-			"settingsWorkspaceTab": "Workspace"
+			"settingsWorkspaceTab": "Spazio di lavoro"
 		},
 		"projectSettings": {
 			"projectLabel": "Progetto"
@@ -1384,7 +1424,7 @@
 				"prevTask": "Attività precedente",
 				"openTask": "Apri attività selezionata",
 				"quickSelectNumber": "Seleziona opzione per numero",
-				"calendarView": "Switch to calendar view"
+				"calendarView": "Passa alla vista calendario"
 			}
 		}
 	},
@@ -1875,7 +1915,7 @@
 			"resizeStart": "Ridimensiona data inizio",
 			"resizeDue": "Ridimensiona data scadenza",
 			"taskAriaLabel": "{{title}}: apri o trascina per spostare",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "Vai a oggi"
 		},
 		"delete": {
 			"title": "Eliminare l'Attività?",
@@ -1979,15 +2019,15 @@
 		"calendar": {
 			"dayTasksAriaLabel": "Show all tasks for {{date}}",
 			"moreTasks": "+{{count}} more",
-			"nextMonth": "Next month",
-			"noTasks": "No scheduled tasks",
-			"noTasksSubtitle": "Add a start date, due date, or both to tasks to place them on the calendar.",
+			"nextMonth": "Mese successivo",
+			"noTasks": "Nessuna attività pianificata",
+			"noTasksSubtitle": "Aggiungi alle attività una data di inizio, una scadenza o entrambe per posizionarle nel calendario.",
 			"pageTitle": "{{name}} – Calendar",
-			"previousMonth": "Previous month",
+			"previousMonth": "Mese precedente",
 			"taskAriaLabel": "{{title}}, {{range}}: open task",
-			"title": "Calendar",
+			"title": "Calendario",
 			"today": "Today",
-			"loadError": "Failed to load tasks."
+			"loadError": "Caricamento delle attività non riuscito."
 		}
 	},
 	"invitations": {
@@ -2009,7 +2049,7 @@
 		"continueToSetup": "Continua alla Configurazione",
 		"skipForNow": "Salta per ora",
 		"table": {
-			"workspace": "Workspace",
+			"workspace": "Spazio di lavoro",
 			"invitedBy": "Invitato Da",
 			"expires": "Scade"
 		},
@@ -2169,6 +2209,32 @@
 		},
 		"branding": {
 			"poweredBy": "Offerto da"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "Appena crei un progetto, quelli di tutti i tuoi spazi di lavoro compariranno qui.",
+			"title": "Ancora nessun progetto"
+		},
+		"pageDescription": "Un'unica vista di tutti i progetti dei tuoi spazi di lavoro.",
+		"pageTitle": "Tutti i progetti",
+		"section": {
+			"projectCount_many": "{{count}} progetti",
+			"projectCount_one": "{{count}} progetto",
+			"projectCount_other": "{{count}} progetti"
+		},
+		"stats": {
+			"completion": "Completamento",
+			"nextDueDate": "Prossima scadenza",
+			"projects": "Progetti",
+			"tasks": "Attività"
+		},
+		"table": {
+			"dueDate": "Scadenza",
+			"progress": "Avanzamento",
+			"project": "Progetto",
+			"status": "Stato",
+			"tasks": "Attività"
 		}
 	}
 }
