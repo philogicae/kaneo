@@ -2,23 +2,19 @@ import { useEffect } from "react";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
 export function useUserPreferencesEffects() {
-  const { compactMode } = useUserPreferencesStore();
+  const { uiScale } = useUserPreferencesStore();
 
   useEffect(() => {
     const root = document.documentElement;
 
-    if (compactMode) {
-      root.classList.add("compact-mode");
-    } else {
-      root.classList.remove("compact-mode");
-    }
+    root.style.fontSize = `${uiScale * 100}%`;
 
     return () => {
-      root.classList.remove("compact-mode");
+      root.style.fontSize = "";
     };
-  }, [compactMode]);
+  }, [uiScale]);
 
   return {
-    compactMode,
+    uiScale,
   };
 }

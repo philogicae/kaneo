@@ -158,7 +158,14 @@
 					"amber": "Amber",
 					"terracotta": "Terracotta",
 					"rose": "Rose",
-					"crimson": "Crimson"
+					"crimson": "Crimson",
+					"sky": "Sky",
+					"ocean": "Ocean",
+					"cyan": "Cyan",
+					"indigo": "Indigo",
+					"fuchsia": "Fuchsia",
+					"lime": "Lime",
+					"emerald": "Emerald"
 				}
 			}
 		}
@@ -503,7 +510,11 @@
 			"selectTheme": "Select a theme",
 			"themeLight": "Light",
 			"themeDark": "Dark",
+			"themeVolt": "Volt",
 			"themeSystem": "System",
+			"interfaceSize": "Interface size",
+			"interfaceSizeDecrease": "Decrease interface size",
+			"interfaceSizeIncrease": "Increase interface size",
 			"language": "Language",
 			"languageDescription": "Choose your preferred interface language",
 			"selectLanguage": "Select a language",
@@ -1360,9 +1371,10 @@
 			"createWorkspace": "Create workspace",
 			"lightTheme": "Light theme",
 			"darkTheme": "Dark theme",
+			"voltTheme": "Volt theme",
 			"systemTheme": "System theme",
 			"keyboardShortcuts": "Keyboard shortcuts",
-			"inputPlaceholder": "Search for apps and commands...",
+			"inputPlaceholder": "Search",
 			"empty": "No results found.",
 			"footer": {
 				"navigate": "Navigate",
@@ -1388,10 +1400,15 @@
 			"deleteConfirmTitle": "Delete Project?",
 			"deleteConfirmDescription": "This will permanently remove the project and all its data. You can't undo this action.",
 			"deletedToast": "Project deleted",
-			"deleteProject": "Delete Project"
+			"deleteProject": "Delete Project",
+			"sortProjects": "Sort projects",
+			"sortCustom": "Custom order",
+			"sortName": "Name",
+			"sortDate": "Date created",
+			"sortCompletion": "Completion"
 		},
 		"search": {
-			"inputPlaceholder": "Search tasks, projects, comments...",
+			"inputPlaceholder": "Search",
 			"minCharsHint": "Type at least 3 characters to search",
 			"groups": {
 				"task": "Tasks",
@@ -1418,7 +1435,8 @@
 			"workspaces": "Workspaces",
 			"switching": "Switching...",
 			"addWorkspace": "Add workspace",
-			"selectWorkspace": "Select workspace"
+			"selectWorkspace": "Select workspace",
+			"sortWorkspaces": "Sort workspaces"
 		},
 		"page": {
 			"projectsTitle": "Projects",
@@ -1653,7 +1671,7 @@
 			"high": "High",
 			"urgent": "Urgent"
 		},
-		"boardSearchPlaceholder": "Search tickets...",
+		"boardSearchPlaceholder": "Search",
 		"view": {
 			"board": "Board",
 			"list": "List"
@@ -1781,7 +1799,7 @@
 			"tasksInProject": "Tasks in project",
 			"linkError": "Failed to link task",
 			"empty": "No related tasks",
-			"searchPlaceholder": "Search tasks to link...",
+			"searchPlaceholder": "Search",
 			"noTasksFound": "No tasks found",
 			"openTask": "Open task",
 			"removeRelation": "Remove relation",
@@ -1857,18 +1875,7 @@
 				"removeSuccess": "Label removed",
 				"updateError": "Failed to update label",
 				"createSuccess": "Label created and added",
-				"createError": "Failed to create label",
-				"colors": {
-					"stone": "Stone",
-					"slate": "Slate",
-					"lavender": "Lavender",
-					"sage": "Sage",
-					"forest": "Forest",
-					"amber": "Amber",
-					"terracotta": "Terracotta",
-					"rose": "Rose",
-					"crimson": "Crimson"
-				}
+				"createError": "Failed to create label"
 			}
 		},
 		"backlog": {
@@ -1953,7 +1960,7 @@
 			"pageTitle": "{{name}} – Gantt",
 			"title": "Gantt Timeline",
 			"jumpToToday": "Jump to today",
-			"searchPlaceholder": "Search scheduled tickets...",
+			"searchPlaceholder": "Search",
 			"hideTasks": "Hide tasks",
 			"showTasks": "Show tasks",
 			"noTasks": "No scheduled tasks",
@@ -2095,6 +2102,37 @@
 			"rejectSuccess": "Invitation rejected"
 		}
 	},
+	"unified": {
+		"pageTitle": "All projects",
+		"tabs": {
+			"overview": "Overview",
+			"charts": "Charts"
+		},
+		"charts": {
+			"tasks": "Tasks",
+			"backlog": "Backlog",
+			"empty": "No task activity in the last 6 months."
+		},
+		"stats": {
+			"projects": "Projects",
+			"tasks": "Tasks",
+			"completion": "Completion"
+		},
+		"table": {
+			"project": "Project",
+			"progress": "Progress",
+			"tasks": "Tasks",
+			"status": "Status"
+		},
+		"section": {
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects"
+		},
+		"empty": {
+			"title": "No projects yet",
+			"description": "Projects from all your workspaces will show up here as soon as you create one."
+		}
+	},
 	"workspace": {
 		"projects": {
 			"pageTitle": "Projects",
@@ -2119,7 +2157,7 @@
 		"search": {
 			"pageTitle": "Search",
 			"backToDashboard": "Back to Dashboard",
-			"placeholder": "Search tasks by title or short ID (e.g. DEP-23)...",
+			"placeholder": "Search",
 			"hint": "Search across all projects in this workspace. Use short IDs like DEP-23 to find specific tasks.",
 			"searching": "Searching...",
 			"resultsFound_one": "{{count}} result found",

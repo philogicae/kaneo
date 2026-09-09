@@ -32,7 +32,9 @@ Required modern request fields include:
 - per-request client capabilities and, preferably, client information
 
 Kaneo validates the bearer token before protocol routing on every request.
-Modern requests use a fresh `McpServer` instance and hold no process-local
+The token may be an OAuth session token or an [API key](/api-reference/authentication),
+so clients that cannot run the OAuth flow can use a static credential. Modern
+requests use a fresh `McpServer` instance and hold no process-local
 protocol state. Requests classified as the 2025 era continue through the
 existing sessionful transport, preserving `initialize`,
 `notifications/initialized`, and `Mcp-Session-Id` behavior.

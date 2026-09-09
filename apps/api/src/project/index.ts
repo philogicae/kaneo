@@ -13,11 +13,16 @@ import archiveProjectCtrl from "./controllers/archive-project";
 import createProjectCtrl from "./controllers/create-project";
 import deleteProjectCtrl from "./controllers/delete-project";
 import getProjectCtrl from "./controllers/get-project";
+import getProjectCharts from "./controllers/get-project-charts";
 import getProjectsCtrl from "./controllers/get-projects";
 import reorderProjectsCtrl from "./controllers/reorder-projects";
 import unarchiveProjectCtrl from "./controllers/unarchive-project";
 import updateProjectCtrl from "./controllers/update-project";
-import { projectListSchema, projectSchema } from "./response";
+import {
+  projectChartsSchema,
+  projectListSchema,
+  projectSchema,
+} from "./response";
 import {
   createProjectBody,
   listProjectsQuery,
@@ -83,6 +88,28 @@ const getProjectRoute = createRoute({
   request: { params: projectParam },
   responses: {
     200: jsonResponse("Project details", projectSchema),
+    400: errorResponse(
+      "Unknown project, or its workspace could not be determined",
+    ),
+    403: errorResponse("No access to the project's workspace"),
+  },
+});
+
+const getProjectChartsRoute = createRoute({
+  method: "get",
+  operationId: "getProjectCharts",
+  path: "/{id}/charts",
+  tags: ["Projects"],
+  summary: "Get project charts",
+  description:
+    "Weekly task-creation and completion counts for the last months (default 6), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status.",
+  middleware: [workspaceAccess.fromProject()] as const,
+  request: { params: projectParam },
+  responses: {
+    200: jsonResponse(
+      "Weekly progression buckets",
+      z.array(projectChartsSchema),
+    ),
     400: errorResponse(
       "Unknown project, or its workspace could not be determined",
     ),
@@ -240,6 +267,11 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const workspaceId = c.get("workspaceId");
     const projectData = await getProjectCtrl(id, workspaceId);
     return c.json(projectData, 200);
+  })
+  .openapi(getProjectChartsRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const buckets = await getProjectCharts(id);
+    return c.json(buckets, 200);
   })
   .openapi(reorderProjectsRoute, async (c) => {
     const workspaceId = c.get("workspaceId");

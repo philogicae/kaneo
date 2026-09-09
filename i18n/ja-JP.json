@@ -152,7 +152,14 @@
 					"amber": "アンバー",
 					"terracotta": "テラコッタ",
 					"rose": "ローズ",
-					"crimson": "クリムゾン"
+					"crimson": "クリムゾン",
+					"sky": "空",
+					"ocean": "海",
+					"cyan": "シアン",
+					"indigo": "藍",
+					"fuchsia": "フクシア",
+					"lime": "ライム",
+					"emerald": "エメラルド"
 				}
 			}
 		},
@@ -503,6 +510,7 @@
 			"selectTheme": "テーマを選択",
 			"themeLight": "ライト",
 			"themeDark": "ダーク",
+			"themeVolt": "ボルト",
 			"themeSystem": "システム",
 			"language": "言語",
 			"languageDescription": "表示言語を選択してください",
@@ -532,7 +540,10 @@
 			"labels": "ラベル",
 			"labelsDescription": "タスクのラベルとタグを表示します",
 			"priority": "優先度",
-			"priorityDescription": "優先度インジケーターを表示します"
+			"priorityDescription": "優先度インジケーターを表示します",
+			"interfaceSize": "インターフェースサイズ",
+			"interfaceSizeDecrease": "インターフェースサイズを縮小",
+			"interfaceSizeIncrease": "インターフェースサイズを拡大"
 		},
 		"developerPage": {
 			"pageTitle": "開発者設定",
@@ -859,8 +870,8 @@
 			"slackSectionSubtitle": "Incoming Webhook を使用してプロジェクトのタスク更新を Slack チャンネルに送信します。",
 			"telegramSectionTitle": "Telegram 連携",
 			"telegramSectionSubtitle": "ボットを使用してプロジェクトのタスク更新を Telegram のチャットまたはトピックに送信します。",
-			"mattermostSectionSubtitle": "Send project task updates into a Mattermost channel with an incoming webhook.",
-			"mattermostSectionTitle": "Mattermost Integration"
+			"mattermostSectionSubtitle": "Incoming Webhook を使ってプロジェクトのタスク更新を Mattermost チャンネルに送信します。",
+			"mattermostSectionTitle": "Mattermost 統合"
 		},
 		"projectVisibility": {
 			"pageTitle": "プロジェクトの公開設定",
@@ -1276,48 +1287,48 @@
 		},
 		"externalLinks": {
 			"resources": "リソース",
-			"issue": "Issue",
+			"issue": "イシュー",
 			"branch": "ブランチ",
 			"merged": "マージ済み",
 			"draft": "下書き",
 			"open": "オープン"
 		},
 		"mattermostIntegration": {
-			"channelHint": "Optional label for your reference. Mattermost controls the actual destination channel from the webhook setup.",
-			"channelLabel": "Channel name",
+			"channelHint": "参照用の任意ラベルです。実際の送信先チャンネルは webhook の設定によって Mattermost 側で制御されます。",
+			"channelLabel": "チャンネル名",
 			"channelPlaceholder": "#team-updates",
-			"connect": "Connect Mattermost",
-			"connected": "Connected",
-			"connectionHint": "Paste a Mattermost incoming webhook URL and choose which task events should be posted.",
-			"connectionTitle": "Mattermost webhook connection",
-			"disconnect": "Disconnect",
+			"connect": "Mattermost を接続",
+			"connected": "接続済み",
+			"connectionHint": "Mattermost の Incoming Webhook URL を貼り付け、投稿するタスクイベントを選択してください。",
+			"connectionTitle": "Mattermost webhook 接続",
+			"disconnect": "切断",
 			"events": {
-				"taskCommentCreated": "New comments",
-				"taskCreated": "New tasks",
-				"taskDescriptionChanged": "Description changes",
-				"taskPriorityChanged": "Priority changes",
-				"taskStatusChanged": "Status changes",
-				"taskTitleChanged": "Title changes"
+				"taskCommentCreated": "新しいコメント",
+				"taskCreated": "新しいタスク",
+				"taskDescriptionChanged": "説明の変更",
+				"taskPriorityChanged": "優先度の変更",
+				"taskStatusChanged": "ステータスの変更",
+				"taskTitleChanged": "タイトルの変更"
 			},
-			"eventsHint": "Choose which project changes should post to Mattermost.",
-			"eventsTitle": "Event notifications",
-			"paused": "Paused",
-			"saveChanges": "Save changes",
+			"eventsHint": "プロジェクトのどの変更を Mattermost に投稿するかを選択してください。",
+			"eventsTitle": "イベント通知",
+			"paused": "一時停止中",
+			"saveChanges": "変更を保存",
 			"toast": {
-				"disabled": "Mattermost notifications paused",
-				"enabled": "Mattermost notifications enabled",
-				"removed": "Mattermost integration removed successfully",
-				"removeError": "Failed to remove Mattermost integration",
-				"saved": "Mattermost integration saved successfully",
-				"saveError": "Failed to save Mattermost integration",
-				"updateError": "Failed to update Mattermost integration"
+				"disabled": "Mattermost 通知を一時停止しました",
+				"enabled": "Mattermost 通知を有効にしました",
+				"removed": "Mattermost 統合を削除しました",
+				"removeError": "Mattermost 統合の削除に失敗しました",
+				"saved": "Mattermost 統合を保存しました",
+				"saveError": "Mattermost 統合の保存に失敗しました",
+				"updateError": "Mattermost 統合の更新に失敗しました"
 			},
-			"update": "Update Mattermost",
+			"update": "Mattermost を更新",
 			"validation": {
-				"webhookInvalid": "Enter a valid Mattermost webhook URL"
+				"webhookInvalid": "有効な Mattermost webhook URL を入力してください"
 			},
-			"webhookHint": "Create an Incoming Webhook in Mattermost and paste the generated URL here.",
-			"webhookLabel": "Incoming webhook URL",
+			"webhookHint": "Mattermost で Incoming Webhook を作成し、生成された URL をここに貼り付けてください。",
+			"webhookLabel": "Incoming Webhook URL",
 			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		},
 		"customFields": {
@@ -1359,6 +1370,7 @@
 			"createWorkspace": "ワークスペースを作成",
 			"lightTheme": "ライトテーマ",
 			"darkTheme": "ダークテーマ",
+			"voltTheme": "ボルトテーマ",
 			"systemTheme": "システムテーマ",
 			"keyboardShortcuts": "キーボードショートカット",
 			"inputPlaceholder": "アプリやコマンドを検索...",
@@ -1387,7 +1399,12 @@
 			"deleteConfirmTitle": "プロジェクトを削除しますか？",
 			"deleteConfirmDescription": "これにより、プロジェクトとそのすべてのデータが完全に削除されます。この操作は取り消せません。",
 			"deletedToast": "プロジェクトを削除しました",
-			"deleteProject": "プロジェクトを削除"
+			"deleteProject": "プロジェクトを削除",
+			"sortProjects": "プロジェクトを並べ替え",
+			"sortCustom": "カスタム順",
+			"sortName": "名前",
+			"sortDate": "作成日",
+			"sortCompletion": "進捗率"
 		},
 		"search": {
 			"inputPlaceholder": "タスク、プロジェクト、コメントを検索...",
@@ -1417,7 +1434,8 @@
 			"workspaces": "ワークスペース",
 			"switching": "切り替え中...",
 			"addWorkspace": "ワークスペースを追加",
-			"selectWorkspace": "ワークスペースを選択"
+			"selectWorkspace": "ワークスペースを選択",
+			"sortWorkspaces": "ワークスペースを並べ替え"
 		},
 		"page": {
 			"projectsTitle": "プロジェクト",
@@ -1633,7 +1651,7 @@
 		"title": "タスク",
 		"status": {
 			"label": "ステータス",
-			"to-do": "To Do",
+			"to-do": "未着手",
 			"in-progress": "進行中",
 			"in-review": "レビュー中",
 			"done": "完了",
@@ -1852,18 +1870,7 @@
 				"removeSuccess": "ラベルを削除しました",
 				"updateError": "ラベルの更新に失敗しました",
 				"createSuccess": "ラベルを作成して追加しました",
-				"createError": "ラベルの作成に失敗しました",
-				"colors": {
-					"stone": "ストーン",
-					"slate": "スレート",
-					"lavender": "ラベンダー",
-					"sage": "セージ",
-					"forest": "フォレスト",
-					"amber": "アンバー",
-					"terracotta": "テラコッタ",
-					"rose": "ローズ",
-					"crimson": "クリムゾン"
-				}
+				"createError": "ラベルの作成に失敗しました"
 			}
 		},
 		"backlog": {
@@ -1959,7 +1966,7 @@
 			"resizeStart": "開始日を変更",
 			"resizeDue": "期限を変更",
 			"taskAriaLabel": "{{title}}: 開く、またはドラッグして移動",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "今日に移動"
 		},
 		"delete": {
 			"title": "タスクを削除しますか？",
@@ -1983,7 +1990,7 @@
 			"merged": "マージ済み",
 			"draft": "下書き",
 			"open": "オープン",
-			"label": "Pull Request",
+			"label": "プルリクエスト",
 			"count_other": "{{count}} 件の PR"
 		},
 		"assignee": {
@@ -2215,8 +2222,8 @@
 		"taskDetail": {
 			"labels": "ラベル",
 			"externalLinks": "外部リンク",
-			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"pullRequestFallback": "プルリクエスト",
+			"issueFallback": "課題",
 			"prStatusMerged": "マージ済み",
 			"prStatusDraft": "下書き",
 			"prStatusOpen": "オープン",
@@ -2236,6 +2243,36 @@
 		},
 		"branding": {
 			"poweredBy": "Powered by"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "プロジェクトを作成すると、すべてのワークスペースのプロジェクトがここに表示されます。",
+			"title": "プロジェクトはまだありません"
+		},
+		"pageTitle": "すべてのプロジェクト",
+		"section": {
+			"projectCount_other": "{{count}}件のプロジェクト"
+		},
+		"stats": {
+			"completion": "完了率",
+			"projects": "プロジェクト",
+			"tasks": "タスク"
+		},
+		"table": {
+			"progress": "進捗",
+			"project": "プロジェクト",
+			"status": "ステータス",
+			"tasks": "タスク"
+		},
+		"charts": {
+			"backlog": "バックログ",
+			"empty": "過去6か月間にタスクの活動はありません。",
+			"tasks": "タスク"
+		},
+		"tabs": {
+			"charts": "グラフ",
+			"overview": "概要"
 		}
 	}
 }

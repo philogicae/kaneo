@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { FadeIn } from "@/components/landing/fade-in";
 import sponsors from "@/constants/sponsors.json";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,14 @@ function avatarSize(tier: number | null) {
   if (tier >= 100) return "size-16";
   if (tier >= 15) return "size-14";
   return "size-12";
+}
+
+function avatarPixels(tier: number | null) {
+  if (tier == null) return 48;
+  if (tier >= 250) return 80;
+  if (tier >= 100) return 64;
+  if (tier >= 15) return 56;
+  return 48;
 }
 
 export function Sponsors() {
@@ -66,13 +75,15 @@ export function Sponsors() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <img
+                    <Image
                       alt=""
                       className={cn(
                         "rounded-full border border-border/70",
                         avatarSize(sponsor.tier),
                       )}
                       src={sponsor.avatarUrl}
+                      width={avatarPixels(sponsor.tier)}
+                      height={avatarPixels(sponsor.tier)}
                       loading="lazy"
                     />
                     <span>
@@ -107,10 +118,12 @@ export function Sponsors() {
                       sponsor.founding ? " · Founding sponsor" : ""
                     }`}
                   >
-                    <img
+                    <Image
                       alt={sponsor.name ?? sponsor.login}
                       className="size-10 rounded-full border border-border/70 opacity-80 transition-opacity hover:opacity-100"
                       src={sponsor.avatarUrl}
+                      width={40}
+                      height={40}
                       loading="lazy"
                     />
                   </a>

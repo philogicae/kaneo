@@ -4,7 +4,10 @@ type TelegramMessage = {
   chat_id: string;
   text: string;
   parse_mode?: "HTML";
-  disable_web_page_preview?: boolean;
+  // link_preview_options supersedes the deprecated
+  // disable_web_page_preview flag; notifications stay compact with no image
+  // preview.
+  link_preview_options?: { is_disabled: boolean };
   message_thread_id?: number;
 };
 

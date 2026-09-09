@@ -54,21 +54,55 @@ function createMcpServerForUser(token: string): LegacyMcpServer {
   return server;
 }
 
+// verify-api-key pulls in the database client, so it is only loaded when a
+// credential actually needs to be checked as an API key.
+type VerifyApiKey = typeof import("../utils/verify-api-key").verifyApiKey;
+let verifyApiKeyLoader: Promise<VerifyApiKey> | null = null;
+
+function loadVerifyApiKey(): Promise<VerifyApiKey> {
+  verifyApiKeyLoader ??= import("../utils/verify-api-key").then(
+    (module) => module.verifyApiKey,
+  );
+  return verifyApiKeyLoader;
+}
+
+async function getSessionFromBearerToken(token: string) {
+  const headers = new Headers();
+  headers.set("authorization", `Bearer ${token}`);
+  return auth.api.getSession({ headers });
+}
+
+// Mirrors authenticateApiRequest's credential contract for bearer-only
+// requests so MCP HTTP accepts the same credentials as the REST API: a
+// session token, or an API key either as Bearer or via x-api-key when no
+// Authorization header is present. A token cannot be valid as both, so the
+// lookup order only decides which store is queried first.
 async function validateBearerToken(
   req: Request,
 ): Promise<{ userId: string; token: string } | null> {
   const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const match = authHeader.match(/^Bearer\s+(\S+)$/i);
-  if (!match?.[1]) return null;
-  const token = match[1];
+  const match = authHeader?.match(/^Bearer\s+(\S+)$/i);
+  if (authHeader && !match?.[1]) return null;
+  const bearerToken = match?.[1];
 
-  const headers = new Headers();
-  headers.set("authorization", `Bearer ${token}`);
-  const session = await auth.api.getSession({ headers });
+  if (bearerToken) {
+    const session = await getSessionFromBearerToken(bearerToken);
+    if (session?.user?.id) {
+      return { userId: session.user.id, token: bearerToken };
+    }
+  }
 
-  if (!session?.user?.id) return null;
-  return { userId: session.user.id, token };
+  const apiKeyHeader = req.headers.get("x-api-key")?.trim();
+  const apiKeyToken = bearerToken ?? (apiKeyHeader || null);
+  if (apiKeyToken) {
+    const verifyApiKey = await loadVerifyApiKey();
+    const apiKeyResult = await verifyApiKey(apiKeyToken);
+    if (apiKeyResult?.valid && apiKeyResult.key) {
+      return { userId: apiKeyResult.key.userId, token: apiKeyToken };
+    }
+  }
+
+  return null;
 }
 
 const mcp = apiRouter();
