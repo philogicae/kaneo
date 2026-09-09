@@ -6,7 +6,9 @@ export const searchQuery = z.object({
     .enum(["all", "tasks", "projects", "workspaces", "comments", "activities"])
     .optional()
     .default("all"),
-  workspaceId: z.string().min(1),
+  // Optional: when omitted, the search covers every workspace the user is a
+  // member of (the controller intersects any explicit id with that list).
+  workspaceId: z.string().min(1).optional(),
   projectId: z.string().optional(),
   limit: z
     .string()

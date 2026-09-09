@@ -534,7 +534,10 @@
 			"labels": "Метки",
 			"labelsDescription": "Показывать метки и теги задач",
 			"priority": "Приоритет",
-			"priorityDescription": "Показывать индикаторы приоритета"
+			"priorityDescription": "Показывать индикаторы приоритета",
+			"interfaceSize": "Размер интерфейса",
+			"interfaceSizeDecrease": "Уменьшить размер интерфейса",
+			"interfaceSizeIncrease": "Увеличить размер интерфейса"
 		},
 		"developerPage": {
 			"pageTitle": "Настройки разработчика",
@@ -1123,7 +1126,7 @@
 		},
 		"externalLinks": {
 			"resources": "Ресурсы",
-			"issue": "Issue",
+			"issue": "Задача",
 			"branch": "Ветка",
 			"merged": "Влит",
 			"draft": "Черновик",
@@ -1312,7 +1315,7 @@
 			},
 			"eventsHint": "Выберите, какие изменения проекта публиковать в Mattermost.",
 			"eventsTitle": "Уведомления о событиях",
-			"paused": "Paused",
+			"paused": "Приостановлено",
 			"saveChanges": "Сохранить изменения",
 			"toast": {
 				"disabled": "Уведомления Mattermost приостановлены",
@@ -2083,16 +2086,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Показать все задачи за {{date}}",
+			"moreTasks": "ещё {{count}}",
 			"nextMonth": "Следующий месяц",
 			"noTasks": "Нет запланированных задач",
 			"noTasksSubtitle": "Добавьте к задачам дату начала, срок или и то, и другое, чтобы разместить их в календаре.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Календарь",
 			"previousMonth": "Предыдущий месяц",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: открыть задачу",
 			"title": "Календарь",
-			"today": "Today",
+			"today": "Сегодня",
 			"loadError": "Не удалось загрузить задачи."
 		}
 	},
@@ -2256,7 +2259,7 @@
 			"labels": "Метки",
 			"externalLinks": "Внешние ссылки",
 			"pullRequestFallback": "Пул-реквест",
-			"issueFallback": "Issue",
+			"issueFallback": "Задача",
 			"prStatusMerged": "Влит",
 			"prStatusDraft": "Черновик",
 			"prStatusOpen": "Открыт",
@@ -2292,16 +2295,23 @@
 		},
 		"stats": {
 			"completion": "Выполнено",
-			"nextDueDate": "Ближайший срок",
 			"projects": "Проекты",
 			"tasks": "Задачи"
 		},
 		"table": {
-			"dueDate": "Срок",
 			"progress": "Прогресс",
 			"project": "Проект",
 			"status": "Статус",
 			"tasks": "Задачи"
+		},
+		"charts": {
+			"backlog": "Бэклог",
+			"empty": "Нет активности по задачам за последние 6 месяцев.",
+			"tasks": "Задачи"
+		},
+		"tabs": {
+			"charts": "Графики",
+			"overview": "Обзор"
 		}
 	}
 }

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import BacklogListView from "@/components/backlog-list-view";
 import ProjectLayout from "@/components/common/project-layout";
 import SortControl from "@/components/common/sort-control";
+import TaskSearchInput from "@/components/common/task-search-input";
 import PageTitle from "@/components/page-title";
 import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
@@ -35,6 +36,7 @@ import { resolveLabelColor } from "@/lib/label-color";
 import { getPriorityIcon } from "@/lib/priority";
 import type { SortConfig } from "@/lib/sort-tasks";
 import { sortTasks } from "@/lib/sort-tasks";
+import { taskMatchesTextQuery } from "@/lib/task-search";
 import { toast } from "@/lib/toast";
 import useProjectStore from "@/store/project";
 import { useUserPreferencesStore } from "@/store/user-preferences";
@@ -61,6 +63,7 @@ function RouteComponent() {
   const { data } = useGetTasks(projectId);
   const { project, setProject } = useProjectStore();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [backlogSearchQuery, setBacklogSearchQuery] = useState("");
   const { mutate: updateTask } = useUpdateTask();
   const [sort, setSort] = useState<SortConfig>({
     field: "position",
@@ -173,8 +176,17 @@ function RouteComponent() {
   const filteredProject = useMemo(() => {
     if (!project) return null;
 
+    const normalizedSearchQuery = backlogSearchQuery.trim().toLowerCase();
+
     const filterTasks = (tasks: Task[]) => {
       return tasks.filter((task) => {
+        if (
+          normalizedSearchQuery &&
+          !taskMatchesTextQuery(task, normalizedSearchQuery, project.slug)
+        ) {
+          return false;
+        }
+
         if (filters.priority && task.priority !== filters.priority) {
           return false;
         }
@@ -249,7 +261,7 @@ function RouteComponent() {
       plannedTasks: filterTasks(project.plannedTasks || []),
       archivedTasks: filterTasks(project.archivedTasks || []),
     };
-  }, [project, filters, getTaskLabels]);
+  }, [project, filters, getTaskLabels, backlogSearchQuery]);
 
   const uniqueLabels = workspaceLabels.reduce(
     (
@@ -406,7 +418,7 @@ function RouteComponent() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                      className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         updateFilter("priority", null);
@@ -432,7 +444,7 @@ function RouteComponent() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                      className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         updateFilter("assignee", null);
@@ -466,7 +478,7 @@ function RouteComponent() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                      className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         updateFilter("dueDate", null);
@@ -512,7 +524,7 @@ function RouteComponent() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                          className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-white"
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleLabelGroup(label);
@@ -684,6 +696,11 @@ function RouteComponent() {
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                <TaskSearchInput
+                  value={backlogSearchQuery}
+                  onChange={setBacklogSearchQuery}
+                />
               </div>
             </div>
           </div>

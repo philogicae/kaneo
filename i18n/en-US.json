@@ -506,6 +506,9 @@
 			"themeDark": "Dark",
 			"themeVolt": "Volt",
 			"themeSystem": "System",
+			"interfaceSize": "Interface size",
+			"interfaceSizeDecrease": "Decrease interface size",
+			"interfaceSizeIncrease": "Increase interface size",
 			"language": "Language",
 			"languageDescription": "Choose your preferred interface language",
 			"selectLanguage": "Select a language",
@@ -1337,7 +1340,7 @@
 			"voltTheme": "Volt theme",
 			"systemTheme": "System theme",
 			"keyboardShortcuts": "Keyboard shortcuts",
-			"inputPlaceholder": "Search for apps and commands...",
+			"inputPlaceholder": "Search",
 			"empty": "No results found.",
 			"footer": {
 				"navigate": "Navigate",
@@ -1371,7 +1374,7 @@
 			"sortCompletion": "Completion"
 		},
 		"search": {
-			"inputPlaceholder": "Search tasks, projects, comments...",
+			"inputPlaceholder": "Search",
 			"minCharsHint": "Type at least 3 characters to search",
 			"groups": {
 				"task": "Tasks",
@@ -1634,7 +1637,7 @@
 			"high": "High",
 			"urgent": "Urgent"
 		},
-		"boardSearchPlaceholder": "Search tickets...",
+		"boardSearchPlaceholder": "Search",
 		"view": {
 			"board": "Board",
 			"list": "List"
@@ -1759,7 +1762,7 @@
 			"tasksInProject": "Tasks in project",
 			"linkError": "Failed to link task",
 			"empty": "No related tasks",
-			"searchPlaceholder": "Search tasks to link...",
+			"searchPlaceholder": "Search",
 			"noTasksFound": "No tasks found",
 			"openTask": "Open task",
 			"removeRelation": "Remove relation",
@@ -1916,7 +1919,7 @@
 			"pageTitle": "{{name}} – Gantt",
 			"title": "Gantt Timeline",
 			"jumpToToday": "Jump to today",
-			"searchPlaceholder": "Search scheduled tickets...",
+			"searchPlaceholder": "Search",
 			"hideTasks": "Hide tasks",
 			"showTasks": "Show tasks",
 			"noTasks": "No scheduled tasks",
@@ -2060,17 +2063,24 @@
 	},
 	"unified": {
 		"pageTitle": "All projects",
+		"tabs": {
+			"overview": "Overview",
+			"charts": "Charts"
+		},
+		"charts": {
+			"tasks": "Tasks",
+			"backlog": "Backlog",
+			"empty": "No task activity in the last 6 months."
+		},
 		"stats": {
 			"projects": "Projects",
 			"tasks": "Tasks",
-			"completion": "Completion",
-			"nextDueDate": "Next due date"
+			"completion": "Completion"
 		},
 		"table": {
 			"project": "Project",
 			"progress": "Progress",
 			"tasks": "Tasks",
-			"dueDate": "Due date",
 			"status": "Status"
 		},
 		"section": {
@@ -2106,7 +2116,7 @@
 		"search": {
 			"pageTitle": "Search",
 			"backToDashboard": "Back to Dashboard",
-			"placeholder": "Search tasks by title or short ID (e.g. DEP-23)...",
+			"placeholder": "Search",
 			"hint": "Search across all projects in this workspace. Use short IDs like DEP-23 to find specific tasks.",
 			"searching": "Searching...",
 			"resultsFound_one": "{{count}} result found",

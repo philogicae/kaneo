@@ -10,7 +10,7 @@
 			"markAllRead": "Alle als gelesen markieren",
 			"remove": "Entfernen",
 			"reset": "Zurücksetzen",
-			"filter": "Filter",
+			"filter": "Filtern",
 			"clearAllFilters": "Alle Filter löschen"
 		},
 		"a11y": {
@@ -534,7 +534,10 @@
 			"labels": "Labels",
 			"labelsDescription": "Aufgabenlabels und Tags anzeigen",
 			"priority": "Priorität",
-			"priorityDescription": "Prioritätsindikatoren anzeigen"
+			"priorityDescription": "Prioritätsindikatoren anzeigen",
+			"interfaceSize": "Oberflächengröße",
+			"interfaceSizeDecrease": "Oberflächengröße verkleinern",
+			"interfaceSizeIncrease": "Oberflächengröße vergrößern"
 		},
 		"developerPage": {
 			"pageTitle": "Entwicklereinstellungen",
@@ -860,22 +863,22 @@
 			"webhookTitle": "Webhook",
 			"webhookHint": "Füge in deinem Gitea-Repository einen Webhook mit dieser URL und diesem Geheimnis hinzu. Aktiviere Push, Pull Request, Issues, Issue-Kommentare und Create (für Labels).",
 			"webhookSecretLabel": "Geheimnis (muss mit dem Webhook-Geheimnis in Gitea übereinstimmen)",
-			"baseUrlLabel": "Gitea URL",
+			"baseUrlLabel": "Gitea-URL",
 			"baseUrlHint": "Basis-URL deiner Gitea-Instanz",
 			"tokenLabel": "Persönlicher Zugriffstoken",
 			"tokenHint": "Token mit Zugriff auf Repositorys und Issues",
 			"tokenPlaceholder": "Token einfügen",
 			"tokenPlaceholderUpdate": "Neuen Token einfügen, um ihn zu ersetzen",
-			"currentToken": "stored",
-			"ownerLabel": "Owner",
+			"currentToken": "gespeichert",
+			"ownerLabel": "Eigentümer",
 			"ownerHint": "Benutzer- oder Organisationsname",
 			"repoNameLabel": "Repository-Name",
 			"repoNameHint": "Nur der Repository-Name (ohne Eigentümer)",
 			"actionsTitle": "Aktionen",
 			"actionsHint": "Zugriff prüfen und verbinden",
-			"browse": "Browse",
-			"verify": "Verify",
-			"update": "Update",
+			"browse": "Durchsuchen",
+			"verify": "Prüfen",
+			"update": "Aktualisieren",
 			"connect": "Verbinden",
 			"disconnect": "Trennen",
 			"importSectionTitle": "Gitea-Issues importieren",
@@ -888,7 +891,7 @@
 			"searchRepos": "Suchen…",
 			"browseNeedsCredentials": "Gib Gitea-URL und Token ein, um zu durchsuchen",
 			"loadingRepos": "Repositorys werden geladen…",
-			"retry": "Retry"
+			"retry": "Erneut versuchen"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1115,8 +1118,8 @@
 		},
 		"externalLinks": {
 			"resources": "Ressourcen",
-			"issue": "Issue",
-			"branch": "Branch",
+			"issue": "Ticket",
+			"branch": "Zweig",
 			"merged": "Zusammengeführt",
 			"draft": "Entwurf",
 			"open": "Offen"
@@ -1302,7 +1305,7 @@
 			},
 			"eventsHint": "Wähle aus, welche Projektänderungen an Mattermost gepostet werden sollen.",
 			"eventsTitle": "Ereignis-Benachrichtigungen",
-			"paused": "Paused",
+			"paused": "Pausiert",
 			"saveChanges": "Änderungen speichern",
 			"toast": {
 				"disabled": "Mattermost-Benachrichtigungen pausiert",
@@ -1847,7 +1850,7 @@
 			"moveAllTooltip": "Alle geplanten Aufgaben nach „Zu erledigen“ verschieben",
 			"moveAll": "Alle verschieben",
 			"addTask": "Aufgabe hinzufügen",
-			"filter": "Filter",
+			"filter": "Filtern",
 			"addFilter": "Filter hinzufügen...",
 			"sections": {
 				"planned": "Geplant",
@@ -2015,16 +2018,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Alle Aufgaben für den {{date}} anzeigen",
+			"moreTasks": "+{{count}} weitere",
 			"nextMonth": "Nächster Monat",
 			"noTasks": "Keine geplanten Aufgaben",
 			"noTasksSubtitle": "Füge Aufgaben ein Startdatum, ein Fälligkeitsdatum oder beides hinzu, um sie im Kalender zu platzieren.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Kalender",
 			"previousMonth": "Vorheriger Monat",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: Aufgabe öffnen",
 			"title": "Kalender",
-			"today": "Today",
+			"today": "Heute",
 			"loadError": "Aufgaben konnten nicht geladen werden."
 		}
 	},
@@ -2094,7 +2097,7 @@
 			"quickSearchesLabel": "Schnellsuchen:",
 			"suggestionHighPriority": "Hohe Priorität",
 			"suggestionBug": "Bug",
-			"suggestionFeature": "Feature",
+			"suggestionFeature": "Funktion",
 			"suggestionInProgress": "In Bearbeitung",
 			"suggestionCompleted": "Abgeschlossen"
 		},
@@ -2186,7 +2189,7 @@
 			"labels": "Labels",
 			"externalLinks": "Externe Links",
 			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"issueFallback": "Ticket",
 			"prStatusMerged": "Zusammengeführt",
 			"prStatusDraft": "Entwurf",
 			"prStatusOpen": "Offen",
@@ -2220,16 +2223,23 @@
 		},
 		"stats": {
 			"completion": "Abschluss",
-			"nextDueDate": "Nächstes Fälligkeitsdatum",
 			"projects": "Projekte",
 			"tasks": "Aufgaben"
 		},
 		"table": {
-			"dueDate": "Fälligkeitsdatum",
 			"progress": "Fortschritt",
 			"project": "Projekt",
 			"status": "Status",
 			"tasks": "Aufgaben"
+		},
+		"charts": {
+			"backlog": "Backlog",
+			"empty": "Keine Aufgabenaktivität in den letzten 6 Monaten.",
+			"tasks": "Aufgaben"
+		},
+		"tabs": {
+			"charts": "Diagramme",
+			"overview": "Übersicht"
 		}
 	}
 }

@@ -13,7 +13,7 @@ export function NavUnified() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const url = "/dashboards";
+  const url = "/";
 
   return (
     <SidebarGroup className="gap-1 p-2 pt-1">

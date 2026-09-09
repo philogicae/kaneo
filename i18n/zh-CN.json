@@ -534,7 +534,10 @@
 			"labels": "标签",
 			"labelsDescription": "显示任务的标签和标记",
 			"priority": "优先级",
-			"priorityDescription": "显示优先级指示"
+			"priorityDescription": "显示优先级指示",
+			"interfaceSize": "界面大小",
+			"interfaceSizeDecrease": "缩小界面大小",
+			"interfaceSizeIncrease": "放大界面大小"
 		},
 		"developerPage": {
 			"pageTitle": "开发者设置",
@@ -1276,7 +1279,7 @@
 		},
 		"externalLinks": {
 			"resources": "资源",
-			"issue": "Issue",
+			"issue": "议题",
 			"branch": "分支",
 			"merged": "已合并",
 			"draft": "草稿",
@@ -1301,7 +1304,7 @@
 			},
 			"eventsHint": "选择要将哪些项目变更发布到 Mattermost。",
 			"eventsTitle": "事件通知",
-			"paused": "Paused",
+			"paused": "已暂停",
 			"saveChanges": "保存更改",
 			"toast": {
 				"disabled": "Mattermost 通知已暂停",
@@ -2009,16 +2012,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "显示 {{date}} 的所有任务",
+			"moreTasks": "还有 {{count}} 项",
 			"nextMonth": "下个月",
 			"noTasks": "没有已排期的任务",
 			"noTasksSubtitle": "为任务添加开始日期、截止日期或两者，以便显示在日历上。",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – 日历",
 			"previousMonth": "上个月",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}，{{range}}：打开任务",
 			"title": "日历",
-			"today": "Today",
+			"today": "今天",
 			"loadError": "任务加载失败。"
 		}
 	},
@@ -2179,7 +2182,7 @@
 			"labels": "标签",
 			"externalLinks": "外部链接",
 			"pullRequestFallback": "拉取请求",
-			"issueFallback": "Issue",
+			"issueFallback": "议题",
 			"prStatusMerged": "已合并",
 			"prStatusDraft": "草稿",
 			"prStatusOpen": "打开",
@@ -2212,16 +2215,23 @@
 		},
 		"stats": {
 			"completion": "完成度",
-			"nextDueDate": "最近截止日期",
 			"projects": "项目",
 			"tasks": "任务"
 		},
 		"table": {
-			"dueDate": "截止日期",
 			"progress": "进度",
 			"project": "项目",
 			"status": "状态",
 			"tasks": "任务"
+		},
+		"charts": {
+			"backlog": "待办积压",
+			"empty": "最近 6 个月内没有任务动态。",
+			"tasks": "任务"
+		},
+		"tabs": {
+			"charts": "图表",
+			"overview": "总览"
 		}
 	}
 }

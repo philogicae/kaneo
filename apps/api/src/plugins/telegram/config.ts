@@ -22,7 +22,12 @@ export const telegramEventsSchema = v.object(
 
 const telegramBotTokenSchema = v.pipe(
   v.string(),
-  v.regex(/^\d{8,10}:[A-Za-z0-9_-]{35}$/, "Enter a valid Telegram bot token"),
+  v.trim(),
+  // Real tokens are "<bot id>:<random suffix>" where the bot id predates the
+  // 8-digit era and the suffix length varies; the previous strict
+  // 8-10 digits + exactly 35 chars silently rejected older-but-valid
+  // integrations at dispatch time, stopping all notifications.
+  v.regex(/^\d{1,10}:[A-Za-z0-9_-]{30,}$/, "Enter a valid Telegram bot token"),
 );
 
 const telegramChatIdSchema = v.pipe(
@@ -34,12 +39,21 @@ const telegramChatIdSchema = v.pipe(
 export const telegramConfigSchema = v.object({
   botToken: telegramBotTokenSchema,
   chatId: telegramChatIdSchema,
-  threadId: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1))),
-  chatLabel: v.optional(v.string()),
-  events: v.optional(telegramEventsSchema),
+  // Older stored configs may carry null for the optional fields.
+  threadId: v.nullish(v.pipe(v.number(), v.integer(), v.minValue(1))),
+  chatLabel: v.nullish(v.string()),
+  events: v.nullish(telegramEventsSchema),
 });
 
 export type TelegramConfig = v.InferOutput<typeof telegramConfigSchema>;
+
+export type NormalizedTelegramConfig = {
+  botToken: string;
+  chatId: string;
+  threadId?: number;
+  chatLabel?: string;
+  events: Record<TelegramEventKey, boolean>;
+};
 
 export const defaultTelegramEvents: Record<TelegramEventKey, boolean> = {
   taskCreated: true,
@@ -52,9 +66,10 @@ export const defaultTelegramEvents: Record<TelegramEventKey, boolean> = {
 
 export function normalizeTelegramConfig(
   config: TelegramConfig,
-): TelegramConfig {
+): NormalizedTelegramConfig {
   return {
-    ...config,
+    botToken: config.botToken,
+    chatId: config.chatId,
     threadId:
       typeof config.threadId === "number" && Number.isFinite(config.threadId)
         ? config.threadId

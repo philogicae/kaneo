@@ -534,7 +534,10 @@
 			"labels": "라벨",
 			"labelsDescription": "작업 라벨과 태그를 표시합니다",
 			"priority": "우선순위",
-			"priorityDescription": "우선순위 표시기를 표시합니다"
+			"priorityDescription": "우선순위 표시기를 표시합니다",
+			"interfaceSize": "인터페이스 크기",
+			"interfaceSizeDecrease": "인터페이스 크기 줄이기",
+			"interfaceSizeIncrease": "인터페이스 크기 키우기"
 		},
 		"developerPage": {
 			"pageTitle": "개발자 설정",
@@ -1301,7 +1304,7 @@
 			},
 			"eventsHint": "프로젝트의 어떤 변경 사항을 Mattermost에 게시할지 선택하세요.",
 			"eventsTitle": "이벤트 알림",
-			"paused": "Paused",
+			"paused": "일시 중지됨",
 			"saveChanges": "변경 사항 저장",
 			"toast": {
 				"disabled": "Mattermost 알림 일시 중지됨",
@@ -2212,16 +2215,23 @@
 		},
 		"stats": {
 			"completion": "완료율",
-			"nextDueDate": "다음 마감일",
 			"projects": "프로젝트",
 			"tasks": "작업"
 		},
 		"table": {
-			"dueDate": "마감일",
 			"progress": "진행률",
 			"project": "프로젝트",
 			"status": "상태",
 			"tasks": "작업"
+		},
+		"charts": {
+			"backlog": "백로그",
+			"empty": "최근 6개월간 작업 활동이 없습니다.",
+			"tasks": "작업"
+		},
+		"tabs": {
+			"charts": "차트",
+			"overview": "개요"
 		}
 	}
 }

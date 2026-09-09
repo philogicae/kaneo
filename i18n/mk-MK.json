@@ -397,8 +397,8 @@
 			"title": "Известувања",
 			"subtitle": "Избери како Kaneo ги доставува известувањата за твојата сметка и кои канали да се користат.",
 			"statusConnected": "Поврзано",
-			"statusPaused": "Paused",
-			"emailTitle": "Email",
+			"statusPaused": "Паузирано",
+			"emailTitle": "Е-пошта",
 			"emailDescription": "Користи ја е-поштата на твојата сметка како дестинација за известувања.",
 			"accountEmailLabel": "Е-пошта на сметката",
 			"accountEmailNoAddress": "Нема достапна е-пошта на сметката",
@@ -408,8 +408,8 @@
 			"ntfyTitle": "ntfy",
 			"ntfyDescription": "Објавувај известувања за сметката на ntfy тема.",
 			"serverUrl": "URL на серверот",
-			"topic": "Topic",
-			"token": "Token",
+			"topic": "Тема",
+			"token": "Токен",
 			"ntfyServerPlaceholder": "https://ntfy.example.com",
 			"ntfyTopicPlaceholder": "team-alerts",
 			"ntfyTokenPlaceholder": "Опционален bearer токен",
@@ -436,7 +436,7 @@
 			"workspaceRulesTitle": "Правила за достава по работен простор",
 			"workspaceRulesDescription": "Искористи ги твоите глобални канали, па одлучи кои работни простори и проекти смеат да испраќаат известувања за сметката.",
 			"workspaceCardHint": "Избери кои канали може да ги користи овој работен простор за известувања за сметката.",
-			"workspaceCardLabelEmail": "Email",
+			"workspaceCardLabelEmail": "Е-пошта",
 			"workspaceCardLabelNtfy": "ntfy",
 			"workspaceCardLabelGotify": "Gotify",
 			"workspaceCardLabelWebhook": "Прилагоден webhook",
@@ -534,7 +534,10 @@
 			"labels": "Етикети",
 			"labelsDescription": "Прикажи етикети и тагови на задачите",
 			"priority": "Приоритет",
-			"priorityDescription": "Прикажи индикатори за приоритет"
+			"priorityDescription": "Прикажи индикатори за приоритет",
+			"interfaceSize": "Големина на интерфејс",
+			"interfaceSizeDecrease": "Намали големина на интерфејс",
+			"interfaceSizeIncrease": "Зголеми големина на интерфејс"
 		},
 		"developerPage": {
 			"pageTitle": "Програмерски поставки",
@@ -840,14 +843,14 @@
 				"commentOnEnabled": "Kaneo ќе коментира со линк до задачата на новите issues",
 				"commentOnDisabled": "Коментарите со линк до задачата на новите issues се исклучени",
 				"settingsUpdateError": "Неуспешно ажурирање на Gitea интеграцијата",
-				"secretCopied": "Copied",
+				"secretCopied": "Копирано",
 				"unableToCopySecret": "Не можеше да се копира тајната",
 				"notGiteaInstance": "URL не укажува на Gitea инстанца",
 				"redirected": "URL на Gitea беше пренасочен (обично на HTTPS). Користете ја финалната URL директно."
 			},
-			"webhookShow": "Show",
-			"webhookHide": "Hide",
-			"webhookCopy": "Copy",
+			"webhookShow": "Прикажи",
+			"webhookHide": "Сокриј",
+			"webhookCopy": "Копирај",
 			"connectionStatus": "Статус на конекција",
 			"connectedActive": "Репозиториумот е поврзан и активен",
 			"notConnectedHint": "Нема поврзан Gitea репозиториум",
@@ -866,16 +869,16 @@
 			"tokenHint": "Токен со пристап до repo и issues",
 			"tokenPlaceholder": "Залепете го токенот",
 			"tokenPlaceholderUpdate": "Залепи нов токен за замена",
-			"currentToken": "stored",
-			"ownerLabel": "Owner",
+			"currentToken": "зачуван",
+			"ownerLabel": "Сопственик",
 			"ownerHint": "Име на корисник или организација",
 			"repoNameLabel": "Име на репозиториум",
 			"repoNameHint": "Само име на репозиториумот (без сопственик)",
 			"actionsTitle": "Дејства",
 			"actionsHint": "Провери го пристапот и поврзи",
-			"browse": "Browse",
-			"verify": "Verify",
-			"update": "Update",
+			"browse": "Пребарај",
+			"verify": "Провери",
+			"update": "Ажурирај",
 			"connect": "Поврзи",
 			"disconnect": "Исклучи",
 			"importSectionTitle": "Увези Gitea issues",
@@ -888,7 +891,7 @@
 			"searchRepos": "Пребарај…",
 			"browseNeedsCredentials": "Внеси Gitea URL и токен за прегледување",
 			"loadingRepos": "Се вчитуваат репозиториуми…",
-			"retry": "Retry"
+			"retry": "Пробај повторно"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1115,7 +1118,7 @@
 		},
 		"externalLinks": {
 			"resources": "Ресурси",
-			"issue": "Issue",
+			"issue": "Пријава",
 			"branch": "Гранка",
 			"merged": "Споен",
 			"draft": "Нацрт",
@@ -1302,7 +1305,7 @@
 			},
 			"eventsHint": "Изберете кои промени во проектот ќе се објавуваат во Mattermost.",
 			"eventsTitle": "Известувања за настани",
-			"paused": "Paused",
+			"paused": "Паузирано",
 			"saveChanges": "Зачувај промени",
 			"toast": {
 				"disabled": "Известувањата од Mattermost се паузирани",
@@ -1900,7 +1903,7 @@
 			}
 		},
 		"gantt": {
-			"pageTitle": "{{name}} – Gantt",
+			"pageTitle": "{{name}} – Гант",
 			"title": "Gantt временска линија",
 			"searchPlaceholder": "Пребарај закажани тикети...",
 			"hideTasks": "Сокриј задачи",
@@ -2015,16 +2018,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Прикажи ги сите задачи за {{date}}",
+			"moreTasks": "+{{count}} повеќе",
 			"nextMonth": "Следен месец",
 			"noTasks": "Нема закажани задачи",
 			"noTasksSubtitle": "Додадете датум на почеток, рок или двете на задачите за да се појават во календарот.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Календар",
 			"previousMonth": "Претходен месец",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: отвори задача",
 			"title": "Календар",
-			"today": "Today",
+			"today": "Денес",
 			"loadError": "Не успеа вчитување на задачите."
 		}
 	},
@@ -2186,7 +2189,7 @@
 			"labels": "Етикети",
 			"externalLinks": "Надворешни линкови",
 			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"issueFallback": "Пријава",
 			"prStatusMerged": "Споен",
 			"prStatusDraft": "Нацрт",
 			"prStatusOpen": "Отворен",
@@ -2220,16 +2223,23 @@
 		},
 		"stats": {
 			"completion": "Завршеност",
-			"nextDueDate": "Следен рок",
 			"projects": "Проекти",
 			"tasks": "Задачи"
 		},
 		"table": {
-			"dueDate": "Рок",
 			"progress": "Напредок",
 			"project": "Проект",
 			"status": "Статус",
 			"tasks": "Задачи"
+		},
+		"charts": {
+			"backlog": "Беклог",
+			"empty": "Нема активност на задачи во последните 6 месеци.",
+			"tasks": "Задачи"
+		},
+		"tabs": {
+			"charts": "Графикони",
+			"overview": "Преглед"
 		}
 	}
 }

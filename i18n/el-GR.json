@@ -397,7 +397,7 @@
 			"title": "Ειδοποιήσεις",
 			"subtitle": "Επιλέξτε πώς παραδίδει το Kaneo τις ειδοποιήσεις του λογαριασμού σας και ποια κανάλια θα χρησιμοποιούνται.",
 			"statusConnected": "Συνδεδεμένο",
-			"statusPaused": "Paused",
+			"statusPaused": "Σε παύση",
 			"emailTitle": "Email",
 			"emailDescription": "Χρησιμοποιήστε το email του λογαριασμού σας ως προορισμό για τις ειδοποιήσεις.",
 			"accountEmailLabel": "Email λογαριασμού",
@@ -408,7 +408,7 @@
 			"ntfyTitle": "ntfy",
 			"ntfyDescription": "Δημοσιεύστε τις ειδοποιήσεις λογαριασμού σε ένα θέμα ntfy.",
 			"serverUrl": "Διεύθυνση διακομιστή",
-			"topic": "Topic",
+			"topic": "Θέμα",
 			"token": "Token",
 			"ntfyServerPlaceholder": "https://ntfy.example.com",
 			"ntfyTopicPlaceholder": "team-alerts",
@@ -534,7 +534,10 @@
 			"labels": "Ετικέτες",
 			"labelsDescription": "Εμφάνιση ετικετών και tags εργασιών",
 			"priority": "Προτεραιότητα",
-			"priorityDescription": "Εμφάνιση ενδείξεων προτεραιότητας"
+			"priorityDescription": "Εμφάνιση ενδείξεων προτεραιότητας",
+			"interfaceSize": "Μέγεθος διεπαφής",
+			"interfaceSizeDecrease": "Μείωση μεγέθους διεπαφής",
+			"interfaceSizeIncrease": "Αύξηση μεγέθους διεπαφής"
 		},
 		"developerPage": {
 			"pageTitle": "Ρυθμίσεις προγραμματιστή",
@@ -840,14 +843,14 @@
 				"commentOnEnabled": "Το Kaneo θα δημοσιεύει σχόλιο με σύνδεσμο εργασίας στα νέα issues",
 				"commentOnDisabled": "Τα σχόλια με σύνδεσμο εργασίας στα νέα issues είναι απενεργοποιημένα",
 				"settingsUpdateError": "Αποτυχία ενημέρωσης ενσωμάτωσης Gitea",
-				"secretCopied": "Copied",
+				"secretCopied": "Αντιγράφηκε",
 				"unableToCopySecret": "Δεν ήταν δυνατή η αντιγραφή του μυστικού",
 				"notGiteaInstance": "Η διεύθυνση URL δεν οδηγεί σε παρουσία Gitea",
 				"redirected": "Η διεύθυνση URL του Gitea ανακατευθύνθηκε (συνήθως σε HTTPS). Χρησιμοποιήστε απευθείας την τελική διεύθυνση."
 			},
-			"webhookShow": "Show",
-			"webhookHide": "Hide",
-			"webhookCopy": "Copy",
+			"webhookShow": "Εμφάνιση",
+			"webhookHide": "Απόκρυψη",
+			"webhookCopy": "Αντιγραφή",
 			"connectionStatus": "Κατάσταση σύνδεσης",
 			"connectedActive": "Το αποθετήριο είναι συνδεδεμένο και ενεργό",
 			"notConnectedHint": "Δεν έχει συνδεθεί αποθετήριο Gitea",
@@ -860,22 +863,22 @@
 			"webhookTitle": "Webhook",
 			"webhookHint": "Στο αποθετήριό σας στο Gitea, προσθέστε ένα webhook με αυτό το URL και το μυστικό. Ενεργοποιήστε push, pull request, issues, σχόλια issues και create (για ετικέτες).",
 			"webhookSecretLabel": "Μυστικό (πρέπει να ταιριάζει με το μυστικό του webhook στο Gitea)",
-			"baseUrlLabel": "Gitea URL",
+			"baseUrlLabel": "URL Gitea",
 			"baseUrlHint": "Το ριζικό URL της εγκατάστασης Gitea σας",
 			"tokenLabel": "Προσωπικό token πρόσβασης",
 			"tokenHint": "Token με πρόσβαση σε αποθετήρια και issues",
 			"tokenPlaceholder": "Επικολλήστε το token",
 			"tokenPlaceholderUpdate": "Επικολλήστε νέο token για αντικατάσταση",
-			"currentToken": "stored",
-			"ownerLabel": "Owner",
+			"currentToken": "αποθηκευμένο",
+			"ownerLabel": "Ιδιοκτήτης",
 			"ownerHint": "Όνομα χρήστη ή οργανισμού",
 			"repoNameLabel": "Όνομα αποθετηρίου",
 			"repoNameHint": "Μόνο το όνομα του αποθετηρίου (χωρίς κάτοχο)",
 			"actionsTitle": "Ενέργειες",
 			"actionsHint": "Επαληθεύστε την πρόσβαση και συνδεθείτε",
-			"browse": "Browse",
-			"verify": "Verify",
-			"update": "Update",
+			"browse": "Αναζήτηση",
+			"verify": "Επαλήθευση",
+			"update": "Ενημέρωση",
 			"connect": "Σύνδεση",
 			"disconnect": "Αποσύνδεση",
 			"importSectionTitle": "Εισαγωγή issues Gitea",
@@ -888,7 +891,7 @@
 			"searchRepos": "Αναζήτηση…",
 			"browseNeedsCredentials": "Εισαγάγετε URL και token Gitea για περιήγηση",
 			"loadingRepos": "Φόρτωση αποθετηρίων…",
-			"retry": "Retry"
+			"retry": "Επανάληψη"
 		},
 		"slackIntegration": {
 			"channelHint": "Προαιρετική ετικέτα για τη δική σας αναφορά. Το Slack ελέγχει το πραγματικό κανάλι προορισμού από τη ρύθμιση του webhook.",
@@ -1115,7 +1118,7 @@
 		},
 		"externalLinks": {
 			"resources": "Πόροι",
-			"issue": "Issue",
+			"issue": "Ζήτημα",
 			"branch": "Κλάδος",
 			"merged": "Συγχωνευμένο",
 			"draft": "Πρόχειρο",
@@ -1302,7 +1305,7 @@
 			},
 			"eventsHint": "Επιλέξτε ποιες αλλαγές έργου θα δημοσιεύονται στο Mattermost.",
 			"eventsTitle": "Ειδοποιήσεις συμβάντων",
-			"paused": "Paused",
+			"paused": "Σε παύση",
 			"saveChanges": "Αποθήκευση αλλαγών",
 			"toast": {
 				"disabled": "Οι ειδοποιήσεις Mattermost τέθηκαν σε παύση",
@@ -1940,7 +1943,7 @@
 			"open": "Ανοιχτό",
 			"label": "Pull Request",
 			"count_one": "{{count}} PR",
-			"count_other": "{{count}} PRs"
+			"count_other": "{{count}} PR"
 		},
 		"assignee": {
 			"label": "Ανατεθειμένος",
@@ -2015,16 +2018,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Εμφάνιση όλων των εργασιών για {{date}}",
+			"moreTasks": "+{{count}} ακόμη",
 			"nextMonth": "Επόμενος μήνας",
 			"noTasks": "Δεν υπάρχουν προγραμματισμένες εργασίες",
 			"noTasksSubtitle": "Προσθέστε ημερομηνία έναρξης, προθεσμία ή και τα δύο στις εργασίες για να εμφανιστούν στο ημερολόγιο.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Ημερολόγιο",
 			"previousMonth": "Προηγούμενος μήνας",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: άνοιγμα εργασίας",
 			"title": "Ημερολόγιο",
-			"today": "Today",
+			"today": "Σήμερα",
 			"loadError": "Αποτυχία φόρτωσης εργασιών."
 		}
 	},
@@ -2186,7 +2189,7 @@
 			"labels": "Ετικέτες",
 			"externalLinks": "Εξωτερικοί σύνδεσμοι",
 			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"issueFallback": "Ζήτημα",
 			"prStatusMerged": "Συγχωνευμένο",
 			"prStatusDraft": "Πρόχειρο",
 			"prStatusOpen": "Ανοιχτό",
@@ -2220,16 +2223,23 @@
 		},
 		"stats": {
 			"completion": "Ολοκλήρωση",
-			"nextDueDate": "Επόμενη προθεσμία",
 			"projects": "Έργα",
 			"tasks": "Εργασίες"
 		},
 		"table": {
-			"dueDate": "Προθεσμία",
 			"progress": "Πρόοδος",
 			"project": "Έργο",
 			"status": "Κατάσταση",
 			"tasks": "Εργασίες"
+		},
+		"charts": {
+			"backlog": "Backlog",
+			"empty": "Καμία δραστηριότητα εργασιών τους τελευταίους 6 μήνες.",
+			"tasks": "Εργασίες"
+		},
+		"tabs": {
+			"charts": "Γραφήματα",
+			"overview": "Επισκόπηση"
 		}
 	}
 }

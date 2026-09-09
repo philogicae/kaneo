@@ -32,11 +32,28 @@ export const projectStatisticsSchema = z
   .object({
     completionPercentage: z.number(),
     totalTasks: z.number(),
+    plannedTasks: z.number().openapi({
+      description: "Number of tasks sitting in the backlog (planned).",
+    }),
     dueDate: nullableResponseTimestamp.openapi({
       description: "The soonest due date among the project's open tasks.",
     }),
   })
   .openapi("ProjectStatistics");
+
+export const projectChartsSchema = z
+  .object({
+    weekStart: z.string().openapi({
+      description: "ISO date of the week start (Monday, UTC).",
+    }),
+    created: z.number().openapi({
+      description: "Tasks created during that week.",
+    }),
+    completed: z.number().openapi({
+      description: "Tasks moved into a final status during that week.",
+    }),
+  })
+  .openapi("ProjectChartsBucket");
 
 export const projectListItemSchema = projectSchema
   .extend({

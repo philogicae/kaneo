@@ -431,7 +431,10 @@
 			"labels": "Labels",
 			"labelsDescription": "Toon taaklabels en tags",
 			"priority": "Prioriteit",
-			"priorityDescription": "Toon prioriteitsindicatoren"
+			"priorityDescription": "Toon prioriteitsindicatoren",
+			"interfaceSize": "Interfacegrootte",
+			"interfaceSizeDecrease": "Interfacegrootte verkleinen",
+			"interfaceSizeIncrease": "Interfacegrootte vergroten"
 		},
 		"developerPage": {
 			"pageTitle": "Ontwikkelaarsinstellingen",
@@ -890,7 +893,7 @@
 		},
 		"externalLinks": {
 			"resources": "Bronnen",
-			"issue": "Issue",
+			"issue": "Melding",
 			"branch": "Branch",
 			"merged": "Samengevoegd",
 			"draft": "Concept",
@@ -913,7 +916,7 @@
 			"ntfyTitle": "ntfy",
 			"ntfyDescription": "Publiceer accountmeldingen naar een ntfy-topic.",
 			"serverUrl": "Server-URL",
-			"topic": "Topic",
+			"topic": "Onderwerp",
 			"token": "Token",
 			"ntfyServerPlaceholder": "https://ntfy.example.com",
 			"ntfyTopicPlaceholder": "team-alerts",
@@ -1302,7 +1305,7 @@
 			},
 			"eventsHint": "Kies welke projectwijzigingen naar Mattermost geplaatst moeten worden.",
 			"eventsTitle": "Gebeurtenismeldingen",
-			"paused": "Paused",
+			"paused": "Gepauzeerd",
 			"saveChanges": "Wijzigingen opslaan",
 			"toast": {
 				"disabled": "Mattermost-meldingen gepauzeerd",
@@ -2015,16 +2018,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Alle taken van {{date}} tonen",
+			"moreTasks": "+{{count}} meer",
 			"nextMonth": "Volgende maand",
 			"noTasks": "Geen geplande taken",
 			"noTasksSubtitle": "Voeg een startdatum, vervaldatum of beide toe aan taken om ze op de kalender te plaatsen.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Kalender",
 			"previousMonth": "Vorige maand",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: taak openen",
 			"title": "Kalender",
-			"today": "Today",
+			"today": "Vandaag",
 			"loadError": "Taken konden niet worden geladen."
 		}
 	},
@@ -2094,7 +2097,7 @@
 			"quickSearchesLabel": "Snel zoeken:",
 			"suggestionHighPriority": "Hoge prioriteit",
 			"suggestionBug": "Bug",
-			"suggestionFeature": "Feature",
+			"suggestionFeature": "Functie",
 			"suggestionInProgress": "In behandeling",
 			"suggestionCompleted": "Voltooid"
 		},
@@ -2186,7 +2189,7 @@
 			"labels": "Labels",
 			"externalLinks": "Externe links",
 			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"issueFallback": "Melding",
 			"prStatusMerged": "Samengevoegd",
 			"prStatusDraft": "Concept",
 			"prStatusOpen": "Open",
@@ -2220,16 +2223,23 @@
 		},
 		"stats": {
 			"completion": "Voltooiing",
-			"nextDueDate": "Eerstvolgende vervaldatum",
 			"projects": "Projecten",
 			"tasks": "Taken"
 		},
 		"table": {
-			"dueDate": "Vervaldatum",
 			"progress": "Voortgang",
 			"project": "Project",
 			"status": "Status",
 			"tasks": "Taken"
+		},
+		"charts": {
+			"backlog": "Backlog",
+			"empty": "Geen taakactiviteit in de afgelopen 6 maanden.",
+			"tasks": "Taken"
+		},
+		"tabs": {
+			"charts": "Grafieken",
+			"overview": "Overzicht"
 		}
 	}
 }

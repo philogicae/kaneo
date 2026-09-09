@@ -1,5 +1,6 @@
 import { addWeeks, endOfWeek, isWithinInterval, startOfWeek } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { taskMatchesTextQuery } from "@/lib/task-search";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 import type { ProjectWithTasks } from "@/types/project";
 import type Task from "@/types/task";
@@ -76,25 +77,11 @@ export function useTaskFiltersWithLabelsSupport(
       const normalizedTextQuery = textQuery?.trim().toLowerCase();
 
       return tasks.filter((task) => {
-        if (normalizedTextQuery) {
-          const title = task.title?.toLowerCase() ?? "";
-          const description = task.description?.toLowerCase() ?? "";
-          const taskNumber = task.number?.toString() ?? "";
-          const taskIdentifier =
-            taskNumber && project?.slug
-              ? `${project.slug}-${taskNumber}`.toLowerCase()
-              : "";
-          const taskShortIdentifier = taskNumber ? `#${taskNumber}` : "";
-          const matchesText =
-            title.includes(normalizedTextQuery) ||
-            description.includes(normalizedTextQuery) ||
-            taskNumber.includes(normalizedTextQuery) ||
-            taskIdentifier.startsWith(normalizedTextQuery) ||
-            taskShortIdentifier.startsWith(normalizedTextQuery);
-
-          if (!matchesText) {
-            return false;
-          }
+        if (
+          normalizedTextQuery &&
+          !taskMatchesTextQuery(task, normalizedTextQuery, project?.slug)
+        ) {
+          return false;
         }
 
         if (

@@ -35,6 +35,30 @@ export function isWorkspaceSortMode(
   );
 }
 
+// Interface density as root font-size multiplier: every rem-based Tailwind
+// size (text, spacing, sidebar width) follows the root font size. The
+// stepper moves in 5% steps within these bounds.
+export const UI_SCALE_MIN = 0.8;
+export const UI_SCALE_MAX = 1.25;
+export const UI_SCALE_STEP = 0.05;
+
+export function isUiScale(value: unknown): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= UI_SCALE_MIN &&
+    value <= UI_SCALE_MAX
+  );
+}
+
+// Snap to the 5% grid (and to whole percents) so repeated steps and stored
+// values never accumulate float drift.
+export function clampUiScale(value: number): number {
+  const snapped = Math.round(value / UI_SCALE_STEP) * UI_SCALE_STEP;
+  const clamped = Math.min(UI_SCALE_MAX, Math.max(UI_SCALE_MIN, snapped));
+  return Math.round(clamped * 100) / 100;
+}
+
 type UserPreferencesStore = {
   theme: "light" | "dark" | "volt" | "system";
   setTheme: (
@@ -45,8 +69,8 @@ type UserPreferencesStore = {
   viewMode: "board" | "list";
   setViewMode: (mode: "board" | "list") => void;
 
-  compactMode: boolean;
-  setCompactMode: (compact: boolean) => void;
+  uiScale: number;
+  setUiScale: (scale: number) => void;
 
   showTaskNumbers: boolean;
   setShowTaskNumbers: (show: boolean) => void;
@@ -117,8 +141,8 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       viewMode: "board",
       setViewMode: (mode) => set({ viewMode: mode }),
 
-      compactMode: false,
-      setCompactMode: (compact) => set({ compactMode: compact }),
+      uiScale: 1,
+      setUiScale: (uiScale) => set({ uiScale: clampUiScale(uiScale) }),
 
       showTaskNumbers: true,
       setShowTaskNumbers: (show) => set({ showTaskNumbers: show }),
@@ -181,6 +205,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
         }
         if (state && !isWorkspaceSortMode(state.workspaceSort)) {
           state.setWorkspaceSort("name");
+        }
+        if (state && !isUiScale(state.uiScale)) {
+          state.setUiScale(1);
         }
         if (state && !Array.isArray(state.workspaceOrder)) {
           state.setWorkspaceOrder([]);

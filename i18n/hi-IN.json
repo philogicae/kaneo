@@ -534,7 +534,10 @@
 			"labels": "लेबल",
 			"labelsDescription": "कार्य लेबल और टैग दिखाएँ",
 			"priority": "प्राथमिकता",
-			"priorityDescription": "प्राथमिकता संकेतक दिखाएँ"
+			"priorityDescription": "प्राथमिकता संकेतक दिखाएँ",
+			"interfaceSize": "इंटरफ़ेस आकार",
+			"interfaceSizeDecrease": "इंटरफ़ेस आकार घटाएँ",
+			"interfaceSizeIncrease": "इंटरफ़ेस आकार बढ़ाएँ"
 		},
 		"developerPage": {
 			"pageTitle": "डेवलपर सेटिंग",
@@ -1302,7 +1305,7 @@
 			},
 			"eventsHint": "चुनें कि कौन से प्रोजेक्ट परिवर्तन Mattermost पर पोस्ट किए जाएं।",
 			"eventsTitle": "इवेंट सूचनाएँ",
-			"paused": "Paused",
+			"paused": "रुका हुआ",
 			"saveChanges": "परिवर्तन सहेजें",
 			"toast": {
 				"disabled": "Mattermost सूचनाएँ रुकी हुई हैं",
@@ -2015,16 +2018,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "{{date}} के सभी कार्य दिखाएँ",
+			"moreTasks": "+{{count}} और",
 			"nextMonth": "अगला महीना",
 			"noTasks": "कोई निर्धारित कार्य नहीं",
 			"noTasksSubtitle": "कैलेंडर में रखने के लिए कार्यों में प्रारंभ तिथि, नियत तिथि, या दोनों जोड़ें।",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – कैलेंडर",
 			"previousMonth": "पिछला महीना",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: कार्य खोलें",
 			"title": "कैलेंडर",
-			"today": "Today",
+			"today": "आज",
 			"loadError": "कार्य लोड करने में विफल।"
 		}
 	},
@@ -2220,16 +2223,23 @@
 		},
 		"stats": {
 			"completion": "पूर्णता",
-			"nextDueDate": "अगली नियत तिथि",
 			"projects": "प्रोजेक्ट",
 			"tasks": "कार्य"
 		},
 		"table": {
-			"dueDate": "नियत तिथि",
 			"progress": "प्रगति",
 			"project": "प्रोजेक्ट",
 			"status": "स्थिति",
 			"tasks": "कार्य"
+		},
+		"charts": {
+			"backlog": "बैकलॉग",
+			"empty": "पिछले 6 महीनों में कोई कार्य गतिविधि नहीं।",
+			"tasks": "कार्य"
+		},
+		"tabs": {
+			"charts": "चार्ट",
+			"overview": "अवलोकन"
 		}
 	}
 }

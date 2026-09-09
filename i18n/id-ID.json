@@ -10,7 +10,7 @@
 			"markAllRead": "Tandai semua telah dibaca",
 			"remove": "Hapus",
 			"reset": "Atur ulang",
-			"filter": "Filter",
+			"filter": "Saring",
 			"clearAllFilters": "Hapus semua filter"
 		},
 		"a11y": {
@@ -93,7 +93,7 @@
 				"pickIcon": "Pilih ikon",
 				"searchIcons": "Cari ikon...",
 				"projectName": "Nama proyek",
-				"keyLabel": "Key:",
+				"keyLabel": "Kunci:",
 				"keyHint": "Digunakan untuk ID tiket (contoh, {{example}}-123)",
 				"createButton": "Buat Proyek",
 				"successToast": "Proyek berhasil dibuat",
@@ -534,7 +534,10 @@
 			"labels": "Label",
 			"labelsDescription": "Tampilkan label dan tag tugas",
 			"priority": "Prioritas",
-			"priorityDescription": "Tampilkan indikator prioritas"
+			"priorityDescription": "Tampilkan indikator prioritas",
+			"interfaceSize": "Ukuran antarmuka",
+			"interfaceSizeDecrease": "Perkecil ukuran antarmuka",
+			"interfaceSizeIncrease": "Perbesar ukuran antarmuka"
 		},
 		"developerPage": {
 			"pageTitle": "Pengaturan Pengembang",
@@ -562,7 +565,7 @@
 				"loading": "Memuat API key...",
 				"empty": "Belum ada API key. Buat satu untuk memulai.",
 				"columnName": "Nama",
-				"columnKey": "Key",
+				"columnKey": "Kunci",
 				"columnCreated": "Dibuat",
 				"columnExpires": "Kedaluwarsa",
 				"columnActions": "Aksi",
@@ -658,7 +661,7 @@
 			"projectNameLabel": "Nama proyek",
 			"projectNameHint": "Nama proyek Anda",
 			"projectNamePlaceholder": "Masukkan nama proyek",
-			"keyLabel": "Key",
+			"keyLabel": "Kunci",
 			"keyHint": "Digunakan untuk ID tiket (misalnya, {{slug}}-123)",
 			"keyPlaceholder": "PRO",
 			"descriptionLabel": "Deskripsi",
@@ -1115,8 +1118,8 @@
 		},
 		"externalLinks": {
 			"resources": "Sumber daya",
-			"issue": "Issue",
-			"branch": "Branch",
+			"issue": "Isu",
+			"branch": "Cabang",
 			"merged": "Digabung",
 			"draft": "Draf",
 			"open": "Terbuka"
@@ -1263,7 +1266,7 @@
 			"subtitle": "Buat, edit, dan hapus label tingkat ruang kerja.",
 			"cardDescription": "Kelola label yang dapat ditetapkan ke tugas.",
 			"createLabel": "Buat Label",
-			"editLabel": "Edit Label",
+			"editLabel": "Edit label",
 			"deleteLabel": "Hapus",
 			"saveLabel": "Simpan",
 			"nameLabel": "Nama label",
@@ -1301,7 +1304,7 @@
 			},
 			"eventsHint": "Pilih perubahan proyek mana yang akan diposting ke Mattermost.",
 			"eventsTitle": "Notifikasi peristiwa",
-			"paused": "Paused",
+			"paused": "Dijeda",
 			"saveChanges": "Simpan perubahan",
 			"toast": {
 				"disabled": "Notifikasi Mattermost dijeda",
@@ -1684,7 +1687,7 @@
 						"blockquote": "Kutipan",
 						"code-block": "Blok kode",
 						"table": "Tabel",
-						"file": "File"
+						"file": "Berkas"
 					}
 				},
 				"languages": {
@@ -2009,16 +2012,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Tampilkan semua tugas untuk {{date}}",
+			"moreTasks": "+{{count}} lagi",
 			"nextMonth": "Bulan berikutnya",
 			"noTasks": "Tidak ada tugas terjadwal",
 			"noTasksSubtitle": "Tambahkan tanggal mulai, tanggal jatuh tempo, atau keduanya pada tugas untuk menempatkannya di kalender.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Kalender",
 			"previousMonth": "Bulan sebelumnya",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: buka tugas",
 			"title": "Kalender",
-			"today": "Today",
+			"today": "Hari ini",
 			"loadError": "Gagal memuat tugas."
 		}
 	},
@@ -2179,7 +2182,7 @@
 			"labels": "Label",
 			"externalLinks": "Tautan Eksternal",
 			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"issueFallback": "Isu",
 			"prStatusMerged": "Digabung",
 			"prStatusDraft": "Draf",
 			"prStatusOpen": "Terbuka",
@@ -2212,16 +2215,23 @@
 		},
 		"stats": {
 			"completion": "Penyelesaian",
-			"nextDueDate": "Jatuh tempo berikutnya",
 			"projects": "Proyek",
 			"tasks": "Tugas"
 		},
 		"table": {
-			"dueDate": "Tanggal jatuh tempo",
 			"progress": "Progres",
 			"project": "Proyek",
 			"status": "Status",
 			"tasks": "Tugas"
+		},
+		"charts": {
+			"backlog": "Backlog",
+			"empty": "Tidak ada aktivitas tugas dalam 6 bulan terakhir.",
+			"tasks": "Tugas"
+		},
+		"tabs": {
+			"charts": "Grafik",
+			"overview": "Ikhtisar"
 		}
 	}
 }

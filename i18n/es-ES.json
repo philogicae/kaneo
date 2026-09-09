@@ -110,7 +110,7 @@
 				"errorToast": "Hubo un error al crear el espacio de trabajo"
 			},
 			"createTask": {
-				"breadcrumbTask": "TASK",
+				"breadcrumbTask": "TAREA",
 				"selectProject": "Seleccionar proyecto",
 				"title": "Nueva tarea",
 				"description": "Crear una nueva tarea con título, descripción y otra información.",
@@ -358,7 +358,7 @@
 			"profilePicture": "Foto de perfil",
 			"fullName": "Nombre completo",
 			"fullNamePlaceholder": "Introduce tu nombre",
-			"email": "Email",
+			"email": "Correo electrónico",
 			"emailPlaceholder": "Introduce tu correo electrónico",
 			"updateSuccess": "Perfil actualizado correctamente",
 			"updateError": "Error al actualizar tu perfil",
@@ -431,7 +431,10 @@
 			"labels": "Etiquetas",
 			"labelsDescription": "Mostrar descripción y etiquetas de las tareas",
 			"priority": "Prioridad",
-			"priorityDescription": "Mostrar indicador de prioridad"
+			"priorityDescription": "Mostrar indicador de prioridad",
+			"interfaceSize": "Tamaño de la interfaz",
+			"interfaceSizeDecrease": "Reducir el tamaño de la interfaz",
+			"interfaceSizeIncrease": "Aumentar el tamaño de la interfaz"
 		},
 		"developerPage": {
 			"pageTitle": "Ajustes de Desarrollador",
@@ -890,9 +893,9 @@
 		},
 		"externalLinks": {
 			"resources": "Recursos",
-			"issue": "Issue",
+			"issue": "Incidencia",
 			"branch": "Rama",
-			"merged": "Merged",
+			"merged": "Fusionada",
 			"draft": "Borrador",
 			"open": "Abierta"
 		},
@@ -1303,7 +1306,7 @@
 			},
 			"eventsHint": "Elige qué cambios de proyecto deben publicarse en Mattermost.",
 			"eventsTitle": "Notificaciones de eventos",
-			"paused": "Paused",
+			"paused": "En pausa",
 			"saveChanges": "Guardar cambios",
 			"toast": {
 				"disabled": "Notificaciones de Mattermost en pausa",
@@ -1624,7 +1627,7 @@
 		"title": "Tareas",
 		"status": {
 			"label": "Estado",
-			"to-do": "To Do",
+			"to-do": "Por hacer",
 			"in-progress": "En progreso",
 			"in-review": "En revisión",
 			"done": "Hecho",
@@ -2021,16 +2024,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Mostrar todas las tareas del {{date}}",
+			"moreTasks": "+{{count}} más",
 			"nextMonth": "Mes siguiente",
 			"noTasks": "No hay tareas programadas",
 			"noTasksSubtitle": "Añade una fecha de inicio, fecha de vencimiento o ambas a las tareas para colocarlas en el calendario.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Calendario",
 			"previousMonth": "Mes anterior",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: abrir tarea",
 			"title": "Calendario",
-			"today": "Today",
+			"today": "Hoy",
 			"loadError": "No se pudieron cargar las tareas."
 		}
 	},
@@ -2123,7 +2126,7 @@
 	"team": {
 		"roles": {
 			"owner": "Propietario",
-			"admin": "Admin",
+			"admin": "Administrador",
 			"member": "Miembro",
 			"viewer": "Observador"
 		},
@@ -2142,7 +2145,7 @@
 		},
 		"inviteModal": {
 			"title": "Invitar miembro al equipo",
-			"emailLabel": "Email",
+			"emailLabel": "Correo electrónico",
 			"emailPlaceholder": "compi@company.com",
 			"sendInvitation": "Enviar invitación",
 			"success": "Invitación enviada correctamente",
@@ -2193,7 +2196,7 @@
 			"labels": "Etiquetas",
 			"externalLinks": "Enlaces externos",
 			"pullRequestFallback": "Pull Request",
-			"issueFallback": "Issue",
+			"issueFallback": "Incidencia",
 			"prStatusMerged": "Mergeada",
 			"prStatusDraft": "Borrador",
 			"prStatusOpen": "Abierta",
@@ -2212,7 +2215,7 @@
 			"share": "Compartir"
 		},
 		"branding": {
-			"poweredBy": "Powered by"
+			"poweredBy": "Impulsado por"
 		}
 	},
 	"unified": {
@@ -2228,16 +2231,23 @@
 		},
 		"stats": {
 			"completion": "Completado",
-			"nextDueDate": "Próximo vencimiento",
 			"projects": "Proyectos",
 			"tasks": "Tareas"
 		},
 		"table": {
-			"dueDate": "Fecha de vencimiento",
 			"progress": "Progreso",
 			"project": "Proyecto",
 			"status": "Estado",
 			"tasks": "Tareas"
+		},
+		"charts": {
+			"backlog": "Pendientes",
+			"empty": "Sin actividad de tareas en los últimos 6 meses.",
+			"tasks": "Tareas"
+		},
+		"tabs": {
+			"charts": "Gráficos",
+			"overview": "Vista general"
 		}
 	}
 }

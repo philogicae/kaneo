@@ -29,6 +29,10 @@ type WorkspaceIdSource =
 
 type WorkspaceAccessMiddlewareConfig = {
   sources: WorkspaceIdSource[];
+  // When true, a request that carries no workspace id skips the access check
+  // instead of failing; the handler must then scope by the user's own
+  // memberships. Never enable for handlers that trust the workspace id.
+  optional?: boolean;
 };
 
 async function readJsonObjectBody(
@@ -112,6 +116,9 @@ export function workspaceAccessMiddleware(
     }
 
     if (!workspaceId) {
+      if (config.optional) {
+        return next();
+      }
       throw new HTTPException(400, {
         message: "Workspace ID could not be determined",
       });
@@ -277,8 +284,11 @@ async function lookupWorkspaceId(
 }
 
 export const workspaceAccess = {
-  fromQuery: (key = "workspaceId") =>
-    workspaceAccessMiddleware({ sources: [{ type: "query", key }] }),
+  fromQuery: (key = "workspaceId", options?: { optional?: boolean }) =>
+    workspaceAccessMiddleware({
+      sources: [{ type: "query", key }],
+      optional: options?.optional,
+    }),
 
   fromBody: (key = "workspaceId") =>
     workspaceAccessMiddleware({ sources: [{ type: "body", key }] }),

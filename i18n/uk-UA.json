@@ -534,7 +534,10 @@
 			"labels": "Мітки",
 			"labelsDescription": "Показувати мітки та теґи завдань",
 			"priority": "Пріоритет",
-			"priorityDescription": "Відображати індикатори пріоритету"
+			"priorityDescription": "Відображати індикатори пріоритету",
+			"interfaceSize": "Розмір інтерфейсу",
+			"interfaceSizeDecrease": "Зменшити розмір інтерфейсу",
+			"interfaceSizeIncrease": "Збільшити розмір інтерфейсу"
 		},
 		"developerPage": {
 			"pageTitle": "Налаштування розробника",
@@ -1115,7 +1118,7 @@
 		},
 		"externalLinks": {
 			"resources": "Ресурси",
-			"issue": "Issue",
+			"issue": "Завдання",
 			"branch": "Гілка",
 			"merged": "Змерджено",
 			"draft": "Чернетка",
@@ -1304,7 +1307,7 @@
 			},
 			"eventsHint": "Виберіть, які зміни проєкту публікувати в Mattermost.",
 			"eventsTitle": "Сповіщення про події",
-			"paused": "Paused",
+			"paused": "Призупинено",
 			"saveChanges": "Зберегти зміни",
 			"toast": {
 				"disabled": "Сповіщення Mattermost призупинено",
@@ -2027,16 +2030,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Показати всі завдання за {{date}}",
+			"moreTasks": "ще {{count}}",
 			"nextMonth": "Наступний місяць",
 			"noTasks": "Немає запланованих завдань",
 			"noTasksSubtitle": "Додайте до завдань дату початку, термін або обидва, щоб розмістити їх у календарі.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Календар",
 			"previousMonth": "Попередній місяць",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}}: відкрити завдання",
 			"title": "Календар",
-			"today": "Today",
+			"today": "Сьогодні",
 			"loadError": "Не вдалося завантажити завдання."
 		}
 	},
@@ -2200,7 +2203,7 @@
 			"labels": "Мітки",
 			"externalLinks": "Зовнішні посилання",
 			"pullRequestFallback": "Пул-реквест",
-			"issueFallback": "Issue",
+			"issueFallback": "Завдання",
 			"prStatusMerged": "Змерджено",
 			"prStatusDraft": "Чернетка",
 			"prStatusOpen": "Відкрито",
@@ -2236,16 +2239,23 @@
 		},
 		"stats": {
 			"completion": "Виконано",
-			"nextDueDate": "Найближчий термін",
 			"projects": "Проєкти",
 			"tasks": "Завдання"
 		},
 		"table": {
-			"dueDate": "Термін",
 			"progress": "Прогрес",
 			"project": "Проєкт",
 			"status": "Статус",
 			"tasks": "Завдання"
+		},
+		"charts": {
+			"backlog": "Беклог",
+			"empty": "Немає активності завдань за останні 6 місяців.",
+			"tasks": "Завдання"
+		},
+		"tabs": {
+			"charts": "Графіки",
+			"overview": "Огляд"
 		}
 	}
 }

@@ -130,7 +130,7 @@
 				"assign": "Assigner",
 				"assignUnassigned": "Non assigné",
 				"assignUnassignedTitle": "Non assigné",
-				"labels": "Labels",
+				"labels": "Étiquettes",
 				"searchLabels": "Rechercher des labels...",
 				"noLabelsFound": "Aucun label trouvé",
 				"createLabel": "Créer \"{{name}}\"",
@@ -346,7 +346,7 @@
 	"settings": {
 		"account": "Compte",
 		"developer": "Développeur",
-		"information": "Information",
+		"information": "Informations",
 		"notifications": "Notifications",
 		"preferences": "Préférences",
 		"apiKeys": "Clés API",
@@ -359,7 +359,7 @@
 			"profilePicture": "Photo de profil",
 			"fullName": "Nom complet",
 			"fullNamePlaceholder": "Entrez votre nom",
-			"email": "Email",
+			"email": "E-mail",
 			"emailPlaceholder": "Entrez votre email",
 			"updateSuccess": "Profil mis à jour avec succès",
 			"updateError": "Échec de la mise à jour du profil",
@@ -398,7 +398,7 @@
 			"subtitle": "Choisissez comment Kaneo transmet les notifications de votre compte et quels canaux utiliser.",
 			"statusConnected": "Connecté",
 			"statusPaused": "En pause",
-			"emailTitle": "Email",
+			"emailTitle": "E-mail",
 			"emailDescription": "Utilisez l'email de votre compte comme destination pour les notifications.",
 			"accountEmailLabel": "Email du compte",
 			"accountEmailNoAddress": "Aucune adresse email de compte disponible",
@@ -436,7 +436,7 @@
 			"workspaceRulesTitle": "Règles d'envoi par espace de travail",
 			"workspaceRulesDescription": "Réutilisez vos canaux globaux, puis choisissez quels espaces de travail et projets sont autorisés à envoyer des notifications de compte.",
 			"workspaceCardHint": "Choisissez quels canaux cet espace de travail peut utiliser pour les notifications du compte.",
-			"workspaceCardLabelEmail": "Email",
+			"workspaceCardLabelEmail": "E-mail",
 			"workspaceCardLabelNtfy": "ntfy",
 			"workspaceCardLabelGotify": "Gotify",
 			"workspaceCardLabelWebhook": "Webhook",
@@ -531,10 +531,13 @@
 			"assigneesDescription": "Afficher les personnes assignées aux tâches",
 			"dueDates": "Dates d'échéance",
 			"dueDatesDescription": "Afficher les dates d'échéance des tâches",
-			"labels": "Labels",
+			"labels": "Étiquettes",
 			"labelsDescription": "Afficher les labels et tags des tâches",
 			"priority": "Priorité",
-			"priorityDescription": "Afficher les indicateurs de priorité"
+			"priorityDescription": "Afficher les indicateurs de priorité",
+			"interfaceSize": "Taille de l'interface",
+			"interfaceSizeDecrease": "Réduire la taille de l'interface",
+			"interfaceSizeIncrease": "Augmenter la taille de l'interface"
 		},
 		"developerPage": {
 			"pageTitle": "Paramètres développeur",
@@ -748,8 +751,8 @@
 			"doneColumnTooltip": "Considérer ceci comme une colonne terminée",
 			"doneColumn": "Colonne terminée",
 			"markDoneAria": "Marquer {{name}} comme colonne terminée",
-			"on": "On",
-			"off": "Off",
+			"on": "Activé",
+			"off": "Désactivé",
 			"newColumnPlaceholder": "Nouveau nom de colonne...",
 			"add": "Ajouter"
 		},
@@ -840,14 +843,14 @@
 				"commentOnEnabled": "Kaneo commentera les nouvelles issues avec un lien vers la tâche",
 				"commentOnDisabled": "Les commentaires de lien de tâche sur les nouvelles issues sont désactivés",
 				"settingsUpdateError": "Échec de la mise à jour de l'intégration Gitea",
-				"secretCopied": "Copied",
+				"secretCopied": "Copié",
 				"unableToCopySecret": "Impossible de copier le secret",
 				"notGiteaInstance": "L'URL ne pointe pas vers une instance Gitea",
 				"redirected": "L'URL Gitea a été redirigée (généralement vers HTTPS). Utilisez directement l'URL finale."
 			},
-			"webhookShow": "Show",
-			"webhookHide": "Hide",
-			"webhookCopy": "Copy",
+			"webhookShow": "Afficher",
+			"webhookHide": "Masquer",
+			"webhookCopy": "Copier",
 			"connectionStatus": "Statut de la connexion",
 			"connectedActive": "Dépôt connecté et actif",
 			"notConnectedHint": "Aucun dépôt Gitea connecté",
@@ -860,22 +863,22 @@
 			"webhookTitle": "Webhook",
 			"webhookHint": "Dans votre dépôt Gitea, ajoutez un webhook avec cette URL et ce secret. Activez push, pull request, issues, commentaires d'issues et create (pour les labels).",
 			"webhookSecretLabel": "Secret (doit correspondre au secret du webhook dans Gitea)",
-			"baseUrlLabel": "Gitea URL",
+			"baseUrlLabel": "URL Gitea",
 			"baseUrlHint": "URL racine de votre instance Gitea",
 			"tokenLabel": "Jeton d'accès personnel",
 			"tokenHint": "Jeton avec accès aux dépôts et aux issues",
 			"tokenPlaceholder": "Coller le jeton",
 			"tokenPlaceholderUpdate": "Collez un nouveau jeton pour le remplacer",
-			"currentToken": "stored",
-			"ownerLabel": "Owner",
+			"currentToken": "enregistré",
+			"ownerLabel": "Propriétaire",
 			"ownerHint": "Nom d'utilisateur ou d'organisation",
 			"repoNameLabel": "Nom du dépôt",
 			"repoNameHint": "Nom du dépôt uniquement (sans le propriétaire)",
 			"actionsTitle": "Actions",
 			"actionsHint": "Vérifier l'accès et connecter",
-			"browse": "Browse",
-			"verify": "Verify",
-			"update": "Update",
+			"browse": "Parcourir",
+			"verify": "Vérifier",
+			"update": "Mettre à jour",
 			"connect": "Connecter",
 			"disconnect": "Déconnecter",
 			"importSectionTitle": "Importer des issues Gitea",
@@ -888,7 +891,7 @@
 			"searchRepos": "Rechercher…",
 			"browseNeedsCredentials": "Entrez l'URL Gitea et le jeton pour parcourir",
 			"loadingRepos": "Chargement des dépôts…",
-			"retry": "Retry"
+			"retry": "Réessayer"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1155,7 +1158,7 @@
 			"resources": {
 				"project": "Projets",
 				"task": "Tâches",
-				"label": "Labels",
+				"label": "Étiquettes",
 				"workspace": "Espace de travail"
 			},
 			"permissions": {
@@ -1261,7 +1264,7 @@
 		},
 		"workspaceLabels": {
 			"pageTitle": "Paramètres des labels",
-			"title": "Labels",
+			"title": "Étiquettes",
 			"subtitle": "Créez, modifiez et supprimez des labels au niveau de l'espace de travail.",
 			"cardDescription": "Gérez les labels pouvant être assignés aux tâches.",
 			"createLabel": "Créer un label",
@@ -1303,7 +1306,7 @@
 			},
 			"eventsHint": "Choisissez quelles modifications de projet publier dans Mattermost.",
 			"eventsTitle": "Notifications d'événements",
-			"paused": "Paused",
+			"paused": "En pause",
 			"saveChanges": "Enregistrer les modifications",
 			"toast": {
 				"disabled": "Notifications Mattermost en pause",
@@ -1792,7 +1795,7 @@
 		},
 		"properties": {
 			"title": "Propriétés",
-			"labels": "Labels",
+			"labels": "Étiquettes",
 			"copyTaskLink": "Copier le lien de la tâche",
 			"copyTaskBranch": "Copier la branche de la tâche",
 			"start": "Début",
@@ -1848,7 +1851,7 @@
 			"noTasksToMove": "Aucune tâche planifiée à déplacer",
 			"moveAllConfirm": "Déplacer toutes les tâches planifiées {{count}} vers À faire ?",
 			"moveAllSuccess": "Déplacé {{count}} tâches vers À faire",
-			"plan": "Plan",
+			"plan": "Planifier",
 			"moveAllTooltip": "Déplacer toutes les tâches planifiées vers À faire",
 			"moveAll": "Déplacer toutes",
 			"addTask": "Ajouter une tâche",
@@ -1897,7 +1900,7 @@
 				"priority": "Priorité",
 				"assignee": "Assigné",
 				"dueDate": "Date d'échéance",
-				"labels": "Labels"
+				"labels": "Étiquettes"
 			},
 			"operators": {
 				"isAnyOf": "est l'un des",
@@ -1961,7 +1964,7 @@
 			"clearError": "Échec de l'effacement de la date d'échéance"
 		},
 		"labels": {
-			"label": "Labels",
+			"label": "Étiquettes",
 			"empty": "Aucun label disponible"
 		},
 		"update": {
@@ -2021,16 +2024,16 @@
 			}
 		},
 		"calendar": {
-			"dayTasksAriaLabel": "Show all tasks for {{date}}",
-			"moreTasks": "+{{count}} more",
+			"dayTasksAriaLabel": "Afficher toutes les tâches du {{date}}",
+			"moreTasks": "+{{count}} autres",
 			"nextMonth": "Mois suivant",
 			"noTasks": "Aucune tâche planifiée",
 			"noTasksSubtitle": "Ajoutez une date de début, une date d'échéance ou les deux aux tâches pour les placer dans le calendrier.",
-			"pageTitle": "{{name}} – Calendar",
+			"pageTitle": "{{name}} – Calendrier",
 			"previousMonth": "Mois précédent",
-			"taskAriaLabel": "{{title}}, {{range}}: open task",
+			"taskAriaLabel": "{{title}}, {{range}} : ouvrir la tâche",
 			"title": "Calendrier",
-			"today": "Today",
+			"today": "Aujourd'hui",
 			"loadError": "Échec du chargement des tâches."
 		}
 	},
@@ -2069,14 +2072,12 @@
 		"stats": {
 			"projects": "Projets",
 			"tasks": "Tâches",
-			"completion": "Complétion",
-			"nextDueDate": "Prochaine échéance"
+			"completion": "Complétion"
 		},
 		"table": {
 			"project": "Projet",
 			"progress": "Progression",
 			"tasks": "Tâches",
-			"dueDate": "Échéance",
 			"status": "Statut"
 		},
 		"section": {
@@ -2087,6 +2088,15 @@
 		"empty": {
 			"title": "Aucun projet pour le moment",
 			"description": "Les projets de tous vos espaces de travail apparaîtront ici dès que vous en créerez un."
+		},
+		"charts": {
+			"backlog": "Backlog",
+			"empty": "Aucune activité de tâches au cours des 6 derniers mois.",
+			"tasks": "Tâches"
+		},
+		"tabs": {
+			"charts": "Graphiques",
+			"overview": "Vue d'ensemble"
 		}
 	},
 	"workspace": {
@@ -2167,7 +2177,7 @@
 		},
 		"inviteModal": {
 			"title": "Inviter un membre de l'équipe",
-			"emailLabel": "Email",
+			"emailLabel": "E-mail",
 			"emailPlaceholder": "collegue@entreprise.fr",
 			"sendInvitation": "Envoyer l'invitation",
 			"success": "Invitation envoyée avec succès",
@@ -2215,7 +2225,7 @@
 			"viewDetailsAria": "Voir les détails de la tâche {{title}}"
 		},
 		"taskDetail": {
-			"labels": "Labels",
+			"labels": "Étiquettes",
 			"externalLinks": "Liens externes",
 			"pullRequestFallback": "Demande de fusion",
 			"issueFallback": "Problème",

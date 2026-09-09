@@ -156,7 +156,7 @@ describe("Gantt jump-to-today", () => {
       }),
     );
     const { rerender } = render(<GanttRoute />);
-    const search = screen.getByPlaceholderText("Search scheduled tickets...");
+    const search = screen.getByPlaceholderText("Search");
     fireEvent.change(search, { target: { value: "no match" } });
     routeParams.projectId = "project-2";
     mockProjectWithTask(
@@ -283,12 +283,9 @@ describe("Gantt jump-to-today", () => {
     // The search narrows the *visible* timeline down to nothing, even though
     // today is still within the unfiltered project's date range — the button
     // has nothing left to scroll to and must reflect that.
-    fireEvent.change(
-      screen.getByPlaceholderText("Search scheduled tickets..."),
-      {
-        target: { value: "no such task" },
-      },
-    );
+    fireEvent.change(screen.getByPlaceholderText("Search"), {
+      target: { value: "no such task" },
+    });
 
     expect(
       screen.getByText('No scheduled tasks match "no such task"'),
