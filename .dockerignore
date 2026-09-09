@@ -5,8 +5,11 @@
 **/.turbo
 **/coverage
 **/dist
+# tsc incremental build-info: shipping it makes tsc skip emitting dist inside the image
+**/.cache
 **/node_modules
 .env
 .env.*
 !apps/web/.env.production
 *.log
+.local

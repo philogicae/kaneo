@@ -27,6 +27,20 @@ The endpoint implements OAuth 2.1 with PKCE for authentication. Discovery metada
 - `/.well-known/oauth-protected-resource/api/mcp`
 - `/.well-known/oauth-authorization-server/api`
 
+### API key authentication
+
+Clients that cannot run the OAuth consent flow can authenticate with an [API key](/api-reference/authentication) instead. Send the key either as a bearer token or in the `x-api-key` header:
+
+```http
+Authorization: Bearer <api-key>
+```
+
+```http
+x-api-key: <api-key>
+```
+
+The MCP tools then call the Kaneo API with the same key, so the key's workspace access applies exactly as it does for the REST API. Revoking the key in Settings → Account → Developer immediately revokes MCP access.
+
 The endpoint serves both MCP protocol eras: modern `2026-07-28` requests are
 stateless and self-contained, while 2025-era clients keep the sessionful
 `initialize` flow. See [MCP 2026-07-28 stateless compatibility](/core/integrations/mcp-stateless)
@@ -105,7 +119,9 @@ Both the HTTP endpoint and stdio package expose the same tools:
 - Session: `whoami`, `list_workspaces`, `list_workspace_members`, `list_notifications`
 - Search: `search`
 - Projects: `list_projects`, `get_project`, `create_project`, `update_project`, `list_project_columns`
+- Columns: `create_column`, `update_column`, `reorder_columns`, `delete_column`
 - Tasks: `list_tasks`, `get_task`, `create_task`, `update_task`, `delete_task`, `move_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `list_task_activity`
+- Bulk tasks: `bulk_update_tasks`
 - Time entries: `list_task_time_entries`, `get_time_entry`, `create_time_entry`, `update_time_entry`
 - Comments: `list_task_comments`, `create_task_comment`
 - Labels: `list_workspace_labels`, `create_label`, `attach_label_to_task`, `detach_label_from_task`, `delete_label`
@@ -115,7 +131,9 @@ Both the HTTP endpoint and stdio package expose the same tools:
 slugs it returns are exactly the values `create_task` and `update_task_status`
 accept. Likewise `list_workspace_members` resolves the user IDs the assignee
 tools expect. Time entries have no delete endpoint on the API, so there is no
-`delete_time_entry` tool.
+`delete_time_entry` tool. `bulk_update_tasks` applies one operation to many
+tasks at once, which is the cheapest way to triage a backlog, calendar, or
+Gantt selection.
 
 ## Debugging
 

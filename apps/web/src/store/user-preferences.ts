@@ -8,18 +8,69 @@ export function isWeekStartDay(value: number): value is WeekStartDay {
   return WEEK_START_DAYS.some((day) => day === value);
 }
 
+export const PROJECT_SORT_MODES = [
+  "custom",
+  "name",
+  "date",
+  "completion",
+] as const;
+export type ProjectSortMode = (typeof PROJECT_SORT_MODES)[number];
+
+export function isProjectSortMode(value: unknown): value is ProjectSortMode {
+  return (
+    typeof value === "string" &&
+    (PROJECT_SORT_MODES as readonly string[]).includes(value)
+  );
+}
+
+export const WORKSPACE_SORT_MODES = ["custom", "name", "date"] as const;
+export type WorkspaceSortMode = (typeof WORKSPACE_SORT_MODES)[number];
+
+export function isWorkspaceSortMode(
+  value: unknown,
+): value is WorkspaceSortMode {
+  return (
+    typeof value === "string" &&
+    (WORKSPACE_SORT_MODES as readonly string[]).includes(value)
+  );
+}
+
+// Interface density as root font-size multiplier: every rem-based Tailwind
+// size (text, spacing, sidebar width) follows the root font size. The
+// stepper moves in 5% steps within these bounds.
+export const UI_SCALE_MIN = 0.8;
+export const UI_SCALE_MAX = 1.25;
+export const UI_SCALE_STEP = 0.05;
+
+export function isUiScale(value: unknown): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= UI_SCALE_MIN &&
+    value <= UI_SCALE_MAX
+  );
+}
+
+// Snap to the 5% grid (and to whole percents) so repeated steps and stored
+// values never accumulate float drift.
+export function clampUiScale(value: number): number {
+  const snapped = Math.round(value / UI_SCALE_STEP) * UI_SCALE_STEP;
+  const clamped = Math.min(UI_SCALE_MAX, Math.max(UI_SCALE_MIN, snapped));
+  return Math.round(clamped * 100) / 100;
+}
+
 type UserPreferencesStore = {
-  theme: "light" | "dark" | "system";
+  theme: "light" | "dark" | "volt" | "system";
   setTheme: (
-    theme: "light" | "dark" | "system",
+    theme: "light" | "dark" | "volt" | "system",
     coordinates?: { x: number; y: number },
   ) => void;
 
   viewMode: "board" | "list";
   setViewMode: (mode: "board" | "list") => void;
 
-  compactMode: boolean;
-  setCompactMode: (compact: boolean) => void;
+  uiScale: number;
+  setUiScale: (scale: number) => void;
 
   showTaskNumbers: boolean;
   setShowTaskNumbers: (show: boolean) => void;
@@ -46,6 +97,14 @@ type UserPreferencesStore = {
 
   weekStartsOn: WeekStartDay;
   setWeekStartsOn: (weekStartsOn: WeekStartDay) => void;
+
+  projectsSort: ProjectSortMode;
+  setProjectsSort: (mode: ProjectSortMode) => void;
+
+  workspaceSort: WorkspaceSortMode;
+  setWorkspaceSort: (mode: WorkspaceSortMode) => void;
+  workspaceOrder: string[];
+  setWorkspaceOrder: (ids: string[]) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -53,7 +112,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     (set) => ({
       theme: "dark",
       setTheme: (
-        theme: "light" | "dark" | "system",
+        theme: "light" | "dark" | "volt" | "system",
         coordinates?: { x: number; y: number },
       ) => {
         if (coordinates) {
@@ -82,8 +141,8 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       viewMode: "board",
       setViewMode: (mode) => set({ viewMode: mode }),
 
-      compactMode: false,
-      setCompactMode: (compact) => set({ compactMode: compact }),
+      uiScale: 1,
+      setUiScale: (uiScale) => set({ uiScale: clampUiScale(uiScale) }),
 
       showTaskNumbers: true,
       setShowTaskNumbers: (show) => set({ showTaskNumbers: show }),
@@ -123,6 +182,16 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
 
       weekStartsOn: 0,
       setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
+
+      // Alphabetical by default; the stored custom order only applies once
+      // the user explicitly picks it.
+      projectsSort: "name",
+      setProjectsSort: (mode) => set({ projectsSort: mode }),
+
+      workspaceSort: "name",
+      setWorkspaceSort: (mode) => set({ workspaceSort: mode }),
+      workspaceOrder: [],
+      setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
     }),
     {
       name: "user-preferences",
@@ -130,6 +199,18 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       onRehydrateStorage: () => (state) => {
         if (state && !isWeekStartDay(state.weekStartsOn)) {
           state.setWeekStartsOn(0);
+        }
+        if (state && !isProjectSortMode(state.projectsSort)) {
+          state.setProjectsSort("name");
+        }
+        if (state && !isWorkspaceSortMode(state.workspaceSort)) {
+          state.setWorkspaceSort("name");
+        }
+        if (state && !isUiScale(state.uiScale)) {
+          state.setUiScale(1);
+        }
+        if (state && !Array.isArray(state.workspaceOrder)) {
+          state.setWorkspaceOrder([]);
         }
       },
     },

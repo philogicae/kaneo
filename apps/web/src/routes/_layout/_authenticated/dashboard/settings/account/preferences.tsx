@@ -71,6 +71,7 @@ function RouteComponent() {
   const themeLabels: Record<string, string> = {
     light: t("settings:preferencesPage.themeLight"),
     dark: t("settings:preferencesPage.themeDark"),
+    volt: t("settings:preferencesPage.themeVolt"),
     system: t("settings:preferencesPage.themeSystem"),
   };
 
@@ -134,6 +135,9 @@ function RouteComponent() {
                 </SelectItem>
                 <SelectItem value="dark">
                   {t("settings:preferencesPage.themeDark")}
+                </SelectItem>
+                <SelectItem value="volt">
+                  {t("settings:preferencesPage.themeVolt")}
                 </SelectItem>
                 <SelectItem value="system">
                   {t("settings:preferencesPage.themeSystem")}
