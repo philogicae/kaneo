@@ -17,7 +17,11 @@ import type {
   TaskTitleChangedEvent,
 } from "../types";
 import { postToTelegram } from "./client";
-import type { TelegramConfig, TelegramEventKey } from "./config";
+import type {
+  NormalizedTelegramConfig,
+  TelegramConfig,
+  TelegramEventKey,
+} from "./config";
 import { normalizeTelegramConfig, validateTelegramConfig } from "./config";
 
 type TelegramEventData = {
@@ -149,7 +153,7 @@ async function getTelegramEventData(
 }
 
 async function sendTelegramMessage(
-  config: TelegramConfig,
+  config: NormalizedTelegramConfig,
   title: string,
   body: string,
   data: TelegramEventData,

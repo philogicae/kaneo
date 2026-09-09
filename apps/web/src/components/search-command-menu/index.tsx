@@ -65,7 +65,7 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   const { data: searchResults } = useGlobalSearch({
     q: query,
     type: "all",
-    workspaceId: workspace?.id,
+    // No workspaceId: search every workspace the user belongs to.
     limit: 20,
   });
 
@@ -87,13 +87,17 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
     setOpen(false);
     setQuery("");
 
+    // Results can come from any workspace the user belongs to, so navigate
+    // by the item's own workspace when present.
+    const targetWorkspaceId = item.workspaceId ?? workspace?.id;
+
     switch (item.type) {
       case "task":
-        if (item.projectId && item.id && workspace?.id) {
+        if (item.projectId && item.id && targetWorkspaceId) {
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
             params: {
-              workspaceId: workspace.id,
+              workspaceId: targetWorkspaceId,
               projectId: item.projectId,
               taskId: item.id,
             },
@@ -101,11 +105,11 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
         }
         break;
       case "project":
-        if (item.id && workspace?.id) {
+        if (item.id && targetWorkspaceId) {
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
             params: {
-              workspaceId: workspace.id,
+              workspaceId: targetWorkspaceId,
               projectId: item.id,
             },
           });
@@ -123,11 +127,11 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
         break;
       case "comment":
       case "activity":
-        if (item.projectId && item.id && workspace?.id) {
+        if (item.projectId && item.id && targetWorkspaceId) {
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
             params: {
-              workspaceId: workspace.id,
+              workspaceId: targetWorkspaceId,
               projectId: item.projectId,
               taskId: item.id,
             },
@@ -193,7 +197,10 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandDialogPopup instant>
-        <Command items={groupedItems}>
+        {/* Filtering happens server-side; the client filter would drop
+            results whose title does not contain the raw query, e.g. the
+            short-id match for "AL-1". */}
+        <Command items={groupedItems} filter={null}>
           <CommandInput
             placeholder={t("navigation:search.inputPlaceholder")}
             value={query}

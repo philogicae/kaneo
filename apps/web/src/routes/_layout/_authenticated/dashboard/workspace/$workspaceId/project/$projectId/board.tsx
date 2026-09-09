@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Search } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import BoardToolbar from "@/components/board/board-toolbar";
 import ProjectLayout from "@/components/common/project-layout";
@@ -10,7 +9,6 @@ import PageTitle from "@/components/page-title";
 import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
-import { Input } from "@/components/ui/input";
 import { shortcuts } from "@/constants/shortcuts";
 import useGetCustomFieldFilterValues from "@/hooks/queries/custom-field/use-get-custom-field-filter-values";
 import useGetCustomFieldsByProject from "@/hooks/queries/custom-field/use-get-custom-fields-by-project";
@@ -87,10 +85,7 @@ function RouteComponent() {
   const { viewMode, setViewMode } = useUserPreferencesStore();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [boardSearchQuery, setBoardSearchQuery] = useState("");
-  const [isBoardSearchMounted, setIsBoardSearchMounted] = useState(false);
-  const [isBoardSearchVisible, setIsBoardSearchVisible] = useState(false);
-  const [boardSearchInput, setBoardSearchInput] =
-    useState<HTMLInputElement | null>(null);
+  const boardSearchInput = useRef<HTMLInputElement | null>(null);
   const { sort, setSort } = useBoardSort(projectId);
 
   const { data: users } = useGetActiveWorkspaceUsers(workspaceId);
@@ -156,16 +151,6 @@ function RouteComponent() {
     }
   }, [data, setProject]);
 
-  const openBoardSearch = useCallback(() => {
-    setIsBoardSearchMounted(true);
-    window.requestAnimationFrame(() => setIsBoardSearchVisible(true));
-  }, []);
-
-  const closeBoardSearch = useCallback(() => {
-    setIsBoardSearchVisible(false);
-    window.setTimeout(() => setIsBoardSearchMounted(false), 180);
-  }, []);
-
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const isFindShortcut =
@@ -174,17 +159,12 @@ function RouteComponent() {
       if (!isFindShortcut) return;
 
       event.preventDefault();
-      openBoardSearch();
+      boardSearchInput.current?.focus();
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [openBoardSearch]);
-
-  useEffect(() => {
-    if (!isBoardSearchMounted) return;
-    window.requestAnimationFrame(() => boardSearchInput?.focus());
-  }, [isBoardSearchMounted, boardSearchInput]);
+  }, []);
 
   const {
     filters,
@@ -207,41 +187,11 @@ function RouteComponent() {
     };
   }, [filteredProject, sort]);
 
-  const boardHeaderSearch = isBoardSearchMounted ? (
-    <div
-      className={`relative w-[240px] origin-top transition-[translate,scale,opacity] duration-180 ease-out ${
-        isBoardSearchVisible
-          ? "translate-y-0 scale-y-100 opacity-100"
-          : "pointer-events-none -translate-y-1 scale-y-95 opacity-0"
-      }`}
-    >
-      <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 text-muted-foreground" />
-      <Input
-        ref={setBoardSearchInput}
-        value={boardSearchQuery}
-        onChange={(event) => setBoardSearchQuery(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && !boardSearchQuery.trim()) {
-            closeBoardSearch();
-          }
-        }}
-        onBlur={() => {
-          if (!boardSearchQuery.trim()) {
-            closeBoardSearch();
-          }
-        }}
-        placeholder={t("tasks:boardSearchPlaceholder")}
-        className="h-7.5 [&_[data-slot=input]]:h-7 [&_[data-slot=input]]:leading-7 [&_[data-slot=input]]:pl-8 [&_[data-slot=input]]:text-xs [&_[data-slot=input]]:placeholder:text-xs [&_[data-slot=input]]:placeholder:leading-7"
-      />
-    </div>
-  ) : null;
-
   return (
     <ProjectLayout
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="board"
-      headerActions={boardHeaderSearch}
     >
       <PageTitle
         title={`${project?.name} · ${viewMode === "board" ? t("tasks:view.board") : t("tasks:view.list")}`}
@@ -264,6 +214,9 @@ function RouteComponent() {
           onSortChange={setSort}
           customFieldDefinitions={customFieldDefinitions}
           usedCustomFieldValues={usedCustomFieldValues}
+          searchQuery={boardSearchQuery}
+          onSearchChange={setBoardSearchQuery}
+          searchInputRef={boardSearchInput}
         />
 
         <div className="flex h-full flex-1 overflow-hidden bg-background">

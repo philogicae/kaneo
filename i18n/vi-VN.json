@@ -683,7 +683,7 @@
       "labels": "Nhãn",
       "externalLinks": "Liên kết ngoài",
       "pullRequestFallback": "Pull Request",
-      "issueFallback": "Issue",
+      "issueFallback": "Vấn đề",
       "prStatusMerged": "Đã gộp",
       "prStatusDraft": "Bản nháp",
       "prStatusOpen": "Đang mở",
@@ -863,7 +863,7 @@
     },
     "externalLinks": {
       "resources": "Tài nguyên",
-      "issue": "Issue",
+      "issue": "Vấn đề",
       "branch": "Nhánh",
       "merged": "Đã gộp",
       "draft": "Bản nháp",
@@ -1113,7 +1113,7 @@
       },
       "eventsHint": "Chọn những thay đổi dự án nào sẽ được đăng lên Mattermost.",
       "eventsTitle": "Thông báo sự kiện",
-      "paused": "Paused",
+      "paused": "Đã tạm dừng",
       "saveChanges": "Lưu thay đổi",
       "toast": {
         "disabled": "Đã tạm dừng thông báo Mattermost",
@@ -1150,7 +1150,7 @@
       "ntfyDescription": "Đăng thông báo tài khoản lên một chủ đề ntfy.",
       "serverUrl": "URL máy chủ",
       "topic": "Chủ đề",
-      "token": "Token",
+      "token": "Mã thông báo",
       "ntfyServerPlaceholder": "https://ntfy.example.com",
       "ntfyTopicPlaceholder": "team-alerts",
       "ntfyTokenPlaceholder": "Token bearer (không bắt buộc)",
@@ -1276,7 +1276,10 @@
       "labels": "Nhãn",
       "labelsDescription": "Hiển thị nhãn và thẻ của công việc",
       "priority": "Mức ưu tiên",
-      "priorityDescription": "Hiển thị chỉ báo mức ưu tiên"
+      "priorityDescription": "Hiển thị chỉ báo mức ưu tiên",
+      "interfaceSize": "Kích thước giao diện",
+      "interfaceSizeDecrease": "Giảm kích thước giao diện",
+      "interfaceSizeIncrease": "Tăng kích thước giao diện"
     },
     "projectGeneral": {
       "pageTitle": "Cài đặt dự án",
@@ -1808,16 +1811,16 @@
       "changeStatus": "Đổi trạng thái"
     },
     "calendar": {
-      "dayTasksAriaLabel": "Show all tasks for {{date}}",
-      "moreTasks": "+{{count}} more",
+      "dayTasksAriaLabel": "Hiện tất cả công việc của {{date}}",
+      "moreTasks": "+{{count}} khác",
       "nextMonth": "Tháng sau",
       "noTasks": "Không có công việc được lên lịch",
       "noTasksSubtitle": "Thêm ngày bắt đầu, ngày hết hạn hoặc cả hai vào công việc để hiển thị chúng trên lịch.",
-      "pageTitle": "{{name}} – Calendar",
+      "pageTitle": "{{name}} – Lịch",
       "previousMonth": "Tháng trước",
-      "taskAriaLabel": "{{title}}, {{range}}: open task",
+      "taskAriaLabel": "{{title}}, {{range}}: mở công việc",
       "title": "Lịch",
-      "today": "Today",
+      "today": "Hôm nay",
       "loadError": "Không thể tải công việc."
     },
     "common": {
@@ -1879,7 +1882,7 @@
             "blockquote": "Trích dẫn",
             "code-block": "Khối mã",
             "table": "Bảng",
-            "file": "File"
+            "file": "Tệp"
           }
         },
         "languages": {
@@ -2199,16 +2202,23 @@
     },
     "stats": {
       "completion": "Hoàn thành",
-      "nextDueDate": "Hạn tiếp theo",
       "projects": "Dự án",
       "tasks": "Công việc"
     },
     "table": {
-      "dueDate": "Hạn chót",
       "progress": "Tiến độ",
       "project": "Dự án",
       "status": "Trạng thái",
       "tasks": "Công việc"
+    },
+    "charts": {
+      "backlog": "Backlog",
+      "empty": "Không có hoạt động công việc nào trong 6 tháng qua.",
+      "tasks": "Công việc"
+    },
+    "tabs": {
+      "charts": "Biểu đồ",
+      "overview": "Tổng quan"
     }
   },
   "workspace": {

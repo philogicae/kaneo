@@ -269,6 +269,10 @@
           "totalTasks": {
             "type": "number"
           },
+          "plannedTasks": {
+            "type": "number",
+            "description": "Number of tasks sitting in the backlog (planned)."
+          },
           "dueDate": {
             "type": [
               "string",
@@ -281,6 +285,7 @@
         "required": [
           "completionPercentage",
           "totalTasks",
+          "plannedTasks",
           "dueDate"
         ]
       },
@@ -578,6 +583,28 @@
           "archivedAt",
           "position",
           "lastTaskNumber"
+        ]
+      },
+      "ProjectChartsBucket": {
+        "type": "object",
+        "properties": {
+          "weekStart": {
+            "type": "string",
+            "description": "ISO date of the week start (Monday, UTC)."
+          },
+          "created": {
+            "type": "number",
+            "description": "Tasks created during that week."
+          },
+          "completed": {
+            "type": "number",
+            "description": "Tasks moved into a final status during that week."
+          }
+        },
+        "required": [
+          "weekStart",
+          "created",
+          "completed"
         ]
       },
       "BoardResponse": {
@@ -6069,6 +6096,64 @@
         }
       }
     },
+    "/project/{id}/charts": {
+      "get": {
+        "operationId": "getProjectCharts",
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get project charts",
+        "description": "Weekly task-creation and completion counts for the last months (default 6), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weekly progression buckets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectChartsBucket"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No access to the project's workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/project/reorder": {
       "put": {
         "operationId": "reorderProjects",
@@ -10134,7 +10219,7 @@
           "Search"
         ],
         "summary": "Global search",
-        "description": "Search across tasks, projects, workspaces, comments, and activities in one workspace. Results are ranked by relevance and returned as a single flat list, each entry tagged with its `type`.",
+        "description": "Search across tasks, projects, workspaces, comments, and activities, ranked by relevance and returned as a single flat list, each entry tagged with its `type`. Scoped to the given workspace, or — when `workspaceId` is omitted — to every workspace the user is a member of.",
         "parameters": [
           {
             "schema": {
@@ -10167,7 +10252,7 @@
               "type": "string",
               "minLength": 1
             },
-            "required": true,
+            "required": false,
             "name": "workspaceId",
             "in": "query"
           },

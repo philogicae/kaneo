@@ -9,9 +9,7 @@ import {
 export function getPriorityIcon(priority: string) {
   switch (priority) {
     case "urgent":
-      return (
-        <CircleAlert className="h-[12px] w-[12px] text-destructive-foreground" />
-      );
+      return <CircleAlert className="h-[12px] w-[12px] text-destructive" />;
     case "high":
       return (
         <ChevronsUp className="h-[12px] w-[12px] text-warning-foreground" />

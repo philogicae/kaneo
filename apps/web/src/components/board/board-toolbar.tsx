@@ -1,8 +1,9 @@
 import { Filter, PanelsTopLeft, Rows3, X } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import SortControl from "@/components/common/sort-control";
 import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
+import TaskSearchInput from "@/components/common/task-search-input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -63,6 +64,9 @@ type BoardToolbarProps = {
   onSortChange: (sort: SortConfig) => void;
   customFieldDefinitions?: CustomFieldDefinition[];
   usedCustomFieldValues?: Record<string, string[]>;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  searchInputRef?: RefObject<HTMLInputElement | null>;
 };
 
 function CheckSlot({ checked }: { checked: boolean }) {
@@ -152,6 +156,9 @@ export default function BoardToolbar({
   onSortChange,
   customFieldDefinitions = [],
   usedCustomFieldValues = {},
+  searchQuery,
+  onSearchChange,
+  searchInputRef,
 }: BoardToolbarProps) {
   const { t } = useTranslation();
   const selectedStatusIds = filters.status ?? [];
@@ -681,6 +688,12 @@ export default function BoardToolbar({
             </DropdownMenu>
 
             <SortControl sort={sort} onSortChange={onSortChange} />
+
+            <TaskSearchInput
+              value={searchQuery}
+              onChange={onSearchChange}
+              inputRef={searchInputRef}
+            />
 
             {selectedStatusIds.length > 0 && (
               <ActiveFilterChip

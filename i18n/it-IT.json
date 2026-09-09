@@ -232,7 +232,7 @@
       "invitationExpired": "Invito Scaduto",
       "errorLoadDescription": "Caricamento dei dettagli dell'invito fallito. L'invito potrebbe non essere valido o essere scaduto.",
       "goToSignIn": "Vai al Login",
-      "workspaceLabel": "Workspace: {{workspaceName}}",
+      "workspaceLabel": "Spazio di lavoro: {{workspaceName}}",
       "joinWorkspace": "Unisciti a {{workspaceName}}",
       "inviteBodySignedIn": "<inviter>{{inviterName}}</inviter> ti ha invitato a unirti al suo workspace.",
       "inviteBodySignedOut": "<inviter>{{inviterName}}</inviter> ti ha invitato a unirti al suo workspace su Kaneo.",
@@ -315,7 +315,7 @@
       "undefined": "Undefined"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
+      "label": "Percorso di navigazione",
       "more": "Altro"
     },
     "empty": {
@@ -440,7 +440,7 @@
           "cyan": "Ciano",
           "indigo": "Indaco",
           "fuchsia": "Fucsia",
-          "lime": "Lime",
+          "lime": "Verde limone",
           "emerald": "Smeraldo"
         }
       }
@@ -691,7 +691,7 @@
       "labels": "Etichette",
       "externalLinks": "Link Esterni",
       "pullRequestFallback": "Pull Request",
-      "issueFallback": "Issue",
+      "issueFallback": "Segnalazione",
       "prStatusMerged": "Unito",
       "prStatusDraft": "Bozza",
       "prStatusOpen": "Aperto",
@@ -871,7 +871,7 @@
     },
     "externalLinks": {
       "resources": "Risorse",
-      "issue": "Issue",
+      "issue": "Segnalazione",
       "branch": "Ramo",
       "merged": "Unito",
       "draft": "Bozza",
@@ -1121,7 +1121,7 @@
       },
       "eventsHint": "Scegli quali modifiche al progetto pubblicare su Mattermost.",
       "eventsTitle": "Notifiche di eventi",
-      "paused": "Paused",
+      "paused": "In pausa",
       "saveChanges": "Salva modifiche",
       "toast": {
         "disabled": "Notifiche Mattermost in pausa",
@@ -1157,7 +1157,7 @@
       "ntfyTitle": "ntfy",
       "ntfyDescription": "Pubblica le notifiche dell'account su un topic ntfy.",
       "serverUrl": "URL Server",
-      "topic": "Topic",
+      "topic": "Argomento",
       "token": "Token",
       "ntfyServerPlaceholder": "https://ntfy.esempio.com",
       "ntfyTopicPlaceholder": "avvisi-team",
@@ -1284,7 +1284,10 @@
       "labels": "Etichette",
       "labelsDescription": "Mostra etichette e tag delle attività",
       "priority": "Priorità",
-      "priorityDescription": "Visualizza indicatori di priorità"
+      "priorityDescription": "Visualizza indicatori di priorità",
+      "interfaceSize": "Dimensione interfaccia",
+      "interfaceSizeDecrease": "Riduci dimensione interfaccia",
+      "interfaceSizeIncrease": "Aumenta dimensione interfaccia"
     },
     "projectGeneral": {
       "pageTitle": "Impostazioni Progetto",
@@ -1818,16 +1821,16 @@
       "changeStatus": "Cambia Stato"
     },
     "calendar": {
-      "dayTasksAriaLabel": "Show all tasks for {{date}}",
-      "moreTasks": "+{{count}} more",
+      "dayTasksAriaLabel": "Mostra tutte le attività del {{date}}",
+      "moreTasks": "+{{count}} altre",
       "nextMonth": "Mese successivo",
       "noTasks": "Nessuna attività pianificata",
       "noTasksSubtitle": "Aggiungi alle attività una data di inizio, una scadenza o entrambe per posizionarle nel calendario.",
-      "pageTitle": "{{name}} – Calendar",
+      "pageTitle": "{{name}} – Calendario",
       "previousMonth": "Mese precedente",
-      "taskAriaLabel": "{{title}}, {{range}}: open task",
+      "taskAriaLabel": "{{title}}, {{range}}: apri attività",
       "title": "Calendario",
-      "today": "Today",
+      "today": "Oggi",
       "loadError": "Caricamento delle attività non riuscito."
     },
     "common": {
@@ -2213,16 +2216,23 @@
     },
     "stats": {
       "completion": "Completamento",
-      "nextDueDate": "Prossima scadenza",
       "projects": "Progetti",
       "tasks": "Attività"
     },
     "table": {
-      "dueDate": "Scadenza",
       "progress": "Avanzamento",
       "project": "Progetto",
       "status": "Stato",
       "tasks": "Attività"
+    },
+    "charts": {
+      "backlog": "Backlog",
+      "empty": "Nessuna attività sulle attività negli ultimi 6 mesi.",
+      "tasks": "Attività"
+    },
+    "tabs": {
+      "charts": "Grafici",
+      "overview": "Panoramica"
     }
   },
   "workspace": {

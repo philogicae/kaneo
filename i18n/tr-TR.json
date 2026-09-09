@@ -1117,7 +1117,7 @@
       },
       "eventsHint": "Hangi proje değişikliklerinin Mattermost'a gönderileceğini seçin.",
       "eventsTitle": "Olay bildirimleri",
-      "paused": "Paused",
+      "paused": "Duraklatıldı",
       "saveChanges": "Değişiklikleri kaydet",
       "toast": {
         "disabled": "Mattermost bildirimleri duraklatıldı",
@@ -1280,7 +1280,10 @@
       "labels": "Etiketler",
       "labelsDescription": "Talep etiketlerini ve etiketleri göster",
       "priority": "Öncelik",
-      "priorityDescription": "Öncelik göstergelerini görüntüle"
+      "priorityDescription": "Öncelik göstergelerini görüntüle",
+      "interfaceSize": "Arayüz boyutu",
+      "interfaceSizeDecrease": "Arayüz boyutunu küçült",
+      "interfaceSizeIncrease": "Arayüz boyutunu büyüt"
     },
     "projectGeneral": {
       "pageTitle": "Proje Ayarları",
@@ -1813,16 +1816,16 @@
       "changeStatus": "Durumu Değiştir"
     },
     "calendar": {
-      "dayTasksAriaLabel": "Show all tasks for {{date}}",
-      "moreTasks": "+{{count}} more",
+      "dayTasksAriaLabel": "{{date}} tarihindeki tüm görevleri göster",
+      "moreTasks": "+{{count}} daha",
       "nextMonth": "Sonraki ay",
       "noTasks": "Zamanlanmış görev yok",
       "noTasksSubtitle": "Görevleri takvime yerleştirmek için görevlere başlangıç tarihi, bitiş tarihi veya her ikisini ekleyin.",
-      "pageTitle": "{{name}} – Calendar",
+      "pageTitle": "{{name}} – Takvim",
       "previousMonth": "Önceki ay",
-      "taskAriaLabel": "{{title}}, {{range}}: open task",
+      "taskAriaLabel": "{{title}}, {{range}}: görevi aç",
       "title": "Takvim",
-      "today": "Today",
+      "today": "Bugün",
       "loadError": "Görevler yüklenemedi."
     },
     "common": {
@@ -2201,21 +2204,28 @@
     },
     "pageTitle": "Tüm projeler",
     "section": {
-      "projectCount_one": "{{count}} project",
+      "projectCount_one": "{{count}} proje",
       "projectCount_other": "{{count}} proje"
     },
     "stats": {
       "completion": "Tamamlanma",
-      "nextDueDate": "Yaklaşan teslim tarihi",
       "projects": "Projeler",
       "tasks": "Görevler"
     },
     "table": {
-      "dueDate": "Teslim tarihi",
       "progress": "İlerleme",
       "project": "Proje",
       "status": "Durum",
       "tasks": "Görevler"
+    },
+    "charts": {
+      "backlog": "Backlog",
+      "empty": "Son 6 ayda görev etkinliği yok.",
+      "tasks": "Görevler"
+    },
+    "tabs": {
+      "charts": "Grafikler",
+      "overview": "Genel bakış"
     }
   },
   "workspace": {

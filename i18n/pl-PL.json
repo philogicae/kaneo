@@ -438,7 +438,7 @@
           "sky": "Niebo",
           "ocean": "Ocean",
           "cyan": "Cyjan",
-          "indigo": "Indigo",
+          "indigo": "Indygo",
           "fuchsia": "Fuksja",
           "lime": "Limonka",
           "emerald": "Szmaragd"
@@ -1125,7 +1125,7 @@
       },
       "eventsHint": "Wybierz, które zmiany w projekcie mają być publikowane w Mattermost.",
       "eventsTitle": "Powiadomienia o zdarzeniach",
-      "paused": "Paused",
+      "paused": "Wstrzymane",
       "saveChanges": "Zapisz zmiany",
       "toast": {
         "disabled": "Powiadomienia Mattermost wstrzymane",
@@ -1288,7 +1288,10 @@
       "title": "Preferencje",
       "weekStartsOnMonday": "Poniedziałek",
       "weekStartsOnSaturday": "Sobota",
-      "weekStartsOnSunday": "Niedziela"
+      "weekStartsOnSunday": "Niedziela",
+      "interfaceSize": "Rozmiar interfejsu",
+      "interfaceSizeDecrease": "Zmniejsz rozmiar interfejsu",
+      "interfaceSizeIncrease": "Zwiększ rozmiar interfejsu"
     },
     "projectGeneral": {
       "dangerZone": "Strefa niebezpieczna",
@@ -2220,16 +2223,23 @@
     },
     "stats": {
       "completion": "Ukończono",
-      "nextDueDate": "Najbliższy termin",
       "projects": "Projekty",
       "tasks": "Zadania"
     },
     "table": {
-      "dueDate": "Termin",
       "progress": "Postęp",
       "project": "Projekt",
       "status": "Status",
       "tasks": "Zadania"
+    },
+    "charts": {
+      "backlog": "Backlog",
+      "empty": "Brak aktywności zadań w ciągu ostatnich 6 miesięcy.",
+      "tasks": "Zadania"
+    },
+    "tabs": {
+      "charts": "Wykresy",
+      "overview": "Przegląd"
     }
   },
   "workspace": {

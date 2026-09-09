@@ -28,6 +28,7 @@ import {
   Folder,
   Forward,
   MoreHorizontal,
+  Plus,
   Settings,
   Trash2,
 } from "lucide-react";
@@ -256,7 +257,7 @@ export function NavProjects() {
   return (
     <>
       <Collapsible defaultOpen className="group/collapsible">
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden gap-1 p-2 pt-1">
+        <SidebarGroup className="gap-1 p-2 pt-1">
           <div className="flex h-7 items-center">
             <CollapsibleTrigger
               className="min-w-0 flex-1 data-panel-open:[&_svg]:rotate-90"
@@ -274,7 +275,7 @@ export function NavProjects() {
                     type="button"
                     aria-label={t("navigation:projectList.sortProjects")}
                     title={t("navigation:projectList.sortProjects")}
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-sidebar-foreground/60 outline-hidden ring-sidebar-ring transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-sidebar-foreground/60 outline-hidden ring-sidebar-ring transition-colors group-data-[collapsible=icon]:hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2"
                   />
                 }
               >
@@ -335,10 +336,18 @@ export function NavProjects() {
                           <SidebarMenuButton
                             isActive={isCurrentProject(project.id)}
                             size="default"
+                            tooltip={project.name}
                             className="h-8 gap-0 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
                             onClick={() => handleProjectClick(project)}
                           >
-                            <span>{project.name}</span>
+                            {/* Collapsed rail: the project slug stands in for
+                                a generic folder icon. */}
+                            <span className="hidden h-5 min-w-6 items-center justify-center rounded-md bg-sidebar-accent px-1 text-[10px] font-semibold tracking-wide text-sidebar-accent-foreground uppercase group-data-[collapsible=icon]:flex">
+                              {project.slug}
+                            </span>
+                            <span className="group-data-[collapsible=icon]:hidden">
+                              {project.name}
+                            </span>
                           </SidebarMenuButton>
 
                           <DropdownMenu>
@@ -434,9 +443,14 @@ export function NavProjects() {
                     <SidebarMenuItem className="mt-1">
                       <SidebarMenuButton
                         size="default"
+                        tooltip={t("navigation:projectList.addProject")}
                         className="h-8 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
                         onClick={() => setIsCreateProjectModalOpen(true)}
                       >
+                        <Plus
+                          aria-hidden="true"
+                          className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/70"
+                        />
                         <span>{t("navigation:projectList.addProject")}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

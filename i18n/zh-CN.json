@@ -683,7 +683,7 @@
       "labels": "标签",
       "externalLinks": "外部链接",
       "pullRequestFallback": "拉取请求",
-      "issueFallback": "Issue",
+      "issueFallback": "议题",
       "prStatusMerged": "已合并",
       "prStatusDraft": "草稿",
       "prStatusOpen": "打开",
@@ -863,7 +863,7 @@
     },
     "externalLinks": {
       "resources": "资源",
-      "issue": "Issue",
+      "issue": "议题",
       "branch": "分支",
       "merged": "已合并",
       "draft": "草稿",
@@ -1276,7 +1276,10 @@
       "labels": "标签",
       "labelsDescription": "显示任务的标签和标记",
       "priority": "优先级",
-      "priorityDescription": "显示优先级指示"
+      "priorityDescription": "显示优先级指示",
+      "interfaceSize": "界面大小",
+      "interfaceSizeDecrease": "缩小界面大小",
+      "interfaceSizeIncrease": "放大界面大小"
     },
     "projectGeneral": {
       "pageTitle": "项目设置",
@@ -2199,16 +2202,23 @@
     },
     "stats": {
       "completion": "完成度",
-      "nextDueDate": "最近截止日期",
       "projects": "项目",
       "tasks": "任务"
     },
     "table": {
-      "dueDate": "截止日期",
       "progress": "进度",
       "project": "项目",
       "status": "状态",
       "tasks": "任务"
+    },
+    "charts": {
+      "backlog": "待办积压",
+      "empty": "最近 6 个月内没有任务动态。",
+      "tasks": "任务"
+    },
+    "tabs": {
+      "charts": "图表",
+      "overview": "总览"
     }
   },
   "workspace": {

@@ -540,7 +540,10 @@
 			"labels": "ラベル",
 			"labelsDescription": "タスクのラベルとタグを表示します",
 			"priority": "優先度",
-			"priorityDescription": "優先度インジケーターを表示します"
+			"priorityDescription": "優先度インジケーターを表示します",
+			"interfaceSize": "インターフェースサイズ",
+			"interfaceSizeDecrease": "インターフェースサイズを縮小",
+			"interfaceSizeIncrease": "インターフェースサイズを拡大"
 		},
 		"developerPage": {
 			"pageTitle": "開発者設定",
@@ -1284,7 +1287,7 @@
 		},
 		"externalLinks": {
 			"resources": "リソース",
-			"issue": "Issue",
+			"issue": "イシュー",
 			"branch": "ブランチ",
 			"merged": "マージ済み",
 			"draft": "下書き",
@@ -1309,7 +1312,7 @@
 			},
 			"eventsHint": "プロジェクトのどの変更を Mattermost に投稿するかを選択してください。",
 			"eventsTitle": "イベント通知",
-			"paused": "Paused",
+			"paused": "一時停止中",
 			"saveChanges": "変更を保存",
 			"toast": {
 				"disabled": "Mattermost 通知を一時停止しました",
@@ -1648,7 +1651,7 @@
 		"title": "タスク",
 		"status": {
 			"label": "ステータス",
-			"to-do": "To Do",
+			"to-do": "未着手",
 			"in-progress": "進行中",
 			"in-review": "レビュー中",
 			"done": "完了",
@@ -2220,7 +2223,7 @@
 			"labels": "ラベル",
 			"externalLinks": "外部リンク",
 			"pullRequestFallback": "プルリクエスト",
-			"issueFallback": "Issue",
+			"issueFallback": "課題",
 			"prStatusMerged": "マージ済み",
 			"prStatusDraft": "下書き",
 			"prStatusOpen": "オープン",
@@ -2253,16 +2256,23 @@
 		},
 		"stats": {
 			"completion": "完了率",
-			"nextDueDate": "次の期日",
 			"projects": "プロジェクト",
 			"tasks": "タスク"
 		},
 		"table": {
-			"dueDate": "期日",
 			"progress": "進捗",
 			"project": "プロジェクト",
 			"status": "ステータス",
 			"tasks": "タスク"
+		},
+		"charts": {
+			"backlog": "バックログ",
+			"empty": "過去6か月間にタスクの活動はありません。",
+			"tasks": "タスク"
+		},
+		"tabs": {
+			"charts": "グラフ",
+			"overview": "概要"
 		}
 	}
 }

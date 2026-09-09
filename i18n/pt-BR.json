@@ -691,7 +691,7 @@
       "labels": "Etiquetas",
       "externalLinks": "Links externos",
       "pullRequestFallback": "Pull Request",
-      "issueFallback": "Issue",
+      "issueFallback": "Ocorrência",
       "prStatusMerged": "Mesclado",
       "prStatusDraft": "Rascunho",
       "prStatusOpen": "Aberto",
@@ -871,7 +871,7 @@
     },
     "externalLinks": {
       "resources": "Recursos",
-      "issue": "Issue",
+      "issue": "Ocorrência",
       "branch": "Branch",
       "merged": "Mesclado",
       "draft": "Rascunho",
@@ -1121,7 +1121,7 @@
       },
       "eventsHint": "Escolha quais mudanças do projeto devem ser publicadas no Mattermost.",
       "eventsTitle": "Notificações de eventos",
-      "paused": "Paused",
+      "paused": "Pausado",
       "saveChanges": "Salvar alterações",
       "toast": {
         "disabled": "Notificações do Mattermost pausadas",
@@ -1284,7 +1284,10 @@
       "labels": "Etiquetas",
       "labelsDescription": "Mostrar etiquetas e marcadores das tarefas",
       "priority": "Prioridade",
-      "priorityDescription": "Exibir indicadores de prioridade"
+      "priorityDescription": "Exibir indicadores de prioridade",
+      "interfaceSize": "Tamanho da interface",
+      "interfaceSizeDecrease": "Diminuir o tamanho da interface",
+      "interfaceSizeIncrease": "Aumentar o tamanho da interface"
     },
     "projectGeneral": {
       "pageTitle": "Configurações do projeto",
@@ -1818,16 +1821,16 @@
       "changeStatus": "Mudar status"
     },
     "calendar": {
-      "dayTasksAriaLabel": "Show all tasks for {{date}}",
-      "moreTasks": "+{{count}} more",
+      "dayTasksAriaLabel": "Mostrar todas as tarefas de {{date}}",
+      "moreTasks": "+{{count}} mais",
       "nextMonth": "Próximo mês",
       "noTasks": "Nenhuma tarefa programada",
       "noTasksSubtitle": "Adicione uma data de início, data de vencimento ou ambas às tarefas para colocá-las no calendário.",
-      "pageTitle": "{{name}} – Calendar",
+      "pageTitle": "{{name}} – Calendário",
       "previousMonth": "Mês anterior",
-      "taskAriaLabel": "{{title}}, {{range}}: open task",
+      "taskAriaLabel": "{{title}}, {{range}}: abrir tarefa",
       "title": "Calendário",
-      "today": "Today",
+      "today": "Hoje",
       "loadError": "Falha ao carregar as tarefas."
     },
     "common": {
@@ -2213,16 +2216,23 @@
     },
     "stats": {
       "completion": "Conclusão",
-      "nextDueDate": "Próximo vencimento",
       "projects": "Projetos",
       "tasks": "Tarefas"
     },
     "table": {
-      "dueDate": "Data de vencimento",
       "progress": "Progresso",
       "project": "Projeto",
       "status": "Status",
       "tasks": "Tarefas"
+    },
+    "charts": {
+      "backlog": "Backlog",
+      "empty": "Nenhuma atividade de tarefas nos últimos 6 meses.",
+      "tasks": "Tarefas"
+    },
+    "tabs": {
+      "charts": "Gráficos",
+      "overview": "Visão geral"
     }
   },
   "workspace": {
