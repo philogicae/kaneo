@@ -18,7 +18,9 @@ const shikiPluginKey = new PluginKey("shiki-codeblock");
 
 export function isDarkTheme() {
   if (typeof document === "undefined") return true;
-  return document.documentElement.classList.contains("dark");
+  const root = document.documentElement.classList;
+  // volt is a dark-leaning theme: code highlighting and mermaid follow it.
+  return root.contains("dark") || root.contains("volt");
 }
 
 function getCurrentTheme(options: ShikiCodeBlockOptions) {

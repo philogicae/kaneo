@@ -399,7 +399,7 @@ function RouteComponent() {
                   <button
                     key={c.value}
                     type="button"
-                    title={c.label}
+                    title={t(`common:modals.createTask.labelColors.${c.key}`)}
                     className={cn(
                       "w-8 h-8 rounded-full border-2 transition-[scale,border-color]",
                       newColor === c.value
@@ -488,7 +488,7 @@ function RouteComponent() {
                   <button
                     key={c.value}
                     type="button"
-                    title={c.label}
+                    title={t(`common:modals.createTask.labelColors.${c.key}`)}
                     className={cn(
                       "w-8 h-8 rounded-full border-2 transition-[scale,border-color]",
                       editColor === c.value

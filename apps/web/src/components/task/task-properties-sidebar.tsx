@@ -739,9 +739,7 @@ export default function TaskPropertiesSidebar({
                             backgroundColor: resolveLabelColor(label.color),
                           }}
                         />
-                        <span className="truncate max-w-[60px]">
-                          {label.name}
-                        </span>
+                        <span>{label.name}</span>
                       </Badge>
                     </TaskLabelsPopover>
                   ),

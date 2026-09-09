@@ -42,7 +42,7 @@ import {
 } from "@/lib/due-date-status";
 import { getInitials } from "@/lib/get-initials";
 import { getTaskItemStats } from "@/lib/get-task-item-stats";
-import { getPriorityIcon } from "@/lib/priority";
+import { getPriorityBorderClass, getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
@@ -73,7 +73,6 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
   const navigate = useNavigate();
   const {
     showAssignees,
-    showPriority,
     showDueDates,
     showLabels,
     showTaskNumbers,
@@ -214,11 +213,11 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
             } ${
               isDragging
                 ? "border-ring/40 bg-card shadow-lg"
-                : "hover:border-border/90 hover:bg-background hover:shadow-sm"
+                : "hover:bg-background hover:shadow-sm"
             } ${
               isTaskSelected
                 ? "border-ring/40 bg-accent/50 shadow-sm ring-1 ring-inset ring-ring/30"
-                : "border-border"
+                : getPriorityBorderClass(task.priority ?? "")
             } ${isTaskFocused ? "ring-2 ring-inset ring-ring/50" : ""}`}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -234,34 +233,29 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
               </div>
             )}
 
-            {showAssignees && (
-              <div className="absolute top-3 right-3">
-                {task.userId ? (
-                  <Avatar className="h-5 w-5">
-                    <AvatarImage
-                      src={assignee?.user?.image ?? ""}
-                      alt={assignee?.user?.name || ""}
-                    />
-                    <AvatarFallback className="text-xs font-medium border border-border/30">
-                      {getInitials(assignee?.user?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <div
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-muted"
-                    title={t("tasks:assignee.unassigned")}
-                  >
-                    <span className="text-[10px] font-medium text-muted-foreground">
-                      ?
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+            {/*
+              Top-right cluster: assignee first, then the priority mark. The
+              old bottom priority chip is gone — this is the only priority
+              indicator on the card now.
+             */}
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              {showAssignees && task.userId && (
+                <Avatar className="h-5 w-5">
+                  <AvatarImage
+                    src={assignee?.user?.image ?? ""}
+                    alt={assignee?.user?.name || ""}
+                  />
+                  <AvatarFallback className="text-xs font-medium border border-border/30">
+                    {getInitials(assignee?.user?.name)}
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              {getPriorityIcon(task.priority ?? "")}
+            </div>
 
             <div className="mb-2.5 pr-6">
               <div
-                className="overflow-hidden break-words leading-5 font-medium text-foreground/95 text-[15px]"
+                className="overflow-hidden wrap-break-word leading-5 font-medium text-foreground/95 text-[15px]"
                 style={{
                   display: "-webkit-box",
                   WebkitLineClamp: 3,
@@ -281,12 +275,6 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
             )}
 
             <div className="flex items-center gap-1.5">
-              {showPriority && (
-                <span className="inline-flex items-center gap-1 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground h-5.5">
-                  {getPriorityIcon(task.priority ?? "")}
-                </span>
-              )}
-
               {activeCustomFieldValues.length > 0 && (
                 <HoverCard openDelay={200} closeDelay={100}>
                   <HoverCardTrigger asChild>
@@ -333,7 +321,6 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
                   </HoverCardContent>
                 </HoverCard>
               )}
-
               {showTaskItemCounts && taskItemStats.total > 0 && (
                 <span
                   className={cn(
@@ -344,7 +331,7 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
                     },
                   )}
                 >
-                  <SquareCheck className="h-[12px] w-[12px]" />
+                  <SquareCheck className="h-3 w-3" />
                   {taskItemStats.completed}/{taskItemStats.total}
                 </span>
               )}

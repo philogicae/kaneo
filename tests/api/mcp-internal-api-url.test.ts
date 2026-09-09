@@ -1,4 +1,10 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+
+// The dynamic import below re-executes the whole mcp module graph per test;
+// its cold transform costs ~4-7s on a loaded machine and blows the default
+// 5s test timeout. Give this file a roomier cap and warm the graph once in
+// beforeAll so per-test imports only pay the module-registry reset.
+vi.setConfig({ testTimeout: 30_000 });
 
 const authMocks = vi.hoisted(() => ({
   getSession: vi.fn(async () => ({ user: { id: "test-user" } })),
@@ -48,6 +54,10 @@ async function loadMcpRoutes(internalApiUrl?: string) {
   return (await import("../../apps/api/src/mcp")).default;
 }
 
+beforeAll(async () => {
+  await loadMcpRoutes();
+}, 30_000);
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
@@ -83,6 +93,8 @@ describe("MCP API URLs", () => {
     expect(String(apiFetch.mock.calls[0]?.[0])).toBe(
       "http://127.0.0.1:1337/api/auth/get-session",
     );
+    // Drain the response body so no stream handle leaks between tests.
+    await toolResponse.text();
   });
 
   it.each(["http://api.internal:1337/api/", "http://api.internal:1337/"])(
@@ -101,6 +113,8 @@ describe("MCP API URLs", () => {
       expect(String(apiFetch.mock.calls[0]?.[0])).toBe(
         "http://api.internal:1337/api/auth/get-session",
       );
+      // Drain the response body so no stream handle leaks between tests.
+      await toolResponse.text();
     },
   );
 });

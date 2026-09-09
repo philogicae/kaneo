@@ -57,27 +57,27 @@
 			"tryAgain": "다시 시도",
 			"viewDeploymentGuide": "배포 가이드 보기",
 			"refreshPage": "페이지 새로고침",
-			"description": "The page crashed unexpectedly. Refreshing usually fixes it.",
+			"description": "페이지가 갑자기 충돌했습니다. 새로 고치면 보통 해결됩니다.",
 			"messages": {
-				"auth": "Authentication failed. Please sign in again.",
-				"cors": "Unable to connect to the server. This might be due to CORS configuration issues.",
-				"network": "Network error. Please check your internet connection and try again.",
-				"server": "Server error. Please try again later.",
-				"unknown": "An unexpected error occurred."
+				"auth": "인증에 실패했습니다. 다시 로그인하세요.",
+				"cors": "서버에 연결할 수 없습니다. CORS 구성 문제 때문일 수 있습니다.",
+				"network": "네트워크 오류입니다. 인터넷 연결을 확인하고 다시 시도하세요.",
+				"server": "서버 오류입니다. 나중에 다시 시도하세요.",
+				"unknown": "예기치 않은 오류가 발생했습니다."
 			},
 			"troubleshootingSteps": {
 				"cors": {
-					"checkAccessibility": "Check that your API server is accessible from your browser",
-					"checkApiRunning": "Make sure your API server is running",
-					"checkApiUrl": "Check that VITE_API_URL in your frontend .env matches your API server URL",
-					"checkProtocol": "Ensure both frontend and API are using the same protocol (http/https)",
-					"verifyCorsOrigins": "Verify CORS_ORIGINS in your API .env includes your frontend URL"
+					"checkAccessibility": "브라우저에서 API 서버에 접근 가능한지 확인하세요",
+					"checkApiRunning": "API 서버가 실행 중인지 확인하세요",
+					"checkApiUrl": "프런트엔드 .env의 VITE_API_URL이 API 서버 URL과 일치하는지 확인하세요",
+					"checkProtocol": "프런트엔드와 API가 동일한 프로토콜(http/https)을 사용하는지 확인하세요",
+					"verifyCorsOrigins": "API .env의 CORS_ORIGINS에 프런트엔드 URL이 포함되어 있는지 확인하세요"
 				},
 				"network": {
-					"checkConnection": "Check your internet connection",
-					"checkFirewall": "Check if there are any firewall or proxy issues",
-					"tryRefresh": "Try refreshing the page",
-					"verifyApiRunning": "Verify the API server is running and accessible"
+					"checkConnection": "인터넷 연결을 확인하세요",
+					"checkFirewall": "방화벽이나 프록시 문제가 있는지 확인하세요",
+					"tryRefresh": "페이지를 새로 고쳐 보세요",
+					"verifyApiRunning": "API 서버가 실행 중이고 접근 가능한지 확인하세요"
 				}
 			}
 		},
@@ -152,7 +152,14 @@
 					"amber": "앰버",
 					"terracotta": "테라코타",
 					"rose": "로즈",
-					"crimson": "크림슨"
+					"crimson": "크림슨",
+					"sky": "하늘",
+					"ocean": "바다",
+					"cyan": "시안",
+					"indigo": "남색",
+					"fuchsia": "후크시아",
+					"lime": "라임",
+					"emerald": "에메랄드"
 				}
 			}
 		},
@@ -370,25 +377,25 @@
 			"avatar": {
 				"hint": "PNG, JPEG, or WebP. Cropped to a square and resized to 256x256.",
 				"remove": "Remove",
-				"removeError": "Failed to remove profile picture",
-				"removeSuccess": "Profile picture removed",
-				"updateError": "Failed to update profile picture",
-				"updateSuccess": "Profile picture updated",
-				"change": "Change avatar",
-				"edit": "Change your profile picture"
+				"removeError": "프로필 사진 삭제 실패",
+				"removeSuccess": "프로필 사진이 삭제됨",
+				"updateError": "프로필 사진 업데이트 실패",
+				"updateSuccess": "프로필 사진이 업데이트됨",
+				"change": "아바타 변경",
+				"edit": "프로필 사진 변경"
 			},
 			"deleteAccount": {
-				"confirm": "Delete account",
+				"confirm": "계정 삭제",
 				"confirmLabel": "Confirm your email address",
-				"description": "Workspaces only you belong to are deleted with your account. Elsewhere, your tasks stay and become unassigned, and your comments are removed.",
-				"error": "Failed to delete account",
+				"description": "본인만 속한 워크스페이스는 계정과 함께 삭제됩니다. 그 외의 경우, 작업은 유지되며 배정이 해제되고 댓글은 삭제됩니다.",
+				"error": "계정 삭제 실패",
 				"modalDescription": "This cannot be undone. Type {{email}} to confirm.",
-				"modalTitle": "Delete your account?",
-				"sectionSubtitle": "Permanent actions that affect your whole account.",
-				"sectionTitle": "Danger zone",
-				"success": "Your account has been deleted",
-				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"modalTitle": "계정을 삭제하시겠습니까?",
+				"sectionSubtitle": "전체 계정에 영향을 주는 영구 작업입니다.",
+				"sectionTitle": "위험 구역",
+				"success": "계정이 삭제되었습니다",
+				"title": "계정 삭제",
+				"sessionTooOld": "보안을 위해 계정을 삭제하기 전에 로그아웃한 후 다시 로그인하세요."
 			}
 		},
 		"notificationsPage": {
@@ -503,6 +510,7 @@
 			"selectTheme": "테마 선택",
 			"themeLight": "라이트",
 			"themeDark": "다크",
+			"themeVolt": "볼트",
 			"themeSystem": "시스템",
 			"language": "언어",
 			"languageDescription": "선호하는 인터페이스 언어를 선택합니다",
@@ -532,7 +540,10 @@
 			"labels": "라벨",
 			"labelsDescription": "작업 라벨과 태그를 표시합니다",
 			"priority": "우선순위",
-			"priorityDescription": "우선순위 표시기를 표시합니다"
+			"priorityDescription": "우선순위 표시기를 표시합니다",
+			"interfaceSize": "인터페이스 크기",
+			"interfaceSizeDecrease": "인터페이스 크기 줄이기",
+			"interfaceSizeIncrease": "인터페이스 크기 키우기"
 		},
 		"developerPage": {
 			"pageTitle": "개발자 설정",
@@ -698,8 +709,8 @@
 			"slackSectionSubtitle": "수신 웹훅을 사용하여 프로젝트 작업 업데이트를 Slack 채널로 전송합니다.",
 			"telegramSectionTitle": "Telegram 연동",
 			"telegramSectionSubtitle": "봇을 사용하여 프로젝트 작업 업데이트를 Telegram 채팅 또는 토픽으로 전송합니다.",
-			"mattermostSectionSubtitle": "Send project task updates into a Mattermost channel with an incoming webhook.",
-			"mattermostSectionTitle": "Mattermost Integration"
+			"mattermostSectionSubtitle": "Incoming Webhook으로 프로젝트 작업 업데이트를 Mattermost 채널에 보냅니다.",
+			"mattermostSectionTitle": "Mattermost 통합"
 		},
 		"projectVisibility": {
 			"pageTitle": "프로젝트 공개 설정",
@@ -1283,41 +1294,41 @@
 			"nameRequired": "라벨 이름은 필수입니다"
 		},
 		"mattermostIntegration": {
-			"channelHint": "Optional label for your reference. Mattermost controls the actual destination channel from the webhook setup.",
-			"channelLabel": "Channel name",
+			"channelHint": "참고용 선택 라벨입니다. 실제 대상 채널은 webhook 설정에 따라 Mattermost가 제어합니다.",
+			"channelLabel": "채널 이름",
 			"channelPlaceholder": "#team-updates",
-			"connect": "Connect Mattermost",
-			"connected": "Connected",
-			"connectionHint": "Paste a Mattermost incoming webhook URL and choose which task events should be posted.",
-			"connectionTitle": "Mattermost webhook connection",
-			"disconnect": "Disconnect",
+			"connect": "Mattermost 연결",
+			"connected": "연결됨",
+			"connectionHint": "Mattermost Incoming Webhook URL을 붙여넣고 게시할 작업 이벤트를 선택하세요.",
+			"connectionTitle": "Mattermost webhook 연결",
+			"disconnect": "연결 해제",
 			"events": {
-				"taskCommentCreated": "New comments",
-				"taskCreated": "New tasks",
-				"taskDescriptionChanged": "Description changes",
-				"taskPriorityChanged": "Priority changes",
-				"taskStatusChanged": "Status changes",
-				"taskTitleChanged": "Title changes"
+				"taskCommentCreated": "새 댓글",
+				"taskCreated": "새 작업",
+				"taskDescriptionChanged": "설명 변경",
+				"taskPriorityChanged": "우선순위 변경",
+				"taskStatusChanged": "상태 변경",
+				"taskTitleChanged": "제목 변경"
 			},
-			"eventsHint": "Choose which project changes should post to Mattermost.",
-			"eventsTitle": "Event notifications",
-			"paused": "Paused",
-			"saveChanges": "Save changes",
+			"eventsHint": "프로젝트의 어떤 변경 사항을 Mattermost에 게시할지 선택하세요.",
+			"eventsTitle": "이벤트 알림",
+			"paused": "일시 중지됨",
+			"saveChanges": "변경 사항 저장",
 			"toast": {
-				"disabled": "Mattermost notifications paused",
-				"enabled": "Mattermost notifications enabled",
-				"removed": "Mattermost integration removed successfully",
-				"removeError": "Failed to remove Mattermost integration",
-				"saved": "Mattermost integration saved successfully",
-				"saveError": "Failed to save Mattermost integration",
-				"updateError": "Failed to update Mattermost integration"
+				"disabled": "Mattermost 알림 일시 중지됨",
+				"enabled": "Mattermost 알림 활성화됨",
+				"removed": "Mattermost 통합이 성공적으로 삭제됨",
+				"removeError": "Mattermost 통합 삭제 실패",
+				"saved": "Mattermost 통합이 성공적으로 저장됨",
+				"saveError": "Mattermost 통합 저장 실패",
+				"updateError": "Mattermost 통합 업데이트 실패"
 			},
-			"update": "Update Mattermost",
+			"update": "Mattermost 업데이트",
 			"validation": {
-				"webhookInvalid": "Enter a valid Mattermost webhook URL"
+				"webhookInvalid": "유효한 Mattermost webhook URL을 입력하세요"
 			},
-			"webhookHint": "Create an Incoming Webhook in Mattermost and paste the generated URL here.",
-			"webhookLabel": "Incoming webhook URL",
+			"webhookHint": "Mattermost에서 Incoming Webhook을 만들고 생성된 URL을 여기에 붙여넣으세요.",
+			"webhookLabel": "Incoming Webhook URL",
 			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
 		},
 		"customFields": {
@@ -1359,6 +1370,7 @@
 			"createWorkspace": "워크스페이스 만들기",
 			"lightTheme": "라이트 테마",
 			"darkTheme": "다크 테마",
+			"voltTheme": "볼트 테마",
 			"systemTheme": "시스템 테마",
 			"keyboardShortcuts": "키보드 단축키",
 			"inputPlaceholder": "앱과 명령 검색...",
@@ -1387,7 +1399,12 @@
 			"deleteConfirmTitle": "프로젝트를 삭제하시겠습니까?",
 			"deleteConfirmDescription": "프로젝트와 모든 데이터가 영구적으로 제거됩니다. 이 작업은 취소할 수 없습니다.",
 			"deletedToast": "프로젝트가 삭제되었습니다",
-			"deleteProject": "프로젝트 삭제"
+			"deleteProject": "프로젝트 삭제",
+			"sortProjects": "프로젝트 정렬",
+			"sortCustom": "사용자 지정 순서",
+			"sortName": "이름",
+			"sortDate": "생성일",
+			"sortCompletion": "진행률"
 		},
 		"search": {
 			"inputPlaceholder": "작업, 프로젝트, 댓글 검색...",
@@ -1417,7 +1434,8 @@
 			"workspaces": "워크스페이스",
 			"switching": "전환 중...",
 			"addWorkspace": "워크스페이스 추가",
-			"selectWorkspace": "워크스페이스 선택"
+			"selectWorkspace": "워크스페이스 선택",
+			"sortWorkspaces": "워크스페이스 정렬"
 		},
 		"page": {
 			"projectsTitle": "프로젝트",
@@ -1852,18 +1870,7 @@
 				"removeSuccess": "라벨이 제거되었습니다",
 				"updateError": "라벨 업데이트에 실패했습니다",
 				"createSuccess": "라벨이 생성되어 추가되었습니다",
-				"createError": "라벨 생성에 실패했습니다",
-				"colors": {
-					"stone": "스톤",
-					"slate": "슬레이트",
-					"lavender": "라벤더",
-					"sage": "세이지",
-					"forest": "포레스트",
-					"amber": "앰버",
-					"terracotta": "테라코타",
-					"rose": "로즈",
-					"crimson": "크림슨"
-				}
+				"createError": "라벨 생성에 실패했습니다"
 			}
 		},
 		"backlog": {
@@ -1959,7 +1966,7 @@
 			"resizeStart": "시작일 크기 조정",
 			"resizeDue": "마감일 크기 조정",
 			"taskAriaLabel": "{{title}}: 열거나 드래그하여 이동",
-			"jumpToToday": "Jump to today"
+			"jumpToToday": "오늘로 이동"
 		},
 		"delete": {
 			"title": "작업을 삭제하시겠습니까?",
@@ -2236,6 +2243,36 @@
 		},
 		"branding": {
 			"poweredBy": "제공"
+		}
+	},
+	"unified": {
+		"empty": {
+			"description": "프로젝트를 만들면 모든 워크스페이스의 프로젝트가 여기에 표시됩니다.",
+			"title": "아직 프로젝트가 없습니다"
+		},
+		"pageTitle": "모든 프로젝트",
+		"section": {
+			"projectCount_other": "프로젝트 {{count}}개"
+		},
+		"stats": {
+			"completion": "완료율",
+			"projects": "프로젝트",
+			"tasks": "작업"
+		},
+		"table": {
+			"progress": "진행률",
+			"project": "프로젝트",
+			"status": "상태",
+			"tasks": "작업"
+		},
+		"charts": {
+			"backlog": "백로그",
+			"empty": "최근 6개월간 작업 활동이 없습니다.",
+			"tasks": "작업"
+		},
+		"tabs": {
+			"charts": "차트",
+			"overview": "개요"
 		}
 	}
 }
