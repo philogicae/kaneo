@@ -28,6 +28,35 @@ const hexColorSchema = z
     "Expected a hex color like #FF6600",
   );
 
+// Label colors must match the web palette in apps/web/src/constants/label-colors.ts.
+export const LABEL_COLOR_SLUGS = [
+  "gray",
+  "dark-gray",
+  "purple",
+  "teal",
+  "green",
+  "yellow",
+  "orange",
+  "pink",
+  "red",
+  "sky",
+  "blue",
+  "cyan",
+  "indigo",
+  "fuchsia",
+  "lime",
+  "emerald",
+] as const;
+
+const labelColorSchema = z
+  .string()
+  .refine(
+    (value) =>
+      hexColorSchema.safeParse(value).success ||
+      (LABEL_COLOR_SLUGS as readonly string[]).includes(value),
+    `Expected a hex color like #FF6600 or a semantic name (${LABEL_COLOR_SLUGS.join(", ")})`,
+  );
+
 function run(fn: () => Promise<unknown>): Promise<CallToolResult> {
   return fn()
     .then((data) => textResult(data))
@@ -437,10 +466,10 @@ export function registerTools(
     "create_label",
     {
       description:
-        "Create a label in a workspace (optionally attach to a task).",
+        "Create a label in a workspace (optionally attach to a task). color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
       inputSchema: z.object({
         name: nonEmptyString,
-        color: hexColorSchema,
+        color: labelColorSchema,
         workspaceId: nonEmptyString,
         taskId: optionalNonEmptyString,
       }),
@@ -487,6 +516,44 @@ export function registerTools(
       run(() =>
         client.json(`/api/label/${encodeURIComponent(args.labelId)}/task`, {
           method: "DELETE",
+        }),
+      ),
+  );
+
+  server.registerTool(
+    "bulk_update_tasks",
+    {
+      description:
+        "Apply one operation to many tasks at once (backlog triage, bulk labeling, reassignment). All tasks must belong to the same workspace.",
+      inputSchema: z.object({
+        taskIds: z.array(nonEmptyString).min(1),
+        operation: z.enum([
+          "updateStatus",
+          "updatePriority",
+          "updateAssignee",
+          "delete",
+          "addLabel",
+          "removeLabel",
+          "updateDueDate",
+        ]),
+        value: z
+          .string()
+          .nullable()
+          .optional()
+          .describe(
+            "New value for the operation (status slug, priority, user id, label id, or ISO date). Unused by delete; null clears an assignee or due date.",
+          ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json("/api/task/bulk", {
+          method: "PATCH",
+          body: JSON.stringify({
+            taskIds: args.taskIds,
+            operation: args.operation,
+            ...(args.value !== undefined ? { value: args.value } : {}),
+          }),
         }),
       ),
   );

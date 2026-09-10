@@ -210,6 +210,35 @@ const hexColorSchema = z
     "Expected a hex color like #FF6600",
   );
 
+// Label colors must match the web palette in apps/web/src/constants/label-colors.ts.
+export const LABEL_COLOR_SLUGS = [
+  "gray",
+  "dark-gray",
+  "purple",
+  "teal",
+  "green",
+  "yellow",
+  "orange",
+  "pink",
+  "red",
+  "sky",
+  "blue",
+  "cyan",
+  "indigo",
+  "fuchsia",
+  "lime",
+  "emerald",
+] as const;
+
+const labelColorSchema = z
+  .string()
+  .refine(
+    (value) =>
+      hexColorSchema.safeParse(value).success ||
+      (LABEL_COLOR_SLUGS as readonly string[]).includes(value),
+    `Expected a hex color like #FF6600 or a semantic name (${LABEL_COLOR_SLUGS.join(", ")})`,
+  );
+
 /** Register Kaneo's authenticated tool catalog on an MCP server adapter. */
 export function registerMcpTools(
   server: McpToolRegistrar,
@@ -608,10 +637,10 @@ export function registerMcpTools(
     "create_label",
     {
       description:
-        "Create a label in a workspace (optionally attach to a task).",
+        "Create a label in a workspace (optionally attach to a task). color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
       inputSchema: z.object({
         name: nonEmptyString,
-        color: hexColorSchema,
+        color: labelColorSchema,
         workspaceId: nonEmptyString,
         taskId: optionalNonEmptyString,
       }),
@@ -660,6 +689,92 @@ export function registerMcpTools(
           method: "DELETE",
         }),
       ),
+  );
+
+  registerTool(
+    "configure_telegram_notifications",
+    {
+      description:
+        "Configure Telegram notifications: link a chat to a stored bot, then route a workspace (or one project) into that chat, optionally into a forum topic (topicId). Existing duplicates are skipped. Requires workspace:manage_settings on the target workspace.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot id (from the config listing)",
+        ),
+        chatId: nonEmptyString.describe(
+          "Target Telegram chat id (numeric @getidsbot style, or @username)",
+        ),
+        workspaceId: optionalNonEmptyString.describe(
+          "Route the whole workspace (or the single projectId) into the chat",
+        ),
+        projectId: optionalNonEmptyString.describe(
+          "Restrict routing to one project of workspaceId",
+        ),
+        topicId: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe("Forum topic/message_thread_id when the chat is a forum"),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const config = await client.json<{
+          bots: Array<{
+            id: string;
+            name: string | null;
+            chats: Array<{ id: string; chatId: string }>;
+          }>;
+        }>("/api/telegram-config", { method: "GET" });
+        const bot = config.bots?.find((b) => b.id === args.botId);
+        if (!bot) {
+          const known = (config.bots ?? [])
+            .map((b) => `${b.id}${b.name ? ` (${b.name})` : ""}`)
+            .join(", ");
+          throw new Error(
+            `Telegram bot ${args.botId} not found.${known ? ` Available bots: ${known}` : " No bots are configured yet."}`,
+          );
+        }
+
+        let chatRow = (bot.chats ?? []).find((c) => c.chatId === args.chatId);
+        if (!chatRow) {
+          chatRow = (await client.json(
+            `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
+            {
+              method: "POST",
+              body: JSON.stringify({ chatId: args.chatId }),
+            },
+          )) as { id: string; chatId: string };
+        }
+        if (!chatRow) {
+          throw new Error(`Failed to register chat ${args.chatId} on the bot`);
+        }
+
+        if (!args.workspaceId) {
+          return {
+            bot: { id: bot.id, name: bot.name },
+            chat: chatRow,
+            rules: [],
+            note: "Chat linked to the bot. Pass workspaceId to route notifications.",
+          };
+        }
+
+        return client.json(
+          `/api/telegram-config/telegram-chat/${encodeURIComponent(chatRow.id)}/rules`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              scopes: [
+                {
+                  workspaceId: args.workspaceId,
+                  projectIds: args.projectId ? [args.projectId] : null,
+                },
+              ],
+              ...(args.topicId !== undefined ? { threadId: args.topicId } : {}),
+            }),
+          },
+        );
+      }),
   );
 
   registerTool(

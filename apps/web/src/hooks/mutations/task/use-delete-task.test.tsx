@@ -93,7 +93,9 @@ describe("useDeleteTask", () => {
     queryClient.setQueryData(["tasks", project.id], project);
     queryClient.setQueryData(["task", deletedTask.id], deletedTask);
     useProjectStore.getState().setProject(project);
-    vi.mocked(deleteTask).mockResolvedValue(deletedTask);
+    vi.mocked(deleteTask).mockResolvedValue(
+      deletedTask as unknown as Awaited<ReturnType<typeof deleteTask>>,
+    );
 
     const { result } = renderHook(() => useDeleteTask(), { wrapper: Wrapper });
 
