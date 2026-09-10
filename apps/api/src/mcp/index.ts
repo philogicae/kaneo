@@ -323,7 +323,7 @@ mcp.all("/mcp", async (c) => {
 
 mcp.post("/mcp/token", async (c) => {
   const contentType = c.req.header("content-type") || "";
-  let params: Record<string, string>;
+  let params: Record<string, unknown>;
 
   // Treat a missing or incorrect media type as form data when the body is
   // form-shaped. Unreadable input is a protocol error, never a server error.
@@ -336,7 +336,7 @@ mcp.post("/mcp/token", async (c) => {
       if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
         return c.json({ error: "invalid_request" }, 400);
       }
-      params = parsed as Record<string, string>;
+      params = parsed as Record<string, unknown>;
     } else {
       params = Object.fromEntries(new URLSearchParams(body));
     }
@@ -349,7 +349,16 @@ mcp.post("/mcp/token", async (c) => {
   if (grant_type !== "authorization_code") {
     return c.json({ error: "unsupported_grant_type" }, 400);
   }
-  if (!code || !client_id || !code_verifier || !redirect_uri) {
+  if (
+    typeof code !== "string" ||
+    typeof client_id !== "string" ||
+    typeof code_verifier !== "string" ||
+    typeof redirect_uri !== "string" ||
+    !code ||
+    !client_id ||
+    !code_verifier ||
+    !redirect_uri
+  ) {
     return c.json({ error: "invalid_request" }, 400);
   }
 

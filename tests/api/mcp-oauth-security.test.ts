@@ -432,6 +432,22 @@ describe("MCP OAuth security", () => {
       error: "invalid_request",
     });
 
+    const invalidTypes = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        code: 123,
+        client_id: client.client_id,
+        redirect_uri: redirectUri,
+        code_verifier: { value: "verifier" },
+      }),
+    });
+    expect(invalidTypes.status).toBe(400);
+    await expect(invalidTypes.json()).resolves.toMatchObject({
+      error: "invalid_request",
+    });
+
     const emptyJson = await mcpRoutes.request("/mcp/token", {
       method: "POST",
       headers: { "content-type": "application/json" },
