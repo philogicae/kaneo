@@ -18,7 +18,8 @@ type WorkspaceIdSource =
         | "activity"
         | "comment"
         | "column"
-        | "workflowRule";
+        | "workflowRule"
+        | "telegramRule";
       idKey: string;
     }
   | {
@@ -144,7 +145,8 @@ async function lookupWorkspaceId(
     | "activity"
     | "comment"
     | "column"
-    | "workflowRule",
+    | "workflowRule"
+    | "telegramRule",
   id: string,
 ): Promise<string | null> {
   try {
@@ -274,6 +276,17 @@ async function lookupWorkspaceId(
         return workflowRule?.workspaceId || null;
       }
 
+      case "telegramRule": {
+        // A rule stores its own target workspace, which the bot owner must be
+        // allowed to manage.
+        const [telegramRule] = await db
+          .select({ workspaceId: schema.telegramRuleTable.workspaceId })
+          .from(schema.telegramRuleTable)
+          .where(eq(schema.telegramRuleTable.id, id))
+          .limit(1);
+        return telegramRule?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -366,6 +379,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "workflowRule", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromTelegramRule: (idKey = "telegramRuleId") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "telegramRule", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

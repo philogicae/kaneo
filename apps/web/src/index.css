@@ -106,6 +106,9 @@ input:-webkit-autofill:active {
 }
 
 :root {
+  /* Native widgets (time input clock, scrollbars, date pickers) must follow
+     the active palette or their icons render light-on-light / dark-on-dark. */
+  color-scheme: light;
   --font-sans:
     "Geist Variable",
     ui-sans-serif,
@@ -171,6 +174,7 @@ input:-webkit-autofill:active {
 }
 
 .dark {
+  color-scheme: dark;
   --accent: --alpha(var(--color-white) / 4%);
   --accent-foreground: var(--color-neutral-100);
   --background: color-mix(
@@ -229,6 +233,7 @@ input:-webkit-autofill:active {
 /* Volt: hardcore cyberpunk — near-pitch-black base, high-contrast neon
    accents (cyan/magenta/purple) straight out of a Tokyo night. */
 .volt {
+  color-scheme: dark;
   --accent: #151522;
   --accent-foreground: #eef0ff;
   --background: #030307;

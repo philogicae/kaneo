@@ -27,6 +27,7 @@ import { generateLink } from "@/lib/generate-link";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
+import { applyDatePreservingTime } from "@/lib/task-datetime";
 import { toast } from "@/lib/toast";
 import useProjectStore from "@/store/project";
 import type Task from "@/types/task";
@@ -209,7 +210,12 @@ export default function TaskCardContextMenuContent({
                   try {
                     await updateTaskDueDate({
                       ...task,
-                      dueDate: date?.toISOString() || null,
+                      dueDate: date
+                        ? applyDatePreservingTime(
+                            task.dueDate ? new Date(task.dueDate) : undefined,
+                            date,
+                          ).toISOString()
+                        : null,
                     });
                     toast.success(t("tasks:dueDate.updateSuccess"));
                   } catch (error) {

@@ -47,6 +47,36 @@ export const bulkUpdateBody = z.object({
   }),
 });
 
+// Calendar-like recurrence; the next occurrence is spawned when the task is
+// completed (moved to a final column).
+export const recurrenceRule = z
+  .object({
+    frequency: z.enum(["daily", "weekly", "monthly"]),
+    interval: z.number().int().min(1).max(365),
+  })
+  .nullable()
+  .optional()
+  .openapi({
+    description:
+      "Recurrence of the task. The next occurrence is created automatically when the task completes.",
+  });
+
+export const reminderOffsets = z
+  .array(
+    z
+      .number()
+      .int()
+      .min(1)
+      .max(60 * 24 * 30),
+  )
+  .max(10)
+  .nullable()
+  .optional()
+  .openapi({
+    description:
+      "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders.",
+  });
+
 export const createTaskBody = z.object({
   title: z.string(),
   description: z.string(),
@@ -55,6 +85,8 @@ export const createTaskBody = z.object({
   priority,
   status: z.string().openapi({ description: "The target column's slug." }),
   userId: z.string().optional().openapi({ description: "Assignee, if any." }),
+  reminderOffsets,
+  recurrence: recurrenceRule,
 });
 
 export const updateTaskBody = z.object({
@@ -67,6 +99,8 @@ export const updateTaskBody = z.object({
   projectId: z.string(),
   position: z.number(),
   userId: z.string().optional(),
+  reminderOffsets,
+  recurrence: recurrenceRule,
 });
 
 export const moveTaskBody = z.object({
@@ -95,7 +129,10 @@ export const updatePriorityBody = z.object({ priority });
 export const updateAssigneeBody = z.object({
   userId: z.string().nullable().openapi({ description: "Null unassigns." }),
 });
-export const updateDueDateBody = z.object({ dueDate: z.string().optional() });
+export const updateDueDateBody = z.object({
+  dueDate: z.string().optional(),
+  reminderOffsets,
+});
 export const updateTitleBody = z.object({ title: z.string() });
 export const updateDescriptionBody = z.object({ description: z.string() });
 

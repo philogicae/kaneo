@@ -4,7 +4,7 @@ import {
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
-import { Bell, Code, Settings, User } from "lucide-react";
+import { Bell, Blocks, Code, Send, Settings, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
 import SettingsSidebar from "@/components/SettingsSidebar";
@@ -46,6 +46,11 @@ function RouteComponent() {
       title: t("settings:preferences"),
       url: "/dashboard/settings/account/preferences",
       icon: Settings,
+    },
+    {
+      title: t("settings:telegramUnified.sidebarLabel"),
+      url: "/dashboard/settings/account/telegram",
+      icon: Send,
     },
   ];
 
@@ -116,6 +121,21 @@ function RouteComponent() {
                   >
                     <Code className="h-4 w-4" />
                     <span>{t("settings:apiKeys")}</span>
+                  </Button>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <Button
+                    render={<Link to="/dashboard/settings/account/mcp" />}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-8 w-full justify-start gap-2 rounded-lg px-2 text-sm font-normal text-sidebar-foreground/80",
+                      isActivePath("/dashboard/settings/account/mcp") &&
+                        "bg-sidebar-accent text-sidebar-accent-foreground",
+                    )}
+                  >
+                    <Blocks className="h-4 w-4" />
+                    <span>{t("settings:mcp")}</span>
                   </Button>
                 </SidebarMenuItem>
               </SidebarMenu>

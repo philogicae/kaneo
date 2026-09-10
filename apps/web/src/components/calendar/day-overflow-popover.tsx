@@ -56,7 +56,7 @@ export default function DayOverflowPopover({
               <button
                 key={task.id}
                 type="button"
-                onClick={() => handleSelectTask(task.id)}
+                onClick={() => handleSelectTask(task.sourceTaskId ?? task.id)}
                 className="flex w-full min-w-0 flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {projectSlug && task.number != null ? (

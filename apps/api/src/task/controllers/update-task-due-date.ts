@@ -7,10 +7,12 @@ import { publishEvent } from "../../events";
 async function updateTaskDueDate({
   id,
   dueDate,
+  reminderOffsets,
   currentUserId,
 }: {
   id: string;
   dueDate: Date | null;
+  reminderOffsets?: number[] | null;
   currentUserId: string;
 }) {
   const existingTask = await db.query.taskTable.findFirst({
@@ -30,7 +32,12 @@ async function updateTaskDueDate({
 
   const [updatedTask] = await db
     .update(taskTable)
-    .set({ dueDate: dueDate || null })
+    .set({
+      dueDate: dueDate || null,
+      ...(reminderOffsets !== undefined
+        ? { reminderOffsets: reminderOffsets ?? null }
+        : {}),
+    })
     .where(eq(taskTable.id, id))
     .returning();
 

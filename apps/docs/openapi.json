@@ -331,6 +331,40 @@
             ],
             "format": "date-time"
           },
+          "reminderOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "number"
+            },
+            "description": "Reminder offsets in minutes before the due date (Telegram reminders)."
+          },
+          "recurrence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly"
+                ]
+              },
+              "interval": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "frequency",
+              "interval"
+            ],
+            "description": "Recurrence of the task; the next occurrence is spawned on completion."
+          },
           "position": {
             "type": [
               "number",
@@ -390,6 +424,8 @@
           "priority",
           "startDate",
           "dueDate",
+          "reminderOffsets",
+          "recurrence",
           "position",
           "createdAt",
           "userId",
@@ -787,6 +823,40 @@
             ],
             "format": "date-time"
           },
+          "reminderOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "number"
+            },
+            "description": "Reminder offsets in minutes before the due date (Telegram reminders)."
+          },
+          "recurrence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly"
+                ]
+              },
+              "interval": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "frequency",
+              "interval"
+            ],
+            "description": "Recurrence of the task; the next occurrence is spawned on completion."
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -804,6 +874,8 @@
           "priority",
           "startDate",
           "dueDate",
+          "reminderOffsets",
+          "recurrence",
           "createdAt"
         ]
       },
@@ -2745,6 +2817,333 @@
           "isActive",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "TelegramConfig": {
+        "type": "object",
+        "properties": {
+          "bots": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/TelegramBot"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "chats": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/TelegramChat"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "rules": {
+                                "type": "array",
+                                "items": {
+                                  "$ref": "#/components/schemas/TelegramRule"
+                                }
+                              }
+                            },
+                            "required": [
+                              "rules"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "chats"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "bots"
+        ]
+      },
+      "TelegramBotEvents": {
+        "type": "object",
+        "properties": {
+          "taskCreated": {
+            "type": "boolean"
+          },
+          "taskStatusChanged": {
+            "type": "boolean"
+          },
+          "taskPriorityChanged": {
+            "type": "boolean"
+          },
+          "taskTitleChanged": {
+            "type": "boolean"
+          },
+          "taskDescriptionChanged": {
+            "type": "boolean"
+          },
+          "taskCommentCreated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "taskCreated",
+          "taskStatusChanged",
+          "taskPriorityChanged",
+          "taskTitleChanged",
+          "taskDescriptionChanged",
+          "taskCommentCreated"
+        ],
+        "description": "Effective per-bot event filter (defaults merged in when the stored filter omits a key)."
+      },
+      "TelegramRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chatId": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "workspaceName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "projectId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Null routes the whole workspace instead of one project."
+          },
+          "projectName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "threadId": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Forum topic id, when the target group uses topics."
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "chatId",
+          "workspaceId",
+          "workspaceName",
+          "projectId",
+          "projectName",
+          "threadId",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "TelegramChat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "botId": {
+            "type": "string"
+          },
+          "chatId": {
+            "type": "string"
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "botId",
+          "chatId",
+          "label",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "TelegramBot": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "botTokenConfigured": {
+            "type": "boolean"
+          },
+          "maskedBotToken": {
+            "type": "string"
+          },
+          "events": {
+            "$ref": "#/components/schemas/TelegramBotEvents"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "botTokenConfigured",
+          "maskedBotToken",
+          "events",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "TelegramTopics": {
+        "type": "object",
+        "properties": {
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "Forum topic (thread) id."
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Topic title when it was announced in the chat, otherwise a placeholder."
+                }
+              },
+              "required": [
+                "id",
+                "title"
+              ]
+            }
+          }
+        },
+        "required": [
+          "topics"
+        ],
+        "description": "Forum topics detected through the bot's recent updates. The Bot API cannot list topics: send a message inside a topic while polling to detect it."
+      },
+      "TelegramVerifyResult": {
+        "type": "object",
+        "properties": {
+          "bot": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "username": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "username",
+              "name"
+            ]
+          },
+          "chat": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "username": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "isForum": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "True when the chat is a forum group; a topic id is then required to route into a topic."
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "username",
+              "isForum"
+            ]
+          }
+        },
+        "required": [
+          "bot",
+          "chat"
         ]
       },
       "TaskRelationWithTasks": {
@@ -6490,6 +6889,45 @@
                   "userId": {
                     "type": "string",
                     "description": "Assignee, if any."
+                  },
+                  "reminderOffsets": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 43200
+                    },
+                    "maxItems": 10,
+                    "description": "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders."
+                  },
+                  "recurrence": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "frequency": {
+                        "type": "string",
+                        "enum": [
+                          "daily",
+                          "weekly",
+                          "monthly"
+                        ]
+                      },
+                      "interval": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 365
+                      }
+                    },
+                    "required": [
+                      "frequency",
+                      "interval"
+                    ],
+                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
                   }
                 },
                 "required": [
@@ -6650,6 +7088,45 @@
                   },
                   "userId": {
                     "type": "string"
+                  },
+                  "reminderOffsets": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 43200
+                    },
+                    "maxItems": 10,
+                    "description": "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders."
+                  },
+                  "recurrence": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "frequency": {
+                        "type": "string",
+                        "enum": [
+                          "daily",
+                          "weekly",
+                          "monthly"
+                        ]
+                      },
+                      "interval": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 365
+                      }
+                    },
+                    "required": [
+                      "frequency",
+                      "interval"
+                    ],
+                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
                   }
                 },
                 "required": [
@@ -7275,6 +7752,19 @@
                 "properties": {
                   "dueDate": {
                     "type": "string"
+                  },
+                  "reminderOffsets": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 43200
+                    },
+                    "maxItems": 10,
+                    "description": "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders."
                   }
                 }
               }
@@ -12889,6 +13379,859 @@
           },
           "404": {
             "description": "Telegram integration not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config": {
+      "get": {
+        "operationId": "getTelegramConfig",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Get the unified Telegram notification config",
+        "description": "The account's bots, their chats, and per-chat routing rules. Unified rules supersede the per-project Telegram integration for matching projects.",
+        "responses": {
+          "200": {
+            "description": "The account's Telegram config tree",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          }
+        }
+      }
+    },
+    "/telegram-config/bot": {
+      "post": {
+        "operationId": "createTelegramConfigBot",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Add a Telegram bot",
+        "description": "Register a bot token in the account. The token is checked for shape only, not against Telegram; use the verify endpoint for a live check.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "botToken": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "A Telegram bot token, in the form 123456789:AA..."
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "botToken"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The stored bot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramBot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid bot token, or the token is already configured in the account",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          }
+        }
+      }
+    },
+    "/telegram-config/bot/{botId}": {
+      "patch": {
+        "operationId": "updateTelegramConfigBot",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Update a Telegram bot",
+        "description": "Rename the bot or rotate its token. Omitted fields keep their current value.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "botId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "botToken": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "events": {
+                    "type": "object",
+                    "properties": {
+                      "taskCreated": {
+                        "type": "boolean"
+                      },
+                      "taskStatusChanged": {
+                        "type": "boolean"
+                      },
+                      "taskPriorityChanged": {
+                        "type": "boolean"
+                      },
+                      "taskTitleChanged": {
+                        "type": "boolean"
+                      },
+                      "taskDescriptionChanged": {
+                        "type": "boolean"
+                      },
+                      "taskCommentCreated": {
+                        "type": "boolean"
+                      }
+                    },
+                    "description": "Per-bot event filter; omitted keys keep the plugin default (created and comments on)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated bot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramBot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid bot token",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Telegram bot not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTelegramConfigBot",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Remove a Telegram bot",
+        "description": "Removes the bot, its chats, and all their rules.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "botId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The bot was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Telegram bot not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config/bot/{botId}/chat": {
+      "post": {
+        "operationId": "createTelegramConfigChat",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Add a chat to a bot",
+        "description": "Register a chat, group, or channel the bot can post to. Several chats can be attached to one bot.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "botId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The Telegram chat, group, or channel id (e.g. -1001234567890)."
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "chatId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The stored chat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramChat"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chat id, or the chat already exists",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Telegram bot not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config/telegram-chat/{telegramChatId}": {
+      "patch": {
+        "operationId": "updateTelegramConfigChat",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Update a chat",
+        "description": "Change the chat id or its label. Omitted fields keep their current value.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "telegramChatId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chatId": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The chat was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chat id",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Telegram chat not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTelegramConfigChat",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Remove a chat",
+        "description": "Removes the chat and all its rules.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "telegramChatId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The chat was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Telegram chat not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config/telegram-chat/{telegramChatId}/topics": {
+      "post": {
+        "operationId": "listTelegramConfigTopics",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "List forum topics detected through the bot's recent updates",
+        "description": "The Bot API cannot list topics directly; this reads getUpdates and returns the topics seen in recent messages for this chat. Poll it while the rule dialog is open and send a message inside a topic to make it appear.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "telegramChatId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detected topics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramTopics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Telegram rejected the request (e.g. a webhook is set on the bot, which forbids getUpdates)",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Telegram chat not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config/telegram-chat/{telegramChatId}/rules": {
+      "post": {
+        "operationId": "createTelegramConfigRules",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Add routing rules to a chat",
+        "description": "One scope per selected workspace; each scope covers the whole workspace (null projectIds) or the listed projects. Requires workspace:manage_settings on every target workspace. The Bot API cannot list forum topics, so the topic id is entered manually.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "telegramChatId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "workspaceId": {
+                          "type": "string"
+                        },
+                        "projectIds": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Restrict the rule to these projects of the workspace; null routes every project."
+                        }
+                      },
+                      "required": [
+                        "workspaceId",
+                        "projectIds"
+                      ]
+                    },
+                    "minItems": 1,
+                    "description": "One entry per selected workspace; several workspaces create several rules."
+                  },
+                  "threadId": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 1,
+                    "description": "Forum topic id. The Bot API cannot list topics, so this is entered manually."
+                  }
+                },
+                "required": [
+                  "scopes",
+                  "threadId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created rules (existing duplicates are skipped)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TelegramRule"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, project outside a target workspace, or missing scopes",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:manage_settings on a target workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Telegram chat not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config/telegram-rule/{telegramRuleId}": {
+      "patch": {
+        "operationId": "updateTelegramConfigRule",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Update a routing rule",
+        "description": "Change the rule's project scope (rewrites the workspace's rules on this chat), topic, or active state. Requires workspace:manage_settings on the target workspace.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "telegramRuleId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectIds": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "threadId": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 1
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated rules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TelegramRule"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, project outside the target workspace, or invalid thread id",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:manage_settings on the target workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Telegram rule not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTelegramConfigRule",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Remove a routing rule",
+        "description": "Requires workspace:manage_settings on the target workspace.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "telegramRuleId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The rule was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:manage_settings on the target workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Telegram rule not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telegram-config/verify": {
+      "post": {
+        "operationId": "verifyTelegramConfig",
+        "tags": [
+          "Telegram"
+        ],
+        "summary": "Verify a bot token or chat against Telegram",
+        "description": "Calls the Telegram Bot API (getMe / getChat) with the given or stored token. getChat also reports isForum, which tells whether a topic id is needed. Note the Bot API cannot list forum topics.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "botToken": {
+                    "type": "string",
+                    "description": "Raw token to verify before saving."
+                  },
+                  "botId": {
+                    "type": "string",
+                    "description": "Stored bot to verify (token resolved server-side)."
+                  },
+                  "chatId": {
+                    "type": "string"
+                  },
+                  "telegramChatId": {
+                    "type": "string",
+                    "description": "Stored chat row to verify (chat id + token resolved server-side)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result; bot and chat are null when not requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramVerifyResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nothing to verify, or Telegram rejected the token/chat",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Stored bot or chat not found",
             "content": {
               "text/plain": {
                 "schema": {

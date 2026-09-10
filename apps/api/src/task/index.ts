@@ -581,8 +581,17 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(createTaskRoute, async (c) => {
     const { projectId } = c.req.param();
-    const { title, description, startDate, dueDate, priority, status, userId } =
-      c.req.valid("json");
+    const {
+      title,
+      description,
+      startDate,
+      dueDate,
+      priority,
+      status,
+      userId,
+      reminderOffsets,
+      recurrence,
+    } = c.req.valid("json");
 
     const parsedStartDate =
       startDate !== undefined
@@ -605,6 +614,8 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       dueDate: parsedDueDate,
       priority,
       status,
+      reminderOffsets: reminderOffsets ?? undefined,
+      recurrence: recurrence ?? undefined,
     });
 
     return c.json(task, 200);
@@ -642,6 +653,8 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       projectId,
       position,
       userId,
+      reminderOffsets,
+      recurrence,
     } = c.req.valid("json");
 
     const currentUserId = c.get("userId");
@@ -669,6 +682,8 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       position,
       userId,
       currentUserId,
+      reminderOffsets ?? undefined,
+      recurrence ?? undefined,
     );
 
     return c.json(task, 200);
@@ -726,12 +741,13 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(updateTaskDueDateRoute, async (c) => {
     const { id } = c.req.valid("param");
-    const { dueDate = null } = c.req.valid("json");
+    const { dueDate = null, reminderOffsets } = c.req.valid("json");
     const currentUserId = c.get("userId");
 
     const task = await updateTaskDueDate({
       id,
       dueDate: dueDate ? validateAndParseDate(dueDate, "dueDate") : null,
+      reminderOffsets,
       currentUserId,
     });
 
