@@ -3,6 +3,7 @@ import { Cron } from "croner";
 import { checkDueDateReminders } from "./due-date-reminders";
 import { checkProjectWebhookReminders } from "./project-webhook-reminders";
 import { reconcileWorkspaceSeats } from "./seat-reconciliation";
+import { checkTelegramTaskReminders } from "./telegram-task-reminders";
 import { checkTrialReminders } from "./trial-reminders";
 
 const jobs: Cron[] = [];
@@ -55,6 +56,12 @@ export function initializeScheduler(): void {
     new Cron(
       "*/5 * * * *",
       withCheckIn("project-webhook-reminders", checkProjectWebhookReminders),
+    ),
+  );
+  jobs.push(
+    new Cron(
+      "*/5 * * * *",
+      withCheckIn("telegram-task-reminders", checkTelegramTaskReminders),
     ),
   );
   jobs.push(

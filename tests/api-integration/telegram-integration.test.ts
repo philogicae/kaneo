@@ -94,6 +94,9 @@ describe("API integration: Telegram notifications", () => {
     };
     expect(body.chat_id).toBe(chatId);
     expect(body.text).toContain("Telegram probe");
+    expect(body.text).toContain("Aurora");
+    // Compact format: the action is the last line.
+    expect(body.text).toContain("⚡ Task created");
     expect(body.parse_mode).toBe("HTML");
     // Notifications stay compact: no link preview (recent fix, must hold).
     expect(body.link_preview_options?.is_disabled).toBe(true);
@@ -143,7 +146,10 @@ describe("API integration: Telegram notifications", () => {
 
     const body = telegramFetchCalls[0]?.body as { text: string };
     expect(body.text).toContain("Status probe");
-    expect(body.text).toContain("Done");
+    // Status renders as an icon next to the task; the action line spells the
+    // transition out.
+    expect(body.text).toContain("✅");
+    expect(body.text).toContain("To Do → Done");
   });
 
   it("stays silent when the integration is disabled", async () => {

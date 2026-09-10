@@ -1,4 +1,5 @@
 import { i18n } from "./i18n";
+import { hasTimeComponent } from "./task-datetime";
 
 type DateInput = Date | string | number;
 
@@ -39,6 +40,17 @@ export function formatDateMedium(value: DateInput, locale?: string) {
       day: "numeric",
       year: "numeric",
     },
+    locale,
+  );
+}
+
+/** Task-chip date: shows the time of day only when one was set. */
+export function formatDateWithTime(value: DateInput, locale?: string) {
+  return formatDate(
+    value,
+    hasTimeComponent(value)
+      ? { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }
+      : { month: "short", day: "numeric" },
     locale,
   );
 }

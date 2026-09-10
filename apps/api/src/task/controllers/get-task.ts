@@ -14,6 +14,8 @@ async function getTask(taskId: string) {
       priority: taskTable.priority,
       startDate: taskTable.startDate,
       dueDate: taskTable.dueDate,
+      reminderOffsets: taskTable.reminderOffsets,
+      recurrence: taskTable.recurrence,
       position: taskTable.position,
       createdAt: taskTable.createdAt,
       userId: taskTable.userId,
