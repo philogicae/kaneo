@@ -113,10 +113,7 @@ export async function exchangeCode(
   redirectUri: string,
 ): Promise<{ accessToken: string; expiresIn: number } | null> {
   const stored = await consumeState<AuthCode>("code", code);
-  if (!stored) {
-    console.warn("[mcp] token exchange rejected: unknown or expired code");
-    return null;
-  }
+  if (!stored) return null;
 
   if (stored.clientId !== clientId) {
     console.warn("[mcp] token exchange rejected: client_id mismatch");
