@@ -391,6 +391,79 @@ describe("MCP OAuth security", () => {
     expect((await redeem(verifier)).status).toBe(400);
   });
 
+  it("accepts form token requests without a content-type header", async () => {
+    const redirectUri = "https://client.example/token-shapes";
+    const client = await registerClient(redirectUri);
+    const verifier = "missing-content-type-verifier";
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier,
+      approved: true,
+    });
+
+    const token = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code: callback.searchParams.get("code") ?? "",
+        client_id: client.client_id,
+        redirect_uri: redirectUri,
+        code_verifier: verifier,
+      }).toString(),
+    });
+    expect(token.status).toBe(200);
+    await expect(token.json()).resolves.toMatchObject({
+      token_type: "Bearer",
+    });
+  });
+
+  it("rejects unreadable bodies and mismatched redirect URIs with 400", async () => {
+    const redirectUri = "https://client.example/token-rejections";
+    const client = await registerClient(redirectUri);
+
+    const unreadable = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{not json",
+    });
+    expect(unreadable.status).toBe(400);
+    await expect(unreadable.json()).resolves.toMatchObject({
+      error: "invalid_request",
+    });
+
+    const emptyJson = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+    });
+    expect(emptyJson.status).toBe(400);
+    await expect(emptyJson.json()).resolves.toMatchObject({
+      error: "unsupported_grant_type",
+    });
+
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier: "mismatch-verifier",
+      approved: true,
+    });
+    const mismatched = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code: callback.searchParams.get("code") ?? "",
+        client_id: client.client_id,
+        redirect_uri: "https://client.example/other",
+        code_verifier: "mismatch-verifier",
+      }),
+    });
+    expect(mismatched.status).toBe(400);
+    await expect(mismatched.json()).resolves.toMatchObject({
+      error: "invalid_grant",
+    });
+  });
+
   it("sweeps expired authorization requests when creating a new one", async () => {
     const now = Date.now();
     vi.useFakeTimers();

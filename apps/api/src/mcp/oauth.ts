@@ -113,11 +113,23 @@ export async function exchangeCode(
   redirectUri: string,
 ): Promise<{ accessToken: string; expiresIn: number } | null> {
   const stored = await consumeState<AuthCode>("code", code);
-  if (!stored) return null;
+  if (!stored) {
+    console.warn("[mcp] token exchange rejected: unknown or expired code");
+    return null;
+  }
 
-  if (stored.clientId !== clientId) return null;
-  if (stored.redirectUri !== redirectUri) return null;
-  if (!verifyPkce(codeVerifier, stored.codeChallenge)) return null;
+  if (stored.clientId !== clientId) {
+    console.warn("[mcp] token exchange rejected: client_id mismatch");
+    return null;
+  }
+  if (stored.redirectUri !== redirectUri) {
+    console.warn("[mcp] token exchange rejected: redirect_uri mismatch");
+    return null;
+  }
+  if (!verifyPkce(codeVerifier, stored.codeChallenge)) {
+    console.warn("[mcp] token exchange rejected: PKCE verification failed");
+    return null;
+  }
 
   const sessionToken = randomUUID();
   const expiresIn = 30 * 24 * 60 * 60;
