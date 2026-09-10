@@ -52,6 +52,7 @@ import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
 import taskRelation from "./task-relation";
+import telegramConfig from "./telegram-config";
 import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
 import user from "./user";
@@ -609,6 +610,7 @@ export function createApp() {
     "/telegram-integration",
     telegramIntegration,
   );
+  const telegramConfigApi = api.route("/telegram-config", telegramConfig);
   const taskRelationApi = api.route("/task-relation", taskRelation);
   const externalLinkApi = api.route("/external-link", externalLink);
   const workflowRuleApi = api.route("/workflow-rule", workflowRule);
@@ -777,6 +779,7 @@ export function createApp() {
     slackIntegrationApi,
     taskApi,
     taskRelationApi,
+    telegramConfigApi,
     telegramIntegrationApi,
     timeEntryApi,
     userApi,
@@ -897,6 +900,7 @@ const {
   slackIntegrationApi,
   taskApi,
   taskRelationApi,
+  telegramConfigApi,
   telegramIntegrationApi,
   timeEntryApi,
   userApi,
@@ -935,6 +939,7 @@ export type AppType =
   | typeof discordIntegrationApi
   | typeof mattermostIntegrationApi
   | typeof slackIntegrationApi
+  | typeof telegramConfigApi
   | typeof telegramIntegrationApi
   | typeof taskRelationApi
   | typeof externalLinkApi

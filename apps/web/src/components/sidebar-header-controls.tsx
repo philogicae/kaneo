@@ -11,7 +11,7 @@ import { UserAvatar } from "@/components/user-avatar";
 function AppWordmark() {
   return (
     <Link
-      className="font-heading bg-linear-to-r from-foreground/85 to-foreground/40 bg-clip-text text-base font-bold tracking-[0.2em] text-transparent uppercase hover:from-chart-2 hover:to-primary group-data-[collapsible=icon]:hidden"
+      className="font-heading bg-linear-to-r from-foreground/85 to-foreground/40 bg-clip-text text-base font-bold tracking-[0.2em] text-transparent uppercase hover:from-foreground hover:to-foreground/60 group-data-[collapsible=icon]:hidden"
       to="/"
     >
       Kaneo

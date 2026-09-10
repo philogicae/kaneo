@@ -12,6 +12,7 @@ import { shortcuts } from "@/constants/shortcuts";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { expandRecurringTasks } from "@/lib/recurrence";
 import { toScheduledTasks } from "@/lib/task-schedule";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
@@ -46,12 +47,31 @@ function RouteComponent() {
     startOfMonth(new Date()),
   );
 
-  const scheduledTasks = useMemo(() => toScheduledTasks(project), [project]);
-
   const weeks = useMemo(
     () => buildMonthWeeks(visibleMonth, weekStartsOn),
     [visibleMonth, weekStartsOn],
   );
+
+  const scheduledTasks = useMemo(() => {
+    const base = toScheduledTasks(project);
+    const rangeStart = weeks[0]?.[0];
+    const rangeEnd = weeks.at(-1)?.at(-1);
+    if (!rangeStart || !rangeEnd) return base;
+
+    // Completed recurring tasks do not project: completing one spawns its
+    // next occurrence as a real task, which projects on its own.
+    const completedIds = new Set(
+      (project?.columns ?? [])
+        .filter((column) => column.isFinal)
+        .flatMap((column) => column.tasks.map((task) => task.id)),
+    );
+    return expandRecurringTasks(
+      base,
+      rangeStart,
+      rangeEnd,
+      (task) => !completedIds.has(task.id),
+    );
+  }, [project, weeks]);
 
   const handlePreviousMonth = useCallback(() => {
     setVisibleMonth((current) => subMonths(current, 1));

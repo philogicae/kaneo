@@ -1,3 +1,4 @@
+import { Repeat } from "lucide-react";
 import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
@@ -8,6 +9,9 @@ export type CalendarTask = PackableTask & {
   title: string;
   number: number | null;
   status: string;
+  // Set on client-projected occurrences of a recurring task; the bar opens
+  // the real task behind the projection.
+  sourceTaskId?: string;
 };
 
 const STATUS_CLASSES: Record<string, string> = {
@@ -75,7 +79,7 @@ export default function CalendarTaskBar({
         range,
       })}
       data-task-status={task.status}
-      onClick={() => onOpenTask(task.id)}
+      onClick={() => onOpenTask(task.sourceTaskId ?? task.id)}
       className={cn(
         "z-10 mb-0.5 flex h-6 min-w-0 items-center overflow-hidden border px-1.5 text-left text-[11px] font-medium leading-none text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-5",
         getCalendarTaskStatusClass(task.status),
@@ -85,6 +89,9 @@ export default function CalendarTaskBar({
         continuesAfter ? "rounded-r-none border-r-0" : "mr-1 rounded-r-md",
       )}
     >
+      {task.sourceTaskId && (
+        <Repeat className="mr-1 size-3 shrink-0 opacity-70" aria-hidden />
+      )}
       <span className="truncate">{task.title}</span>
     </button>
   );

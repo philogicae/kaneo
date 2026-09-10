@@ -13,6 +13,7 @@ import {
   assertAssignableUser,
   getProjectWorkspaceId,
 } from "../../utils/assert-assignable-user";
+import type { RecurrenceRule } from "../recurrence";
 import {
   assertRequiredCustomFields,
   assertValidTaskStatus,
@@ -51,6 +52,8 @@ async function createTask({
   description,
   priority,
   customFields,
+  reminderOffsets,
+  recurrence,
 }: {
   projectId: string;
   currentUserId: string;
@@ -62,6 +65,8 @@ async function createTask({
   description?: string;
   priority?: string;
   customFields?: CustomFieldInput[];
+  reminderOffsets?: number[] | null;
+  recurrence?: RecurrenceRule | null;
 }) {
   const resolvedStatus = status || "to-do";
   const resolvedPriority = priority || "no-priority";
@@ -143,6 +148,8 @@ async function createTask({
         columnId: column?.id ?? null,
         startDate: startDate || null,
         dueDate: dueDate || null,
+        reminderOffsets: reminderOffsets ?? null,
+        recurrence: recurrence ?? null,
         description: description || "",
         priority: resolvedPriority,
         number: taskNumber,

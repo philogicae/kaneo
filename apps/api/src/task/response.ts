@@ -24,6 +24,20 @@ export const taskSchema = z
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
+    reminderOffsets: z.array(z.number()).nullable().openapi({
+      description:
+        "Reminder offsets in minutes before the due date (Telegram reminders).",
+    }),
+    recurrence: z
+      .object({
+        frequency: z.enum(["daily", "weekly", "monthly"]),
+        interval: z.number(),
+      })
+      .nullable()
+      .openapi({
+        description:
+          "Recurrence of the task; the next occurrence is spawned on completion.",
+      }),
     createdAt: responseTimestamp,
     customFields: z
       .array(z.object({ fieldId: z.string(), value: z.string() }))
@@ -70,6 +84,20 @@ export const boardTaskSchema = z
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
+    reminderOffsets: z.array(z.number()).nullable().openapi({
+      description:
+        "Reminder offsets in minutes before the due date (Telegram reminders).",
+    }),
+    recurrence: z
+      .object({
+        frequency: z.enum(["daily", "weekly", "monthly"]),
+        interval: z.number(),
+      })
+      .nullable()
+      .openapi({
+        description:
+          "Recurrence of the task; the next occurrence is spawned on completion.",
+      }),
     position: z.number().nullable(),
     createdAt: responseTimestamp,
     userId: z.string().nullable(),

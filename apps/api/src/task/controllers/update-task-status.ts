@@ -3,7 +3,9 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { columnTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
+import { shiftRecurrenceDate } from "../recurrence";
 import { assertValidTaskStatus } from "../validate-task-fields";
+import createTask from "./create-task";
 
 async function updateTaskStatus({
   id,
@@ -60,6 +62,35 @@ async function updateTaskStatus({
     projectId: updatedTask.projectId,
     userId: currentUserId,
   });
+
+  // A recurring task completed for the first time spawns its next occurrence
+  // in the column it came from, with dates and reminder offsets shifted by
+  // one period.
+  const recurrence = existingTask.recurrence;
+  const statusChanged = existingTask.status !== status;
+  if (recurrence && column?.isFinal && statusChanged) {
+    await createTask({
+      projectId: existingTask.projectId,
+      currentUserId,
+      userId: existingTask.userId ?? undefined,
+      title: existingTask.title,
+      description: existingTask.description ?? undefined,
+      startDate:
+        shiftRecurrenceDate(
+          existingTask.startDate ? new Date(existingTask.startDate) : null,
+          recurrence,
+        ) ?? undefined,
+      dueDate:
+        shiftRecurrenceDate(
+          existingTask.dueDate ? new Date(existingTask.dueDate) : null,
+          recurrence,
+        ) ?? undefined,
+      priority: existingTask.priority,
+      status: existingTask.status,
+      reminderOffsets: existingTask.reminderOffsets ?? null,
+      recurrence,
+    });
+  }
 
   return updatedTask;
 }

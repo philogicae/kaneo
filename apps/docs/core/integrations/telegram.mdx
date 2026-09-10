@@ -88,16 +88,37 @@ Once connected you can enable or disable the integration with the toggle, update
 
 You can change these toggles at any time in the integration settings.
 
+## Unified notification config
+
+Beyond the per-project integration below, Settings → Account → Telegram offers a
+unified configuration: bots connected to your account, their chats, and per-chat
+routing rules (one or more workspaces, optionally narrowed to projects,
+optionally into a forum topic). When a rule matches a project, it supersedes
+this per-project integration; projects no rule covers keep using the per-project
+integration, and the per-bot **Event notifications** panel filters which events
+unified rules send (same event list as the per-project integration).
+
+Tasks can also carry per-task reminder offsets (minutes before the start date,
+edited from the task's Reminders menu); a scheduler tick delivers them through
+the same unified Telegram rules.
+
+The Bot API has no way to list a forum group's topics. The rule dialog polls the
+bot's recent updates (`getUpdates`) while it is open: send any message inside a
+topic and it appears in the dropdown. The topic id can also be entered
+manually. A webhook set on the bot blocks `getUpdates`, so topic detection
+needs a bot without one. The verify action calls `getMe` / `getChat` and
+reports whether the chat is a forum.
+
 ## Message format
 
-Kaneo sends formatted Telegram messages with:
+Kaneo sends compact HTML notifications with:
 
-- The event title
-- A direct link to the task in Kaneo
-- Project, status, and priority details
+- The project name, linked to the project
+- The task code and title, linked to the task, followed by status and priority icons
 - The name of the user who triggered the event when available
+- The action that happened, as the last line (for example `To Do → Done`)
 
-Make sure [`KANEO_CLIENT_URL`](/core/installation/environment-variables) is set to your public Kaneo URL so task links work correctly.
+Make sure [`KANEO_CLIENT_URL`](/core/installation/environment-variables) is set to your public Kaneo URL so task and project links work correctly.
 
 ## Updating credentials
 

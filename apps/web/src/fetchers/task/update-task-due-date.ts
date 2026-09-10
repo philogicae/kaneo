@@ -6,6 +6,9 @@ async function updateTaskDueDate(taskId: string, task: Task) {
     param: { id: taskId },
     json: {
       dueDate: task.dueDate || "",
+      ...(task.reminderOffsets !== undefined
+        ? { reminderOffsets: task.reminderOffsets }
+        : {}),
     },
   });
 

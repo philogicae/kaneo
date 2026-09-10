@@ -1,0 +1,1 @@
+ALTER TABLE "telegram_bot" ADD COLUMN "events" jsonb;

@@ -129,6 +129,8 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     priority: taskTable.priority,
     startDate: taskTable.startDate,
     dueDate: taskTable.dueDate,
+    reminderOffsets: taskTable.reminderOffsets,
+    recurrence: taskTable.recurrence,
     position: taskTable.position,
     createdAt: taskTable.createdAt,
     userId: taskTable.userId,
@@ -201,6 +203,8 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       url: string;
       title: string | null;
       metadata: Record<string, unknown> | null;
+      createdAt: Date;
+      updatedAt: Date;
     }>
   >();
   for (const externalLink of externalLinksData) {
