@@ -65,10 +65,16 @@ async function updateTaskStatus({
 
   // A recurring task completed for the first time spawns its next occurrence
   // in the column it came from, with dates and reminder offsets shifted by
-  // one period.
+  // one period. Recurrence is anchored to the start date; without one the
+  // rule is a leftover from older builds and must not spawn dateless clones.
   const recurrence = existingTask.recurrence;
   const statusChanged = existingTask.status !== status;
-  if (recurrence && column?.isFinal && statusChanged) {
+  if (
+    recurrence &&
+    existingTask.startDate &&
+    column?.isFinal &&
+    statusChanged
+  ) {
     await createTask({
       projectId: existingTask.projectId,
       currentUserId,

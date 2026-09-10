@@ -2182,6 +2182,7 @@
 		"recurrence": {
 			"title": "Recurrence",
 			"none": "No recurrence",
+			"needsStartDate": "Set a start date first",
 			"every": "Every",
 			"day_one": "day",
 			"day_other": "days",

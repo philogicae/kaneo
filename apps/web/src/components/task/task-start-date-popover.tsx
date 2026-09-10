@@ -23,6 +23,7 @@ import {
   applyDatePreservingTime,
   combineDateAndTime,
   hasTimeComponent,
+  startOfDay,
   toTimeInputValue,
 } from "@/lib/task-datetime";
 import { toast } from "@/lib/toast";
@@ -65,13 +66,13 @@ export default function TaskStartDatePopover({
   const [open, setOpen] = useState(false);
   // Draft state: the picker edits locally and Apply commits, so the date, the
   // optional time, and the recurrence are chosen before anything is sent.
-  const [draftDate, setDraftDate] = useState<Date | undefined>(
-    task.startDate ? new Date(task.startDate) : undefined,
+  const [draftDate, setDraftDate] = useState<Date | undefined>(() =>
+    task.startDate ? new Date(task.startDate) : startOfDay(),
   );
-  const [draftTime, setDraftTime] = useState<string>(
+  const [draftTime, setDraftTime] = useState<string>(() =>
     task.startDate && hasTimeComponent(task.startDate)
       ? toTimeInputValue(task.startDate)
-      : "",
+      : "00:00",
   );
   const [draftRecurrence, setDraftRecurrence] = useState<RecurrenceRule | null>(
     task.recurrence ?? null,
@@ -83,11 +84,14 @@ export default function TaskStartDatePopover({
 
   useEffect(() => {
     if (open) {
-      setDraftDate(task.startDate ? new Date(task.startDate) : undefined);
+      // Forced setup defaults: today at 00:00, no recurrence. Without this a
+      // fresh picker inherits stray values (or the wall-clock time of the
+      // day-pick click) and they leak into the stored date on Apply.
+      setDraftDate(task.startDate ? new Date(task.startDate) : startOfDay());
       setDraftTime(
         task.startDate && hasTimeComponent(task.startDate)
           ? toTimeInputValue(task.startDate)
-          : "",
+          : "00:00",
       );
       setDraftRecurrence(task.recurrence ?? null);
     }
@@ -118,13 +122,26 @@ export default function TaskStartDatePopover({
   };
 
   const handleApply = async () => {
-    if (!draftDate) return;
+    if (!draftDate) {
+      // Without a start date the only committable change is dropping a
+      // leftover recurrence (older builds allowed setting one without a date);
+      // picking a new frequency still requires a date to repeat from.
+      if (!draftRecurrence && task.recurrence) {
+        await save(null, null);
+      }
+      return;
+    }
     const iso = draftTime
       ? combineDateAndTime(draftDate, draftTime)
       : draftDate.toISOString();
     if (!iso) return;
     await save(iso, draftRecurrence);
   };
+
+  // Recurrence needs a date to repeat from; without one the select only
+  // stays editable to clear a leftover rule.
+  const canEditRecurrence = !!draftDate || !!task.recurrence;
+  const needsStartDate = !draftDate && (!!draftRecurrence || !task.recurrence);
 
   if (!canEdit) return <>{children}</>;
 
@@ -160,6 +177,7 @@ export default function TaskStartDatePopover({
             <Repeat className="size-4 shrink-0 text-muted-foreground" />
             <Select
               value={draftRecurrence?.frequency ?? "none"}
+              disabled={!canEditRecurrence}
               onValueChange={(value) => {
                 if (value === "none") {
                   setDraftRecurrence(null);
@@ -193,6 +211,11 @@ export default function TaskStartDatePopover({
               </SelectContent>
             </Select>
           </div>
+          {needsStartDate && (
+            <p className="text-xs text-muted-foreground">
+              {t("tasks:recurrence.needsStartDate")}
+            </p>
+          )}
           {draftRecurrence && (
             <div className="flex items-center gap-2 pl-6">
               <label
@@ -255,7 +278,11 @@ export default function TaskStartDatePopover({
             <Button
               size="sm"
               className="h-8"
-              disabled={!draftDate || saving}
+              disabled={
+                (!draftDate &&
+                  !(draftRecurrence === null && task.recurrence)) ||
+                saving
+              }
               onClick={handleApply}
             >
               {t("tasks:popover.startDate.apply")}

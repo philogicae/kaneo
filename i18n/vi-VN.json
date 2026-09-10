@@ -2159,7 +2159,8 @@
       "day_other": "days",
       "month_other": "months",
       "summary": "Every {{interval}} {{unit}}",
-      "week_other": "weeks"
+      "week_other": "weeks",
+      "needsStartDate": "Set a start date first"
     },
     "relations": {
       "title": "Liên kết",

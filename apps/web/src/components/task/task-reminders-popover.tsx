@@ -175,7 +175,11 @@ export default function TaskRemindersPopover({
                 max={999}
                 value={draftAmount}
                 onChange={(event) => setDraftAmount(event.target.value)}
-                className="h-7 w-14 px-2 text-xs"
+                // The compact coss size keeps the inner input inside the
+                // bordered span; a smaller height plus extra padding left the
+                // value hidden under the native spinner.
+                size="sm"
+                className="w-14 text-xs"
                 aria-label={t("tasks:reminders.amountLabel")}
               />
               <Select
@@ -183,7 +187,7 @@ export default function TaskRemindersPopover({
                 onValueChange={(value) => setDraftUnit(value as ReminderUnit)}
               >
                 <SelectTrigger
-                  className="h-7 w-[7.75rem] shrink-0 px-2 text-xs"
+                  className="h-7 w-31 shrink-0 px-2 text-xs"
                   aria-label={t("tasks:reminders.unitLabel")}
                 >
                   <SelectValue>

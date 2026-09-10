@@ -44,6 +44,14 @@ export async function dispatchUnifiedTelegram(
 ): Promise<boolean> {
   const matches = await getMatchingRules(event.projectId);
   if (matches.length === 0) {
+    // The dispatch is fire-and-forget on the event bus; without this line a
+    // dead rule produces zero evidence (seen live: a hung pool connection
+    // silently swallowed a task.created notification).
+    console.log("[telegram] unified dispatch: no matching rule", {
+      projectId: event.projectId,
+      taskId: event.taskId,
+      action: action.kind,
+    });
     return false;
   }
 
@@ -55,6 +63,10 @@ export async function dispatchUnifiedTelegram(
   if (!data) {
     // Task is gone (e.g. deleted mid-flight): consider it handled so the
     // legacy path stays silent too.
+    console.warn("[telegram] unified dispatch: task data unavailable", {
+      projectId: event.projectId,
+      taskId: event.taskId,
+    });
     return true;
   }
 
@@ -68,7 +80,14 @@ export async function dispatchUnifiedTelegram(
         ...defaultTelegramEvents,
         ...(bot.events ?? {}),
       };
-      if (!events[eventKey]) return;
+      if (!events[eventKey]) {
+        console.log("[telegram] unified dispatch: event disabled for bot", {
+          botId: bot.id,
+          eventKey,
+          taskId: event.taskId,
+        });
+        return;
+      }
 
       const config = normalizeTelegramConfig({
         botToken: bot.botToken,
@@ -77,7 +96,24 @@ export async function dispatchUnifiedTelegram(
         chatLabel: chat.label ?? null,
         events: null,
       });
-      await sendTelegramMessage(config, actionText, data);
+      try {
+        await sendTelegramMessage(config, actionText, data);
+        console.log("[telegram] unified dispatch: sent", {
+          botId: bot.id,
+          eventKey,
+          taskId: event.taskId,
+          threadId: rule.threadId ?? null,
+        });
+      } catch (error) {
+        // sendTelegramMessage already reports its own failures; this log
+        // only guarantees the dispatch outcome is visible in one place.
+        console.error("[telegram] unified dispatch: send failed", {
+          botId: bot.id,
+          eventKey,
+          taskId: event.taskId,
+          error,
+        });
+      }
     }),
   );
 
