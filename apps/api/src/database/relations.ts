@@ -21,6 +21,9 @@ import {
   taskTable,
   teamMemberTable,
   teamTable,
+  telegramBotTable,
+  telegramChatTable,
+  telegramRuleTable,
   timeEntryTable,
   userNotificationPreferenceTable,
   userNotificationWorkspaceProjectTable,
@@ -341,6 +344,46 @@ export const integrationTableRelations = relations(
       references: [projectTable.id],
     }),
     externalLinks: many(externalLinkTable),
+  }),
+);
+
+export const telegramBotTableRelations = relations(
+  telegramBotTable,
+  ({ one, many }) => ({
+    user: one(userTable, {
+      fields: [telegramBotTable.userId],
+      references: [userTable.id],
+    }),
+    chats: many(telegramChatTable),
+  }),
+);
+
+export const telegramChatTableRelations = relations(
+  telegramChatTable,
+  ({ one, many }) => ({
+    bot: one(telegramBotTable, {
+      fields: [telegramChatTable.botId],
+      references: [telegramBotTable.id],
+    }),
+    rules: many(telegramRuleTable),
+  }),
+);
+
+export const telegramRuleTableRelations = relations(
+  telegramRuleTable,
+  ({ one }) => ({
+    chat: one(telegramChatTable, {
+      fields: [telegramRuleTable.chatId],
+      references: [telegramChatTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [telegramRuleTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [telegramRuleTable.projectId],
+      references: [projectTable.id],
+    }),
   }),
 );
 

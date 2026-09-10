@@ -1,13 +1,18 @@
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { columnTable, taskTable } from "../../database/schema";
+import {
+  columnTable,
+  taskReminderSentTable,
+  taskTable,
+} from "../../database/schema";
 import { publishEvent } from "../../events";
 import { deleteOrphanedAssets } from "../../storage/cleanup-assets";
 import {
   assertAssignableUser,
   getProjectWorkspaceId,
 } from "../../utils/assert-assignable-user";
+import type { RecurrenceRule } from "../recurrence";
 import { assertValidTaskStatus } from "../validate-task-fields";
 
 async function updateTask(
@@ -22,6 +27,8 @@ async function updateTask(
   position: number,
   userId?: string,
   currentUserId?: string,
+  reminderOffsets?: number[] | null,
+  recurrence?: RecurrenceRule | null,
 ) {
   const [existingTask] = await db
     .select({
@@ -29,6 +36,9 @@ async function updateTask(
       description: taskTable.description,
       status: taskTable.status,
       projectId: taskTable.projectId,
+      startDate: taskTable.startDate,
+      dueDate: taskTable.dueDate,
+      reminderOffsets: taskTable.reminderOffsets,
     })
     .from(taskTable)
     .where(eq(taskTable.id, id))
@@ -77,6 +87,10 @@ async function updateTask(
       priority,
       position,
       userId: normalizedUserId ?? null,
+      ...(reminderOffsets !== undefined
+        ? { reminderOffsets: reminderOffsets ?? null }
+        : {}),
+      ...(recurrence !== undefined ? { recurrence: recurrence ?? null } : {}),
     })
     .where(eq(taskTable.id, id))
     .returning();
@@ -85,6 +99,28 @@ async function updateTask(
     throw new HTTPException(500, {
       message: "Failed to update task",
     });
+  }
+
+  if (reminderOffsets !== undefined) {
+    const offsetsChanged =
+      JSON.stringify(reminderOffsets ?? null) !==
+      JSON.stringify(existingTask.reminderOffsets ?? null);
+    // Reminder history is keyed to the date the offsets count down from, so
+    // moving the start date invalidates what has already been sent.
+    const datesChanged =
+      (startDate?.getTime() ?? null) !==
+        (existingTask.startDate
+          ? new Date(existingTask.startDate).getTime()
+          : null) ||
+      (dueDate?.getTime() ?? null) !==
+        (existingTask.dueDate
+          ? new Date(existingTask.dueDate).getTime()
+          : null);
+    if (offsetsChanged || datesChanged) {
+      await db
+        .delete(taskReminderSentTable)
+        .where(eq(taskReminderSentTable.taskId, id));
+    }
   }
 
   if (existingTask.status !== status) {

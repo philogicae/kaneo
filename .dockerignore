@@ -13,3 +13,4 @@
 !apps/web/.env.production
 *.log
 .local
+.playwright-*

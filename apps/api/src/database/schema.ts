@@ -13,6 +13,7 @@ import {
   unique,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import type { TelegramEventKey } from "../plugins/telegram/config";
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
@@ -426,6 +427,15 @@ export const taskTable = pgTable(
     priority: text("priority").default("low").notNull(),
     startDate: timestamp("start_date", { mode: "date" }),
     dueDate: timestamp("due_date", { mode: "date" }),
+    // Minutes before the due date at which Telegram reminders fire; empty or
+    // null means the task has no reminder configured.
+    reminderOffsets: jsonb("reminder_offsets").$type<number[]>(),
+    // Calendar-like recurrence; the next occurrence is spawned when the task
+    // completes (moved to a final column).
+    recurrence: jsonb("recurrence").$type<{
+      frequency: "daily" | "weekly" | "monthly";
+      interval: number;
+    } | null>(),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" })
       .defaultNow()
@@ -889,6 +899,106 @@ export const integrationTable = pgTable(
     index("integration_projectId_idx").on(table.projectId),
     index("integration_type_idx").on(table.type),
     unique("integration_project_type_unique").on(table.projectId, table.type),
+  ],
+);
+
+// Unified Telegram notification config: account-owned bots, their chats, and
+// per-chat routing rules (a workspace, optionally narrowed to projects,
+// optional forum topic). Rules are created by users holding
+// workspace:manage_settings on the target workspace. Supersedes the
+// per-project integration config, which is still honored for projects
+// without a matching unified rule.
+export const telegramBotTable = pgTable(
+  "telegram_bot",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    botToken: text("bot_token").notNull(),
+    name: text("name"),
+    // Per-bot event filter (same keys as the legacy per-project config);
+    // null falls back to the plugin defaults at dispatch time.
+    events: jsonb("events").$type<Partial<Record<TelegramEventKey, boolean>>>(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("telegram_bot_userId_idx").on(table.userId),
+    unique("telegram_bot_user_token_unique").on(table.userId, table.botToken),
+  ],
+);
+
+export const telegramChatTable = pgTable(
+  "telegram_chat",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    botId: text("bot_id")
+      .notNull()
+      .references(() => telegramBotTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    chatId: text("chat_id").notNull(),
+    label: text("label"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("telegram_chat_botId_idx").on(table.botId),
+    unique("telegram_chat_bot_chat_unique").on(table.botId, table.chatId),
+  ],
+);
+
+export const telegramRuleTable = pgTable(
+  "telegram_rule",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => telegramChatTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    // Target scope: null projectId means the whole workspace.
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    projectId: text("project_id").references(() => projectTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+    // Telegram forum topic (message_thread_id); null delivers to the chat.
+    threadId: integer("thread_id"),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("telegram_rule_chatId_idx").on(table.chatId),
+    index("telegram_rule_workspaceId_idx").on(table.workspaceId),
+    index("telegram_rule_projectId_idx").on(table.projectId),
   ],
 );
 

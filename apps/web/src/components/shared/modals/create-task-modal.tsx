@@ -73,6 +73,7 @@ import { formatDateMedium } from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { resolveLabelColor } from "@/lib/label-color";
 import { getPriorityIcon } from "@/lib/priority";
+import { startOfDay } from "@/lib/task-datetime";
 import { toast } from "@/lib/toast";
 import useProjectStore from "@/store/project";
 import type Task from "@/types/task";
@@ -928,7 +929,11 @@ function CreateTaskModal({
                   <Calendar
                     mode="single"
                     selected={startDate}
-                    onSelect={setStartDate}
+                    // Local midnight: a raw day-pick carries the wall-clock
+                    // time of the click, which then leaks into the task.
+                    onSelect={(date) =>
+                      setStartDate(date ? startOfDay(date) : undefined)
+                    }
                     className="w-full bg-popover"
                   />
                   {startDate && (
@@ -1089,7 +1094,11 @@ function CreateTaskModal({
                   <Calendar
                     mode="single"
                     selected={dueDate}
-                    onSelect={setDueDate}
+                    // Local midnight: a raw day-pick carries the wall-clock
+                    // time of the click, which then leaks into the task.
+                    onSelect={(date) =>
+                      setDueDate(date ? startOfDay(date) : undefined)
+                    }
                     className="w-full bg-popover"
                   />
                   {dueDate && (

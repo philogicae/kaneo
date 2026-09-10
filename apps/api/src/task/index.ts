@@ -590,6 +590,8 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       status,
       userId,
       customFields,
+      reminderOffsets,
+      recurrence,
     } = c.req.valid("json");
 
     const parsedStartDate =
@@ -614,6 +616,10 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       priority,
       status,
       customFields,
+      // Pass null through: createTask normalizes it, and `?? undefined` here
+      // would make an explicit null indistinguishable from "not provided".
+      reminderOffsets,
+      recurrence,
     });
 
     return c.json(task, 200);
@@ -651,6 +657,8 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       projectId,
       position,
       userId,
+      reminderOffsets,
+      recurrence,
     } = c.req.valid("json");
 
     const currentUserId = c.get("userId");
@@ -678,6 +686,11 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       position,
       userId,
       currentUserId,
+      // Pass null through so the controller's "explicit null clears" branch
+      // runs; `?? undefined` silently dropped clears (e.g. removing a
+      // recurrence rule or all reminders never reached the database).
+      reminderOffsets,
+      recurrence,
     );
 
     return c.json(task, 200);
@@ -735,12 +748,13 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(updateTaskDueDateRoute, async (c) => {
     const { id } = c.req.valid("param");
-    const { dueDate = null } = c.req.valid("json");
+    const { dueDate = null, reminderOffsets } = c.req.valid("json");
     const currentUserId = c.get("userId");
 
     const task = await updateTaskDueDate({
       id,
       dueDate: dueDate ? validateAndParseDate(dueDate, "dueDate") : null,
+      reminderOffsets,
       currentUserId,
     });
 
