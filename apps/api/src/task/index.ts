@@ -614,8 +614,10 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       dueDate: parsedDueDate,
       priority,
       status,
-      reminderOffsets: reminderOffsets ?? undefined,
-      recurrence: recurrence ?? undefined,
+      // Pass null through: createTask normalizes it, and `?? undefined` here
+      // would make an explicit null indistinguishable from "not provided".
+      reminderOffsets,
+      recurrence,
     });
 
     return c.json(task, 200);
@@ -682,8 +684,11 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       position,
       userId,
       currentUserId,
-      reminderOffsets ?? undefined,
-      recurrence ?? undefined,
+      // Pass null through so the controller's "explicit null clears" branch
+      // runs; `?? undefined` silently dropped clears (e.g. removing a
+      // recurrence rule or all reminders never reached the database).
+      reminderOffsets,
+      recurrence,
     );
 
     return c.json(task, 200);

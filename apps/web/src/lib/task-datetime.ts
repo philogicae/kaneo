@@ -57,3 +57,14 @@ export function toTimeInputValue(value: AnyDateInput): string {
     date.getMinutes(),
   ).padStart(2, "0")}`;
 }
+
+/**
+ * Local midnight — defaults to today when no date is given. Fresh date setup
+ * must land on 00:00: calendar day picks carry the wall-clock time of the
+ * click, which used to leak into the stored date (the "15:00" reports).
+ */
+export function startOfDay(value?: AnyDateInput): Date {
+  const date = value ? toDate(value) : new Date();
+  date.setHours(0, 0, 0, 0);
+  return date;
+}

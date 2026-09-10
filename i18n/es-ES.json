@@ -2172,7 +2172,8 @@
 			"summary": "Every {{interval}} {{unit}}",
 			"week_many": "weeks",
 			"week_one": "week",
-			"week_other": "weeks"
+			"week_other": "weeks",
+			"needsStartDate": "Set a start date first"
 		}
 	},
 	"invitations": {

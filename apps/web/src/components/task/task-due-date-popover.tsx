@@ -15,6 +15,7 @@ import {
   applyDatePreservingTime,
   combineDateAndTime,
   hasTimeComponent,
+  startOfDay,
   toTimeInputValue,
 } from "@/lib/task-datetime";
 import { toast } from "@/lib/toast";
@@ -33,13 +34,13 @@ export default function TaskDueDatePopover({
   const [open, setOpen] = useState(false);
   // Draft state: the picker edits locally and Apply commits, so a date and an
   // optional time can be chosen before anything is sent.
-  const [draftDate, setDraftDate] = useState<Date | undefined>(
-    task.dueDate ? new Date(task.dueDate) : undefined,
+  const [draftDate, setDraftDate] = useState<Date | undefined>(() =>
+    task.dueDate ? new Date(task.dueDate) : startOfDay(),
   );
-  const [draftTime, setDraftTime] = useState<string>(
+  const [draftTime, setDraftTime] = useState<string>(() =>
     task.dueDate && hasTimeComponent(task.dueDate)
       ? toTimeInputValue(task.dueDate)
-      : "",
+      : "00:00",
   );
   const [saving, setSaving] = useState(false);
   const { mutateAsync: updateTaskDueDate } = useUpdateTaskDueDate();
@@ -48,11 +49,13 @@ export default function TaskDueDatePopover({
 
   useEffect(() => {
     if (open) {
-      setDraftDate(task.dueDate ? new Date(task.dueDate) : undefined);
+      // Forced setup defaults: today at 00:00, so a fresh picker never
+      // inherits the wall-clock time of the day-pick click.
+      setDraftDate(task.dueDate ? new Date(task.dueDate) : startOfDay());
       setDraftTime(
         task.dueDate && hasTimeComponent(task.dueDate)
           ? toTimeInputValue(task.dueDate)
-          : "",
+          : "00:00",
       );
     }
   }, [open, task.dueDate]);

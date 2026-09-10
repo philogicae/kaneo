@@ -2172,7 +2172,8 @@
 			"updateError": "Échec de la mise à jour de la récurrence",
 			"day_many": "jours",
 			"week_many": "semaines",
-			"month_many": "mois"
+			"month_many": "mois",
+			"needsStartDate": "Définissez d'abord une date de début"
 		}
 	},
 	"invitations": {
