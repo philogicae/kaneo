@@ -152,7 +152,14 @@
 					"amber": "Kəhrəba rəngi",
 					"terracotta": "Bişmiş gil rəngi",
 					"rose": "Çəhrayı",
-					"crimson": "Tünd qırmızı"
+					"crimson": "Tünd qırmızı",
+					"cyan": "Cyan",
+					"emerald": "Emerald",
+					"fuchsia": "Fuchsia",
+					"indigo": "Indigo",
+					"lime": "Lime",
+					"ocean": "Ocean",
+					"sky": "Sky"
 				}
 			}
 		},
@@ -532,7 +539,11 @@
 			"labels": "Etiketlər",
 			"labelsDescription": "Tapşırıq etiketlərini göstər",
 			"priority": "Prioritet",
-			"priorityDescription": "Prioritet göstəricilərini göstər"
+			"priorityDescription": "Prioritet göstəricilərini göstər",
+			"interfaceSize": "Interface size",
+			"interfaceSizeDecrease": "Decrease interface size",
+			"interfaceSizeIncrease": "Increase interface size",
+			"themeVolt": "Volt"
 		},
 		"developerPage": {
 			"pageTitle": "Proqramçı parametrləri",
@@ -1346,6 +1357,80 @@
 				"number": "Number",
 				"text": "Text"
 			}
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
+			"authModeApiKey": "API key",
+			"authModeOauth": "OAuth",
+			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
+			"cardTitle": "Connect an agent",
+			"copied": "Copied",
+			"copy": "Copy",
+			"createApiKey": "Create an API key",
+			"followUpLabel": "Then authenticate",
+			"installCommandLabel": "Install command",
+			"manualConfigLabel": "Manual configuration",
+			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
+			"serverUrlLabel": "Server URL",
+			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopics_one": "{{count}} topic detected",
+			"detectedTopics_other": "{{count}} topics detected",
+			"detectedTopicsLabel": "Detected topics",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicHint": "Topics are detected live while this dialog is open: send a message inside a topic and it appears in the list above. You can also type the id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotOk": "Bot verified: @{username}",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -1368,7 +1453,8 @@
 				"navigate": "Keçid et",
 				"open": "Aç",
 				"close": "Bağla"
-			}
+			},
+			"voltTheme": "Volt theme"
 		},
 		"notifications": "Bildirişlər",
 		"sidebar": {
@@ -1388,7 +1474,12 @@
 			"deleteConfirmTitle": "Layihə silinsin?",
 			"deleteConfirmDescription": "Bu, layihəni və bütün məlumatlarını həmişəlik siləcək. Bu əməliyyatı geri qaytara bilməzsiniz.",
 			"deletedToast": "Layihə silindi",
-			"deleteProject": "Layihəni sil"
+			"deleteProject": "Layihəni sil",
+			"sortCompletion": "Completion",
+			"sortCustom": "Custom order",
+			"sortDate": "Date created",
+			"sortName": "Name",
+			"sortProjects": "Sort projects"
 		},
 		"search": {
 			"inputPlaceholder": "Tapşırıqları, layihələri və şərhləri axtar...",
@@ -1418,7 +1509,8 @@
 			"workspaces": "İş sahələri",
 			"switching": "Dəyişdirilir...",
 			"addWorkspace": "İş sahəsi əlavə et",
-			"selectWorkspace": "İş sahəsi seç"
+			"selectWorkspace": "İş sahəsi seç",
+			"sortWorkspaces": "Sort workspaces"
 		},
 		"page": {
 			"projectsTitle": "Layihələr",
@@ -1813,8 +1905,7 @@
 			"copyTaskLink": "Tapşırığın keçidini kopyala",
 			"copyTaskBranch": "Tapşırığın budağını kopyala",
 			"start": "Başlat",
-			"startDate": "Başlama tarixi",
-			"noDate": "Tarix yoxdur"
+			"end": "End"
 		},
 		"move": {
 			"title": "Tapşırığı köçür",
@@ -1841,12 +1932,18 @@
 			"dueDate": {
 				"updateSuccess": "Tapşırığın son tarixi uğurla yeniləndi",
 				"updateError": "Tapşırığın son tarixini yeniləmək alınmadı",
-				"clear": "Tarixi təmizlə"
+				"clear": "Tarixi təmizlə",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "End time"
 			},
 			"startDate": {
 				"updateSuccess": "Tapşırığın başlama tarixi uğurla yeniləndi",
 				"updateError": "Tapşırığın başlama tarixini yeniləmək alınmadı",
-				"clear": "Başlama tarixini təmizlə"
+				"clear": "Başlama tarixini təmizlə",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time"
 			},
 			"labels": {
 				"searchPlaceholder": "Etiketləri axtar...",
@@ -1857,18 +1954,7 @@
 				"removeSuccess": "Etiket çıxarıldı",
 				"updateError": "Etiketi yeniləmək alınmadı",
 				"createSuccess": "Etiket yaradıldı və əlavə edildi",
-				"createError": "Etiketi yaratmaq alınmadı",
-				"colors": {
-					"stone": "Daş rəngi",
-					"slate": "Şifer rəngi",
-					"lavender": "Lavanda rəngi",
-					"sage": "Adaçayı rəngi",
-					"forest": "Meşə yaşılı",
-					"amber": "Kəhrəba rəngi",
-					"terracotta": "Bişmiş gil rəngi",
-					"rose": "Çəhrayı",
-					"crimson": "Tünd qırmızı"
-				}
+				"createError": "Etiketi yaratmaq alınmadı"
 			}
 		},
 		"backlog": {
@@ -2063,6 +2149,54 @@
 				"deleteRow": "Sətri sil",
 				"deleteTable": "Cədvəli sil"
 			}
+		},
+		"recurrence": {
+			"daily": "Daily",
+			"day_one": "day",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_one": "month",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_one": "week",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_one": "{{count}} day before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders fire before the start date and are delivered via the unified Telegram configuration.",
+			"hoursBefore_one": "{{count}} hour before",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_one": "{{count}} minute before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_one": "day",
+			"unitDay_other": "days",
+			"unitHour_one": "hour",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_one": "minute",
+			"unitMinute_other": "minutes",
+			"unitWeek_one": "week",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_one": "{{count}} week before",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -2243,6 +2377,37 @@
 		},
 		"branding": {
 			"poweredBy": "Təmin edən"
+		}
+	},
+	"unified": {
+		"charts": {
+			"backlog": "Backlog",
+			"empty": "No task activity in the last 6 months.",
+			"tasks": "Tasks"
+		},
+		"empty": {
+			"description": "Projects from all your workspaces will show up here as soon as you create one.",
+			"title": "No projects yet"
+		},
+		"pageTitle": "All projects",
+		"section": {
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects"
+		},
+		"stats": {
+			"completion": "Completion",
+			"projects": "Projects",
+			"tasks": "Tasks"
+		},
+		"table": {
+			"progress": "Progress",
+			"project": "Project",
+			"status": "Status",
+			"tasks": "Tasks"
+		},
+		"tabs": {
+			"charts": "Charts",
+			"overview": "Overview"
 		}
 	}
 }

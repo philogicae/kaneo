@@ -29,8 +29,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-        with:
-          version: 10.32.1
 
       # No registry-url here on purpose: it writes an .npmrc referencing
       # NODE_AUTH_TOKEN, and npm only attempts the tokenless OIDC exchange when

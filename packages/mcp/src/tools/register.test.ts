@@ -181,7 +181,7 @@ describe("registerTools", () => {
     });
   });
 
-  it("validates label colors as hex values", () => {
+  it("validates label colors as hex or semantic palette names", () => {
     const { server, tools } = createServerMock();
     const client = { json: vi.fn() };
 
@@ -189,13 +189,24 @@ describe("registerTools", () => {
 
     const schema = tools.get("create_label")?.config.inputSchema;
     expect(schema).toBeDefined();
+    expect(
+      schema?.parse({
+        name: "Bug",
+        color: "dark-gray",
+        workspaceId: "workspace-1",
+      }),
+    ).toEqual({
+      name: "Bug",
+      color: "dark-gray",
+      workspaceId: "workspace-1",
+    });
     expect(() =>
       schema?.parse({
         name: "Bug",
-        color: "red",
+        color: "bright-harlequin",
         workspaceId: "workspace-1",
       }),
-    ).toThrow(/hex color/i);
+    ).toThrow(/hex color|semantic name/i);
   });
 
   it("validates task date filters as ISO datetimes with timezone", () => {

@@ -19,7 +19,8 @@ type WorkspaceIdSource =
         | "comment"
         | "column"
         | "workflowRule"
-    | "customField" | "telegramRule";
+        | "customField"
+        | "telegramRule";
       idKey: string;
     }
   | {
@@ -357,6 +358,10 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "label", idKey },
+        // Task-scoped labels can (in legacy data) carry a null workspaceId;
+        // resolving the described task's workspace keeps attach/detach
+        // working and authorizes against the task's workspace instead.
+        { type: "lookup", resource: "task", idKey: "taskId" },
         { type: "query", key: "workspaceId" },
       ],
     }),
@@ -408,9 +413,7 @@ export const workspaceAccess = {
 
   fromTelegramRule: (idKey = "telegramRuleId") =>
     workspaceAccessMiddleware({
-      sources: [
-        { type: "lookup", resource: "telegramRule", idKey },
-      ],
+      sources: [{ type: "lookup", resource: "telegramRule", idKey }],
     }),
 
   fromProjectId: (idKey = "projectId") =>
