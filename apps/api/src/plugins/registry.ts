@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import db from "../database";
 import { integrationTable } from "../database/schema";
 import { subscribeToEvent } from "../events";
+import { dispatchUnifiedTelegram } from "./telegram/unified";
 import type {
   IntegrationPlugin,
   PluginContext,
@@ -266,9 +267,13 @@ function createContext(integration: {
 export async function broadcastTaskCreated(
   event: TaskCreatedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "created",
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskCreated) continue;
 
@@ -285,9 +290,15 @@ export async function broadcastTaskCreated(
 export async function broadcastTaskStatusChanged(
   event: TaskStatusChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "statusChanged",
+    oldStatus: event.oldStatus ?? null,
+    newStatus: event.newStatus,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskStatusChanged) continue;
 
@@ -307,9 +318,15 @@ export async function broadcastTaskStatusChanged(
 export async function broadcastTaskPriorityChanged(
   event: TaskPriorityChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "priorityChanged",
+    oldPriority: event.oldPriority ?? null,
+    newPriority: event.newPriority,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskPriorityChanged) continue;
 
@@ -329,9 +346,15 @@ export async function broadcastTaskPriorityChanged(
 export async function broadcastTaskTitleChanged(
   event: TaskTitleChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "titleChanged",
+    oldTitle: event.oldTitle,
+    newTitle: event.newTitle,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskTitleChanged) continue;
 
@@ -351,9 +374,14 @@ export async function broadcastTaskTitleChanged(
 export async function broadcastTaskDescriptionChanged(
   event: TaskDescriptionChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "descriptionChanged",
+    newDescription: event.newDescription,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskDescriptionChanged) continue;
 
@@ -373,9 +401,14 @@ export async function broadcastTaskDescriptionChanged(
 export async function broadcastTaskCommentCreated(
   event: TaskCommentCreatedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "commentCreated",
+    comment: event.comment,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskCommentCreated) continue;
 

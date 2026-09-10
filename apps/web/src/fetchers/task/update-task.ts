@@ -21,6 +21,14 @@ async function updateTask(taskId: string, task: Task) {
       priority: (task.priority || "no-priority") as UpdateTaskPriority,
       startDate: task.startDate?.toString(),
       dueDate: task.dueDate?.toString(),
+      // Only sent when the caller's task object actually carries the fields,
+      // so stale task payloads (lists without them) never wipe the config.
+      ...(task.reminderOffsets !== undefined
+        ? { reminderOffsets: task.reminderOffsets ?? null }
+        : {}),
+      ...(task.recurrence !== undefined
+        ? { recurrence: task.recurrence ?? null }
+        : {}),
       position: task.position ?? 0,
       projectId: task.projectId,
     },

@@ -6,8 +6,10 @@ import {
   Copy,
   GitBranch,
   Plus,
+  Repeat,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import TaskRemindersPopover from "@/components/task/task-reminders-popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +35,7 @@ import {
   getDueDateStatus,
   isTaskCompleted,
 } from "@/lib/due-date-status";
-import { formatDateShort } from "@/lib/format";
+import { formatDateWithTime } from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityLabel, getStatusDisplayLabel } from "@/lib/i18n/domain";
 import { resolveLabelColor } from "@/lib/label-color";
@@ -44,7 +46,9 @@ import TaskDueDatePopover from "./task-due-date-popover";
 import TaskLabelsPopover from "./task-labels-popover";
 import TaskMovePopover from "./task-move-popover";
 import TaskPriorityPopover from "./task-priority-popover";
-import TaskStartDatePopover from "./task-start-date-popover";
+import TaskStartDatePopover, {
+  formatRecurrenceSummary,
+} from "./task-start-date-popover";
 import TaskStatusPopover from "./task-status-popover";
 
 function slugify(text: string | undefined): string {
@@ -274,9 +278,17 @@ export default function TaskPropertiesSidebar({
                       className={`text-xs font-semibold ${task.startDate ? "" : "text-muted-foreground"}`}
                     >
                       {task.startDate
-                        ? formatDateShort(task.startDate)
+                        ? formatDateWithTime(task.startDate)
                         : t("tasks:properties.start")}
                     </span>
+                    {task.recurrence && (
+                      <span
+                        className="flex shrink-0"
+                        title={formatRecurrenceSummary(task.recurrence, t)}
+                      >
+                        <Repeat className="w-3 h-3 text-muted-foreground" />
+                      </span>
+                    )}
                   </Button>
                 </TaskStartDatePopover>
               )}
@@ -310,20 +322,21 @@ export default function TaskPropertiesSidebar({
                           />
                         )}
                         <span className="text-xs font-semibold">
-                          {formatDateShort(task.dueDate)}
+                          {formatDateWithTime(task.dueDate)}
                         </span>
                       </>
                     ) : (
                       <>
                         <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                         <span className="text-xs font-semibold text-muted-foreground">
-                          {t("tasks:properties.noDate")}
+                          {t("tasks:properties.end")}
                         </span>
                       </>
                     )}
                   </Button>
                 </TaskDueDatePopover>
               )}
+              {task && <TaskRemindersPopover task={task} />}
             </div>
           </div>
         )}
@@ -465,9 +478,17 @@ export default function TaskPropertiesSidebar({
                         className={`text-xs font-semibold ${task.startDate ? "" : "text-muted-foreground"}`}
                       >
                         {task.startDate
-                          ? formatDateShort(task.startDate)
+                          ? formatDateWithTime(task.startDate)
                           : t("tasks:properties.start")}
                       </span>
+                      {task.recurrence && (
+                        <span
+                          className="flex shrink-0"
+                          title={formatRecurrenceSummary(task.recurrence, t)}
+                        >
+                          <Repeat className="w-3 h-3 text-muted-foreground" />
+                        </span>
+                      )}
                     </Button>
                   </TaskStartDatePopover>
                 )}
@@ -501,20 +522,21 @@ export default function TaskPropertiesSidebar({
                             />
                           )}
                           <span className="text-xs font-semibold">
-                            {formatDateShort(task.dueDate)}
+                            {formatDateWithTime(task.dueDate)}
                           </span>
                         </>
                       ) : (
                         <>
                           <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                           <span className="text-xs font-semibold text-muted-foreground">
-                            {t("tasks:properties.noDate")}
+                            {t("tasks:properties.end")}
                           </span>
                         </>
                       )}
                     </Button>
                   </TaskDueDatePopover>
                 )}
+                {task && <TaskRemindersPopover task={task} />}
               </div>
             </div>
 
@@ -658,9 +680,17 @@ export default function TaskPropertiesSidebar({
                         className={`text-xs font-semibold ${task.startDate ? "" : "text-muted-foreground"}`}
                       >
                         {task.startDate
-                          ? formatDateShort(task.startDate)
-                          : t("tasks:properties.startDate")}
+                          ? formatDateWithTime(task.startDate)
+                          : t("tasks:properties.start")}
                       </span>
+                      {task.recurrence && (
+                        <span
+                          className="flex shrink-0"
+                          title={formatRecurrenceSummary(task.recurrence, t)}
+                        >
+                          <Repeat className="w-3 h-3 text-muted-foreground" />
+                        </span>
+                      )}
                     </Button>
                   </TaskStartDatePopover>
                 )}
@@ -694,20 +724,21 @@ export default function TaskPropertiesSidebar({
                             />
                           )}
                           <span className="text-xs font-semibold">
-                            {formatDateShort(task.dueDate)}
+                            {formatDateWithTime(task.dueDate)}
                           </span>
                         </>
                       ) : (
                         <>
                           <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                           <span className="text-xs font-semibold text-muted-foreground">
-                            {t("tasks:properties.noDate")}
+                            {t("tasks:properties.end")}
                           </span>
                         </>
                       )}
                     </Button>
                   </TaskDueDatePopover>
                 )}
+                {task && <TaskRemindersPopover task={task} />}
               </div>
             </div>
           </>
