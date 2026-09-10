@@ -323,13 +323,25 @@ mcp.all("/mcp", async (c) => {
 
 mcp.post("/mcp/token", async (c) => {
   const contentType = c.req.header("content-type") || "";
-  let params: Record<string, string>;
+  let params: Record<string, unknown>;
 
-  if (contentType.includes("application/x-www-form-urlencoded")) {
+  // Treat a missing or incorrect media type as form data when the body is
+  // form-shaped. Unreadable input is a protocol error, never a server error.
+  try {
     const body = await c.req.text();
-    params = Object.fromEntries(new URLSearchParams(body));
-  } else {
-    params = await c.req.json();
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      params = Object.fromEntries(new URLSearchParams(body));
+    } else if (body.trimStart().startsWith("{")) {
+      const parsed: unknown = JSON.parse(body);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        return c.json({ error: "invalid_request" }, 400);
+      }
+      params = parsed as Record<string, unknown>;
+    } else {
+      params = Object.fromEntries(new URLSearchParams(body));
+    }
+  } catch {
+    return c.json({ error: "invalid_request" }, 400);
   }
 
   const { grant_type, code, client_id, code_verifier, redirect_uri } = params;
@@ -337,7 +349,16 @@ mcp.post("/mcp/token", async (c) => {
   if (grant_type !== "authorization_code") {
     return c.json({ error: "unsupported_grant_type" }, 400);
   }
-  if (!code || !client_id || !code_verifier || !redirect_uri) {
+  if (
+    typeof code !== "string" ||
+    typeof client_id !== "string" ||
+    typeof code_verifier !== "string" ||
+    typeof redirect_uri !== "string" ||
+    !code ||
+    !client_id ||
+    !code_verifier ||
+    !redirect_uri
+  ) {
     return c.json({ error: "invalid_request" }, 400);
   }
 
@@ -353,7 +374,7 @@ mcp.post("/mcp/token", async (c) => {
 
   return c.json({
     access_token: result.accessToken,
-    token_type: "bearer",
+    token_type: "Bearer",
     expires_in: result.expiresIn,
   });
 });

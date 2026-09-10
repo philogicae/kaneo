@@ -922,15 +922,16 @@ function AddRulesDialog({
     workspaceId: string,
     update: Partial<WorkspaceSelection>,
   ) => {
-    setSelection((previous) => ({
-      ...previous,
-      [workspaceId]: {
+    setSelection((previous) => {
+      const current = previous[workspaceId] ?? {
         all: false,
-        projectIds: new Set(),
-        ...previous[workspaceId],
-        ...update,
-      },
-    }));
+        projectIds: new Set<string>(),
+      };
+      return {
+        ...previous,
+        [workspaceId]: { ...current, ...update },
+      };
+    });
   };
 
   const buildScopes = (): TelegramRuleScope[] | null => {
