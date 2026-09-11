@@ -1,183 +1,79 @@
 <p align="center">
   <a href="https://kaneo.app">
-    <img src="https://assets.kaneo.app/logo-text.png" alt="Kaneo's logo" width="450" />
+    <img src="https://assets.kaneo.app/logo-text.png" alt="Kaneo's logo" width="420" />
   </a>
 </p>
 
 <div align="center">
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/usekaneo/kaneo/ci.yml?branch=main)](https://github.com/usekaneo/kaneo/actions)
-[![Discord](https://img.shields.io/discord/1326250681530843178?color=7389D8&label=&logo=discord&logoColor=ffffff)](https://discord.gg/rU4tSyhXXU)
-[![Sponsors](https://img.shields.io/github/sponsors/andrejsshell)](https://github.com/sponsors/andrejsshell)
+[![CI](https://github.com/philogicae/kaneo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/philogicae/kaneo/actions/workflows/ci.yml)
 
 </div>
 
-<div align="center">
-  <h3>
-    <a href="https://kaneo.app/docs/core">Quick Start</a>
-    <span> | </span>
-    <a href="https://kaneo.app">Website</a>
-    <span> | </span>
-    <a href="https://cloud.kaneo.app">Cloud</a>
-    <span> | </span>
-    <a href="https://discord.gg/rU4tSyhXXU">Discord</a>
-  </h3>
-</div>
+A customized fork of [Kaneo](https://github.com/usekaneo/kaneo) — the simple, fast, self-hosted project management platform — tailored for and deployed as a personal self-hosted instance.
 
+**This fork adds on top of upstream:**
 
-<p align="center">
-  <img src="https://assets.kaneo.app/readme.png" alt="Kaneo Dashboard" />
-</p>
+- **Telegram notifications** — unified bots / chats / rules configuration, per-task reminders, task recurrence, and notification templates
+- **MCP improvements** — extra tools (bulk task updates, Telegram management), API-key and OAuth hardening for the HTTP endpoint, in-app MCP setup docs
+- **Dashboard work** — unified all-projects view, weekly project charts, backlog tabs, collapsible sidebar with UI scale control
+- **Cross-workspace search** and small UX refinements across the board
+- **Self-hosted deployment** — a single `compose.yml` that builds locally via `Dockerfile.kaneo` (Dokploy-friendly), instead of the upstream image publishing pipeline
+- **Repo cleanup** — removed the upstream release/GHCR/Helm machinery, marketing site, and other pieces a self-hosted fork doesn't need
 
-## Why Kaneo?
+Upstream roadmap item under study: a SQLite single-container mode (`plans/008-sqlite-single-container.md`).
 
-After years of using bloated, overcomplicated project management platforms that distracted from actual work, we built Kaneo to be different.
+> This is a personal fork, not an official Kaneo release. For the upstream project, docs, cloud offering, and community, go to [usekaneo/kaneo](https://github.com/usekaneo/kaneo).
 
-The problem with most tools isn't that they lack features, it's that they have **too many**. Every notification, every unnecessary button, every complex workflow pulls your team away from what matters: **building great products**.
+## Deploy (self-hosted)
 
-We believe the best tools are **invisible**. They should amplify your team's natural workflow, not force you to adapt to theirs. Kaneo is built on the principle that **less is more**: every feature exists because it solves a real problem, not because it looks impressive in a demo.
-
-**What makes it different:**
-- **Clean interface** that focuses on your work, not the tool
-- **Self-hosted** so your data stays yours
-- **Actually fast** because we care about performance
-- **Open source** with a permissive MIT license
-
-Learn more about Kaneo's features and capabilities in our [documentation](https://kaneo.app/docs/core).
-
-## Sponsors
-
-Kaneo is open source. If you find it useful, consider [sponsoring the project](https://github.com/sponsors/andrejsshell) to help support ongoing development.
-
-<!-- sponsors --><a href="https://github.com/danielsada"><img src="https:&#x2F;&#x2F;github.com&#x2F;danielsada.png" width="60px" alt="User avatar: Daniel Sada" /></a><a href="https://github.com/randoneering"><img src="https:&#x2F;&#x2F;github.com&#x2F;randoneering.png" width="60px" alt="User avatar: (justin)randoneering" /></a><a href="https://github.com/floreabogdan"><img src="https:&#x2F;&#x2F;github.com&#x2F;floreabogdan.png" width="60px" alt="User avatar: Bogdan FLOREA" /></a><!-- sponsors -->
-
-## Getting Started
-
-### One-Click Deployment with drim
-
-For straightforward deployments, use [drim](https://github.com/usekaneo/drim) - a CLI tool that handles everything for you:
+Requires Docker with Compose. The compose file builds the bundled image from source (API + web + PostgreSQL in one Kaneo container):
 
 ```bash
-curl -fsSL https://assets.kaneo.app/install.sh | sh
-drim setup
+git clone https://github.com/philogicae/kaneo.git
+cd kaneo
+cp .env.sample .env
+# set KANEO_CLIENT_URL, POSTGRES_PASSWORD, AUTH_SECRET (openssl rand -hex 32)
+# adjust the postgres volume bind mount in compose.yml to your host path
+docker compose up -d --build
 ```
 
-That's it. Your Kaneo instance will be running with automatic HTTPS, database setup, and all services configured.
+Open [http://localhost:5173](http://localhost:5173).
 
-Perfect for quick deployments and production setups where you want things to just work.
-
-### Quick Start with Docker Compose
-
-The fastest way to try Kaneo is with Docker Compose. This sets up Kaneo and PostgreSQL with a single Kaneo container:
-
-```yaml
-services:
-  postgres:
-    image: postgres:16-alpine
-    env_file:
-      - .env
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kaneo -d kaneo"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  kaneo:
-    image: ghcr.io/usekaneo/kaneo:latest
-    ports:
-      - "5173:5173"
-    env_file:
-      - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-```
-
-Save this as `compose.yml`, copy `.env.sample` to `.env`, uncomment `KANEO_CLIENT_URL=http://localhost:5173`, and set `POSTGRES_PASSWORD=<password>` and `AUTH_SECRET=<output of openssl rand -hex 32>`, run `docker compose up -d`, and open [http://localhost:5173](http://localhost:5173).
-
-In Docker Compose, the bundled Kaneo container reaches PostgreSQL at the service hostname `postgres`.
-If you run the API on your host instead of inside Compose, use `localhost` or set `DATABASE_URL` explicitly.
-
-> **Important:** See our [full documentation](https://kaneo.app/docs/core) for detailed setup instructions, environment variable configuration, and troubleshooting guides.
-
-### Deploy on Coolify
-
-Kaneo ships a [Coolify-optimized `compose.coolify.yml`](compose.coolify.yml). In Coolify, create a **Public Repository** resource pointing to `https://github.com/usekaneo/kaneo`, pick the **Docker Compose** build pack (Base Directory `/`, Compose Location `compose.coolify.yml`), assign a domain to the `kaneo` service as `https://your-domain.com:5173`, set `KANEO_CLIENT_URL`, and deploy. `AUTH_SECRET` and the database password are auto-generated by Coolify. Leave `KANEO_API_URL` unset (it is derived from `KANEO_CLIENT_URL`; a `localhost` value breaks the browser API calls). See the [Coolify deployment guide](https://kaneo.app/docs/core/deployments/coolify) for details.
-
-### Development Setup
-
-For development, see our [Environment Setup Guide](ENVIRONMENT_SETUP.md) for detailed instructions on configuring environment variables and troubleshooting common issues like CORS problems.
-
-### Configuration
-
-Kaneo requires several environment variables to be configured. The Docker Compose setup above handles the database automatically, but you'll need to configure environment variables for the API and web services.
-
-For complete configuration instructions, including all required environment variables, database setup for non-Docker deployments, and advanced settings, see the [documentation](https://kaneo.app/docs/core). Advanced deployments can still use the separate `ghcr.io/usekaneo/api` and `ghcr.io/usekaneo/web` images.
-
-## Kubernetes Deployment
-
-If you're running Kubernetes, we provide a comprehensive Helm chart. Check out the [Helm chart documentation](./charts/kaneo/README.md) for detailed installation instructions, production configuration examples, TLS setup, and more.
+Environment variables: see [.env.sample](.env.sample) and [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md). Upstream's prebuilt `ghcr.io/usekaneo/kaneo` image also works with this compose file if you do not want to build locally.
 
 ## Development
 
-Want to hack on Kaneo? See our [Environment Setup Guide](ENVIRONMENT_SETUP.md) for detailed instructions on configuring environment variables and troubleshooting common issues like CORS problems.
+Requires Node.js ≥ 24 and pnpm 12 (see `packageManager`).
 
-Quick start:
 ```bash
-# Clone and install dependencies
-git clone https://github.com/usekaneo/kaneo.git
-cd kaneo
 pnpm install
-
-# Create a .env file in the root with required environment variables
-# See ENVIRONMENT_SETUP.md for detailed instructions
-
-# Start development servers
-pnpm dev
+pnpm dev          # start dev servers
+pnpm build        # build all workspaces
+pnpm test         # unit tests
+pnpm typecheck    # typecheck all workspaces
+pnpm lint         # biome (writes fixes)
+pnpm i18n:check   # locale files vs en-US source of truth
+pnpm openapi:check # API reference vs routes
 ```
 
-For contributing guidelines, code structure, and development best practices, check out our [contributing guide](CONTRIBUTING.md) and [documentation](https://kaneo.app/docs/core).
+Read [AGENTS.md](AGENTS.md) for architecture, conventions, and boundaries before changing anything. Database schema lives in `apps/api/src/database/schema.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`.
 
-## MCP Server
+Tests: `pnpm test` (unit) and `pnpm test:integration` (needs PostgreSQL; see CI config for the expected environment).
 
-Kaneo has an official [MCP (Model Context Protocol) server](https://kaneo.app/docs/core/integrations/mcp), so AI tools like Claude, Cursor, and other MCP clients can manage your tasks, projects, and labels. Every instance ships a built-in HTTP MCP endpoint at `/api/mcp`, and for stdio clients there is the official [@kaneo/mcp](https://www.npmjs.com/package/@kaneo/mcp) package on npm (`npx -y @kaneo/mcp`).
+## Acknowledgments
 
-## Community
+All credit for Kaneo goes to the upstream team and contributors:
 
-- **[Discord](https://discord.gg/rU4tSyhXXU)** - Chat with users and contributors
-- **[GitHub Issues](https://github.com/usekaneo/kaneo/issues)** - Bug reports and feature requests
-- **[Documentation](https://kaneo.app/docs/core)** - Detailed guides, API docs, and tutorials
+- Upstream repository: [usekaneo/kaneo](https://github.com/usekaneo/kaneo)
+- Documentation: [kaneo.app/docs](https://kaneo.app/docs/core)
+- Upstream repository: [usekaneo/kaneo](https://github.com/usekaneo/kaneo)
+- Documentation: [kaneo.app/docs](https://kaneo.app/docs/core)
+- MCP: this instance exposes the built-in HTTP endpoint at `/api/mcp` (see docs); upstream's stdio package [@kaneo/mcp](https://www.npmjs.com/package/@kaneo/mcp) is not used here
 
-## Contributing
-
-We're always looking for help, whether that's:
-- Reporting bugs or suggesting features
-- Improving documentation
-- Contributing code
-- Helping other users on Discord
-
-Check out [CONTRIBUTING.md](CONTRIBUTING.md) for the details on how to get involved.
+This fork tracks upstream and stays close to it; divergences are the ones listed above.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-  <img src="https://repobeats.axiom.co/api/embed/3e8367ec2b2350e4fc48662df33c81dac657b833.svg" alt="Repobeats analytics image" />
-</div>
-
-<p align="center">
-  Built with ❤️ by the Kaneo team and <a href="#contributors">contributors</a>
-</p>
+MIT — see [LICENSE](LICENSE). Upstream © the Kaneo team and contributors; fork changes © 2026 philogicae.

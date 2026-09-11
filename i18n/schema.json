@@ -157,54 +157,6 @@
 					},
 					"required": ["true", "false", "undefined", "notSet"]
 				},
-				"language": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"english": {
-							"type": "string"
-						},
-						"german": {
-							"type": "string"
-						},
-						"greek": {
-							"type": "string"
-						},
-						"macedonian": {
-							"type": "string"
-						},
-						"french": {
-							"type": "string"
-						},
-						"spanish": {
-							"type": "string"
-						},
-						"dutch": {
-							"type": "string"
-						},
-						"korean": {
-							"type": "string"
-						},
-						"chinese": {
-							"type": "string"
-						},
-						"italian": {
-							"type": "string"
-						}
-					},
-					"required": [
-						"english",
-						"german",
-						"greek",
-						"macedonian",
-						"french",
-						"spanish",
-						"dutch",
-						"korean",
-						"chinese",
-						"italian"
-					]
-				},
 				"people": {
 					"type": "object",
 					"additionalProperties": false,
@@ -381,9 +333,6 @@
 								"createButton": {
 									"type": "string"
 								},
-								"successToast": {
-									"type": "string"
-								},
 								"errorToast": {
 									"type": "string"
 								}
@@ -399,7 +348,6 @@
 								"keyLabel",
 								"keyHint",
 								"createButton",
-								"successToast",
 								"errorToast"
 							]
 						},
@@ -481,9 +429,6 @@
 									"type": "string"
 								},
 								"priority": {
-									"type": "string"
-								},
-								"statusFallback": {
 									"type": "string"
 								},
 								"startDate": {
@@ -632,7 +577,6 @@
 								"successUpdated",
 								"createError",
 								"priority",
-								"statusFallback",
 								"startDate",
 								"dueDate",
 								"clearStartDate",
@@ -669,7 +613,6 @@
 				"pagination",
 				"breadcrumb",
 				"boolean",
-				"language",
 				"people",
 				"error",
 				"formats",
@@ -1815,55 +1758,7 @@
 						"removeRule": {
 							"type": "string"
 						},
-						"toastEmailSaved": {
-							"type": "string"
-						},
-						"toastEmailSaveFailed": {
-							"type": "string"
-						},
-						"toastNtfySaved": {
-							"type": "string"
-						},
-						"toastNtfySaveFailed": {
-							"type": "string"
-						},
-						"toastNtfyDisconnected": {
-							"type": "string"
-						},
-						"toastNtfyDisconnectFailed": {
-							"type": "string"
-						},
-						"toastGotifySaved": {
-							"type": "string"
-						},
-						"toastGotifySaveFailed": {
-							"type": "string"
-						},
-						"toastGotifyDisconnected": {
-							"type": "string"
-						},
-						"toastGotifyDisconnectFailed": {
-							"type": "string"
-						},
-						"toastWebhookSaved": {
-							"type": "string"
-						},
-						"toastWebhookSaveFailed": {
-							"type": "string"
-						},
-						"toastWebhookDisconnected": {
-							"type": "string"
-						},
-						"toastWebhookDisconnectFailed": {
-							"type": "string"
-						},
-						"toastRuleSaved": {
-							"type": "string"
-						},
 						"toastRuleSaveFailed": {
-							"type": "string"
-						},
-						"toastRuleRemoved": {
 							"type": "string"
 						},
 						"toastRuleRemoveFailed": {
@@ -1961,23 +1856,7 @@
 						"noProjectsInWorkspace",
 						"createRule",
 						"removeRule",
-						"toastEmailSaved",
-						"toastEmailSaveFailed",
-						"toastNtfySaved",
-						"toastNtfySaveFailed",
-						"toastNtfyDisconnected",
-						"toastNtfyDisconnectFailed",
-						"toastGotifySaved",
-						"toastGotifySaveFailed",
-						"toastGotifyDisconnected",
-						"toastGotifyDisconnectFailed",
-						"toastWebhookSaved",
-						"toastWebhookSaveFailed",
-						"toastWebhookDisconnected",
-						"toastWebhookDisconnectFailed",
-						"toastRuleSaved",
 						"toastRuleSaveFailed",
-						"toastRuleRemoved",
 						"toastRuleRemoveFailed",
 						"toastPreferencesSaved",
 						"toastPreferencesSaveFailed",
@@ -2073,9 +1952,6 @@
 						"list": {
 							"type": "string"
 						},
-						"gantt": {
-							"type": "string"
-						},
 						"sidebarDefault": {
 							"type": "string"
 						},
@@ -2148,7 +2024,6 @@
 						"selectViewMode",
 						"board",
 						"list",
-						"gantt",
 						"sidebarDefault",
 						"sidebarDefaultDescription",
 						"displayOptions",
@@ -3974,9 +3849,6 @@
 						"addButton": {
 							"type": "string"
 						},
-						"creating": {
-							"type": "string"
-						},
 						"loading": {
 							"type": "string"
 						},
@@ -3993,9 +3865,6 @@
 							"type": "string"
 						},
 						"deleteButton": {
-							"type": "string"
-						},
-						"deleting": {
 							"type": "string"
 						},
 						"deleteSuccess": {
@@ -4035,14 +3904,12 @@
 						"optionsPlaceholder",
 						"required",
 						"addButton",
-						"creating",
 						"loading",
 						"empty",
 						"defaultLabel",
 						"createSuccess",
 						"createError",
 						"deleteButton",
-						"deleting",
 						"deleteSuccess",
 						"deleteError",
 						"types"
@@ -4724,9 +4591,6 @@
 						"saveChanges": {
 							"type": "string"
 						},
-						"update": {
-							"type": "string"
-						},
 						"disconnect": {
 							"type": "string"
 						}
@@ -4749,7 +4613,6 @@
 						"events",
 						"connect",
 						"saveChanges",
-						"update",
 						"disconnect"
 					]
 				},
@@ -4877,9 +4740,6 @@
 						"saveChanges": {
 							"type": "string"
 						},
-						"update": {
-							"type": "string"
-						},
 						"disconnect": {
 							"type": "string"
 						}
@@ -4902,7 +4762,6 @@
 						"events",
 						"connect",
 						"saveChanges",
-						"update",
 						"disconnect"
 					]
 				},
@@ -5030,9 +4889,6 @@
 						"saveChanges": {
 							"type": "string"
 						},
-						"update": {
-							"type": "string"
-						},
 						"disconnect": {
 							"type": "string"
 						}
@@ -5055,7 +4911,6 @@
 						"events",
 						"connect",
 						"saveChanges",
-						"update",
 						"disconnect"
 					]
 				},
@@ -5904,9 +5759,6 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
-						"overview": {
-							"type": "string"
-						},
 						"projects": {
 							"type": "string"
 						},
@@ -5924,7 +5776,6 @@
 						}
 					},
 					"required": [
-						"overview",
 						"projects",
 						"members",
 						"invitations",
@@ -6294,24 +6145,6 @@
 			"additionalProperties": false,
 			"properties": {
 				"title": {
-					"type": "string"
-				},
-				"newCount_one": {
-					"type": "string"
-				},
-				"newCount_zero": {
-					"type": "string"
-				},
-				"newCount_two": {
-					"type": "string"
-				},
-				"newCount_few": {
-					"type": "string"
-				},
-				"newCount_many": {
-					"type": "string"
-				},
-				"newCount_other": {
 					"type": "string"
 				},
 				"emptyTitle": {
@@ -8133,12 +7966,6 @@
 						"noValuesUsedYet": {
 							"type": "string"
 						},
-						"noCustomFieldValues": {
-							"type": "string"
-						},
-						"allCustomFieldValues": {
-							"type": "string"
-						},
 						"selectedCount": {
 							"type": "string"
 						},
@@ -8213,8 +8040,6 @@
 						"allDueDates",
 						"allLabels",
 						"noValuesUsedYet",
-						"noCustomFieldValues",
-						"allCustomFieldValues",
 						"all",
 						"subjects",
 						"operators"
@@ -9408,20 +9233,14 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
-						"project": {
-							"type": "string"
-						},
 						"progress": {
 							"type": "string"
 						},
 						"tasks": {
 							"type": "string"
-						},
-						"status": {
-							"type": "string"
 						}
 					},
-					"required": ["project", "progress", "tasks", "status"]
+					"required": ["progress", "tasks"]
 				},
 				"section": {
 					"type": "object",
@@ -9529,9 +9348,6 @@
 						"noDueDate": {
 							"type": "string"
 						},
-						"reorderHandle": {
-							"type": "string"
-						},
 						"reorderError": {
 							"type": "string"
 						}
@@ -9549,7 +9365,6 @@
 						"emptyDescriptionReadOnly",
 						"projectStatus",
 						"noDueDate",
-						"reorderHandle",
 						"reorderError"
 					]
 				},
@@ -9835,18 +9650,9 @@
 								},
 								"joined": {
 									"type": "string"
-								},
-								"actions": {
-									"type": "string"
 								}
 							},
-							"required": ["name", "role", "joined", "actions"]
-						},
-						"memberRolePending": {
-							"type": "string"
-						},
-						"ariaCancelInvitation": {
-							"type": "string"
+							"required": ["name", "role", "joined"]
 						},
 						"ariaInvitationActions": {
 							"type": "string"
@@ -9895,8 +9701,6 @@
 						"emptyTitle",
 						"emptyDescription",
 						"columns",
-						"memberRolePending",
-						"ariaCancelInvitation",
 						"ariaInvitationActions",
 						"ariaRemoveMember",
 						"removeDialogTitle",
@@ -9968,9 +9772,6 @@
 						"externalLinks": {
 							"type": "string"
 						},
-						"pullRequestFallback": {
-							"type": "string"
-						},
 						"issueFallback": {
 							"type": "string"
 						},
@@ -9996,7 +9797,6 @@
 					"required": [
 						"labels",
 						"externalLinks",
-						"pullRequestFallback",
 						"issueFallback",
 						"prStatusMerged",
 						"prStatusDraft",

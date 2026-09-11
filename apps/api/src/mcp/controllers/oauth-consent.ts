@@ -1,6 +1,5 @@
 import { HTTPException } from "hono/http-exception";
 import { auth } from "../../auth";
-import { publishEvent } from "../../events";
 import type { z } from "../../openapi";
 import {
   consumeAuthorizationRequest,
@@ -133,11 +132,6 @@ export async function decideMcpAuthorizationRequest(params: {
     clientId: request.clientId,
     userId: session.user.id,
     codeChallenge: request.codeChallenge,
-    redirectUri: request.redirectUri,
-  });
-  await publishEvent("mcp.authorization_code_issued", {
-    clientId: request.clientId,
-    userId: session.user.id,
     redirectUri: request.redirectUri,
   });
   return buildAuthorizationRedirect(request, { code });

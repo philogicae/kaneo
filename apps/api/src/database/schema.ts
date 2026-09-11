@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   boolean,
   customType,
@@ -1189,103 +1189,6 @@ export const mcpOauthStateTable = pgTable(
     uniqueIndex("mcp_oauth_state_kind_key_uidx").on(table.kind, table.key),
     index("mcp_oauth_state_expiresAt_idx").on(table.expiresAt),
   ],
-);
-
-// Auth-schema compatible aliases in schema.ts
-export const user = userTable;
-export const session = sessionTable;
-export const account = accountTable;
-export const verification = verificationTable;
-export const workspace = workspaceTable;
-export const team = teamTable;
-export const teamMember = teamMemberTable;
-export const workspace_member = workspaceUserTable;
-export const invitation = invitationTable;
-export const organizationRole = workspaceRoleTable;
-export const apikey = apikeyTable;
-export const deviceCode = deviceCodeTable;
-
-// Auth-schema compatible relation exports in schema.ts
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  teamMembers: many(teamMember),
-  workspace_members: many(workspace_member),
-  invitations: many(invitation),
-}));
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}));
-
-export const workspaceRelations = relations(workspace, ({ many }) => ({
-  teams: many(team),
-  workspace_members: many(workspace_member),
-  invitations: many(invitation),
-}));
-
-export const teamRelations = relations(team, ({ one, many }) => ({
-  workspace: one(workspace, {
-    fields: [team.workspaceId],
-    references: [workspace.id],
-  }),
-  teamMembers: many(teamMember),
-}));
-
-export const teamMemberRelations = relations(teamMember, ({ one }) => ({
-  team: one(team, {
-    fields: [teamMember.teamId],
-    references: [team.id],
-  }),
-  user: one(user, {
-    fields: [teamMember.userId],
-    references: [user.id],
-  }),
-}));
-
-export const workspace_memberRelations = relations(
-  workspace_member,
-  ({ one }) => ({
-    workspace: one(workspace, {
-      fields: [workspace_member.workspaceId],
-      references: [workspace.id],
-    }),
-    user: one(user, {
-      fields: [workspace_member.userId],
-      references: [user.id],
-    }),
-  }),
-);
-
-export const invitationRelations = relations(invitation, ({ one }) => ({
-  workspace: one(workspace, {
-    fields: [invitation.workspaceId],
-    references: [workspace.id],
-  }),
-  user: one(user, {
-    fields: [invitation.inviterId],
-    references: [user.id],
-  }),
-}));
-
-export const organizationRoleRelations = relations(
-  organizationRole,
-  ({ one }) => ({
-    workspace: one(workspace, {
-      fields: [organizationRole.workspaceId],
-      references: [workspace.id],
-    }),
-  }),
 );
 
 export const customFieldDefinitionTable = pgTable(

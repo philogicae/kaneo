@@ -41,18 +41,6 @@
 			"undefined": "Undefined",
 			"notSet": "Not Set"
 		},
-		"language": {
-			"english": "English",
-			"german": "German",
-			"greek": "Greek",
-			"macedonian": "Macedonian",
-			"french": "French",
-			"spanish": "Spanish",
-			"dutch": "Dutch",
-			"korean": "Korean",
-			"chinese": "Chinese",
-			"italian": "Italian"
-		},
 		"people": {
 			"someone": "Someone",
 			"unknown": "Unknown"
@@ -102,7 +90,6 @@
 				"keyLabel": "Key:",
 				"keyHint": "Used for ticket IDs (e.g., {{example}}-123)",
 				"createButton": "Create Project",
-				"successToast": "Project created successfully",
 				"errorToast": "Failed to create project"
 			},
 			"createWorkspace": {
@@ -128,7 +115,6 @@
 				"successUpdated": "Task updated successfully",
 				"createError": "Failed to create task",
 				"priority": "Priority",
-				"statusFallback": "In Progress",
 				"startDate": "Start date",
 				"dueDate": "Due date",
 				"clearStartDate": "Clear start date",
@@ -477,23 +463,7 @@
 			"noProjectsInWorkspace": "No projects available for this workspace yet.",
 			"createRule": "Create rule",
 			"removeRule": "Remove rule",
-			"toastEmailSaved": "Email notification settings saved",
-			"toastEmailSaveFailed": "Failed to save email settings",
-			"toastNtfySaved": "ntfy settings saved",
-			"toastNtfySaveFailed": "Failed to save ntfy settings",
-			"toastNtfyDisconnected": "ntfy disconnected",
-			"toastNtfyDisconnectFailed": "Failed to disconnect ntfy",
-			"toastGotifySaved": "Gotify settings saved",
-			"toastGotifySaveFailed": "Failed to save Gotify settings",
-			"toastGotifyDisconnected": "Gotify disconnected",
-			"toastGotifyDisconnectFailed": "Failed to disconnect Gotify",
-			"toastWebhookSaved": "Webhook settings saved",
-			"toastWebhookSaveFailed": "Failed to save webhook settings",
-			"toastWebhookDisconnected": "Webhook disconnected",
-			"toastWebhookDisconnectFailed": "Failed to disconnect webhook",
-			"toastRuleSaved": "Saved notification rule for {{workspaceName}}",
 			"toastRuleSaveFailed": "Failed to save workspace notification rule",
-			"toastRuleRemoved": "Removed notification rule for {{workspaceName}}",
 			"toastRuleRemoveFailed": "Failed to remove workspace notification rule",
 			"toastPreferencesSaved": "Notification preferences saved",
 			"toastPreferencesSaveFailed": "Failed to save notification preferences",
@@ -529,7 +499,6 @@
 			"selectViewMode": "Select a view mode",
 			"board": "Board",
 			"list": "List",
-			"gantt": "Gantt",
 			"sidebarDefault": "Sidebar Default",
 			"sidebarDefaultDescription": "Keep sidebar expanded on startup",
 			"displayOptions": "Display options",
@@ -1008,14 +977,12 @@
 			"optionsPlaceholder": "Options separated by commas",
 			"required": "Required",
 			"addButton": "Add",
-			"creating": "Creating...",
 			"loading": "Loading custom fields...",
 			"empty": "No custom fields configured yet.",
 			"defaultLabel": "Default",
 			"createSuccess": "Custom field created.",
 			"createError": "Failed to create custom field.",
 			"deleteButton": "Delete",
-			"deleting": "Deleting...",
 			"deleteSuccess": "Custom field deleted.",
 			"deleteError": "Failed to delete custom field.",
 			"types": {
@@ -1198,7 +1165,6 @@
 			},
 			"connect": "Connect Slack",
 			"saveChanges": "Save changes",
-			"update": "Update Slack",
 			"disconnect": "Disconnect"
 		},
 		"discordIntegration": {
@@ -1236,7 +1202,6 @@
 			},
 			"connect": "Connect Discord",
 			"saveChanges": "Save changes",
-			"update": "Update Discord",
 			"disconnect": "Disconnect"
 		},
 		"mattermostIntegration": {
@@ -1274,7 +1239,6 @@
 			},
 			"connect": "Connect Mattermost",
 			"saveChanges": "Save changes",
-			"update": "Update Mattermost",
 			"disconnect": "Disconnect"
 		},
 		"genericWebhookIntegration": {
@@ -1458,7 +1422,6 @@
 		},
 		"notifications": "Notifications",
 		"sidebar": {
-			"overview": "Overview",
 			"projects": "Projects",
 			"members": "Members",
 			"invitations": "Invitations",
@@ -1555,8 +1518,6 @@
 	},
 	"notifications": {
 		"title": "Notifications",
-		"newCount_one": "{{count}} new",
-		"newCount_other": "{{count}} new",
 		"emptyTitle": "No notifications yet",
 		"emptySubtitle": "You'll see updates and activity here.",
 		"clearAll": "Clear all notifications",
@@ -2006,8 +1967,6 @@
 			"allDueDates": "All due dates",
 			"allLabels": "All labels",
 			"noValuesUsedYet": "No values used yet",
-			"noCustomFieldValues": "No custom field values",
-			"allCustomFieldValues": "All values",
 			"selectedCount": "{{count}} selected",
 			"all": "All",
 			"subjects": {
@@ -2246,10 +2205,8 @@
 			"completion": "Completion"
 		},
 		"table": {
-			"project": "Project",
 			"progress": "Progress",
-			"tasks": "Tasks",
-			"status": "Status"
+			"tasks": "Tasks"
 		},
 		"section": {
 			"projectCount_one": "{{count}} project",
@@ -2278,7 +2235,6 @@
 				"inProgress": "In progress"
 			},
 			"noDueDate": "No due date",
-			"reorderHandle": "Reorder project",
 			"reorderError": "Failed to reorder projects"
 		},
 		"search": {
@@ -2352,11 +2308,8 @@
 			"columns": {
 				"name": "Name",
 				"role": "Role",
-				"joined": "Joined",
-				"actions": "Actions"
+				"joined": "Joined"
 			},
-			"memberRolePending": "{{role}} (Pending)",
-			"ariaCancelInvitation": "Cancel invitation",
 			"ariaInvitationActions": "Invitation actions",
 			"ariaRemoveMember": "Remove member",
 			"removeDialogTitle": "Remove Team Member?",
@@ -2387,7 +2340,6 @@
 		"taskDetail": {
 			"labels": "Labels",
 			"externalLinks": "External Links",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Issue",
 			"prStatusMerged": "Merged",
 			"prStatusDraft": "Draft",

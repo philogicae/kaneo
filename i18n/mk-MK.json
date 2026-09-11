@@ -327,18 +327,6 @@
 			"label": "Навигација",
 			"more": "Повеќе"
 		},
-		"language": {
-			"english": "Англиски",
-			"german": "Германски",
-			"greek": "Грчки",
-			"macedonian": "Македонски",
-			"french": "Француски",
-			"spanish": "Шпански",
-			"dutch": "Холандски",
-			"korean": "Корејски",
-			"chinese": "Кинески",
-			"italian": "Италијански"
-		},
 		"people": {
 			"someone": "Некој",
 			"unknown": "Непознат"
@@ -388,7 +376,6 @@
 				"keyLabel": "Клуч:",
 				"keyHint": "Се користи за ID на тикети (пр. {{example}}-123)",
 				"createButton": "Креирај проект",
-				"successToast": "Проектот е успешно креиран",
 				"errorToast": "Неуспешно креирање на проект"
 			},
 			"createWorkspace": {
@@ -414,7 +401,6 @@
 				"successUpdated": "Задачата е успешно ажурирана",
 				"createError": "Неуспешно креирање на задача",
 				"priority": "Приоритет",
-				"statusFallback": "Во тек",
 				"startDate": "Почетен датум",
 				"dueDate": "Краен рок",
 				"clearStartDate": "Исчисти почетен датум",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Известувања",
 		"sidebar": {
-			"overview": "Преглед",
 			"projects": "Проекти",
 			"members": "Членови",
 			"invitations": "Покани",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Известувања",
-		"newCount_one": "{{count}} ново",
-		"newCount_other": "{{count}} нови",
 		"emptyTitle": "Нема известувања засега",
 		"emptySubtitle": "Тука ќе ги гледаш ажурирањата и активностите.",
 		"clearAll": "Исчисти ги сите известувања",
@@ -686,7 +669,6 @@
 		"taskDetail": {
 			"labels": "Етикети",
 			"externalLinks": "Надворешни линкови",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Пријава",
 			"prStatusMerged": "Споен",
 			"prStatusDraft": "Нацрт",
@@ -795,13 +777,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -862,7 +842,6 @@
 			},
 			"connect": "Поврзи Discord",
 			"saveChanges": "Зачувај промени",
-			"update": "Ажурирај Discord",
 			"disconnect": "Откачи"
 		},
 		"externalLinks": {
@@ -1128,7 +1107,6 @@
 				"saveError": "Не успеа зачувување на Mattermost интеграцијата",
 				"updateError": "Не успеа ажурирање на Mattermost интеграцијата"
 			},
-			"update": "Ажурирај Mattermost",
 			"validation": {
 				"webhookInvalid": "Внесете валидна URL на Mattermost webhook"
 			},
@@ -1222,23 +1200,7 @@
 			"noProjectsInWorkspace": "Сè уште нема достапни проекти за овој работен простор.",
 			"createRule": "Креирај правило",
 			"removeRule": "Отстрани правило",
-			"toastEmailSaved": "Поставките за известувања по е-пошта се зачувани",
-			"toastEmailSaveFailed": "Неуспешно зачувување на поставките за е-пошта",
-			"toastNtfySaved": "ntfy поставките се зачувани",
-			"toastNtfySaveFailed": "Неуспешно зачувување на ntfy поставките",
-			"toastNtfyDisconnected": "ntfy е исклучен",
-			"toastNtfyDisconnectFailed": "Неуспешно исклучување на ntfy",
-			"toastGotifySaved": "Gotify поставките се зачувани",
-			"toastGotifySaveFailed": "Неуспешно зачувување на Gotify поставките",
-			"toastGotifyDisconnected": "Gotify е исклучен",
-			"toastGotifyDisconnectFailed": "Неуспешно исклучување на Gotify",
-			"toastWebhookSaved": "Webhook поставките се зачувани",
-			"toastWebhookSaveFailed": "Неуспешно зачувување на webhook поставките",
-			"toastWebhookDisconnected": "Webhook-от е исклучен",
-			"toastWebhookDisconnectFailed": "Неуспешно исклучување на webhook-от",
-			"toastRuleSaved": "Правилото за известувања за {{workspaceName}} е зачувано",
 			"toastRuleSaveFailed": "Неуспешно зачувување на правилото за известувања на работниот простор",
-			"toastRuleRemoved": "Правилото за известувања за {{workspaceName}} е отстрането",
 			"toastRuleRemoveFailed": "Неуспешно отстранување на правилото за известувања на работниот простор",
 			"toastPreferencesSaved": "Преференциите за известувања се зачувани",
 			"toastPreferencesSaveFailed": "Неуспешно зачувување на преференциите за известувања",
@@ -1286,7 +1248,6 @@
 			"selectViewMode": "Избери режим на приказ",
 			"board": "Табла",
 			"list": "Листа",
-			"gantt": "Gantt",
 			"sidebarDefault": "Стандардна странична лента",
 			"sidebarDefaultDescription": "Задржи ја страничната лента отворена при стартување",
 			"displayOptions": "Опции за приказ",
@@ -1447,7 +1408,6 @@
 			},
 			"connect": "Поврзи Slack",
 			"saveChanges": "Зачувај промени",
-			"update": "Ажурирај Slack",
 			"disconnect": "Откачи"
 		},
 		"tasksImportExport": {
@@ -1852,8 +1812,6 @@
 				"includeAnyOf": "вклучува било кој од"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Пребарај тикети...",
@@ -2303,11 +2261,8 @@
 			"columns": {
 				"name": "Име",
 				"role": "Улога",
-				"joined": "Приклучен",
-				"actions": "Акции"
+				"joined": "Приклучен"
 			},
-			"memberRolePending": "{{role}} (На чекање)",
-			"ariaCancelInvitation": "Откажи покана",
 			"ariaRemoveMember": "Отстрани член",
 			"removeDialogTitle": "Отстрани член на тим?",
 			"removeDialogDescription": "Дали си сигурен дека сакаш да го отстраниш {{name}} од работниот простор? Оваа акција не може да се врати.",
@@ -2341,8 +2296,6 @@
 		},
 		"table": {
 			"progress": "Напредок",
-			"project": "Проект",
-			"status": "Статус",
 			"tasks": "Задачи"
 		},
 		"charts": {
@@ -2372,7 +2325,6 @@
 				"inProgress": "Во тек"
 			},
 			"noDueDate": "Без краен рок",
-			"reorderHandle": "Прередување на проектот",
 			"reorderError": "Прередувањето на проектите не успеа",
 			"emptyDescriptionReadOnly": "Сè уште нема проекти во овој работен простор. Замоли администратор да креира еден."
 		},

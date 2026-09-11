@@ -43,13 +43,6 @@ export const defaultSlackEvents: Record<SlackEventKey, boolean> = {
   taskCommentCreated: true,
 };
 
-export function getDefaultSlackConfig(webhookUrl: string): SlackConfig {
-  return {
-    webhookUrl,
-    events: { ...defaultSlackEvents },
-  };
-}
-
 export function normalizeSlackConfig(config: SlackConfig): SlackConfig {
   return {
     ...config,

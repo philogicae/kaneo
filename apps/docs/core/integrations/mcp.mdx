@@ -1,18 +1,13 @@
 ---
 title: Kaneo MCP Server
-description: Connect Kaneo to MCP clients like Cursor and Claude Desktop using the official Kaneo MCP server.
+description: Connect Kaneo to MCP clients like Cursor and Claude Code through the built-in HTTP MCP endpoint.
 ---
 
-Kaneo supports the Model Context Protocol (MCP) in two ways:
+Kaneo ships a built-in MCP (Model Context Protocol) endpoint: every instance exposes `/api/mcp` out of the box. No extra process, no extra package — clients connect over Streamable HTTP directly to your instance.
 
-1. **Built-in HTTP endpoint**: every Kaneo instance exposes `/api/mcp` out of the box. No extra setup, no extra process.
-2. **Stdio package** ([`@kaneo/mcp`](https://www.npmjs.com/package/@kaneo/mcp)): the official Kaneo MCP package on npm, a local stdio server for clients that prefer stdio transport.
-
-Both offer the same tools for managing workspaces, projects, tasks, comments, and labels.
+> Upstream Kaneo also publishes a stdio npm package ([`@kaneo/mcp`](https://www.npmjs.com/package/@kaneo/mcp)) for clients that only support stdio transport. This fork's documentation covers the built-in HTTP endpoint, which is what the instance uses. See the [upstream docs](https://kaneo.app/docs/core/integrations/mcp) for the stdio package.
 
 ## Built-in HTTP endpoint
-
-Every Kaneo API instance ships with a Streamable HTTP MCP endpoint. This is the recommended approach for self-hosted deployments.
 
 Point your MCP client at:
 
@@ -46,75 +41,9 @@ stateless and self-contained, while 2025-era clients keep the sessionful
 `initialize` flow. See [MCP 2026-07-28 stateless compatibility](/core/integrations/mcp-stateless)
 for the exact contract, tests, Codex configuration, limitations, and rollback.
 
-## Stdio package
-
-The `@kaneo/mcp` package runs a local stdio MCP server and authenticates with Kaneo using device authorization. Use this when your MCP client requires stdio transport.
-
-### Prerequisites
-
-- Node.js 24 or newer
-- A running Kaneo API
-- Access to the Kaneo web app to approve device login
-
-By default, self-hosted Kaneo allows both `kaneo-cli` and `kaneo-mcp` as device auth client IDs.
-
-### Install and register
-
-Use the recommended interactive installer:
-
-```bash
-npx @kaneo/mcp
-```
-
-The installer lets you choose where to register the server configuration:
-
-- Cursor (user-wide)
-- Cursor (project-level)
-- Claude Desktop
-- Custom JSON config path
-
-You can also run the explicit install command:
-
-```bash
-kaneo-mcp install --target cursor-user -y
-```
-
-Use `--help` to see all available targets and flags:
-
-```bash
-kaneo-mcp install --help
-```
-
-### Point to a self-hosted instance
-
-When generating config, pass your Kaneo base URL:
-
-```bash
-kaneo-mcp install --target cursor-user -y --api-url https://kaneo.example.com
-```
-
-Or set it via environment variable:
-
-| Variable | Description |
-| --- | --- |
-| `KANEO_API_URL` | Kaneo API origin. Default: `http://localhost:1337`. Do not include `/api`. |
-| `KANEO_MCP_CLIENT_ID` | Device auth client ID. Default: `kaneo-mcp`. |
-
-If you override `KANEO_MCP_CLIENT_ID`, make sure it is included in [`DEVICE_AUTH_CLIENT_IDS`](/core/installation/environment-variables).
-
-### Authentication flow
-
-On the first tool call that needs Kaneo access, the MCP server:
-
-1. Requests a device code from Kaneo
-2. Prints a verification URL and user code
-3. Opens the browser when possible
-4. Polls until you approve sign-in
-5. Stores credentials in `~/.config/kaneo-mcp/credentials.json`
-
 ## Available tools
 
-Both the HTTP endpoint and stdio package expose the same tools:
+The HTTP endpoint exposes these tools:
 
 - Session: `whoami`, `list_workspaces`, `list_workspace_members`, `list_notifications`
 - Search: `search`
@@ -137,15 +66,10 @@ Gantt selection.
 
 ## Debugging
 
-To run the stdio server directly:
+Check that the endpoint responds and discovery metadata resolves:
 
 ```bash
-npx @kaneo/mcp serve
+curl -i https://your-kaneo-instance.com/.well-known/oauth-protected-resource/api/mcp
 ```
 
-When running from source in this monorepo:
-
-```bash
-pnpm --filter @kaneo/mcp run build
-pnpm --filter @kaneo/mcp run start
-```
+A `401` from `/api/mcp` without credentials is expected; a `404` usually means the reverse proxy in front of the instance does not forward the `/.well-known` paths or the `/api/mcp` route. Authentication failures with API keys most often mean the key was revoked or lacks workspace access — regenerate it in Settings → Account → Developer.

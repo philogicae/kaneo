@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Asla"
 		},
-		"language": {
-			"english": "İngilizce",
-			"german": "Almanca",
-			"greek": "Yunanca",
-			"macedonian": "Makedonca",
-			"french": "Fransızca",
-			"spanish": "İspanyolca",
-			"dutch": "Hollandaca",
-			"korean": "Korece",
-			"chinese": "Çince",
-			"italian": "İtalyanca"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Yeni proje oluştur",
@@ -378,7 +366,6 @@
 				"keyLabel": "Anahtar:",
 				"keyHint": "Talep kimlikleri için kullanılır (örn. {{example}}-123)",
 				"createButton": "Proje Oluştur",
-				"successToast": "Proje başarıyla oluşturuldu",
 				"errorToast": "Proje oluşturulamadı"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Talep başarıyla güncellendi",
 				"createError": "Talep oluşturulamadı",
 				"priority": "Öncelik",
-				"statusFallback": "Devam Ediyor",
 				"startDate": "Başlangıç tarihi",
 				"dueDate": "Bitiş tarihi",
 				"clearStartDate": "Başlangıç tarihini temizle",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Bildirimler",
 		"sidebar": {
-			"overview": "Genel Bakış",
 			"projects": "Projeler",
 			"members": "Üyeler",
 			"invitations": "Davetler",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Bildirimler",
-		"newCount_one": "{{count}} yeni",
-		"newCount_other": "{{count}} yeni",
 		"emptyTitle": "Henüz bildirim yok",
 		"emptySubtitle": "Güncellemeleri ve aktiviteleri burada göreceksiniz.",
 		"clearAll": "Tüm bildirimleri temizle",
@@ -686,7 +669,6 @@
 		"taskDetail": {
 			"labels": "Etiketler",
 			"externalLinks": "Dış Bağlantılar",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Sorun",
 			"prStatusMerged": "Birleştirildi",
 			"prStatusDraft": "Taslak",
@@ -795,13 +777,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -862,7 +842,6 @@
 			},
 			"connect": "Discord bağla",
 			"saveChanges": "Değişiklikleri kaydet",
-			"update": "Discord'u güncelle",
 			"disconnect": "Bağlantıyı kes"
 		},
 		"externalLinks": {
@@ -1128,7 +1107,6 @@
 				"saveError": "Mattermost entegrasyonu kaydedilemedi",
 				"updateError": "Mattermost entegrasyonu güncellenemedi"
 			},
-			"update": "Mattermost'u güncelle",
 			"validation": {
 				"webhookInvalid": "Geçerli bir Mattermost webhook URL'si girin"
 			},
@@ -1222,23 +1200,7 @@
 			"noProjectsInWorkspace": "Bu çalışma alanında henüz proje yok.",
 			"createRule": "Kural oluştur",
 			"removeRule": "Kuralı kaldır",
-			"toastEmailSaved": "E-posta bildirim ayarları kaydedildi",
-			"toastEmailSaveFailed": "E-posta ayarları kaydedilemedi",
-			"toastNtfySaved": "ntfy ayarları kaydedildi",
-			"toastNtfySaveFailed": "ntfy ayarları kaydedilemedi",
-			"toastNtfyDisconnected": "ntfy bağlantısı kesildi",
-			"toastNtfyDisconnectFailed": "ntfy bağlantısı kesilemedi",
-			"toastGotifySaved": "Gotify ayarları kaydedildi",
-			"toastGotifySaveFailed": "Gotify ayarları kaydedilemedi",
-			"toastGotifyDisconnected": "Gotify bağlantısı kesildi",
-			"toastGotifyDisconnectFailed": "Gotify bağlantısı kesilemedi",
-			"toastWebhookSaved": "Webhook ayarları kaydedildi",
-			"toastWebhookSaveFailed": "Webhook ayarları kaydedilemedi",
-			"toastWebhookDisconnected": "Webhook bağlantısı kesildi",
-			"toastWebhookDisconnectFailed": "Webhook bağlantısı kesilemedi",
-			"toastRuleSaved": "{{workspaceName}} için bildirim kuralı kaydedildi",
 			"toastRuleSaveFailed": "Çalışma alanı bildirim kuralı kaydedilemedi",
-			"toastRuleRemoved": "{{workspaceName}} için bildirim kuralı kaldırıldı",
 			"toastRuleRemoveFailed": "Çalışma alanı bildirim kuralı kaldırılamadı",
 			"toastPreferencesSaved": "Bildirim tercihleri kaydedildi",
 			"toastPreferencesSaveFailed": "Bildirim tercihleri kaydedilemedi",
@@ -1286,7 +1248,6 @@
 			"selectViewMode": "Bir görünüm modu seçin",
 			"board": "Pano",
 			"list": "Liste",
-			"gantt": "Gantt",
 			"sidebarDefault": "Kenar Çubuğu Varsayılanı",
 			"sidebarDefaultDescription": "Başlangıçta kenar çubuğunu geniş tut",
 			"displayOptions": "Görüntüleme seçenekleri",
@@ -1447,7 +1408,6 @@
 			},
 			"connect": "Slack bağla",
 			"saveChanges": "Değişiklikleri kaydet",
-			"update": "Slack'i güncelle",
 			"disconnect": "Bağlantıyı kes"
 		},
 		"tasksImportExport": {
@@ -1852,8 +1812,6 @@
 				"includeAnyOf": "herhangi birini içer"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Talep ara...",
@@ -2303,11 +2261,8 @@
 			"columns": {
 				"name": "Ad",
 				"role": "Rol",
-				"joined": "Katılım",
-				"actions": "İşlemler"
+				"joined": "Katılım"
 			},
-			"memberRolePending": "{{role}} (Beklemede)",
-			"ariaCancelInvitation": "Daveti iptal et",
 			"ariaRemoveMember": "Üyeyi kaldır",
 			"removeDialogTitle": "Ekip Üyesi Kaldırılsın mı?",
 			"removeDialogDescription": "{{name}} kişisini çalışma alanından kaldırmak istediğinizden emin misiniz? Bu işlem geri alınamaz.",
@@ -2341,8 +2296,6 @@
 		},
 		"table": {
 			"progress": "İlerleme",
-			"project": "Proje",
-			"status": "Durum",
 			"tasks": "Görevler"
 		},
 		"charts": {
@@ -2373,7 +2326,6 @@
 				"inProgress": "Devam ediyor"
 			},
 			"noDueDate": "Bitiş tarihi yok",
-			"reorderHandle": "Projeyi yeniden sırala",
 			"reorderError": "Projeler yeniden sıralanamadı"
 		},
 		"search": {

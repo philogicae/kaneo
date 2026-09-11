@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Никогда"
 		},
-		"language": {
-			"english": "Английский",
-			"german": "Немецкий",
-			"greek": "Греческий",
-			"macedonian": "Македонский",
-			"french": "Французский",
-			"spanish": "Испанский",
-			"dutch": "Нидерландский",
-			"korean": "Корейский",
-			"chinese": "Китайский",
-			"italian": "Итальянский"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Создать новый проект",
@@ -378,7 +366,6 @@
 				"keyLabel": "Ключ:",
 				"keyHint": "Используется для идентификаторов задач (например, {{example}}-123)",
 				"createButton": "Создать проект",
-				"successToast": "Проект успешно создан",
 				"errorToast": "Не удалось создать проект"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Задача успешно обновлена",
 				"createError": "Не удалось создать задачу",
 				"priority": "Приоритет",
-				"statusFallback": "В работе",
 				"startDate": "Дата начала",
 				"dueDate": "Срок выполнения",
 				"clearStartDate": "Очистить дату начала",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Уведомления",
 		"sidebar": {
-			"overview": "Обзор",
 			"projects": "Проекты",
 			"members": "Участники",
 			"invitations": "Приглашения",
@@ -614,10 +599,6 @@
 	},
 	"notifications": {
 		"title": "Уведомления",
-		"newCount_one": "{{count}} новое",
-		"newCount_few": "{{count}} новых",
-		"newCount_many": "{{count}} новых",
-		"newCount_other": "{{count}} новых",
 		"emptyTitle": "Уведомлений пока нет",
 		"emptySubtitle": "Здесь будут отображаться обновления и активность.",
 		"clearAll": "Очистить все уведомления",
@@ -694,7 +675,6 @@
 		"taskDetail": {
 			"labels": "Метки",
 			"externalLinks": "Внешние ссылки",
-			"pullRequestFallback": "Пул-реквест",
 			"issueFallback": "Задача",
 			"prStatusMerged": "Влит",
 			"prStatusDraft": "Черновик",
@@ -803,13 +783,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -870,7 +848,6 @@
 			},
 			"connect": "Подключить Discord",
 			"saveChanges": "Сохранить изменения",
-			"update": "Обновить Discord",
 			"disconnect": "Отключить"
 		},
 		"externalLinks": {
@@ -1136,7 +1113,6 @@
 				"saveError": "Не удалось сохранить интеграцию Mattermost",
 				"updateError": "Не удалось обновить интеграцию Mattermost"
 			},
-			"update": "Обновить Mattermost",
 			"validation": {
 				"webhookInvalid": "Введите корректный URL webhook Mattermost"
 			},
@@ -1230,23 +1206,7 @@
 			"noProjectsInWorkspace": "В этой рабочей области пока нет проектов.",
 			"createRule": "Создать правило",
 			"removeRule": "Удалить правило",
-			"toastEmailSaved": "Настройки email-уведомлений сохранены",
-			"toastEmailSaveFailed": "Не удалось сохранить настройки email",
-			"toastNtfySaved": "Настройки ntfy сохранены",
-			"toastNtfySaveFailed": "Не удалось сохранить настройки ntfy",
-			"toastNtfyDisconnected": "ntfy отключён",
-			"toastNtfyDisconnectFailed": "Не удалось отключить ntfy",
-			"toastGotifySaved": "Настройки Gotify сохранены",
-			"toastGotifySaveFailed": "Не удалось сохранить настройки Gotify",
-			"toastGotifyDisconnected": "Gotify отключён",
-			"toastGotifyDisconnectFailed": "Не удалось отключить Gotify",
-			"toastWebhookSaved": "Настройки вебхука сохранены",
-			"toastWebhookSaveFailed": "Не удалось сохранить настройки вебхука",
-			"toastWebhookDisconnected": "Вебхук отключён",
-			"toastWebhookDisconnectFailed": "Не удалось отключить вебхук",
-			"toastRuleSaved": "Правило уведомлений для {{workspaceName}} сохранено",
 			"toastRuleSaveFailed": "Не удалось сохранить правило уведомлений для рабочей области",
-			"toastRuleRemoved": "Правило уведомлений для {{workspaceName}} удалено",
 			"toastRuleRemoveFailed": "Не удалось удалить правило уведомлений для рабочей области",
 			"toastPreferencesSaved": "Настройки уведомлений сохранены",
 			"toastPreferencesSaveFailed": "Не удалось сохранить настройки уведомлений",
@@ -1294,7 +1254,6 @@
 			"selectViewMode": "Выберите режим просмотра",
 			"board": "Доска",
 			"list": "Список",
-			"gantt": "Гант",
 			"sidebarDefault": "Боковая панель по умолчанию",
 			"sidebarDefaultDescription": "Оставлять боковую панель раскрытой при запуске",
 			"displayOptions": "Параметры отображения",
@@ -1455,7 +1414,6 @@
 			},
 			"connect": "Подключить Slack",
 			"saveChanges": "Сохранить изменения",
-			"update": "Обновить Slack",
 			"disconnect": "Отключить"
 		},
 		"tasksImportExport": {
@@ -1884,8 +1842,6 @@
 			},
 			"selectedCount": "{{count}} выбрано",
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Поиск задач...",
@@ -2395,11 +2351,8 @@
 			"columns": {
 				"name": "Имя",
 				"role": "Роль",
-				"joined": "Присоединился",
-				"actions": "Действия"
+				"joined": "Присоединился"
 			},
-			"memberRolePending": "{{role}} (Ожидает)",
-			"ariaCancelInvitation": "Отменить приглашение",
 			"ariaRemoveMember": "Удалить участника",
 			"removeDialogTitle": "Удалить участника команды?",
 			"removeDialogDescription": "Вы уверены, что хотите удалить {{name}} из рабочей области? Это действие нельзя отменить.",
@@ -2435,8 +2388,6 @@
 		},
 		"table": {
 			"progress": "Прогресс",
-			"project": "Проект",
-			"status": "Статус",
 			"tasks": "Задачи"
 		},
 		"charts": {
@@ -2466,7 +2417,6 @@
 				"inProgress": "В работе"
 			},
 			"noDueDate": "Без срока",
-			"reorderHandle": "Изменить порядок проекта",
 			"reorderError": "Не удалось изменить порядок проектов",
 			"emptyDescriptionReadOnly": "В этой рабочей области пока нет проектов. Попросите администратора создать проект."
 		},
