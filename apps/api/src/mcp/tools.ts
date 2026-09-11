@@ -621,7 +621,8 @@ export function registerMcpTools(
   registerTool(
     "list_workspace_labels",
     {
-      description: "List labels defined in a workspace.",
+      description:
+        "List labels defined in a workspace. The response mixes workspace-level labels (taskId null) with task-level copies attached to tasks; prefer taskId null entries for attach_label_to_task.",
       inputSchema: z.object({ workspaceId: nonEmptyString }),
     },
     async (args) =>
@@ -662,19 +663,35 @@ export function registerMcpTools(
   registerTool(
     "attach_label_to_task",
     {
-      description: "Attach an existing label to a task.",
+      description:
+        "Attach an existing workspace-level label to a task (the API copies it onto the task). Attaching a label that is already attached to another task is refused: the API would move it, silently detaching it from that task.",
       inputSchema: z.object({
         labelId: nonEmptyString,
         taskId: nonEmptyString,
       }),
     },
     async (args) =>
-      run(() =>
-        client.json(`/api/label/${encodeURIComponent(args.labelId)}/task`, {
-          method: "PUT",
-          body: JSON.stringify({ taskId: args.taskId }),
-        }),
-      ),
+      run(async () => {
+        // The API moves a task-level label to the target task (deleting it
+        // from its current one); refuse that so attaching stays
+        // non-destructive when a task-level copy is passed by mistake.
+        const label = (await client.json(
+          `/api/label/${encodeURIComponent(args.labelId)}`,
+          { method: "GET" },
+        )) as { taskId?: string | null };
+        if (label?.taskId && label.taskId !== args.taskId) {
+          throw new Error(
+            `Label is already attached to task ${label.taskId}; attaching it to another task would move it (detach it first, or use its workspace-level label).`,
+          );
+        }
+        return client.json(
+          `/api/label/${encodeURIComponent(args.labelId)}/task`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ taskId: args.taskId }),
+          },
+        );
+      }),
   );
 
   registerTool(
@@ -834,24 +851,15 @@ export function registerMcpTools(
     "delete_label",
     {
       description:
-        "Delete a label by ID. Only task-associated labels can be deleted; workspace-level labels (taskId null) are rejected by the API.",
+        "Delete a label by ID. Deleting a workspace-level label (taskId null) also deletes its task-level copies.",
       inputSchema: z.object({ id: nonEmptyString }),
     },
     async (args) =>
-      run(async () => {
-        const label = (await client.json(
-          `/api/label/${encodeURIComponent(args.id)}`,
-          { method: "GET" },
-        )) as { taskId?: string | null };
-        if (!label?.taskId) {
-          throw new Error(
-            "Label is not associated with a task and cannot be deleted (workspace-level labels are not deletable via this endpoint).",
-          );
-        }
-        return client.json(`/api/label/${encodeURIComponent(args.id)}`, {
+      run(() =>
+        client.json(`/api/label/${encodeURIComponent(args.id)}`, {
           method: "DELETE",
-        });
-      }),
+        }),
+      ),
   );
 
   registerTool(
