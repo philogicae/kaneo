@@ -391,6 +391,180 @@ describe("MCP OAuth security", () => {
     expect((await redeem(verifier)).status).toBe(400);
   });
 
+  it("accepts form token requests without a content-type header", async () => {
+    const redirectUri = "https://client.example/token-shapes";
+    const client = await registerClient(redirectUri);
+    const verifier = "missing-content-type-verifier";
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier,
+      approved: true,
+    });
+
+    const token = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code: callback.searchParams.get("code") ?? "",
+        client_id: client.client_id,
+        redirect_uri: redirectUri,
+        code_verifier: verifier,
+      }).toString(),
+    });
+    expect(token.status).toBe(200);
+    await expect(token.json()).resolves.toMatchObject({
+      token_type: "Bearer",
+    });
+  });
+
+  it("rejects unreadable bodies and mismatched redirect URIs with 400", async () => {
+    const redirectUri = "https://client.example/token-rejections";
+    const client = await registerClient(redirectUri);
+
+    const unreadable = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{not json",
+    });
+    expect(unreadable.status).toBe(400);
+    await expect(unreadable.json()).resolves.toMatchObject({
+      error: "invalid_request",
+    });
+
+    const invalidTypes = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        code: 123,
+        client_id: client.client_id,
+        redirect_uri: redirectUri,
+        code_verifier: { value: "verifier" },
+      }),
+    });
+    expect(invalidTypes.status).toBe(400);
+    await expect(invalidTypes.json()).resolves.toMatchObject({
+      error: "invalid_request",
+    });
+
+    const emptyJson = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+    });
+    expect(emptyJson.status).toBe(400);
+    await expect(emptyJson.json()).resolves.toMatchObject({
+      error: "unsupported_grant_type",
+    });
+
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier: "mismatch-verifier",
+      approved: true,
+    });
+    const mismatched = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code: callback.searchParams.get("code") ?? "",
+        client_id: client.client_id,
+        redirect_uri: "https://client.example/other",
+        code_verifier: "mismatch-verifier",
+      }),
+    });
+    expect(mismatched.status).toBe(400);
+    await expect(mismatched.json()).resolves.toMatchObject({
+      error: "invalid_grant",
+    });
+  });
+
+  it("accepts client_id via Basic auth and tolerates an omitted redirect_uri", async () => {
+    const redirectUri = "https://client.example/basic-client";
+    const client = await registerClient(redirectUri);
+    const verifier = "basic-auth-verifier-1234567890";
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier,
+      approved: true,
+    });
+
+    const basic = Buffer.from(
+      `${encodeURIComponent(client.client_id)}:`,
+    ).toString("base64");
+    const token = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        authorization: `Basic ${basic}`,
+      },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code: callback.searchParams.get("code") ?? "",
+        code_verifier: verifier,
+      }),
+    });
+    expect(token.status).toBe(200);
+    await expect(token.json()).resolves.toMatchObject({
+      token_type: "Bearer",
+    });
+  });
+
+  it("accepts token parameters carried in the query string", async () => {
+    const redirectUri = "https://client.example/query-params";
+    const client = await registerClient(redirectUri);
+    const verifier = "query-params-verifier-1234567890";
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier,
+      approved: true,
+    });
+
+    const query = new URLSearchParams({
+      grant_type: "authorization_code",
+      code: callback.searchParams.get("code") ?? "",
+      client_id: client.client_id,
+      redirect_uri: redirectUri,
+      code_verifier: verifier,
+    });
+    const token = await mcpRoutes.request(`/mcp/token?${query}`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+    });
+    expect(token.status).toBe(200);
+  });
+
+  it("describes which token parameter failed to match", async () => {
+    const redirectUri = "https://client.example/described-errors";
+    const client = await registerClient(redirectUri);
+    const callback = await decideAuthorization({
+      clientId: client.client_id,
+      redirectUri,
+      verifier: "described-errors-verifier",
+      approved: true,
+    });
+
+    const token = await mcpRoutes.request("/mcp/token", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code: callback.searchParams.get("code") ?? "",
+        client_id: "not-the-registered-client",
+        redirect_uri: redirectUri,
+        code_verifier: "described-errors-verifier",
+      }),
+    });
+    expect(token.status).toBe(400);
+    await expect(token.json()).resolves.toMatchObject({
+      error: "invalid_grant",
+      error_description: "client_id does not match the authorization request",
+    });
+  });
+
   it("sweeps expired authorization requests when creating a new one", async () => {
     const now = Date.now();
     vi.useFakeTimers();

@@ -2,8 +2,8 @@ import { Filter, PanelsTopLeft, Rows3, X } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import SortControl from "@/components/common/sort-control";
-import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import TaskSearchInput from "@/components/common/task-search-input";
+import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
