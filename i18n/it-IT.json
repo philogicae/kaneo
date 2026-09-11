@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Mai"
 		},
-		"language": {
-			"english": "Inglese",
-			"german": "Tedesco",
-			"greek": "Greco",
-			"macedonian": "Macedone",
-			"french": "Francese",
-			"spanish": "Spagnolo",
-			"dutch": "Olandese",
-			"korean": "Coreano",
-			"chinese": "Cinese",
-			"italian": "Italiano"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Crea un nuovo progetto",
@@ -378,7 +366,6 @@
 				"keyLabel": "Chiave:",
 				"keyHint": "Usata per gli ID dei ticket (es. {{example}}-123)",
 				"createButton": "Crea Progetto",
-				"successToast": "Progetto creato con successo",
 				"errorToast": "Creazione progetto fallita"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Attività aggiornata con successo",
 				"createError": "Creazione attività fallita",
 				"priority": "Priorità",
-				"statusFallback": "In Corso",
 				"startDate": "Data inizio",
 				"dueDate": "Data scadenza",
 				"clearStartDate": "Cancella data inizio",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Notifiche",
 		"sidebar": {
-			"overview": "Panoramica",
 			"projects": "Progetti",
 			"members": "Membri",
 			"invitations": "Inviti",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Notifiche",
-		"newCount_one": "{{count}} nuova",
-		"newCount_other": "{{count}} nuove",
 		"emptyTitle": "Nessuna notifica ancora",
 		"emptySubtitle": "Vedrai aggiornamenti e attività qui.",
 		"clearAll": "Cancella tutte le notifiche",
@@ -673,8 +656,7 @@
 				"contentWithTask": "Tracciamento tempo iniziato sull'attività: {{taskTitle}}",
 				"contentWithoutTask": "Tracciamento tempo iniziato su un'attività"
 			}
-		},
-		"newCount_many": "{{count}} nuove"
+		}
 	},
 	"publicProject": {
 		"pageTitle": "Vista Pubblica",
@@ -690,7 +672,6 @@
 		"taskDetail": {
 			"labels": "Etichette",
 			"externalLinks": "Link Esterni",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Segnalazione",
 			"prStatusMerged": "Unito",
 			"prStatusDraft": "Bozza",
@@ -799,13 +780,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -866,7 +845,6 @@
 			},
 			"connect": "Connetti Discord",
 			"saveChanges": "Salva modifiche",
-			"update": "Aggiorna Discord",
 			"disconnect": "Disconnetti"
 		},
 		"externalLinks": {
@@ -1132,7 +1110,6 @@
 				"saveError": "Salvataggio dell'integrazione Mattermost non riuscito",
 				"updateError": "Aggiornamento dell'integrazione Mattermost non riuscito"
 			},
-			"update": "Aggiorna Mattermost",
 			"validation": {
 				"webhookInvalid": "Inserisci un URL webhook Mattermost valido"
 			},
@@ -1240,23 +1217,7 @@
 			"noProjectsInWorkspace": "Nessun progetto disponibile per questo workspace al momento.",
 			"createRule": "Crea regola",
 			"removeRule": "Rimuovi regola",
-			"toastEmailSaved": "Impostazioni notifiche email salvate",
-			"toastEmailSaveFailed": "Salvataggio impostazioni email fallito",
-			"toastNtfySaved": "Impostazioni ntfy salvate",
-			"toastNtfySaveFailed": "Salvataggio impostazioni ntfy fallito",
-			"toastNtfyDisconnected": "ntfy disconnesso",
-			"toastNtfyDisconnectFailed": "Disconnessione ntfy fallita",
-			"toastGotifySaved": "Impostazioni Gotify salvate",
-			"toastGotifySaveFailed": "Salvataggio impostazioni Gotify fallito",
-			"toastGotifyDisconnected": "Gotify disconnesso",
-			"toastGotifyDisconnectFailed": "Disconnessione Gotify fallita",
-			"toastWebhookSaved": "Impostazioni webhook salvate",
-			"toastWebhookSaveFailed": "Salvataggio impostazioni webhook fallito",
-			"toastWebhookDisconnected": "Webhook disconnesso",
-			"toastWebhookDisconnectFailed": "Disconnessione webhook fallita",
-			"toastRuleSaved": "Regola notifiche salvata per {{workspaceName}}",
 			"toastRuleSaveFailed": "Salvataggio regola notifiche workspace fallito",
-			"toastRuleRemoved": "Regola notifiche rimossa per {{workspaceName}}",
 			"toastRuleRemoveFailed": "Rimozione regola notifiche workspace fallita",
 			"toastPreferencesSaved": "Preferenze notifiche salvate",
 			"toastPreferencesSaveFailed": "Salvataggio preferenze notifiche fallito",
@@ -1290,7 +1251,6 @@
 			"selectViewMode": "Seleziona una modalità di visualizzazione",
 			"board": "Board",
 			"list": "Elenco",
-			"gantt": "Gantt",
 			"sidebarDefault": "Barra laterale predefinita",
 			"sidebarDefaultDescription": "Mantieni la barra laterale espansa all'avvio",
 			"displayOptions": "Opzioni di visualizzazione",
@@ -1451,7 +1411,6 @@
 			},
 			"connect": "Connetti Slack",
 			"saveChanges": "Salva modifiche",
-			"update": "Aggiorna Slack",
 			"disconnect": "Disconnetti"
 		},
 		"tasksImportExport": {
@@ -1858,8 +1817,6 @@
 				"includeAnyOf": "include uno di"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Cerca ticket...",
@@ -2321,11 +2278,8 @@
 			"columns": {
 				"name": "Nome",
 				"role": "Ruolo",
-				"joined": "Iscritto",
-				"actions": "Azioni"
+				"joined": "Iscritto"
 			},
-			"memberRolePending": "{{role}} (In sospeso)",
-			"ariaCancelInvitation": "Annulla invito",
 			"ariaInvitationActions": "Azioni invito",
 			"ariaRemoveMember": "Rimuovi membro",
 			"removeDialogTitle": "Rimuovere il Membro del Team?",
@@ -2360,8 +2314,6 @@
 		},
 		"table": {
 			"progress": "Avanzamento",
-			"project": "Progetto",
-			"status": "Stato",
 			"tasks": "Attività"
 		},
 		"charts": {
@@ -2392,7 +2344,6 @@
 				"inProgress": "In corso"
 			},
 			"noDueDate": "Nessuna scadenza",
-			"reorderHandle": "Riordina progetto",
 			"reorderError": "Impossibile riordinare i progetti"
 		},
 		"search": {

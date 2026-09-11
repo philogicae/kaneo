@@ -43,15 +43,6 @@ export const defaultMattermostEvents: Record<MattermostEventKey, boolean> = {
   taskCommentCreated: true,
 };
 
-export function getDefaultMattermostConfig(
-  webhookUrl: string,
-): MattermostConfig {
-  return {
-    webhookUrl,
-    events: { ...defaultMattermostEvents },
-  };
-}
-
 export function normalizeMattermostConfig(
   config: MattermostConfig,
 ): MattermostConfig {

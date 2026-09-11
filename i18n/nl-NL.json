@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Nooit"
 		},
-		"language": {
-			"dutch": "Nederlands",
-			"english": "Engels",
-			"german": "Duits",
-			"greek": "Grieks",
-			"macedonian": "Macedonisch",
-			"french": "Frans",
-			"korean": "Koreaans",
-			"chinese": "Chinees",
-			"italian": "Italiaans",
-			"spanish": "Spaans"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Een nieuw project aanmaken",
@@ -378,7 +366,6 @@
 				"keyLabel": "Sleutel:",
 				"keyHint": "Gebruikt voor ticket-ID's (bijv. {{example}}-123)",
 				"createButton": "Project aanmaken",
-				"successToast": "Project succesvol aangemaakt",
 				"errorToast": "Aanmaken van project mislukt"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Taak succesvol bijgewerkt",
 				"createError": "Aanmaken van taak mislukt",
 				"priority": "Prioriteit",
-				"statusFallback": "In uitvoering",
 				"startDate": "Startdatum",
 				"dueDate": "Einddatum",
 				"clearStartDate": "Startdatum wissen",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Meldingen",
 		"sidebar": {
-			"overview": "Overzicht",
 			"projects": "Projecten",
 			"members": "Leden",
 			"invitations": "Uitnodigingen",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Meldingen",
-		"newCount_one": "{{count}} nieuw",
-		"newCount_other": "{{count}} nieuw",
 		"emptyTitle": "Nog geen meldingen",
 		"emptySubtitle": "Updates en activiteiten verschijnen hier.",
 		"clearAll": "Alle meldingen wissen",
@@ -686,7 +669,6 @@
 		"taskDetail": {
 			"labels": "Labels",
 			"externalLinks": "Externe links",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Melding",
 			"prStatusMerged": "Samengevoegd",
 			"prStatusDraft": "Concept",
@@ -795,13 +777,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -862,7 +842,6 @@
 			},
 			"connect": "Verbind Discord",
 			"saveChanges": "Wijzigingen opslaan",
-			"update": "Discord bijwerken",
 			"disconnect": "Ontkoppelen"
 		},
 		"externalLinks": {
@@ -1128,7 +1107,6 @@
 				"saveError": "Opslaan van de Mattermost-integratie mislukt",
 				"updateError": "Bijwerken van de Mattermost-integratie mislukt"
 			},
-			"update": "Mattermost bijwerken",
 			"validation": {
 				"webhookInvalid": "Voer een geldige Mattermost-webhook-URL in"
 			},
@@ -1236,23 +1214,7 @@
 			"noProjectsInWorkspace": "Nog geen projecten beschikbaar voor deze werkruimte.",
 			"createRule": "Regel aanmaken",
 			"removeRule": "Regel verwijderen",
-			"toastEmailSaved": "E-mailmeldingsinstellingen opgeslagen",
-			"toastEmailSaveFailed": "Opslaan e-mailinstellingen mislukt",
-			"toastNtfySaved": "ntfy-instellingen opgeslagen",
-			"toastNtfySaveFailed": "Opslaan ntfy-instellingen mislukt",
-			"toastNtfyDisconnected": "ntfy ontkoppeld",
-			"toastNtfyDisconnectFailed": "Ontkoppelen ntfy mislukt",
-			"toastGotifySaved": "Gotify-instellingen opgeslagen",
-			"toastGotifySaveFailed": "Opslaan Gotify-instellingen mislukt",
-			"toastGotifyDisconnected": "Gotify ontkoppeld",
-			"toastGotifyDisconnectFailed": "Ontkoppelen Gotify mislukt",
-			"toastWebhookSaved": "Webhook-instellingen opgeslagen",
-			"toastWebhookSaveFailed": "Opslaan webhook-instellingen mislukt",
-			"toastWebhookDisconnected": "Webhook ontkoppeld",
-			"toastWebhookDisconnectFailed": "Ontkoppelen webhook mislukt",
-			"toastRuleSaved": "Meldingsregel opgeslagen voor {{workspaceName}}",
 			"toastRuleSaveFailed": "Opslaan werkruimte-meldingsregel mislukt",
-			"toastRuleRemoved": "Meldingsregel verwijderd voor {{workspaceName}}",
 			"toastRuleRemoveFailed": "Verwijderen werkruimte-meldingsregel mislukt",
 			"toastPreferencesSaved": "Meldingsvoorkeuren opgeslagen",
 			"toastPreferencesSaveFailed": "Opslaan meldingsvoorkeuren mislukt",
@@ -1286,7 +1248,6 @@
 			"selectViewMode": "Selecteer een weergavemodus",
 			"board": "Bord",
 			"list": "Lijst",
-			"gantt": "Gantt",
 			"sidebarDefault": "Zijbalk standaard",
 			"sidebarDefaultDescription": "Houd de zijbalk uitgeklapt bij het opstarten",
 			"displayOptions": "Weergaveopties",
@@ -1447,7 +1408,6 @@
 			},
 			"connect": "Verbind Slack",
 			"saveChanges": "Wijzigingen opslaan",
-			"update": "Slack bijwerken",
 			"disconnect": "Ontkoppelen"
 		},
 		"tasksImportExport": {
@@ -1852,8 +1812,6 @@
 				"includeAnyOf": "bevat een van"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Tickets zoeken...",
@@ -2303,11 +2261,8 @@
 			"columns": {
 				"name": "Naam",
 				"role": "Rol",
-				"joined": "Lid sinds",
-				"actions": "Acties"
+				"joined": "Lid sinds"
 			},
-			"memberRolePending": "{{role}} (In afwachting)",
-			"ariaCancelInvitation": "Uitnodiging annuleren",
 			"ariaRemoveMember": "Lid verwijderen",
 			"removeDialogTitle": "Teamlid verwijderen?",
 			"removeDialogDescription": "Weet je zeker dat je {{name}} wilt verwijderen uit de werkruimte? Dit kan niet ongedaan worden gemaakt.",
@@ -2341,8 +2296,6 @@
 		},
 		"table": {
 			"progress": "Voortgang",
-			"project": "Project",
-			"status": "Status",
 			"tasks": "Taken"
 		},
 		"charts": {
@@ -2372,7 +2325,6 @@
 				"inProgress": "In behandeling"
 			},
 			"noDueDate": "Geen einddatum",
-			"reorderHandle": "Project opnieuw ordenen",
 			"reorderError": "Projecten opnieuw ordenen mislukt",
 			"emptyDescriptionReadOnly": "Er zijn nog geen projecten in deze werkruimte. Vraag een beheerder om er een aan te maken."
 		},

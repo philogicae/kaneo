@@ -236,10 +236,6 @@ export function getPlugin(type: string): IntegrationPlugin | undefined {
   return plugins.get(type);
 }
 
-export function listPlugins(): IntegrationPlugin[] {
-  return Array.from(plugins.values());
-}
-
 async function getActiveIntegrations(projectId: string) {
   return db.query.integrationTable.findMany({
     where: and(

@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Tidak pernah"
 		},
-		"language": {
-			"english": "Inggris",
-			"german": "Jerman",
-			"greek": "Yunani",
-			"macedonian": "Makedonia",
-			"french": "Prancis",
-			"spanish": "Spanyol",
-			"dutch": "Belanda",
-			"korean": "Korea",
-			"chinese": "Mandarin",
-			"italian": "Italia"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Buat proyek baru",
@@ -378,7 +366,6 @@
 				"keyLabel": "Kunci:",
 				"keyHint": "Digunakan untuk ID tiket (contoh, {{example}}-123)",
 				"createButton": "Buat Proyek",
-				"successToast": "Proyek berhasil dibuat",
 				"errorToast": "Gagal membuat proyek"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Tugas berhasil diperbarui",
 				"createError": "Gagal membuat tugas",
 				"priority": "Prioritas",
-				"statusFallback": "Sedang Berjalan",
 				"startDate": "Tanggal mulai",
 				"dueDate": "Tenggat",
 				"clearStartDate": "Hapus tanggal mulai",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Notifikasi",
 		"sidebar": {
-			"overview": "Ringkasan",
 			"projects": "Proyek",
 			"members": "Anggota",
 			"invitations": "Undangan",
@@ -614,7 +599,6 @@
 	},
 	"notifications": {
 		"title": "Notifikasi",
-		"newCount_other": "{{count}} baru",
 		"emptyTitle": "Belum ada notifikasi",
 		"emptySubtitle": "Pembaruan dan aktivitas akan muncul di sini.",
 		"clearAll": "Hapus semua notifikasi",
@@ -682,7 +666,6 @@
 		"taskDetail": {
 			"labels": "Label",
 			"externalLinks": "Tautan Eksternal",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Isu",
 			"prStatusMerged": "Digabung",
 			"prStatusDraft": "Draf",
@@ -791,13 +774,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -858,7 +839,6 @@
 			},
 			"connect": "Hubungkan Discord",
 			"saveChanges": "Simpan perubahan",
-			"update": "Perbarui Discord",
 			"disconnect": "Putuskan"
 		},
 		"externalLinks": {
@@ -1124,7 +1104,6 @@
 				"saveError": "Gagal menyimpan integrasi Mattermost",
 				"updateError": "Gagal memperbarui integrasi Mattermost"
 			},
-			"update": "Perbarui Mattermost",
 			"validation": {
 				"webhookInvalid": "Masukkan URL webhook Mattermost yang valid"
 			},
@@ -1218,23 +1197,7 @@
 			"noProjectsInWorkspace": "Belum ada proyek yang tersedia untuk ruang kerja ini.",
 			"createRule": "Buat aturan",
 			"removeRule": "Hapus aturan",
-			"toastEmailSaved": "Pengaturan notifikasi email disimpan",
-			"toastEmailSaveFailed": "Gagal menyimpan pengaturan email",
-			"toastNtfySaved": "Pengaturan ntfy disimpan",
-			"toastNtfySaveFailed": "Gagal menyimpan pengaturan ntfy",
-			"toastNtfyDisconnected": "ntfy diputuskan",
-			"toastNtfyDisconnectFailed": "Gagal memutuskan ntfy",
-			"toastGotifySaved": "Pengaturan Gotify disimpan",
-			"toastGotifySaveFailed": "Gagal menyimpan pengaturan Gotify",
-			"toastGotifyDisconnected": "Gotify diputuskan",
-			"toastGotifyDisconnectFailed": "Gagal memutuskan Gotify",
-			"toastWebhookSaved": "Pengaturan webhook disimpan",
-			"toastWebhookSaveFailed": "Gagal menyimpan pengaturan webhook",
-			"toastWebhookDisconnected": "Webhook diputuskan",
-			"toastWebhookDisconnectFailed": "Gagal memutuskan webhook",
-			"toastRuleSaved": "Aturan notifikasi untuk {{workspaceName}} disimpan",
 			"toastRuleSaveFailed": "Gagal menyimpan aturan notifikasi ruang kerja",
-			"toastRuleRemoved": "Aturan notifikasi untuk {{workspaceName}} dihapus",
 			"toastRuleRemoveFailed": "Gagal menghapus aturan notifikasi ruang kerja",
 			"toastPreferencesSaved": "Preferensi notifikasi disimpan",
 			"toastPreferencesSaveFailed": "Gagal menyimpan preferensi notifikasi",
@@ -1282,7 +1245,6 @@
 			"selectViewMode": "Pilih mode tampilan",
 			"board": "Papan",
 			"list": "Daftar",
-			"gantt": "Gantt",
 			"sidebarDefault": "Default panel samping",
 			"sidebarDefaultDescription": "Biarkan sanel samping terbuka saat mulai",
 			"displayOptions": "Opsi tampilan",
@@ -1443,7 +1405,6 @@
 			},
 			"connect": "Hubungkan Slack",
 			"saveChanges": "Simpan perubahan",
-			"update": "Perbarui Slack",
 			"disconnect": "Putuskan"
 		},
 		"tasksImportExport": {
@@ -1846,8 +1807,6 @@
 				"includeAnyOf": "menyertakan salah satu dari"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Cari tiket...",
@@ -2285,11 +2244,8 @@
 			"columns": {
 				"name": "Nama",
 				"role": "Peran",
-				"joined": "Bergabung",
-				"actions": "Aksi"
+				"joined": "Bergabung"
 			},
-			"memberRolePending": "{{role}} (Tertunda)",
-			"ariaCancelInvitation": "Batalkan undangan",
 			"ariaRemoveMember": "Hapus anggota",
 			"removeDialogTitle": "Hapus Anggota Tim?",
 			"removeDialogDescription": "Apakah Anda yakin ingin menghapus {{name}} dari ruang kerja? Tindakan ini tidak dapat dibatalkan.",
@@ -2322,8 +2278,6 @@
 		},
 		"table": {
 			"progress": "Progres",
-			"project": "Proyek",
-			"status": "Status",
 			"tasks": "Tugas"
 		},
 		"charts": {
@@ -2354,7 +2308,6 @@
 				"inProgress": "Sedang berjalan"
 			},
 			"noDueDate": "Tanpa tenggat",
-			"reorderHandle": "Ubah urutan proyek",
 			"reorderError": "Gagal mengubah urutan proyek"
 		},
 		"search": {

@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Nie"
 		},
-		"language": {
-			"english": "Englisch",
-			"german": "Deutsch",
-			"greek": "Griechisch",
-			"macedonian": "Mazedonisch",
-			"french": "Französisch",
-			"spanish": "Spanisch",
-			"dutch": "Niederländisch",
-			"korean": "Koreanisch",
-			"chinese": "Chinesisch",
-			"italian": "Italienisch"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Neues Projekt erstellen",
@@ -378,7 +366,6 @@
 				"keyLabel": "Schlüssel:",
 				"keyHint": "Wird für Ticket-IDs verwendet (z. B. {{example}}-123)",
 				"createButton": "Projekt erstellen",
-				"successToast": "Projekt erfolgreich erstellt",
 				"errorToast": "Projekt konnte nicht erstellt werden"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Aufgabe erfolgreich aktualisiert",
 				"createError": "Aufgabe konnte nicht erstellt werden",
 				"priority": "Priorität",
-				"statusFallback": "In Bearbeitung",
 				"startDate": "Startdatum",
 				"dueDate": "Fälligkeitsdatum",
 				"clearStartDate": "Startdatum entfernen",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Benachrichtigungen",
 		"sidebar": {
-			"overview": "Übersicht",
 			"projects": "Projekte",
 			"members": "Mitglieder",
 			"invitations": "Einladungen",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Benachrichtigungen",
-		"newCount_one": "{{count}} neu",
-		"newCount_other": "{{count}} neu",
 		"emptyTitle": "Noch keine Benachrichtigungen",
 		"emptySubtitle": "Hier erscheinen Updates und Aktivitäten.",
 		"clearAll": "Alle Benachrichtigungen löschen",
@@ -686,7 +669,6 @@
 		"taskDetail": {
 			"labels": "Labels",
 			"externalLinks": "Externe Links",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Ticket",
 			"prStatusMerged": "Zusammengeführt",
 			"prStatusDraft": "Entwurf",
@@ -795,13 +777,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -862,7 +842,6 @@
 			},
 			"connect": "Discord verbinden",
 			"saveChanges": "Änderungen speichern",
-			"update": "Discord aktualisieren",
 			"disconnect": "Trennen"
 		},
 		"externalLinks": {
@@ -1128,7 +1107,6 @@
 				"saveError": "Speichern der Mattermost-Integration fehlgeschlagen",
 				"updateError": "Aktualisieren der Mattermost-Integration fehlgeschlagen"
 			},
-			"update": "Mattermost aktualisieren",
 			"validation": {
 				"webhookInvalid": "Gib eine gültige Mattermost-Webhook-URL ein"
 			},
@@ -1236,23 +1214,7 @@
 			"noProjectsInWorkspace": "Für diesen Arbeitsbereich sind noch keine Projekte vorhanden.",
 			"createRule": "Regel erstellen",
 			"removeRule": "Regel entfernen",
-			"toastEmailSaved": "E-Mail-Benachrichtigungseinstellungen gespeichert",
-			"toastEmailSaveFailed": "E-Mail-Einstellungen konnten nicht gespeichert werden",
-			"toastNtfySaved": "ntfy-Einstellungen gespeichert",
-			"toastNtfySaveFailed": "ntfy-Einstellungen konnten nicht gespeichert werden",
-			"toastNtfyDisconnected": "ntfy getrennt",
-			"toastNtfyDisconnectFailed": "ntfy konnte nicht getrennt werden",
-			"toastGotifySaved": "Gotify-Einstellungen gespeichert",
-			"toastGotifySaveFailed": "Gotify-Einstellungen konnten nicht gespeichert werden",
-			"toastGotifyDisconnected": "Gotify getrennt",
-			"toastGotifyDisconnectFailed": "Gotify konnte nicht getrennt werden",
-			"toastWebhookSaved": "Webhook-Einstellungen gespeichert",
-			"toastWebhookSaveFailed": "Webhook-Einstellungen konnten nicht gespeichert werden",
-			"toastWebhookDisconnected": "Webhook getrennt",
-			"toastWebhookDisconnectFailed": "Webhook konnte nicht getrennt werden",
-			"toastRuleSaved": "Benachrichtigungsregel für {{workspaceName}} gespeichert",
 			"toastRuleSaveFailed": "Arbeitsbereichs-Benachrichtigungsregel konnte nicht gespeichert werden",
-			"toastRuleRemoved": "Benachrichtigungsregel für {{workspaceName}} entfernt",
 			"toastRuleRemoveFailed": "Arbeitsbereichs-Benachrichtigungsregel konnte nicht entfernt werden",
 			"toastPreferencesSaved": "Benachrichtigungseinstellungen gespeichert",
 			"toastPreferencesSaveFailed": "Benachrichtigungseinstellungen konnten nicht gespeichert werden",
@@ -1286,7 +1248,6 @@
 			"selectViewMode": "Ansicht auswählen",
 			"board": "Board",
 			"list": "Liste",
-			"gantt": "Gantt",
 			"sidebarDefault": "Standard-Sidebar",
 			"sidebarDefaultDescription": "Sidebar beim Start erweitert geöffnet halten",
 			"displayOptions": "Anzeigeoptionen",
@@ -1447,7 +1408,6 @@
 			},
 			"connect": "Slack verbinden",
 			"saveChanges": "Änderungen speichern",
-			"update": "Slack aktualisieren",
 			"disconnect": "Trennen"
 		},
 		"tasksImportExport": {
@@ -1852,8 +1812,6 @@
 				"includeAnyOf": "enthält einen von"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Tickets suchen...",
@@ -2303,11 +2261,8 @@
 			"columns": {
 				"name": "Name",
 				"role": "Rolle",
-				"joined": "Beigetreten",
-				"actions": "Aktionen"
+				"joined": "Beigetreten"
 			},
-			"memberRolePending": "{{role}} (Ausstehend)",
-			"ariaCancelInvitation": "Einladung abbrechen",
 			"ariaRemoveMember": "Mitglied entfernen",
 			"removeDialogTitle": "Teammitglied entfernen?",
 			"removeDialogDescription": "Bist du sicher, dass du {{name}} aus dem Workspace entfernen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -2341,8 +2296,6 @@
 		},
 		"table": {
 			"progress": "Fortschritt",
-			"project": "Projekt",
-			"status": "Status",
 			"tasks": "Aufgaben"
 		},
 		"charts": {
@@ -2372,7 +2325,6 @@
 				"inProgress": "In Bearbeitung"
 			},
 			"noDueDate": "Kein Fälligkeitsdatum",
-			"reorderHandle": "Projekt neu anordnen",
 			"reorderError": "Projekte konnten nicht neu angeordnet werden",
 			"emptyDescriptionReadOnly": "In diesem Workspace gibt es noch keine Projekte. Bitte einen Admin, eines zu erstellen."
 		},

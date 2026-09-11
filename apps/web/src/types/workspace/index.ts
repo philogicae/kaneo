@@ -6,8 +6,4 @@ export type Workspace = NonNullable<
   >["data"]
 >;
 
-export type ActiveWorkspace = NonNullable<
-  ReturnType<typeof authClient.useActiveOrganization>["data"]
->;
-
 export default Workspace;

@@ -46,13 +46,6 @@ export const defaultDiscordEvents: Record<DiscordEventKey, boolean> = {
   taskCommentCreated: true,
 };
 
-export function getDefaultDiscordConfig(webhookUrl: string): DiscordConfig {
-  return {
-    webhookUrl,
-    events: { ...defaultDiscordEvents },
-  };
-}
-
 export function normalizeDiscordConfig(config: DiscordConfig): DiscordConfig {
   return {
     ...config,

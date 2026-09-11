@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Jamais"
 		},
-		"language": {
-			"english": "Anglais",
-			"german": "Allemand",
-			"greek": "Grec",
-			"macedonian": "Macédonien",
-			"french": "Français",
-			"spanish": "Espagnol",
-			"dutch": "Néerlandais",
-			"korean": "Coréen",
-			"chinese": "Chinois",
-			"italian": "Italien"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Créer un nouveau projet",
@@ -378,7 +366,6 @@
 				"keyLabel": "Clé :",
 				"keyHint": "Utilisée pour les ID de tickets (par ex. {{example}}-123)",
 				"createButton": "Créer le projet",
-				"successToast": "Projet créé avec succès",
 				"errorToast": "Échec de la création du projet"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Tâche mise à jour avec succès",
 				"createError": "Échec de la création de la tâche",
 				"priority": "Priorité",
-				"statusFallback": "En cours",
 				"startDate": "Date de début",
 				"dueDate": "Date d'échéance",
 				"clearStartDate": "Supprimer la date de début",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Notifications",
 		"sidebar": {
-			"overview": "Vue d'ensemble",
 			"projects": "Projets",
 			"members": "Membres",
 			"invitations": "Invitations",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Notifications",
-		"newCount_one": "{{count}} nouvelle",
-		"newCount_other": "{{count}} nouvelles",
 		"emptyTitle": "Aucune notification pour le moment",
 		"emptySubtitle": "Vous verrez les mises à jour et l'activité ici.",
 		"clearAll": "Effacer toutes les notifications",
@@ -673,8 +656,7 @@
 			"minutes_many": "{{count}} minutes",
 			"days_many": "{{count}} jours",
 			"hours_many": "{{count}} heures"
-		},
-		"newCount_many": "{{count}} nouvelles"
+		}
 	},
 	"publicProject": {
 		"pageTitle": "Vue publique",
@@ -690,7 +672,6 @@
 		"taskDetail": {
 			"labels": "Étiquettes",
 			"externalLinks": "Liens externes",
-			"pullRequestFallback": "Demande de fusion",
 			"issueFallback": "Problème",
 			"prStatusMerged": "Fusionné",
 			"prStatusDraft": "Brouillon",
@@ -799,13 +780,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -866,7 +845,6 @@
 			},
 			"connect": "Connecter Discord",
 			"saveChanges": "Enregistrer les modifications",
-			"update": "Mettre à jour Discord",
 			"disconnect": "Déconnecter"
 		},
 		"externalLinks": {
@@ -1132,7 +1110,6 @@
 				"saveError": "Échec de l'enregistrement de l'intégration Mattermost",
 				"updateError": "Échec de la mise à jour de l'intégration Mattermost"
 			},
-			"update": "Mettre à jour Mattermost",
 			"validation": {
 				"webhookInvalid": "Saisissez une URL de webhook Mattermost valide"
 			},
@@ -1226,23 +1203,7 @@
 			"noProjectsInWorkspace": "Aucun projet n'est encore disponible dans cet espace de travail.",
 			"createRule": "Créer une règle",
 			"removeRule": "Supprimer la règle",
-			"toastEmailSaved": "Paramètres des notifications par email enregistrés",
-			"toastEmailSaveFailed": "Échec de l'enregistrement des paramètres email",
-			"toastNtfySaved": "Paramètres ntfy enregistrés",
-			"toastNtfySaveFailed": "Échec de l'enregistrement des paramètres ntfy",
-			"toastNtfyDisconnected": "ntfy déconnecté",
-			"toastNtfyDisconnectFailed": "Échec de la déconnexion de ntfy",
-			"toastGotifySaved": "Paramètres Gotify enregistrés",
-			"toastGotifySaveFailed": "Échec de l'enregistrement des paramètres Gotify",
-			"toastGotifyDisconnected": "Gotify déconnecté",
-			"toastGotifyDisconnectFailed": "Échec de la déconnexion de Gotify",
-			"toastWebhookSaved": "Paramètres du webhook enregistrés",
-			"toastWebhookSaveFailed": "Échec de l'enregistrement des paramètres du webhook",
-			"toastWebhookDisconnected": "Webhook déconnecté",
-			"toastWebhookDisconnectFailed": "Échec de la déconnexion du webhook",
-			"toastRuleSaved": "Règle de notification enregistrée pour {{workspaceName}}",
 			"toastRuleSaveFailed": "Échec de l'enregistrement de la règle de notification de l'espace de travail",
-			"toastRuleRemoved": "Règle de notification supprimée pour {{workspaceName}}",
 			"toastRuleRemoveFailed": "Échec de la suppression de la règle de notification de l'espace de travail",
 			"toastPreferencesSaved": "Préférences de notification enregistrées",
 			"toastPreferencesSaveFailed": "Échec de l'enregistrement des préférences de notification",
@@ -1290,7 +1251,6 @@
 			"selectViewMode": "Sélectionnez un mode d'affichage",
 			"board": "Tableau",
 			"list": "Liste",
-			"gantt": "Gantt",
 			"sidebarDefault": "Barre latérale par défaut",
 			"sidebarDefaultDescription": "Garder la barre latérale ouverte au démarrage",
 			"displayOptions": "Options d'affichage",
@@ -1451,7 +1411,6 @@
 			},
 			"connect": "Connecter Slack",
 			"saveChanges": "Enregistrer les modifications",
-			"update": "Mettre à jour Slack",
 			"disconnect": "Déconnecter"
 		},
 		"tasksImportExport": {
@@ -1841,13 +1800,11 @@
 		"boardFilters": {
 			"all": "All",
 			"allAssignees": "Tous les assignés",
-			"allCustomFieldValues": "All values",
 			"allDueDates": "Toutes les dates d'échéance",
 			"allLabels": "Tous les labels",
 			"allPriorities": "Toutes les priorités",
 			"allStatuses": "Tous les statuts",
 			"filterBy": "Filtrer par",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet",
 			"operators": {
 				"isAnyOf": "est l'un des",
@@ -2321,11 +2278,8 @@
 			"columns": {
 				"name": "Nom",
 				"role": "Rôle",
-				"joined": "Rejoint",
-				"actions": "Actions"
+				"joined": "Rejoint"
 			},
-			"memberRolePending": "{{role}} (En attente)",
-			"ariaCancelInvitation": "Annuler l'invitation",
 			"ariaRemoveMember": "Supprimer le membre",
 			"removeDialogTitle": "Supprimer un membre de l'équipe ?",
 			"removeDialogDescription": "Êtes-vous sûr de vouloir supprimer {{name}} de l'équipe ? Cette action ne peut pas être annulée.",
@@ -2350,10 +2304,8 @@
 			"completion": "Complétion"
 		},
 		"table": {
-			"project": "Projet",
 			"progress": "Progression",
-			"tasks": "Tâches",
-			"status": "Statut"
+			"tasks": "Tâches"
 		},
 		"section": {
 			"projectCount_one": "{{count}} projet",
@@ -2392,7 +2344,6 @@
 				"inProgress": "En cours"
 			},
 			"noDueDate": "Pas de date d'échéance",
-			"reorderHandle": "Réorganiser le projet",
 			"reorderError": "Échec de la réorganisation des projets"
 		},
 		"search": {

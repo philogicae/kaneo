@@ -108,11 +108,7 @@
 					},
 					{
 						"group": "Deployment & Operations",
-						"pages": [
-							"core/reverse-proxy/nginx",
-							"core/deployments/railway",
-							"core/deployments/coolify"
-						]
+						"pages": ["core/reverse-proxy/nginx", "core/deployments/railway"]
 					},
 					{
 						"group": "Migration",

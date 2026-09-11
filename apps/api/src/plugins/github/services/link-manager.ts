@@ -126,13 +126,3 @@ export async function createOrUpdateExternalLink(
   const link = await createExternalLink(params);
   return { id: link.id, created: true };
 }
-
-export async function deleteExternalLink(id: string) {
-  await db.delete(externalLinkTable).where(eq(externalLinkTable.id, id));
-}
-
-export async function getExternalLinksByIntegration(integrationId: string) {
-  return db.query.externalLinkTable.findMany({
-    where: eq(externalLinkTable.integrationId, integrationId),
-  });
-}

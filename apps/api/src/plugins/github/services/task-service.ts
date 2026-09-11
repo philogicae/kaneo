@@ -108,20 +108,6 @@ export async function isTaskInFinalState(task: {
   return task.status === "done";
 }
 
-export async function getIntegrationWithProject(integrationId: string) {
-  return db.query.integrationTable.findFirst({
-    where: eq(integrationTable.id, integrationId),
-    with: {
-      project: true,
-    },
-  });
-}
-
-export async function findIntegrationByRepo(owner: string, repo: string) {
-  const integrations = await findAllIntegrationsByRepo(owner, repo);
-  return integrations[0] || null;
-}
-
 export async function findAllIntegrationsByRepo(owner: string, repo: string) {
   const integrations = await db.query.integrationTable.findMany({
     where: and(

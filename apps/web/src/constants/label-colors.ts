@@ -25,10 +25,5 @@ const labelColors = [
 }>;
 
 export type LabelColorValue = (typeof labelColors)[number]["value"];
-export type LabelColorKey = (typeof labelColors)[number]["key"];
-
-export const labelColorValues = labelColors.map(
-  (c) => c.value,
-) as LabelColorValue[];
 
 export default labelColors;

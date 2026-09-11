@@ -327,18 +327,6 @@
 			"label": "Διαδρομή πλοήγησης",
 			"more": "Περισσότερα"
 		},
-		"language": {
-			"english": "Αγγλικά",
-			"german": "Γερμανικά",
-			"greek": "Ελληνικά",
-			"macedonian": "Μακεδονικά",
-			"french": "Γαλλικά",
-			"spanish": "Ισπανικά",
-			"dutch": "Ολλανδικά",
-			"korean": "Κορεατικά",
-			"chinese": "Κινεζικά",
-			"italian": "Ιταλικά"
-		},
 		"people": {
 			"someone": "Κάποιος",
 			"unknown": "Άγνωστος"
@@ -388,7 +376,6 @@
 				"keyLabel": "Κλειδί:",
 				"keyHint": "Χρησιμοποιείται για IDs αιτημάτων (π.χ. {{example}}-123)",
 				"createButton": "Δημιουργία έργου",
-				"successToast": "Το έργο δημιουργήθηκε με επιτυχία",
 				"errorToast": "Αποτυχία δημιουργίας έργου"
 			},
 			"createWorkspace": {
@@ -414,7 +401,6 @@
 				"successUpdated": "Η εργασία ενημερώθηκε με επιτυχία",
 				"createError": "Αποτυχία δημιουργίας εργασίας",
 				"priority": "Προτεραιότητα",
-				"statusFallback": "Σε εξέλιξη",
 				"startDate": "Ημερομηνία έναρξης",
 				"dueDate": "Ημερομηνία λήξης",
 				"clearStartDate": "Εκκαθάριση ημερομηνίας έναρξης",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Ειδοποιήσεις",
 		"sidebar": {
-			"overview": "Επισκόπηση",
 			"projects": "Έργα",
 			"members": "Μέλη",
 			"invitations": "Προσκλήσεις",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "Ειδοποιήσεις",
-		"newCount_one": "{{count}} νέα",
-		"newCount_other": "{{count}} νέα",
 		"emptyTitle": "Δεν υπάρχουν ακόμα ειδοποιήσεις",
 		"emptySubtitle": "Θα βλέπετε εδώ ενημερώσεις και δραστηριότητα.",
 		"clearAll": "Εκκαθάριση όλων των ειδοποιήσεων",
@@ -686,7 +669,6 @@
 		"taskDetail": {
 			"labels": "Ετικέτες",
 			"externalLinks": "Εξωτερικοί σύνδεσμοι",
-			"pullRequestFallback": "Pull Request",
 			"issueFallback": "Ζήτημα",
 			"prStatusMerged": "Συγχωνευμένο",
 			"prStatusDraft": "Πρόχειρο",
@@ -795,13 +777,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -857,7 +837,6 @@
 				"saveError": "Αποτυχία αποθήκευσης της ενσωμάτωσης Discord",
 				"updateError": "Αποτυχία ενημέρωσης της ενσωμάτωσης Discord"
 			},
-			"update": "Ενημέρωση Discord",
 			"validation": {
 				"webhookInvalid": "Εισαγάγετε ένα έγκυρο URL webhook Discord"
 			},
@@ -1128,7 +1107,6 @@
 				"saveError": "Αποτυχία αποθήκευσης της ενσωμάτωσης Mattermost",
 				"updateError": "Αποτυχία ενημέρωσης της ενσωμάτωσης Mattermost"
 			},
-			"update": "Ενημέρωση Mattermost",
 			"validation": {
 				"webhookInvalid": "Εισάγετε μια έγκυρη διεύθυνση webhook Mattermost"
 			},
@@ -1222,23 +1200,7 @@
 			"noProjectsInWorkspace": "Δεν υπάρχουν ακόμα διαθέσιμα έργα για αυτόν τον χώρο εργασίας.",
 			"createRule": "Δημιουργία κανόνα",
 			"removeRule": "Αφαίρεση κανόνα",
-			"toastEmailSaved": "Οι ρυθμίσεις ειδοποιήσεων email αποθηκεύτηκαν",
-			"toastEmailSaveFailed": "Αποτυχία αποθήκευσης ρυθμίσεων email",
-			"toastNtfySaved": "Οι ρυθμίσεις ntfy αποθηκεύτηκαν",
-			"toastNtfySaveFailed": "Αποτυχία αποθήκευσης ρυθμίσεων ntfy",
-			"toastNtfyDisconnected": "Το ntfy αποσυνδέθηκε",
-			"toastNtfyDisconnectFailed": "Αποτυχία αποσύνδεσης ntfy",
-			"toastGotifySaved": "Οι ρυθμίσεις Gotify αποθηκεύτηκαν",
-			"toastGotifySaveFailed": "Αποτυχία αποθήκευσης ρυθμίσεων Gotify",
-			"toastGotifyDisconnected": "Το Gotify αποσυνδέθηκε",
-			"toastGotifyDisconnectFailed": "Αποτυχία αποσύνδεσης Gotify",
-			"toastWebhookSaved": "Οι ρυθμίσεις webhook αποθηκεύτηκαν",
-			"toastWebhookSaveFailed": "Αποτυχία αποθήκευσης ρυθμίσεων webhook",
-			"toastWebhookDisconnected": "Το webhook αποσυνδέθηκε",
-			"toastWebhookDisconnectFailed": "Αποτυχία αποσύνδεσης webhook",
-			"toastRuleSaved": "Ο κανόνας ειδοποιήσεων για το {{workspaceName}} αποθηκεύτηκε",
 			"toastRuleSaveFailed": "Αποτυχία αποθήκευσης κανόνα ειδοποιήσεων χώρου εργασίας",
-			"toastRuleRemoved": "Ο κανόνας ειδοποιήσεων για το {{workspaceName}} αφαιρέθηκε",
 			"toastRuleRemoveFailed": "Αποτυχία αφαίρεσης κανόνα ειδοποιήσεων χώρου εργασίας",
 			"toastPreferencesSaved": "Οι προτιμήσεις ειδοποιήσεων αποθηκεύτηκαν",
 			"toastPreferencesSaveFailed": "Αποτυχία αποθήκευσης προτιμήσεων ειδοποιήσεων",
@@ -1286,7 +1248,6 @@
 			"selectViewMode": "Επιλέξτε τρόπο προβολής",
 			"board": "Πίνακας",
 			"list": "Λίστα",
-			"gantt": "Gantt",
 			"sidebarDefault": "Προεπιλογή πλαϊνής μπάρας",
 			"sidebarDefaultDescription": "Διατήρηση της πλαϊνής μπάρας ανεπτυγμένης κατά την εκκίνηση",
 			"displayOptions": "Επιλογές εμφάνισης",
@@ -1442,7 +1403,6 @@
 				"saveError": "Αποτυχία αποθήκευσης της ενσωμάτωσης Slack",
 				"updateError": "Αποτυχία ενημέρωσης της ενσωμάτωσης Slack"
 			},
-			"update": "Ενημέρωση Slack",
 			"validation": {
 				"webhookInvalid": "Εισαγάγετε ένα έγκυρο URL webhook Slack"
 			},
@@ -1852,8 +1812,6 @@
 				"includeAnyOf": "περιλαμβάνει κάποιο από"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Αναζήτηση αιτημάτων...",
@@ -2303,11 +2261,8 @@
 			"columns": {
 				"name": "Όνομα",
 				"role": "Ρόλος",
-				"joined": "Εντάχθηκε",
-				"actions": "Ενέργειες"
+				"joined": "Εντάχθηκε"
 			},
-			"memberRolePending": "{{role}} (Σε εκκρεμότητα)",
-			"ariaCancelInvitation": "Ακύρωση πρόσκλησης",
 			"ariaRemoveMember": "Αφαίρεση μέλους",
 			"removeDialogTitle": "Αφαίρεση μέλους ομάδας;",
 			"removeDialogDescription": "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε τον/την {{name}} από τον χώρο εργασίας; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
@@ -2341,8 +2296,6 @@
 		},
 		"table": {
 			"progress": "Πρόοδος",
-			"project": "Έργο",
-			"status": "Κατάσταση",
 			"tasks": "Εργασίες"
 		},
 		"charts": {
@@ -2372,7 +2325,6 @@
 				"inProgress": "Σε εξέλιξη"
 			},
 			"noDueDate": "Χωρίς ημερομηνία λήξης",
-			"reorderHandle": "Αναδιάταξη έργου",
 			"reorderError": "Η αναδιάταξη των έργων απέτυχε",
 			"emptyDescriptionReadOnly": "Δεν υπάρχουν ακόμα έργα σε αυτόν τον χώρο εργασίας. Ζητήστε από έναν διαχειριστή να δημιουργήσει ένα."
 		},

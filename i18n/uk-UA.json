@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Ніколи"
 		},
-		"language": {
-			"english": "Англійська",
-			"german": "Німецька",
-			"greek": "Грецька",
-			"macedonian": "Македонська",
-			"french": "Французька",
-			"spanish": "Іспанська",
-			"dutch": "Нідерландська",
-			"korean": "Корейська",
-			"chinese": "Китайська",
-			"italian": "Італійська"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Створити новий проєкт",
@@ -378,7 +366,6 @@
 				"keyLabel": "Ключ:",
 				"keyHint": "Використовується для ID тікетів (напр., {{example}}-123)",
 				"createButton": "Створити проєкт",
-				"successToast": "Проєкт успішно створено",
 				"errorToast": "Не вдалося створити проєкт"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Завдання успішно оновлено",
 				"createError": "Не вдалося створити завдання",
 				"priority": "Пріоритет",
-				"statusFallback": "В роботі",
 				"startDate": "Дата початку",
 				"dueDate": "Дата завершення",
 				"clearStartDate": "Очистити дату початку",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Сповіщення",
 		"sidebar": {
-			"overview": "Огляд",
 			"projects": "Проєкти",
 			"members": "Учасники",
 			"invitations": "Запрошення",
@@ -614,10 +599,6 @@
 	},
 	"notifications": {
 		"title": "Сповіщення",
-		"newCount_one": "{{count}} нове",
-		"newCount_few": "{{count}} нових",
-		"newCount_many": "{{count}} нових",
-		"newCount_other": "{{count}} нових",
 		"emptyTitle": "Сповіщень ще немає",
 		"emptySubtitle": "Тут з'являтимуться оновлення та активність.",
 		"clearAll": "Очистити всі сповіщення",
@@ -694,7 +675,6 @@
 		"taskDetail": {
 			"labels": "Мітки",
 			"externalLinks": "Зовнішні посилання",
-			"pullRequestFallback": "Пул-реквест",
 			"issueFallback": "Завдання",
 			"prStatusMerged": "Змерджено",
 			"prStatusDraft": "Чернетка",
@@ -803,13 +783,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -870,7 +848,6 @@
 			},
 			"connect": "Підключити Discord",
 			"saveChanges": "Зберегти зміни",
-			"update": "Оновити Discord",
 			"disconnect": "Від'єднати"
 		},
 		"externalLinks": {
@@ -1136,7 +1113,6 @@
 				"saveError": "Не вдалося зберегти інтеграцію Mattermost",
 				"updateError": "Не вдалося оновити інтеграцію Mattermost"
 			},
-			"update": "Оновити Mattermost",
 			"validation": {
 				"webhookInvalid": "Введіть коректний URL webhook Mattermost"
 			},
@@ -1230,23 +1206,7 @@
 			"noProjectsInWorkspace": "У цьому робочому просторі ще немає доступних проєктів.",
 			"createRule": "Створити правило",
 			"removeRule": "Видалити правило",
-			"toastEmailSaved": "Налаштування сповіщень електронною поштою збережено",
-			"toastEmailSaveFailed": "Не вдалося зберегти налаштування пошти",
-			"toastNtfySaved": "Налаштування ntfy збережено",
-			"toastNtfySaveFailed": "Не вдалося зберегти налаштування ntfy",
-			"toastNtfyDisconnected": "ntfy від'єднано",
-			"toastNtfyDisconnectFailed": "Не вдалося від'єднати ntfy",
-			"toastGotifySaved": "Налаштування Gotify збережено",
-			"toastGotifySaveFailed": "Не вдалося зберегти налаштування Gotify",
-			"toastGotifyDisconnected": "Gotify від'єднано",
-			"toastGotifyDisconnectFailed": "Не вдалося від'єднати Gotify",
-			"toastWebhookSaved": "Налаштування вебхука збережено",
-			"toastWebhookSaveFailed": "Не вдалося зберегти налаштування вебхука",
-			"toastWebhookDisconnected": "Вебхук від'єднано",
-			"toastWebhookDisconnectFailed": "Не вдалося від'єднати вебхук",
-			"toastRuleSaved": "Правило сповіщень для {{workspaceName}} збережено",
 			"toastRuleSaveFailed": "Не вдалося зберегти правило сповіщень робочого простору",
-			"toastRuleRemoved": "Правило сповіщень для {{workspaceName}} видалено",
 			"toastRuleRemoveFailed": "Не вдалося видалити правило сповіщень робочого простору",
 			"toastPreferencesSaved": "Налаштування сповіщень збережено",
 			"toastPreferencesSaveFailed": "Не вдалося зберегти налаштування сповіщень",
@@ -1294,7 +1254,6 @@
 			"selectViewMode": "Обрати режим перегляду",
 			"board": "Дошка",
 			"list": "Список",
-			"gantt": "Ґант",
 			"sidebarDefault": "Бічна панель за замовчуванням",
 			"sidebarDefaultDescription": "Тримати бічну панель розгорнутою при запуску",
 			"displayOptions": "Параметри відображення",
@@ -1455,7 +1414,6 @@
 			},
 			"connect": "Підключити Slack",
 			"saveChanges": "Зберегти зміни",
-			"update": "Оновити Slack",
 			"disconnect": "Від'єднати"
 		},
 		"tasksImportExport": {
@@ -1864,8 +1822,6 @@
 				"includeAnyOf": "включає будь-який з"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Пошук тікетів...",
@@ -2339,11 +2295,8 @@
 			"columns": {
 				"name": "Ім'я",
 				"role": "Роль",
-				"joined": "Приєднався",
-				"actions": "Дії"
+				"joined": "Приєднався"
 			},
-			"memberRolePending": "{{role}} (Очікує)",
-			"ariaCancelInvitation": "Скасувати запрошення",
 			"ariaRemoveMember": "Видалити учасника",
 			"removeDialogTitle": "Видалити учасника команди?",
 			"removeDialogDescription": "Ви впевнені, що хочете видалити {{name}} з робочого простору? Цю дію неможливо скасувати.",
@@ -2379,8 +2332,6 @@
 		},
 		"table": {
 			"progress": "Прогрес",
-			"project": "Проєкт",
-			"status": "Статус",
 			"tasks": "Завдання"
 		},
 		"charts": {
@@ -2410,7 +2361,6 @@
 				"inProgress": "В роботі"
 			},
 			"noDueDate": "Без дати завершення",
-			"reorderHandle": "Змінити порядок проєкту",
 			"reorderError": "Не вдалося змінити порядок проєктів",
 			"emptyDescriptionReadOnly": "У цьому робочому просторі ще немає проєктів. Попросіть адміністратора створити проєкт."
 		},

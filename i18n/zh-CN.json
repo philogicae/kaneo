@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "永不过期"
 		},
-		"language": {
-			"chinese": "中文",
-			"dutch": "荷兰语",
-			"english": "英语",
-			"french": "法语",
-			"german": "德语",
-			"greek": "希腊语",
-			"italian": "意大利语",
-			"korean": "韩语",
-			"macedonian": "马其顿语",
-			"spanish": "西班牙语"
-		},
 		"modals": {
 			"createProject": {
 				"title": "创建新项目",
@@ -378,7 +366,6 @@
 				"keyLabel": "标识：",
 				"keyHint": "用于工单 ID（例如 {{example}}-123）",
 				"createButton": "创建项目",
-				"successToast": "项目创建成功",
 				"errorToast": "项目创建失败"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "任务更新成功",
 				"createError": "任务创建失败",
 				"priority": "优先级",
-				"statusFallback": "进行中",
 				"startDate": "开始日期",
 				"dueDate": "截止日期",
 				"clearStartDate": "清除开始日期",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "通知",
 		"sidebar": {
-			"overview": "概览",
 			"projects": "项目",
 			"members": "成员",
 			"invitations": "邀请",
@@ -614,7 +599,6 @@
 	},
 	"notifications": {
 		"title": "通知",
-		"newCount_other": "{{count}} 条新通知",
 		"emptyTitle": "暂无通知",
 		"emptySubtitle": "更新和活动将显示在这里。",
 		"clearAll": "清空所有通知",
@@ -682,7 +666,6 @@
 		"taskDetail": {
 			"labels": "标签",
 			"externalLinks": "外部链接",
-			"pullRequestFallback": "拉取请求",
 			"issueFallback": "议题",
 			"prStatusMerged": "已合并",
 			"prStatusDraft": "草稿",
@@ -791,13 +774,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -858,7 +839,6 @@
 			},
 			"connect": "连接 Discord",
 			"saveChanges": "保存更改",
-			"update": "更新 Discord",
 			"disconnect": "断开连接"
 		},
 		"externalLinks": {
@@ -1124,7 +1104,6 @@
 				"saved": "Mattermost 集成保存成功",
 				"updateError": "更新 Mattermost 集成失败"
 			},
-			"update": "更新 Mattermost",
 			"validation": {
 				"webhookInvalid": "请输入有效的 Mattermost Webhook URL"
 			},
@@ -1232,23 +1211,7 @@
 			"noProjectsInWorkspace": "该工作区暂无项目。",
 			"createRule": "新建规则",
 			"removeRule": "移除规则",
-			"toastEmailSaved": "邮件通知设置已保存",
-			"toastEmailSaveFailed": "保存邮件设置失败",
-			"toastNtfySaved": "ntfy 设置已保存",
-			"toastNtfySaveFailed": "保存 ntfy 设置失败",
-			"toastNtfyDisconnected": "ntfy 已断开",
-			"toastNtfyDisconnectFailed": "断开 ntfy 失败",
-			"toastGotifySaved": "Gotify 设置已保存",
-			"toastGotifySaveFailed": "保存 Gotify 设置失败",
-			"toastGotifyDisconnected": "Gotify 已断开",
-			"toastGotifyDisconnectFailed": "断开 Gotify 失败",
-			"toastWebhookSaved": "Webhook 设置已保存",
-			"toastWebhookSaveFailed": "保存 Webhook 设置失败",
-			"toastWebhookDisconnected": "Webhook 已断开",
-			"toastWebhookDisconnectFailed": "断开 Webhook 失败",
-			"toastRuleSaved": "已保存 {{workspaceName}} 的通知规则",
 			"toastRuleSaveFailed": "保存工作区通知规则失败",
-			"toastRuleRemoved": "已移除 {{workspaceName}} 的通知规则",
 			"toastRuleRemoveFailed": "移除工作区通知规则失败",
 			"toastPreferencesSaved": "通知偏好已保存",
 			"toastPreferencesSaveFailed": "保存通知偏好失败",
@@ -1282,7 +1245,6 @@
 			"selectViewMode": "选择视图模式",
 			"board": "看板",
 			"list": "列表",
-			"gantt": "甘特图",
 			"sidebarDefault": "默认展开侧边栏",
 			"sidebarDefaultDescription": "启动时保持侧边栏展开",
 			"displayOptions": "显示选项",
@@ -1443,7 +1405,6 @@
 			},
 			"connect": "连接 Slack",
 			"saveChanges": "保存更改",
-			"update": "更新 Slack",
 			"disconnect": "断开连接"
 		},
 		"tasksImportExport": {
@@ -1846,8 +1807,6 @@
 				"includeAnyOf": "包含以下任一"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "搜索工单…",
@@ -2285,11 +2244,8 @@
 			"columns": {
 				"name": "姓名",
 				"role": "角色",
-				"joined": "加入于",
-				"actions": "操作"
+				"joined": "加入于"
 			},
-			"memberRolePending": "{{role}}（待处理）",
-			"ariaCancelInvitation": "取消邀请",
 			"ariaInvitationActions": "邀请操作",
 			"ariaRemoveMember": "移除成员",
 			"removeDialogTitle": "移除团队成员？",
@@ -2322,8 +2278,6 @@
 		},
 		"table": {
 			"progress": "进度",
-			"project": "项目",
-			"status": "状态",
 			"tasks": "任务"
 		},
 		"charts": {
@@ -2354,7 +2308,6 @@
 				"inProgress": "进行中"
 			},
 			"noDueDate": "无截止日期",
-			"reorderHandle": "重新排序项目",
 			"reorderError": "重新排序项目失败"
 		},
 		"search": {

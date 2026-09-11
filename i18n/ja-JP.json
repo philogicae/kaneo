@@ -327,18 +327,6 @@
 			"label": "パンくずリスト",
 			"more": "その他の階層"
 		},
-		"language": {
-			"english": "英語",
-			"german": "ドイツ語",
-			"greek": "ギリシャ語",
-			"macedonian": "マケドニア語",
-			"french": "フランス語",
-			"spanish": "スペイン語",
-			"dutch": "オランダ語",
-			"korean": "韓国語",
-			"chinese": "中国語",
-			"italian": "イタリア語"
-		},
 		"people": {
 			"someone": "ユーザー",
 			"unknown": "不明なユーザー"
@@ -388,7 +376,6 @@
 				"keyLabel": "キー:",
 				"keyHint": "チケットIDに使用されます (例: {{example}}-123)",
 				"createButton": "プロジェクトを作成",
-				"successToast": "プロジェクトを作成しました",
 				"errorToast": "プロジェクトの作成に失敗しました"
 			},
 			"createWorkspace": {
@@ -414,7 +401,6 @@
 				"successUpdated": "タスクを更新しました",
 				"createError": "タスクの作成に失敗しました",
 				"priority": "優先度",
-				"statusFallback": "進行中",
 				"startDate": "開始日",
 				"dueDate": "期限",
 				"clearStartDate": "開始日をクリア",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "通知",
 		"sidebar": {
-			"overview": "概要",
 			"projects": "プロジェクト",
 			"members": "メンバー",
 			"invitations": "招待",
@@ -614,7 +599,6 @@
 	},
 	"notifications": {
 		"title": "通知",
-		"newCount_other": "{{count}} 件の新着",
 		"emptyTitle": "通知はまだありません",
 		"emptySubtitle": "更新やアクティビティがここに表示されます。",
 		"clearAll": "すべての通知を消去",
@@ -682,7 +666,6 @@
 		"taskDetail": {
 			"labels": "ラベル",
 			"externalLinks": "外部リンク",
-			"pullRequestFallback": "プルリクエスト",
 			"issueFallback": "課題",
 			"prStatusMerged": "マージ済み",
 			"prStatusDraft": "下書き",
@@ -791,13 +774,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -858,7 +839,6 @@
 			},
 			"connect": "Discord に接続",
 			"saveChanges": "変更を保存",
-			"update": "Discord を更新",
 			"disconnect": "接続解除"
 		},
 		"externalLinks": {
@@ -1124,7 +1104,6 @@
 				"saveError": "Mattermost 統合の保存に失敗しました",
 				"updateError": "Mattermost 統合の更新に失敗しました"
 			},
-			"update": "Mattermost を更新",
 			"validation": {
 				"webhookInvalid": "有効な Mattermost webhook URL を入力してください"
 			},
@@ -1232,23 +1211,7 @@
 			"noProjectsInWorkspace": "このワークスペースにはまだプロジェクトがありません。",
 			"createRule": "ルールを作成",
 			"removeRule": "ルールを削除",
-			"toastEmailSaved": "メール通知設定を保存しました",
-			"toastEmailSaveFailed": "メール通知設定の保存に失敗しました",
-			"toastNtfySaved": "ntfy 設定を保存しました",
-			"toastNtfySaveFailed": "ntfy 設定の保存に失敗しました",
-			"toastNtfyDisconnected": "ntfy の接続を解除しました",
-			"toastNtfyDisconnectFailed": "ntfy の接続解除に失敗しました",
-			"toastGotifySaved": "Gotify 設定を保存しました",
-			"toastGotifySaveFailed": "Gotify 設定の保存に失敗しました",
-			"toastGotifyDisconnected": "Gotify の接続を解除しました",
-			"toastGotifyDisconnectFailed": "Gotify の接続解除に失敗しました",
-			"toastWebhookSaved": "Webhook 設定を保存しました",
-			"toastWebhookSaveFailed": "Webhook 設定の保存に失敗しました",
-			"toastWebhookDisconnected": "Webhook の接続を解除しました",
-			"toastWebhookDisconnectFailed": "Webhook の接続解除に失敗しました",
-			"toastRuleSaved": "{{workspaceName}} の通知ルールを保存しました",
 			"toastRuleSaveFailed": "ワークスペースの通知ルールの保存に失敗しました",
-			"toastRuleRemoved": "{{workspaceName}} の通知ルールを削除しました",
 			"toastRuleRemoveFailed": "ワークスペースの通知ルールの削除に失敗しました",
 			"toastPreferencesSaved": "通知設定を保存しました",
 			"toastPreferencesSaveFailed": "通知設定の保存に失敗しました",
@@ -1282,7 +1245,6 @@
 			"selectViewMode": "ビューモードを選択",
 			"board": "ボード",
 			"list": "リスト",
-			"gantt": "ガント",
 			"sidebarDefault": "サイドバーのデフォルト状態",
 			"sidebarDefaultDescription": "起動時にサイドバーを展開した状態に保ちます",
 			"displayOptions": "表示オプション",
@@ -1443,7 +1405,6 @@
 			},
 			"connect": "Slack に接続",
 			"saveChanges": "変更を保存",
-			"update": "Slack を更新",
 			"disconnect": "接続解除"
 		},
 		"tasksImportExport": {
@@ -1846,8 +1807,6 @@
 				"includeAnyOf": "次のいずれかを含む"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "チケットを検索...",
@@ -2285,11 +2244,8 @@
 			"columns": {
 				"name": "名前",
 				"role": "ロール",
-				"joined": "参加日",
-				"actions": "操作"
+				"joined": "参加日"
 			},
-			"memberRolePending": "{{role}} (保留中)",
-			"ariaCancelInvitation": "招待をキャンセル",
 			"ariaInvitationActions": "招待の操作",
 			"ariaRemoveMember": "メンバーを削除",
 			"removeDialogTitle": "チームメンバーを削除しますか？",
@@ -2322,8 +2278,6 @@
 		},
 		"table": {
 			"progress": "進捗",
-			"project": "プロジェクト",
-			"status": "ステータス",
 			"tasks": "タスク"
 		},
 		"charts": {
@@ -2354,7 +2308,6 @@
 				"inProgress": "進行中"
 			},
 			"noDueDate": "期限なし",
-			"reorderHandle": "プロジェクトの並び替え",
 			"reorderError": "プロジェクトの並び替えに失敗しました"
 		},
 		"search": {
