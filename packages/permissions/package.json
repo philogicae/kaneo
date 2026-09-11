@@ -22,9 +22,7 @@
 		"better-auth": "~1.6.30"
 	},
 	"devDependencies": {
-		"@kaneo/typescript-config": "workspace:*",
 		"typescript": "^7.0.2",
-		"vite": "^8.2.0",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	}
 }

@@ -35,7 +35,7 @@ Fixes land on the latest release. Self-hosted instances should track the most re
 
 ## Scope
 
-In scope: the API (`apps/api`), the web app (`apps/web`), the MCP server (`packages/mcp`), the Helm chart, and the published Docker images.
+In scope: the API (`apps/api`), the web app (`apps/web`), and the bundled Docker image built from `Dockerfile.kaneo`.
 
 Out of scope: findings that require an already-compromised host or database, denial of service through sheer request volume, missing hardening headers with no demonstrated impact, and vulnerabilities in third-party dependencies without a working path through Kaneo. For dependency advisories, a pull request bumping the dependency is welcome and can be public.
 

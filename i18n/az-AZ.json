@@ -35,18 +35,6 @@
 			"label": "Naviqasiya yolu",
 			"more": "Daha çox"
 		},
-		"language": {
-			"english": "İngilis",
-			"german": "Alman",
-			"greek": "Yunan",
-			"macedonian": "Makedon",
-			"french": "Fransız",
-			"spanish": "İspan",
-			"dutch": "Holland",
-			"korean": "Koreya",
-			"chinese": "Çin",
-			"italian": "İtalyan"
-		},
 		"people": {
 			"someone": "Kimsə",
 			"unknown": "Naməlum"
@@ -96,7 +84,6 @@
 				"keyLabel": "Açar:",
 				"keyHint": "Tapşırıq identifikatorları üçün istifadə olunur (məs., {{example}}-123)",
 				"createButton": "Layihə yarat",
-				"successToast": "Layihə uğurla yaradıldı",
 				"errorToast": "Layihəni yaratmaq alınmadı"
 			},
 			"createWorkspace": {
@@ -122,7 +109,6 @@
 				"successUpdated": "Tapşırıq uğurla yeniləndi",
 				"createError": "Tapşırığı yaratmaq alınmadı",
 				"priority": "Prioritet",
-				"statusFallback": "İcra olunur",
 				"startDate": "Başlama tarixi",
 				"dueDate": "Son tarix",
 				"clearStartDate": "Başlama tarixini təmizlə",
@@ -477,23 +463,7 @@
 			"noProjectsInWorkspace": "Bu iş sahəsində hələ layihə yoxdur.",
 			"createRule": "Qayda yarat",
 			"removeRule": "Qaydanı çıxar",
-			"toastEmailSaved": "E-poçt bildiriş parametrləri yadda saxlanıldı",
-			"toastEmailSaveFailed": "E-poçt parametrlərini yadda saxlamaq alınmadı",
-			"toastNtfySaved": "ntfy parametrləri yadda saxlanıldı",
-			"toastNtfySaveFailed": "ntfy parametrlərini yadda saxlamaq alınmadı",
-			"toastNtfyDisconnected": "ntfy ayrıldı",
-			"toastNtfyDisconnectFailed": "ntfy-ni ayırmaq alınmadı",
-			"toastGotifySaved": "Gotify parametrləri yadda saxlanıldı",
-			"toastGotifySaveFailed": "Gotify parametrlərini yadda saxlamaq alınmadı",
-			"toastGotifyDisconnected": "Gotify ayrıldı",
-			"toastGotifyDisconnectFailed": "Gotify-ı ayırmaq alınmadı",
-			"toastWebhookSaved": "Webhook-un parametrləri yadda saxlanıldı",
-			"toastWebhookSaveFailed": "Webhook-un parametrlərini yadda saxlamaq alınmadı",
-			"toastWebhookDisconnected": "Webhook ayrıldı",
-			"toastWebhookDisconnectFailed": "Webhook-u ayırmaq alınmadı",
-			"toastRuleSaved": "{{workspaceName}} üçün bildiriş qaydası yadda saxlanıldı",
 			"toastRuleSaveFailed": "İş sahəsinin bildiriş qaydasını yadda saxlamaq alınmadı",
-			"toastRuleRemoved": "{{workspaceName}} üçün bildiriş qaydası çıxarıldı",
 			"toastRuleRemoveFailed": "İş sahəsinin bildiriş qaydasını çıxarmaq alınmadı",
 			"toastPreferencesSaved": "Bildiriş tərcihləri yadda saxlanıldı",
 			"toastPreferencesSaveFailed": "Bildiriş tərcihlərini yadda saxlamaq alınmadı",
@@ -525,7 +495,6 @@
 			"selectViewMode": "Görünüş rejimini seçin",
 			"board": "Lövhə",
 			"list": "Siyahı",
-			"gantt": "Qant diaqramı",
 			"sidebarDefault": "Yan panelin standart vəziyyəti",
 			"sidebarDefaultDescription": "Başlanğıcda yan paneli açıq saxla",
 			"displayOptions": "Göstərmə seçimləri",
@@ -1098,7 +1067,6 @@
 			},
 			"connect": "Slack-ə qoşul",
 			"saveChanges": "Dəyişiklikləri yadda saxla",
-			"update": "Slack-i yenilə",
 			"disconnect": "Ayır"
 		},
 		"discordIntegration": {
@@ -1136,7 +1104,6 @@
 			},
 			"connect": "Discord-a qoşul",
 			"saveChanges": "Dəyişiklikləri yadda saxla",
-			"update": "Discord-u yenilə",
 			"disconnect": "Ayır"
 		},
 		"mattermostIntegration": {
@@ -1174,7 +1141,6 @@
 			},
 			"connect": "Mattermost-a qoşul",
 			"saveChanges": "Dəyişiklikləri yadda saxla",
-			"update": "Mattermost-u yenilə",
 			"disconnect": "Ayır"
 		},
 		"genericWebhookIntegration": {
@@ -1336,13 +1302,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -1458,7 +1422,6 @@
 		},
 		"notifications": "Bildirişlər",
 		"sidebar": {
-			"overview": "İcmal",
 			"projects": "Layihələr",
 			"members": "Üzvlər",
 			"invitations": "Dəvətlər",
@@ -1555,8 +1518,6 @@
 	},
 	"notifications": {
 		"title": "Bildirişlər",
-		"newCount_one": "{{count}} yeni",
-		"newCount_other": "{{count}} yeni",
 		"emptyTitle": "Hələ bildiriş yoxdur",
 		"emptySubtitle": "Yenilikləri və fəaliyyəti burada görəcəksiniz.",
 		"clearAll": "Bütün bildirişləri təmizlə",
@@ -2018,8 +1979,6 @@
 				"includeAnyOf": "Bunlardan hər hansı birini ehtiva edir"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"calendar": {
@@ -2247,7 +2206,6 @@
 				"inProgress": "İcra olunur"
 			},
 			"noDueDate": "Son tarix yoxdur",
-			"reorderHandle": "Layihənin sırasını dəyiş",
 			"reorderError": "Layihələrin sırasını dəyişmək alınmadı"
 		},
 		"search": {
@@ -2321,11 +2279,8 @@
 			"columns": {
 				"name": "Ad",
 				"role": "Rol",
-				"joined": "Qoşulub",
-				"actions": "Əməliyyatlar"
+				"joined": "Qoşulub"
 			},
-			"memberRolePending": "{{role}} (gözləyir)",
-			"ariaCancelInvitation": "Dəvəti ləğv et",
 			"ariaInvitationActions": "Dəvət əməliyyatları",
 			"ariaRemoveMember": "Üzvü çıxar",
 			"removeDialogTitle": "Komanda üzvü çıxarılsın?",
@@ -2356,7 +2311,6 @@
 		"taskDetail": {
 			"labels": "Etiketlər",
 			"externalLinks": "Xarici keçidlər",
-			"pullRequestFallback": "Birləşdirmə sorğusu",
 			"issueFallback": "Məsələ",
 			"prStatusMerged": "Birləşdirilib",
 			"prStatusDraft": "Qaralama",
@@ -2401,8 +2355,6 @@
 		},
 		"table": {
 			"progress": "Progress",
-			"project": "Project",
-			"status": "Status",
 			"tasks": "Tasks"
 		},
 		"tabs": {

@@ -35,9 +35,6 @@
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"outputs": ["dist/**"]
 		},
-		"@kaneo/site#build": {
-			"outputs": [".next/**", "!.next/cache/**", "out/**"]
-		},
 
 		"dev": {
 			"dependsOn": ["^build"],

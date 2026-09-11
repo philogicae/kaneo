@@ -327,18 +327,6 @@
 			"label": "이동 경로",
 			"more": "더 보기"
 		},
-		"language": {
-			"english": "영어",
-			"german": "독일어",
-			"greek": "그리스어",
-			"macedonian": "마케도니아어",
-			"french": "프랑스어",
-			"spanish": "스페인어",
-			"dutch": "네덜란드어",
-			"korean": "한국어",
-			"chinese": "중국어",
-			"italian": "이탈리아어"
-		},
 		"people": {
 			"someone": "누군가",
 			"unknown": "알 수 없음"
@@ -388,7 +376,6 @@
 				"keyLabel": "키:",
 				"keyHint": "티켓 ID에 사용됩니다 (예: {{example}}-123)",
 				"createButton": "프로젝트 만들기",
-				"successToast": "프로젝트가 생성되었습니다",
 				"errorToast": "프로젝트 생성에 실패했습니다"
 			},
 			"createWorkspace": {
@@ -414,7 +401,6 @@
 				"successUpdated": "작업이 업데이트되었습니다",
 				"createError": "작업 생성에 실패했습니다",
 				"priority": "우선순위",
-				"statusFallback": "진행 중",
 				"startDate": "시작일",
 				"dueDate": "마감일",
 				"clearStartDate": "시작일 지우기",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "알림",
 		"sidebar": {
-			"overview": "개요",
 			"projects": "프로젝트",
 			"members": "멤버",
 			"invitations": "초대",
@@ -614,7 +599,6 @@
 	},
 	"notifications": {
 		"title": "알림",
-		"newCount_other": "새 알림 {{count}}개",
 		"emptyTitle": "아직 알림이 없습니다",
 		"emptySubtitle": "여기서 업데이트와 활동을 확인할 수 있습니다.",
 		"clearAll": "모든 알림 지우기",
@@ -682,7 +666,6 @@
 		"taskDetail": {
 			"labels": "라벨",
 			"externalLinks": "외부 링크",
-			"pullRequestFallback": "풀 리퀘스트",
 			"issueFallback": "이슈",
 			"prStatusMerged": "병합됨",
 			"prStatusDraft": "초안",
@@ -791,13 +774,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -858,7 +839,6 @@
 			},
 			"connect": "Discord 연결",
 			"saveChanges": "변경사항 저장",
-			"update": "Discord 업데이트",
 			"disconnect": "연결 해제"
 		},
 		"externalLinks": {
@@ -1124,7 +1104,6 @@
 				"saveError": "Mattermost 통합 저장 실패",
 				"updateError": "Mattermost 통합 업데이트 실패"
 			},
-			"update": "Mattermost 업데이트",
 			"validation": {
 				"webhookInvalid": "유효한 Mattermost webhook URL을 입력하세요"
 			},
@@ -1218,23 +1197,7 @@
 			"noProjectsInWorkspace": "이 워크스페이스에 사용 가능한 프로젝트가 아직 없습니다.",
 			"createRule": "규칙 만들기",
 			"removeRule": "규칙 제거",
-			"toastEmailSaved": "이메일 알림 설정이 저장되었습니다",
-			"toastEmailSaveFailed": "이메일 설정 저장에 실패했습니다",
-			"toastNtfySaved": "ntfy 설정이 저장되었습니다",
-			"toastNtfySaveFailed": "ntfy 설정 저장에 실패했습니다",
-			"toastNtfyDisconnected": "ntfy 연결이 해제되었습니다",
-			"toastNtfyDisconnectFailed": "ntfy 연결 해제에 실패했습니다",
-			"toastGotifySaved": "Gotify 설정이 저장되었습니다",
-			"toastGotifySaveFailed": "Gotify 설정 저장에 실패했습니다",
-			"toastGotifyDisconnected": "Gotify 연결이 해제되었습니다",
-			"toastGotifyDisconnectFailed": "Gotify 연결 해제에 실패했습니다",
-			"toastWebhookSaved": "웹훅 설정이 저장되었습니다",
-			"toastWebhookSaveFailed": "웹훅 설정 저장에 실패했습니다",
-			"toastWebhookDisconnected": "웹훅 연결이 해제되었습니다",
-			"toastWebhookDisconnectFailed": "웹훅 연결 해제에 실패했습니다",
-			"toastRuleSaved": "{{workspaceName}}의 알림 규칙이 저장되었습니다",
 			"toastRuleSaveFailed": "워크스페이스 알림 규칙 저장에 실패했습니다",
-			"toastRuleRemoved": "{{workspaceName}}의 알림 규칙이 제거되었습니다",
 			"toastRuleRemoveFailed": "워크스페이스 알림 규칙 제거에 실패했습니다",
 			"toastPreferencesSaved": "알림 환경설정이 저장되었습니다",
 			"toastPreferencesSaveFailed": "알림 환경설정 저장에 실패했습니다",
@@ -1282,7 +1245,6 @@
 			"selectViewMode": "보기 모드 선택",
 			"board": "보드",
 			"list": "목록",
-			"gantt": "간트",
 			"sidebarDefault": "사이드바 기본값",
 			"sidebarDefaultDescription": "시작 시 사이드바를 펼친 상태로 유지",
 			"displayOptions": "표시 옵션",
@@ -1443,7 +1405,6 @@
 			},
 			"connect": "Slack 연결",
 			"saveChanges": "변경사항 저장",
-			"update": "Slack 업데이트",
 			"disconnect": "연결 해제"
 		},
 		"tasksImportExport": {
@@ -1846,8 +1807,6 @@
 				"includeAnyOf": "다음 중 하나 포함"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "티켓 검색...",
@@ -2285,11 +2244,8 @@
 			"columns": {
 				"name": "이름",
 				"role": "역할",
-				"joined": "참여",
-				"actions": "작업"
+				"joined": "참여"
 			},
-			"memberRolePending": "{{role}} (대기 중)",
-			"ariaCancelInvitation": "초대 취소",
 			"ariaRemoveMember": "멤버 제거",
 			"removeDialogTitle": "팀 멤버를 제거하시겠습니까?",
 			"removeDialogDescription": "{{name}}님을 워크스페이스에서 제거하시겠습니까? 이 작업은 취소할 수 없습니다.",
@@ -2322,8 +2278,6 @@
 		},
 		"table": {
 			"progress": "진행률",
-			"project": "프로젝트",
-			"status": "상태",
 			"tasks": "작업"
 		},
 		"charts": {
@@ -2353,7 +2307,6 @@
 				"inProgress": "진행 중"
 			},
 			"noDueDate": "마감일 없음",
-			"reorderHandle": "프로젝트 순서 변경",
 			"reorderError": "프로젝트 순서를 변경하지 못했습니다",
 			"emptyDescriptionReadOnly": "이 워크스페이스에 아직 프로젝트가 없습니다. 관리자에게 프로젝트 생성을 요청하세요."
 		},

@@ -327,18 +327,6 @@
 			"label": "ब्रेडक्रंब",
 			"more": "और"
 		},
-		"language": {
-			"english": "अंग्रेज़ी",
-			"german": "जर्मन",
-			"greek": "ग्रीक",
-			"macedonian": "मैसेडोनियन",
-			"french": "फ़्रेंच",
-			"spanish": "स्पेनिश",
-			"dutch": "डच",
-			"korean": "कोरियन",
-			"chinese": "चीनी",
-			"italian": "इतालवी"
-		},
 		"people": {
 			"someone": "कोई",
 			"unknown": "अज्ञात"
@@ -388,7 +376,6 @@
 				"keyLabel": "कुंजी:",
 				"keyHint": "टिकट ID के लिए उपयोग (जैसे, {{example}}-123)",
 				"createButton": "प्रोजेक्ट बनाएँ",
-				"successToast": "प्रोजेक्ट सफलतापूर्वक बनाया गया",
 				"errorToast": "प्रोजेक्ट बनाने में विफल"
 			},
 			"createWorkspace": {
@@ -414,7 +401,6 @@
 				"successUpdated": "कार्य सफलतापूर्वक अपडेट किया गया",
 				"createError": "कार्य बनाने में विफल",
 				"priority": "प्राथमिकता",
-				"statusFallback": "प्रगति में",
 				"startDate": "शुरू की तारीख",
 				"dueDate": "नियत तारीख",
 				"clearStartDate": "शुरू की तारीख साफ़ करें",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "सूचनाएँ",
 		"sidebar": {
-			"overview": "अवलोकन",
 			"projects": "प्रोजेक्ट",
 			"members": "सदस्य",
 			"invitations": "निमंत्रण",
@@ -614,8 +599,6 @@
 	},
 	"notifications": {
 		"title": "सूचनाएँ",
-		"newCount_one": "{{count}} नई",
-		"newCount_other": "{{count}} नई",
 		"emptyTitle": "अभी तक कोई सूचना नहीं",
 		"emptySubtitle": "आप यहाँ अपडेट और गतिविधि देखेंगे।",
 		"clearAll": "सभी सूचनाएँ साफ़ करें",
@@ -686,7 +669,6 @@
 		"taskDetail": {
 			"labels": "लेबल",
 			"externalLinks": "बाहरी लिंक",
-			"pullRequestFallback": "पुल अनुरोध",
 			"issueFallback": "मुद्दा",
 			"prStatusMerged": "मर्ज किया गया",
 			"prStatusDraft": "ड्राफ़्ट",
@@ -795,13 +777,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -862,7 +842,6 @@
 			},
 			"connect": "Discord कनेक्ट करें",
 			"saveChanges": "परिवर्तन सहेजें",
-			"update": "Discord अपडेट करें",
 			"disconnect": "डिस्कनेक्ट करें"
 		},
 		"externalLinks": {
@@ -1128,7 +1107,6 @@
 				"saveError": "Mattermost इंटीग्रेशन सहेजने में विफल",
 				"updateError": "Mattermost इंटीग्रेशन अपडेट करने में विफल"
 			},
-			"update": "Mattermost अपडेट करें",
 			"validation": {
 				"webhookInvalid": "एक मान्य Mattermost webhook URL दर्ज करें"
 			},
@@ -1236,23 +1214,7 @@
 			"noProjectsInWorkspace": "इस वर्कस्पेस के लिए अभी तक कोई प्रोजेक्ट उपलब्ध नहीं।",
 			"createRule": "नियम बनाएँ",
 			"removeRule": "नियम हटाएँ",
-			"toastEmailSaved": "ईमेल सूचना सेटिंग सहेजी गई",
-			"toastEmailSaveFailed": "ईमेल सेटिंग सहेजने में विफल",
-			"toastNtfySaved": "ntfy सेटिंग सहेजी गई",
-			"toastNtfySaveFailed": "ntfy सेटिंग सहेजने में विफल",
-			"toastNtfyDisconnected": "ntfy डिस्कनेक्ट किया गया",
-			"toastNtfyDisconnectFailed": "ntfy डिस्कनेक्ट करने में विफल",
-			"toastGotifySaved": "Gotify सेटिंग सहेजी गई",
-			"toastGotifySaveFailed": "Gotify सेटिंग सहेजने में विफल",
-			"toastGotifyDisconnected": "Gotify डिस्कनेक्ट किया गया",
-			"toastGotifyDisconnectFailed": "Gotify डिस्कनेक्ट करने में विफल",
-			"toastWebhookSaved": "वेबहुक सेटिंग सहेजी गई",
-			"toastWebhookSaveFailed": "वेबहुक सेटिंग सहेजने में विफल",
-			"toastWebhookDisconnected": "वेबहुक डिस्कनेक्ट किया गया",
-			"toastWebhookDisconnectFailed": "वेबहुक डिस्कनेक्ट करने में विफल",
-			"toastRuleSaved": "{{workspaceName}} के लिए सूचना नियम सहेजा गया",
 			"toastRuleSaveFailed": "वर्कस्पेस सूचना नियम सहेजने में विफल",
-			"toastRuleRemoved": "{{workspaceName}} के लिए सूचना नियम हटाया गया",
 			"toastRuleRemoveFailed": "वर्कस्पेस सूचना नियम हटाने में विफल",
 			"toastPreferencesSaved": "सूचना प्राथमिकताएँ सहेजी गईं",
 			"toastPreferencesSaveFailed": "सूचना प्राथमिकताएँ सहेजने में विफल",
@@ -1286,7 +1248,6 @@
 			"selectViewMode": "दृश्य मोड चुनें",
 			"board": "बोर्ड",
 			"list": "सूची",
-			"gantt": "गैंट",
 			"sidebarDefault": "साइडबार डिफ़ॉल्ट",
 			"sidebarDefaultDescription": "शुरुआत पर साइडबार विस्तारित रखें",
 			"displayOptions": "प्रदर्शन विकल्प",
@@ -1447,7 +1408,6 @@
 			},
 			"connect": "Slack कनेक्ट करें",
 			"saveChanges": "परिवर्तन सहेजें",
-			"update": "Slack अपडेट करें",
 			"disconnect": "डिस्कनेक्ट करें"
 		},
 		"tasksImportExport": {
@@ -1852,8 +1812,6 @@
 				"includeAnyOf": "में से कोई शामिल है"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "टिकट खोजें...",
@@ -2303,11 +2261,8 @@
 			"columns": {
 				"name": "नाम",
 				"role": "भूमिका",
-				"joined": "शामिल हुए",
-				"actions": "कार्रवाइयाँ"
+				"joined": "शामिल हुए"
 			},
-			"memberRolePending": "{{role}} (लंबित)",
-			"ariaCancelInvitation": "निमंत्रण रद्द करें",
 			"ariaInvitationActions": "निमंत्रण कार्रवाइयाँ",
 			"ariaRemoveMember": "सदस्य हटाएँ",
 			"removeDialogTitle": "टीम सदस्य हटाएँ?",
@@ -2341,8 +2296,6 @@
 		},
 		"table": {
 			"progress": "प्रगति",
-			"project": "प्रोजेक्ट",
-			"status": "स्थिति",
 			"tasks": "कार्य"
 		},
 		"charts": {
@@ -2373,7 +2326,6 @@
 				"inProgress": "प्रगति में"
 			},
 			"noDueDate": "कोई नियत तारीख नहीं",
-			"reorderHandle": "प्रोजेक्ट का क्रम बदलें",
 			"reorderError": "प्रोजेक्ट का क्रम बदलने में विफल"
 		},
 		"search": {
