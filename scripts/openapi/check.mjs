@@ -24,25 +24,26 @@ const RUN = {
   stdio: ["ignore", "ignore", "inherit"],
 };
 
+// npm_execpath is a JS entrypoint for npm-installed pnpm but a native binary
+// for standalone installs; only the former can be exec'd through Node.
+const pnpmIsJavaScript = /\.(c|m)?js$/.test(packageManager);
+const runPnpm = (args) =>
+  execFileSync(
+    pnpmIsJavaScript ? process.execPath : packageManager,
+    pnpmIsJavaScript ? [packageManager, ...args] : args,
+    RUN,
+  );
+
 function generate(into) {
-  execFileSync(
-    process.execPath,
-    [packageManager, "turbo", "build", "--filter=@kaneo/api^..."],
-    RUN,
-  );
-  execFileSync(
-    process.execPath,
-    [
-      packageManager,
-      "--filter",
-      "@kaneo/api",
-      "exec",
-      "tsx",
-      "scripts/export-openapi.ts",
-      into,
-    ],
-    RUN,
-  );
+  runPnpm(["turbo", "build", "--filter=@kaneo/api^..."]);
+  runPnpm([
+    "--filter",
+    "@kaneo/api",
+    "exec",
+    "tsx",
+    "scripts/export-openapi.ts",
+    into,
+  ]);
 }
 
 function run() {

@@ -106,18 +106,36 @@ function verifyPkce(codeVerifier: string, codeChallenge: string): boolean {
   return base64url(hash) === codeChallenge;
 }
 
+export type ExchangeCodeFailure =
+  | "client_id"
+  | "redirect_uri"
+  | "code_verifier";
+
 export async function exchangeCode(
   code: string,
   clientId: string,
   codeVerifier: string,
-  redirectUri: string,
-): Promise<{ accessToken: string; expiresIn: number } | null> {
+  redirectUri?: string,
+): Promise<
+  | { accessToken: string; expiresIn: number }
+  | { failure: ExchangeCodeFailure }
+  | null
+> {
   const stored = await consumeState<AuthCode>("code", code);
   if (!stored) return null;
 
-  if (stored.clientId !== clientId) return null;
-  if (stored.redirectUri !== redirectUri) return null;
-  if (!verifyPkce(codeVerifier, stored.codeChallenge)) return null;
+  if (stored.clientId !== clientId) {
+    console.warn("[mcp] token exchange rejected: client_id mismatch");
+    return { failure: "client_id" };
+  }
+  if (redirectUri !== undefined && stored.redirectUri !== redirectUri) {
+    console.warn("[mcp] token exchange rejected: redirect_uri mismatch");
+    return { failure: "redirect_uri" };
+  }
+  if (!verifyPkce(codeVerifier, stored.codeChallenge)) {
+    console.warn("[mcp] token exchange rejected: PKCE verification failed");
+    return { failure: "code_verifier" };
+  }
 
   const sessionToken = randomUUID();
   const expiresIn = 30 * 24 * 60 * 60;
