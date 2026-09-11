@@ -925,9 +925,9 @@ function AddRulesDialog({
     setSelection((previous) => ({
       ...previous,
       [workspaceId]: {
+        ...previous[workspaceId],
         all: false,
         projectIds: new Set(),
-        ...previous[workspaceId],
         ...update,
       },
     }));

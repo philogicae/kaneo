@@ -210,6 +210,35 @@ const hexColorSchema = z
     "Expected a hex color like #FF6600",
   );
 
+// Label colors must match the web palette in apps/web/src/constants/label-colors.ts.
+export const LABEL_COLOR_SLUGS = [
+  "gray",
+  "dark-gray",
+  "purple",
+  "teal",
+  "green",
+  "yellow",
+  "orange",
+  "pink",
+  "red",
+  "sky",
+  "blue",
+  "cyan",
+  "indigo",
+  "fuchsia",
+  "lime",
+  "emerald",
+] as const;
+
+const labelColorSchema = z
+  .string()
+  .refine(
+    (value) =>
+      hexColorSchema.safeParse(value).success ||
+      (LABEL_COLOR_SLUGS as readonly string[]).includes(value),
+    `Expected a hex color like #FF6600 or a semantic name (${LABEL_COLOR_SLUGS.join(", ")})`,
+  );
+
 /** Register Kaneo's authenticated tool catalog on an MCP server adapter. */
 export function registerMcpTools(
   server: McpToolRegistrar,
@@ -592,7 +621,8 @@ export function registerMcpTools(
   registerTool(
     "list_workspace_labels",
     {
-      description: "List labels defined in a workspace.",
+      description:
+        "List labels defined in a workspace. The response mixes workspace-level labels (taskId null) with task-level copies attached to tasks; prefer taskId null entries for attach_label_to_task.",
       inputSchema: z.object({ workspaceId: nonEmptyString }),
     },
     async (args) =>
@@ -608,10 +638,10 @@ export function registerMcpTools(
     "create_label",
     {
       description:
-        "Create a label in a workspace (optionally attach to a task).",
+        "Create a label in a workspace (optionally attach to a task). color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
       inputSchema: z.object({
         name: nonEmptyString,
-        color: hexColorSchema,
+        color: labelColorSchema,
         workspaceId: nonEmptyString,
         taskId: optionalNonEmptyString,
       }),
@@ -633,19 +663,35 @@ export function registerMcpTools(
   registerTool(
     "attach_label_to_task",
     {
-      description: "Attach an existing label to a task.",
+      description:
+        "Attach an existing workspace-level label to a task (the API copies it onto the task). Attaching a label that is already attached to another task is refused: the API would move it, silently detaching it from that task.",
       inputSchema: z.object({
         labelId: nonEmptyString,
         taskId: nonEmptyString,
       }),
     },
     async (args) =>
-      run(() =>
-        client.json(`/api/label/${encodeURIComponent(args.labelId)}/task`, {
-          method: "PUT",
-          body: JSON.stringify({ taskId: args.taskId }),
-        }),
-      ),
+      run(async () => {
+        // The API moves a task-level label to the target task (deleting it
+        // from its current one); refuse that so attaching stays
+        // non-destructive when a task-level copy is passed by mistake.
+        const label = (await client.json(
+          `/api/label/${encodeURIComponent(args.labelId)}`,
+          { method: "GET" },
+        )) as { taskId?: string | null };
+        if (label?.taskId && label.taskId !== args.taskId) {
+          throw new Error(
+            `Label is already attached to task ${label.taskId}; attaching it to another task would move it (detach it first, or use its workspace-level label).`,
+          );
+        }
+        return client.json(
+          `/api/label/${encodeURIComponent(args.labelId)}/task`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ taskId: args.taskId }),
+          },
+        );
+      }),
   );
 
   registerTool(
@@ -660,6 +706,92 @@ export function registerMcpTools(
           method: "DELETE",
         }),
       ),
+  );
+
+  registerTool(
+    "configure_telegram_notifications",
+    {
+      description:
+        "Configure Telegram notifications: link a chat to a stored bot, then route a workspace (or one project) into that chat, optionally into a forum topic (topicId). Existing duplicates are skipped. Requires workspace:manage_settings on the target workspace.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot id (from the config listing)",
+        ),
+        chatId: nonEmptyString.describe(
+          "Target Telegram chat id (numeric @getidsbot style, or @username)",
+        ),
+        workspaceId: optionalNonEmptyString.describe(
+          "Route the whole workspace (or the single projectId) into the chat",
+        ),
+        projectId: optionalNonEmptyString.describe(
+          "Restrict routing to one project of workspaceId",
+        ),
+        topicId: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe("Forum topic/message_thread_id when the chat is a forum"),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const config = await client.json<{
+          bots: Array<{
+            id: string;
+            name: string | null;
+            chats: Array<{ id: string; chatId: string }>;
+          }>;
+        }>("/api/telegram-config", { method: "GET" });
+        const bot = config.bots?.find((b) => b.id === args.botId);
+        if (!bot) {
+          const known = (config.bots ?? [])
+            .map((b) => `${b.id}${b.name ? ` (${b.name})` : ""}`)
+            .join(", ");
+          throw new Error(
+            `Telegram bot ${args.botId} not found.${known ? ` Available bots: ${known}` : " No bots are configured yet."}`,
+          );
+        }
+
+        let chatRow = (bot.chats ?? []).find((c) => c.chatId === args.chatId);
+        if (!chatRow) {
+          chatRow = (await client.json(
+            `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
+            {
+              method: "POST",
+              body: JSON.stringify({ chatId: args.chatId }),
+            },
+          )) as { id: string; chatId: string };
+        }
+        if (!chatRow) {
+          throw new Error(`Failed to register chat ${args.chatId} on the bot`);
+        }
+
+        if (!args.workspaceId) {
+          return {
+            bot: { id: bot.id, name: bot.name },
+            chat: chatRow,
+            rules: [],
+            note: "Chat linked to the bot. Pass workspaceId to route notifications.",
+          };
+        }
+
+        return client.json(
+          `/api/telegram-config/telegram-chat/${encodeURIComponent(chatRow.id)}/rules`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              scopes: [
+                {
+                  workspaceId: args.workspaceId,
+                  projectIds: args.projectId ? [args.projectId] : null,
+                },
+              ],
+              ...(args.topicId !== undefined ? { threadId: args.topicId } : {}),
+            }),
+          },
+        );
+      }),
   );
 
   registerTool(
@@ -719,24 +851,15 @@ export function registerMcpTools(
     "delete_label",
     {
       description:
-        "Delete a label by ID. Only task-associated labels can be deleted; workspace-level labels (taskId null) are rejected by the API.",
+        "Delete a label by ID. Deleting a workspace-level label (taskId null) also deletes its task-level copies.",
       inputSchema: z.object({ id: nonEmptyString }),
     },
     async (args) =>
-      run(async () => {
-        const label = (await client.json(
-          `/api/label/${encodeURIComponent(args.id)}`,
-          { method: "GET" },
-        )) as { taskId?: string | null };
-        if (!label?.taskId) {
-          throw new Error(
-            "Label is not associated with a task and cannot be deleted (workspace-level labels are not deletable via this endpoint).",
-          );
-        }
-        return client.json(`/api/label/${encodeURIComponent(args.id)}`, {
+      run(() =>
+        client.json(`/api/label/${encodeURIComponent(args.id)}`, {
           method: "DELETE",
-        });
-      }),
+        }),
+      ),
   );
 
   registerTool(

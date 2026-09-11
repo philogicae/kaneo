@@ -321,39 +321,109 @@ mcp.all("/mcp", async (c) => {
   return response;
 });
 
+// Public clients disagree on how credentials travel: some put client_id in
+// the body, others send client_secret_basic (RFC 6749 §2.3.1) with an empty
+// secret. The Basic payload is form-encoded per parameter.
+function basicAuthClientId(header: string | undefined): string | undefined {
+  const match = header?.match(/^Basic\s+(.+)$/i);
+  if (!match?.[1]) return undefined;
+  try {
+    const decoded = Buffer.from(match[1], "base64").toString("utf8");
+    const sep = decoded.indexOf(":");
+    return decodeURIComponent(sep === -1 ? decoded : decoded.slice(0, sep));
+  } catch {
+    return undefined;
+  }
+}
+
 mcp.post("/mcp/token", async (c) => {
   const contentType = c.req.header("content-type") || "";
-  let params: Record<string, string>;
+  let params: Record<string, unknown>;
 
-  if (contentType.includes("application/x-www-form-urlencoded")) {
+  // Treat a missing or incorrect media type as form data when the body is
+  // form-shaped. Unreadable input is a protocol error, never a server error.
+  try {
     const body = await c.req.text();
-    params = Object.fromEntries(new URLSearchParams(body));
-  } else {
-    params = await c.req.json();
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      params = Object.fromEntries(new URLSearchParams(body));
+    } else if (body.trimStart().startsWith("{")) {
+      const parsed: unknown = JSON.parse(body);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        return c.json({ error: "invalid_request" }, 400);
+      }
+      params = parsed as Record<string, unknown>;
+    } else {
+      params = Object.fromEntries(new URLSearchParams(body));
+    }
+  } catch {
+    return c.json({ error: "invalid_request" }, 400);
   }
 
-  const { grant_type, code, client_id, code_verifier, redirect_uri } = params;
+  // Some clients put the parameters in the query string instead of the body;
+  // body values win when both are present.
+  for (const [key, value] of new URL(c.req.url).searchParams) {
+    params[key] ??= value;
+  }
+
+  const { grant_type, code, code_verifier, redirect_uri } = params;
+  const client_id =
+    params.client_id ?? basicAuthClientId(c.req.header("authorization"));
 
   if (grant_type !== "authorization_code") {
     return c.json({ error: "unsupported_grant_type" }, 400);
   }
-  if (!code || !client_id || !code_verifier || !redirect_uri) {
-    return c.json({ error: "invalid_request" }, 400);
+
+  const required: Array<[string, unknown]> = [
+    ["code", code],
+    ["client_id", client_id],
+    ["code_verifier", code_verifier],
+  ];
+  for (const [name, value] of required) {
+    if (typeof value !== "string" || !value) {
+      return c.json(
+        {
+          error: "invalid_request",
+          error_description: `${name} is required`,
+        },
+        400,
+      );
+    }
+  }
+  if (
+    redirect_uri !== undefined &&
+    (typeof redirect_uri !== "string" || !redirect_uri)
+  ) {
+    return c.json(
+      {
+        error: "invalid_request",
+        error_description: "redirect_uri must be a non-empty string",
+      },
+      400,
+    );
   }
 
   const result = await exchangeCode(
-    code,
-    client_id,
-    code_verifier,
-    redirect_uri,
+    code as string,
+    client_id as string,
+    code_verifier as string,
+    redirect_uri as string | undefined,
   );
-  if (!result) {
+  if (result === null) {
     return c.json({ error: "invalid_grant" }, 400);
+  }
+  if ("failure" in result) {
+    return c.json(
+      {
+        error: "invalid_grant",
+        error_description: `${result.failure} does not match the authorization request`,
+      },
+      400,
+    );
   }
 
   return c.json({
     access_token: result.accessToken,
-    token_type: "bearer",
+    token_type: "Bearer",
     expires_in: result.expiresIn,
   });
 });

@@ -138,6 +138,25 @@
 					},
 					"required": ["label", "more"]
 				},
+				"boolean": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"true": {
+							"type": "string"
+						},
+						"false": {
+							"type": "string"
+						},
+						"undefined": {
+							"type": "string"
+						},
+						"notSet": {
+							"type": "string"
+						}
+					},
+					"required": ["true", "false", "undefined", "notSet"]
+				},
 				"language": {
 					"type": "object",
 					"additionalProperties": false,
@@ -649,6 +668,7 @@
 				"empty",
 				"pagination",
 				"breadcrumb",
+				"boolean",
 				"language",
 				"people",
 				"error",
@@ -2002,6 +2022,15 @@
 						"themeSystem": {
 							"type": "string"
 						},
+						"interfaceSize": {
+							"type": "string"
+						},
+						"interfaceSizeDecrease": {
+							"type": "string"
+						},
+						"interfaceSizeIncrease": {
+							"type": "string"
+						},
 						"language": {
 							"type": "string"
 						},
@@ -2102,6 +2131,9 @@
 						"themeDark",
 						"themeVolt",
 						"themeSystem",
+						"interfaceSize",
+						"interfaceSizeDecrease",
+						"interfaceSizeIncrease",
 						"language",
 						"languageDescription",
 						"selectLanguage",
@@ -2167,6 +2199,328 @@
 						"apiKeysCardDescription",
 						"createApiKey",
 						"unnamedKey"
+					]
+				},
+				"mcp": {
+					"type": "string"
+				},
+				"telegramUnified": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"sidebarLabel": {
+							"type": "string"
+						},
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"emptyWorkspace": {
+							"type": "string"
+						},
+						"emptyChats": {
+							"type": "string"
+						},
+						"addBot": {
+							"type": "string"
+						},
+						"addBotDescription": {
+							"type": "string"
+						},
+						"botToken": {
+							"type": "string"
+						},
+						"botName": {
+							"type": "string"
+						},
+						"botNamePlaceholder": {
+							"type": "string"
+						},
+						"unnamedBot": {
+							"type": "string"
+						},
+						"addChat": {
+							"type": "string"
+						},
+						"addChatDescription": {
+							"type": "string"
+						},
+						"chatId": {
+							"type": "string"
+						},
+						"chatLabel": {
+							"type": "string"
+						},
+						"chatLabelPlaceholder": {
+							"type": "string"
+						},
+						"addRule": {
+							"type": "string"
+						},
+						"addRuleDescription": {
+							"type": "string"
+						},
+						"topicId": {
+							"type": "string"
+						},
+						"topicIdPlaceholder": {
+							"type": "string"
+						},
+						"topicHint": {
+							"type": "string"
+						},
+						"verify": {
+							"type": "string"
+						},
+						"verifyBotOk": {
+							"type": "string"
+						},
+						"verifyChatOk": {
+							"type": "string"
+						},
+						"isForumHint": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"toastSaved": {
+							"type": "string"
+						},
+						"toastDeleted": {
+							"type": "string"
+						},
+						"toastError": {
+							"type": "string"
+						},
+						"wholeWorkspace": {
+							"type": "string"
+						},
+						"unknownProject": {
+							"type": "string"
+						},
+						"ruleActive": {
+							"type": "string"
+						},
+						"accountHint": {
+							"type": "string"
+						},
+						"accountHint_zero": {
+							"type": "string"
+						},
+						"accountHint_one": {
+							"type": "string"
+						},
+						"accountHint_two": {
+							"type": "string"
+						},
+						"accountHint_few": {
+							"type": "string"
+						},
+						"accountHint_many": {
+							"type": "string"
+						},
+						"accountHint_other": {
+							"type": "string"
+						},
+						"cardTitle": {
+							"type": "string"
+						},
+						"cardDescription": {
+							"type": "string"
+						},
+						"ruleWorkspaces": {
+							"type": "string"
+						},
+						"allWorkspaces": {
+							"type": "string"
+						},
+						"ruleProjects": {
+							"type": "string"
+						},
+						"allProjects": {
+							"type": "string"
+						},
+						"scopeIncomplete": {
+							"type": "string"
+						},
+						"detectedTopics_one": {
+							"type": "string"
+						},
+						"detectedTopics_zero": {
+							"type": "string"
+						},
+						"detectedTopics_two": {
+							"type": "string"
+						},
+						"detectedTopics_few": {
+							"type": "string"
+						},
+						"detectedTopics_many": {
+							"type": "string"
+						},
+						"detectedTopics_other": {
+							"type": "string"
+						},
+						"detectedTopicsLabel": {
+							"type": "string"
+						},
+						"compatibilityNote": {
+							"type": "string"
+						},
+						"editBot": {
+							"type": "string"
+						},
+						"editBotDescription": {
+							"type": "string"
+						},
+						"botTokenKeepHint": {
+							"type": "string"
+						},
+						"editChat": {
+							"type": "string"
+						},
+						"editChatDescription": {
+							"type": "string"
+						},
+						"deleteBot": {
+							"type": "string"
+						},
+						"deleteChat": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"sidebarLabel",
+						"pageTitle",
+						"title",
+						"subtitle",
+						"emptyWorkspace",
+						"emptyChats",
+						"addBot",
+						"addBotDescription",
+						"botToken",
+						"botName",
+						"botNamePlaceholder",
+						"unnamedBot",
+						"addChat",
+						"addChatDescription",
+						"chatId",
+						"chatLabel",
+						"chatLabelPlaceholder",
+						"addRule",
+						"addRuleDescription",
+						"topicId",
+						"topicIdPlaceholder",
+						"topicHint",
+						"verify",
+						"verifyBotOk",
+						"verifyChatOk",
+						"isForumHint",
+						"save",
+						"toastSaved",
+						"toastDeleted",
+						"toastError",
+						"wholeWorkspace",
+						"unknownProject",
+						"ruleActive",
+						"cardTitle",
+						"cardDescription",
+						"ruleWorkspaces",
+						"allWorkspaces",
+						"ruleProjects",
+						"allProjects",
+						"scopeIncomplete",
+						"detectedTopicsLabel",
+						"compatibilityNote",
+						"editBot",
+						"editBotDescription",
+						"botTokenKeepHint",
+						"editChat",
+						"editChatDescription",
+						"deleteBot",
+						"deleteChat"
+					]
+				},
+				"mcpPage": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"cardTitle": {
+							"type": "string"
+						},
+						"cardDescription": {
+							"type": "string"
+						},
+						"serverUrlLabel": {
+							"type": "string"
+						},
+						"serverUrlDescription": {
+							"type": "string"
+						},
+						"authModeOauth": {
+							"type": "string"
+						},
+						"authModeApiKey": {
+							"type": "string"
+						},
+						"oauthNote": {
+							"type": "string"
+						},
+						"apiKeyNote": {
+							"type": "string"
+						},
+						"createApiKey": {
+							"type": "string"
+						},
+						"installCommandLabel": {
+							"type": "string"
+						},
+						"manualConfigLabel": {
+							"type": "string"
+						},
+						"followUpLabel": {
+							"type": "string"
+						},
+						"copy": {
+							"type": "string"
+						},
+						"copied": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"pageTitle",
+						"title",
+						"subtitle",
+						"cardTitle",
+						"cardDescription",
+						"serverUrlLabel",
+						"serverUrlDescription",
+						"authModeOauth",
+						"authModeApiKey",
+						"oauthNote",
+						"apiKeyNote",
+						"createApiKey",
+						"installCommandLabel",
+						"manualConfigLabel",
+						"followUpLabel",
+						"copy",
+						"copied"
 					]
 				},
 				"apiKey": {
@@ -3469,6 +3823,12 @@
 						"columnsDescription": {
 							"type": "string"
 						},
+						"customFieldsTitle": {
+							"type": "string"
+						},
+						"customFieldsDescription": {
+							"type": "string"
+						},
 						"automationTitle": {
 							"type": "string"
 						},
@@ -3482,6 +3842,8 @@
 						"subtitle",
 						"columnsTitle",
 						"columnsDescription",
+						"customFieldsTitle",
+						"customFieldsDescription",
 						"automationTitle",
 						"automationDescription"
 					]
@@ -3585,6 +3947,105 @@
 						"off",
 						"newColumnPlaceholder",
 						"add"
+					]
+				},
+				"customFields": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"namePlaceholder": {
+							"type": "string"
+						},
+						"typePlaceholder": {
+							"type": "string"
+						},
+						"noOptionsPlaceholder": {
+							"type": "string"
+						},
+						"defaultValuePlaceholder": {
+							"type": "string"
+						},
+						"optionsPlaceholder": {
+							"type": "string"
+						},
+						"required": {
+							"type": "string"
+						},
+						"addButton": {
+							"type": "string"
+						},
+						"creating": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"defaultLabel": {
+							"type": "string"
+						},
+						"createSuccess": {
+							"type": "string"
+						},
+						"createError": {
+							"type": "string"
+						},
+						"deleteButton": {
+							"type": "string"
+						},
+						"deleting": {
+							"type": "string"
+						},
+						"deleteSuccess": {
+							"type": "string"
+						},
+						"deleteError": {
+							"type": "string"
+						},
+						"types": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"text": {
+									"type": "string"
+								},
+								"number": {
+									"type": "string"
+								},
+								"date": {
+									"type": "string"
+								},
+								"dropdown": {
+									"type": "string"
+								},
+								"boolean": {
+									"type": "string"
+								}
+							},
+							"required": ["text", "number", "date", "dropdown", "boolean"]
+						}
+					},
+					"required": [
+						"namePlaceholder",
+						"typePlaceholder",
+						"noOptionsPlaceholder",
+						"defaultValuePlaceholder",
+						"optionsPlaceholder",
+						"required",
+						"addButton",
+						"creating",
+						"loading",
+						"empty",
+						"defaultLabel",
+						"createSuccess",
+						"createError",
+						"deleteButton",
+						"deleting",
+						"deleteSuccess",
+						"deleteError",
+						"types"
 					]
 				},
 				"githubIntegration": {
@@ -5320,6 +5781,9 @@
 				"notificationsPage",
 				"preferencesPage",
 				"developerPage",
+				"mcp",
+				"telegramUnified",
+				"mcpPage",
 				"apiKey",
 				"workspaceGeneral",
 				"workspaceRoles",
@@ -5330,6 +5794,7 @@
 				"projectWorkflow",
 				"projectSwitcher",
 				"columnEditor",
+				"customFields",
 				"githubIntegration",
 				"giteaIntegration",
 				"slackIntegration",
@@ -6646,13 +7111,17 @@
 						},
 						"taskNotFoundDescription": {
 							"type": "string"
+						},
+						"customFields": {
+							"type": "string"
 						}
 					},
 					"required": [
 						"selectTask",
 						"loadingTask",
 						"taskNotFound",
-						"taskNotFoundDescription"
+						"taskNotFoundDescription",
+						"customFields"
 					]
 				},
 				"detail": {
@@ -6660,6 +7129,12 @@
 					"additionalProperties": false,
 					"properties": {
 						"subtaskOf": {
+							"type": "string"
+						},
+						"customFieldUpdated": {
+							"type": "string"
+						},
+						"selectOption": {
 							"type": "string"
 						},
 						"activity": {
@@ -7063,6 +7538,8 @@
 					},
 					"required": [
 						"subtaskOf",
+						"customFieldUpdated",
+						"selectOption",
 						"activity",
 						"noActivity",
 						"openInFullPage",
@@ -7221,10 +7698,7 @@
 						"start": {
 							"type": "string"
 						},
-						"startDate": {
-							"type": "string"
-						},
-						"noDate": {
+						"end": {
 							"type": "string"
 						}
 					},
@@ -7234,8 +7708,7 @@
 						"copyTaskLink",
 						"copyTaskBranch",
 						"start",
-						"startDate",
-						"noDate"
+						"end"
 					]
 				},
 				"move": {
@@ -7331,9 +7804,25 @@
 								},
 								"clear": {
 									"type": "string"
+								},
+								"timeLabel": {
+									"type": "string"
+								},
+								"apply": {
+									"type": "string"
+								},
+								"cancel": {
+									"type": "string"
 								}
 							},
-							"required": ["updateSuccess", "updateError", "clear"]
+							"required": [
+								"updateSuccess",
+								"updateError",
+								"clear",
+								"timeLabel",
+								"apply",
+								"cancel"
+							]
 						},
 						"startDate": {
 							"type": "object",
@@ -7347,9 +7836,25 @@
 								},
 								"clear": {
 									"type": "string"
+								},
+								"timeLabel": {
+									"type": "string"
+								},
+								"apply": {
+									"type": "string"
+								},
+								"cancel": {
+									"type": "string"
 								}
 							},
-							"required": ["updateSuccess", "updateError", "clear"]
+							"required": [
+								"updateSuccess",
+								"updateError",
+								"clear",
+								"timeLabel",
+								"apply",
+								"cancel"
+							]
 						},
 						"labels": {
 							"type": "object",
@@ -7625,6 +8130,15 @@
 						"allLabels": {
 							"type": "string"
 						},
+						"noValuesUsedYet": {
+							"type": "string"
+						},
+						"noCustomFieldValues": {
+							"type": "string"
+						},
+						"allCustomFieldValues": {
+							"type": "string"
+						},
 						"selectedCount": {
 							"type": "string"
 						},
@@ -7644,6 +8158,9 @@
 							"type": "string"
 						},
 						"selectedCount_other": {
+							"type": "string"
+						},
+						"all": {
 							"type": "string"
 						},
 						"subjects": {
@@ -7695,6 +8212,10 @@
 						"allAssignees",
 						"allDueDates",
 						"allLabels",
+						"noValuesUsedYet",
+						"noCustomFieldValues",
+						"allCustomFieldValues",
+						"all",
 						"subjects",
 						"operators"
 					]
@@ -8372,6 +8893,308 @@
 						}
 					},
 					"required": ["table"]
+				},
+				"reminders": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"add": {
+							"type": "string"
+						},
+						"before": {
+							"type": "string"
+						},
+						"amountLabel": {
+							"type": "string"
+						},
+						"unitLabel": {
+							"type": "string"
+						},
+						"unitMinute_one": {
+							"type": "string"
+						},
+						"unitMinute_zero": {
+							"type": "string"
+						},
+						"unitMinute_two": {
+							"type": "string"
+						},
+						"unitMinute_few": {
+							"type": "string"
+						},
+						"unitMinute_many": {
+							"type": "string"
+						},
+						"unitMinute_other": {
+							"type": "string"
+						},
+						"unitHour_one": {
+							"type": "string"
+						},
+						"unitHour_zero": {
+							"type": "string"
+						},
+						"unitHour_two": {
+							"type": "string"
+						},
+						"unitHour_few": {
+							"type": "string"
+						},
+						"unitHour_many": {
+							"type": "string"
+						},
+						"unitHour_other": {
+							"type": "string"
+						},
+						"unitDay_one": {
+							"type": "string"
+						},
+						"unitDay_zero": {
+							"type": "string"
+						},
+						"unitDay_two": {
+							"type": "string"
+						},
+						"unitDay_few": {
+							"type": "string"
+						},
+						"unitDay_many": {
+							"type": "string"
+						},
+						"unitDay_other": {
+							"type": "string"
+						},
+						"unitWeek_one": {
+							"type": "string"
+						},
+						"unitWeek_zero": {
+							"type": "string"
+						},
+						"unitWeek_two": {
+							"type": "string"
+						},
+						"unitWeek_few": {
+							"type": "string"
+						},
+						"unitWeek_many": {
+							"type": "string"
+						},
+						"unitWeek_other": {
+							"type": "string"
+						},
+						"weeksBefore_one": {
+							"type": "string"
+						},
+						"weeksBefore_zero": {
+							"type": "string"
+						},
+						"weeksBefore_two": {
+							"type": "string"
+						},
+						"weeksBefore_few": {
+							"type": "string"
+						},
+						"weeksBefore_many": {
+							"type": "string"
+						},
+						"weeksBefore_other": {
+							"type": "string"
+						},
+						"daysBefore_one": {
+							"type": "string"
+						},
+						"daysBefore_zero": {
+							"type": "string"
+						},
+						"daysBefore_two": {
+							"type": "string"
+						},
+						"daysBefore_few": {
+							"type": "string"
+						},
+						"daysBefore_many": {
+							"type": "string"
+						},
+						"daysBefore_other": {
+							"type": "string"
+						},
+						"hoursBefore_one": {
+							"type": "string"
+						},
+						"hoursBefore_zero": {
+							"type": "string"
+						},
+						"hoursBefore_two": {
+							"type": "string"
+						},
+						"hoursBefore_few": {
+							"type": "string"
+						},
+						"hoursBefore_many": {
+							"type": "string"
+						},
+						"hoursBefore_other": {
+							"type": "string"
+						},
+						"minutesBefore_one": {
+							"type": "string"
+						},
+						"minutesBefore_zero": {
+							"type": "string"
+						},
+						"minutesBefore_two": {
+							"type": "string"
+						},
+						"minutesBefore_few": {
+							"type": "string"
+						},
+						"minutesBefore_many": {
+							"type": "string"
+						},
+						"minutesBefore_other": {
+							"type": "string"
+						},
+						"remove": {
+							"type": "string"
+						},
+						"needsStartDate": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"updateSuccess": {
+							"type": "string"
+						},
+						"updateError": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"empty",
+						"add",
+						"before",
+						"amountLabel",
+						"unitLabel",
+						"remove",
+						"needsStartDate",
+						"hint",
+						"updateSuccess",
+						"updateError"
+					]
+				},
+				"recurrence": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"none": {
+							"type": "string"
+						},
+						"needsStartDate": {
+							"type": "string"
+						},
+						"every": {
+							"type": "string"
+						},
+						"day_one": {
+							"type": "string"
+						},
+						"day_zero": {
+							"type": "string"
+						},
+						"day_two": {
+							"type": "string"
+						},
+						"day_few": {
+							"type": "string"
+						},
+						"day_many": {
+							"type": "string"
+						},
+						"day_other": {
+							"type": "string"
+						},
+						"week_one": {
+							"type": "string"
+						},
+						"week_zero": {
+							"type": "string"
+						},
+						"week_two": {
+							"type": "string"
+						},
+						"week_few": {
+							"type": "string"
+						},
+						"week_many": {
+							"type": "string"
+						},
+						"week_other": {
+							"type": "string"
+						},
+						"month_one": {
+							"type": "string"
+						},
+						"month_zero": {
+							"type": "string"
+						},
+						"month_two": {
+							"type": "string"
+						},
+						"month_few": {
+							"type": "string"
+						},
+						"month_many": {
+							"type": "string"
+						},
+						"month_other": {
+							"type": "string"
+						},
+						"daily": {
+							"type": "string"
+						},
+						"weekly": {
+							"type": "string"
+						},
+						"monthly": {
+							"type": "string"
+						},
+						"summary": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"updateSuccess": {
+							"type": "string"
+						},
+						"updateError": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"none",
+						"needsStartDate",
+						"every",
+						"daily",
+						"weekly",
+						"monthly",
+						"summary",
+						"hint",
+						"updateSuccess",
+						"updateError"
+					]
 				}
 			},
 			"required": [
@@ -8405,7 +9228,9 @@
 				"contextMenu",
 				"actions",
 				"bulk",
-				"editor"
+				"editor",
+				"reminders",
+				"recurrence"
 			]
 		},
 		"invitations": {
@@ -8534,6 +9359,35 @@
 				"pageTitle": {
 					"type": "string"
 				},
+				"tabs": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"overview": {
+							"type": "string"
+						},
+						"charts": {
+							"type": "string"
+						}
+					},
+					"required": ["overview", "charts"]
+				},
+				"charts": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"tasks": {
+							"type": "string"
+						},
+						"backlog": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						}
+					},
+					"required": ["tasks", "backlog", "empty"]
+				},
 				"stats": {
 					"type": "object",
 					"additionalProperties": false,
@@ -8546,12 +9400,9 @@
 						},
 						"completion": {
 							"type": "string"
-						},
-						"nextDueDate": {
-							"type": "string"
 						}
 					},
-					"required": ["projects", "tasks", "completion", "nextDueDate"]
+					"required": ["projects", "tasks", "completion"]
 				},
 				"table": {
 					"type": "object",
@@ -8566,14 +9417,11 @@
 						"tasks": {
 							"type": "string"
 						},
-						"dueDate": {
-							"type": "string"
-						},
 						"status": {
 							"type": "string"
 						}
 					},
-					"required": ["project", "progress", "tasks", "dueDate", "status"]
+					"required": ["project", "progress", "tasks", "status"]
 				},
 				"section": {
 					"type": "object",
@@ -8614,7 +9462,15 @@
 					"required": ["title", "description"]
 				}
 			},
-			"required": ["pageTitle", "stats", "table", "section", "empty"]
+			"required": [
+				"pageTitle",
+				"tabs",
+				"charts",
+				"stats",
+				"table",
+				"section",
+				"empty"
+			]
 		},
 		"workspace": {
 			"type": "object",

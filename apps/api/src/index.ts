@@ -152,6 +152,9 @@ export function createApp() {
     }
 
     Sentry.captureException(err);
+    // Without a DSN, Sentry capture is a no-op and these failures would be
+    // completely silent (schema drift on existing installs, bugs, ...).
+    console.error(`Unhandled error on ${c.req.method} ${c.req.path}:`, err);
     return c.json({ message: "Internal Server Error" }, 500);
   });
   const nodeWs = createNodeWebSocket({ app });

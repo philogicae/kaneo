@@ -98,15 +98,27 @@ describe("time entry duration", () => {
 });
 
 describe("global search", () => {
-  it("rejects a search with no workspace", async () => {
-    const { user } = await createWorkspaceMember({ role: "owner" });
+  it("searches across the user's workspaces when none is given", async () => {
+    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
+    const task = await seedTaskFor(workspace.id);
+
+    const { workspace: foreignWorkspace } = await createWorkspaceMember({
+      role: "owner",
+    });
+    const foreignTask = await seedTaskFor(foreignWorkspace.id);
 
     mockAuthenticatedSession(user);
     const { app } = createApp();
 
-    const response = await app.request("/api/search?q=anything");
+    const response = await app.request("/api/search?q=Tracked");
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    const taskIds = body.results
+      .filter((entry: { type: string }) => entry.type === "task")
+      .map((entry: { id: string }) => entry.id);
+    expect(taskIds).toContain(task.id);
+    expect(taskIds).not.toContain(foreignTask.id);
   });
 });
 
