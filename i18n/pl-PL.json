@@ -354,18 +354,6 @@
 		"formats": {
 			"never": "Nigdy"
 		},
-		"language": {
-			"english": "Angielski",
-			"german": "Niemiecki",
-			"greek": "Grecki",
-			"macedonian": "Macedoński",
-			"french": "Francuski",
-			"spanish": "Hiszpański",
-			"dutch": "Niderlandzki",
-			"korean": "Koreański",
-			"chinese": "Chiński",
-			"italian": "Włoski"
-		},
 		"modals": {
 			"createProject": {
 				"title": "Utwórz nowy projekt",
@@ -378,7 +366,6 @@
 				"keyLabel": "Klucz:",
 				"keyHint": "Używany w identyfikatorach zadań (np. {{example}}-123)",
 				"createButton": "Utwórz projekt",
-				"successToast": "Projekt został utworzony",
 				"errorToast": "Nie udało się utworzyć projektu"
 			},
 			"createWorkspace": {
@@ -404,7 +391,6 @@
 				"successUpdated": "Zadanie zostało zaktualizowane",
 				"createError": "Nie udało się utworzyć zadania",
 				"priority": "Priorytet",
-				"statusFallback": "W trakcie",
 				"startDate": "Data rozpoczęcia",
 				"dueDate": "Termin",
 				"clearStartDate": "Wyczyść datę rozpoczęcia",
@@ -517,7 +503,6 @@
 		},
 		"notifications": "Powiadomienia",
 		"sidebar": {
-			"overview": "Przegląd",
 			"projects": "Projekty",
 			"members": "Członkowie",
 			"invitations": "Zaproszenia",
@@ -614,10 +599,6 @@
 	},
 	"notifications": {
 		"title": "Powiadomienia",
-		"newCount_one": "{{count}} nowe",
-		"newCount_few": "{{count}} nowe",
-		"newCount_many": "{{count}} nowych",
-		"newCount_other": "{{count}} nowych",
 		"emptyTitle": "Brak powiadomień",
 		"emptySubtitle": "Tutaj zobaczysz aktualizacje i aktywność.",
 		"clearAll": "Wyczyść wszystkie powiadomienia",
@@ -694,7 +675,6 @@
 		"taskDetail": {
 			"labels": "Etykiety",
 			"externalLinks": "Linki zewnętrzne",
-			"pullRequestFallback": "Pull request",
 			"issueFallback": "Zgłoszenie",
 			"prStatusMerged": "Scalone",
 			"prStatusDraft": "Szkic",
@@ -803,13 +783,11 @@
 			"addButton": "Add",
 			"createError": "Failed to create custom field.",
 			"createSuccess": "Custom field created.",
-			"creating": "Creating...",
 			"defaultLabel": "Default",
 			"defaultValuePlaceholder": "Default value",
 			"deleteButton": "Delete",
 			"deleteError": "Failed to delete custom field.",
 			"deleteSuccess": "Custom field deleted.",
-			"deleting": "Deleting...",
 			"empty": "No custom fields configured yet.",
 			"loading": "Loading custom fields...",
 			"namePlaceholder": "Field name",
@@ -865,7 +843,6 @@
 				"saveError": "Nie udało się zapisać integracji z Discordem",
 				"updateError": "Nie udało się zaktualizować integracji z Discordem"
 			},
-			"update": "Zaktualizuj Discord",
 			"validation": {
 				"webhookInvalid": "Wpisz prawidłowy adres URL webhooka Discord"
 			},
@@ -1136,7 +1113,6 @@
 				"saveError": "Nie udało się zapisać integracji Mattermost",
 				"updateError": "Nie udało się zaktualizować integracji Mattermost"
 			},
-			"update": "Zaktualizuj Mattermost",
 			"validation": {
 				"webhookInvalid": "Wpisz prawidłowy adres webhooka Mattermost"
 			},
@@ -1226,28 +1202,12 @@
 			"statusPaused": "Wstrzymano",
 			"subtitle": "Wybierz sposób dostarczania powiadomień konta Kaneo i używane kanały.",
 			"title": "Powiadomienia",
-			"toastEmailSaved": "Zapisano ustawienia powiadomień e-mail",
-			"toastEmailSaveFailed": "Nie udało się zapisać ustawień e-mail",
-			"toastGotifyDisconnected": "Odłączono Gotify",
-			"toastGotifyDisconnectFailed": "Nie udało się odłączyć Gotify",
-			"toastGotifySaved": "Zapisano ustawienia Gotify",
-			"toastGotifySaveFailed": "Nie udało się zapisać ustawień Gotify",
-			"toastNtfyDisconnected": "Odłączono ntfy",
-			"toastNtfyDisconnectFailed": "Nie udało się odłączyć ntfy",
-			"toastNtfySaved": "Zapisano ustawienia ntfy",
-			"toastNtfySaveFailed": "Nie udało się zapisać ustawień ntfy",
 			"toastPreferencesSaved": "Zapisano preferencje powiadomień",
 			"toastPreferencesSaveFailed": "Nie udało się zapisać preferencji powiadomień",
-			"toastRuleRemoved": "Usunięto regułę powiadomień dla {{workspaceName}}",
 			"toastRuleRemovedGeneric": "Usunięto regułę powiadomień obszaru roboczego",
 			"toastRuleRemoveFailed": "Nie udało się usunąć reguły powiadomień obszaru roboczego",
-			"toastRuleSaved": "Zapisano regułę powiadomień dla {{workspaceName}}",
 			"toastRuleSavedGeneric": "Zapisano regułę powiadomień obszaru roboczego",
 			"toastRuleSaveFailed": "Nie udało się zapisać reguły powiadomień obszaru roboczego",
-			"toastWebhookDisconnected": "Odłączono webhook",
-			"toastWebhookDisconnectFailed": "Nie udało się odłączyć webhooka",
-			"toastWebhookSaved": "Zapisano ustawienia webhooka",
-			"toastWebhookSaveFailed": "Nie udało się zapisać ustawień webhooka",
 			"token": "Token",
 			"topic": "Temat",
 			"webhookChannelHintDisabled": "Najpierw skonfiguruj i włącz webhook globalnie.",
@@ -1282,7 +1242,6 @@
 			"dueDatesDescription": "Wyświetlaj terminy zadań",
 			"firstDayOfWeek": "Pierwszy dzień tygodnia",
 			"firstDayOfWeekDescription": "Wybierz dzień, od którego rozpoczynają się kalendarze i widoki tygodniowe",
-			"gantt": "Wykres Gantta",
 			"labels": "Etykiety",
 			"labelsDescription": "Pokaż etykiety i tagi zadań",
 			"language": "Język",
@@ -1450,7 +1409,6 @@
 				"saveError": "Nie udało się zapisać integracji ze Slackiem",
 				"updateError": "Nie udało się zaktualizować integracji ze Slackiem"
 			},
-			"update": "Zaktualizuj Slack",
 			"validation": {
 				"webhookInvalid": "Wpisz prawidłowy adres URL webhooka Slack"
 			},
@@ -1864,8 +1822,6 @@
 				"status": "Status"
 			},
 			"all": "All",
-			"allCustomFieldValues": "All values",
-			"noCustomFieldValues": "No custom field values",
 			"noValuesUsedYet": "No values used yet"
 		},
 		"boardSearchPlaceholder": "Szukaj zadań...",
@@ -2339,11 +2295,8 @@
 			"columns": {
 				"name": "Nazwa",
 				"role": "Rola",
-				"joined": "Dołączył",
-				"actions": "Działania"
+				"joined": "Dołączył"
 			},
-			"memberRolePending": "{{role}} (oczekuje)",
-			"ariaCancelInvitation": "Anuluj zaproszenie",
 			"ariaInvitationActions": "Działania związane z zaproszeniem",
 			"ariaRemoveMember": "Usuń członka",
 			"removeDialogTitle": "Usunąć członka zespołu?",
@@ -2379,8 +2332,6 @@
 		},
 		"table": {
 			"progress": "Postęp",
-			"project": "Projekt",
-			"status": "Status",
 			"tasks": "Zadania"
 		},
 		"charts": {
@@ -2411,7 +2362,6 @@
 				"inProgress": "W trakcie"
 			},
 			"noDueDate": "Brak terminu",
-			"reorderHandle": "Przestaw projekt",
 			"reorderError": "Nie udało się zmienić kolejności projektów"
 		},
 		"search": {

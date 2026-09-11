@@ -11,8 +11,6 @@ export const branchPatterns = [
   "fix/{number}-{title}",
 ] as const;
 
-export type BranchPattern = (typeof branchPatterns)[number] | "custom";
-
 export const githubConfigSchema = v.object({
   repositoryOwner: v.string(),
   repositoryName: v.string(),
