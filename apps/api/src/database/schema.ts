@@ -283,6 +283,31 @@ export const invitationTable = pgTable(
   ],
 );
 
+export const workspaceInviteLinkTable = pgTable(
+  "workspace_invite_link",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, { onDelete: "cascade" }),
+    token: text("token").notNull().unique(),
+    role: text("role").default("member").notNull(),
+    expiresAt: timestamp("expires_at", { mode: "date" }),
+    maxUses: integer("max_uses"),
+    usedCount: integer("used_count").default(0).notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => userTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("workspaceInviteLink_workspaceId_idx").on(table.workspaceId),
+    index("workspaceInviteLink_token_idx").on(table.token),
+  ],
+);
+
 export const workspaceRoleTable = pgTable(
   "workspace_role",
   {

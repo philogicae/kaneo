@@ -3558,6 +3558,95 @@
           "role"
         ]
       },
+      "WorkspaceInviteLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "workspaceName": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "maxUses": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "usedCount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "workspaceName",
+          "token",
+          "role",
+          "expiresAt",
+          "maxUses",
+          "usedCount",
+          "createdAt"
+        ]
+      },
+      "WorkspaceInviteLinkPublic": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "workspaceName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": "string",
+            "description": "Why the link is unusable, when valid is false."
+          }
+        },
+        "required": [
+          "valid"
+        ]
+      },
+      "WorkspaceInviteLinkAccepted": {
+        "type": "object",
+        "properties": {
+          "workspaceId": {
+            "type": "string"
+          },
+          "workspaceName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "workspaceName",
+          "role"
+        ]
+      },
       "CustomFieldDefinition": {
         "type": "object",
         "properties": {
@@ -6250,6 +6339,9 @@
                     "type": "string"
                   },
                   "slug": {
+                    "type": "string"
+                  },
+                  "description": {
                     "type": "string"
                   }
                 },
@@ -14989,6 +15081,280 @@
           },
           "403": {
             "description": "No access to the workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspace-sharing": {
+      "post": {
+        "operationId": "createWorkspaceInviteLink",
+        "tags": [
+          "Workspace sharing"
+        ],
+        "summary": "Create a shareable invite link",
+        "description": "Generates a reusable public link that joins anyone to this workspace with the member role. Options: expiry (hours) and a total usage limit.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workspaceId": {
+                    "type": "string"
+                  },
+                  "expiresInHours": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Link lifetime in hours (e.g. 24 or 168). Omit for a never-expiring link."
+                  },
+                  "maxUses": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "workspaceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceInviteLink"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listWorkspaceInviteLinks",
+        "tags": [
+          "Workspace sharing"
+        ],
+        "summary": "List the workspace's shareable invite links",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The workspace's links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceInviteLink"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspace-sharing/{id}": {
+      "delete": {
+        "operationId": "deleteWorkspaceInviteLink",
+        "tags": [
+          "Workspace sharing"
+        ],
+        "summary": "Revoke a shareable invite link",
+        "description": "Deletes the link when it belongs to the workspaceId in the query, and the caller has workspace:manage_settings there.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The link was revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invite link not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspace-sharing/public/{token}": {
+      "get": {
+        "operationId": "getWorkspaceInviteLinkPublic",
+        "tags": [
+          "Workspace sharing"
+        ],
+        "summary": "Look up a shareable invite link",
+        "description": "Public endpoint. Always 200 -- an unusable link is reported with valid: false and a reason rather than an error status.",
+        "security": [],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "token",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Link details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceInviteLinkPublic"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspace-sharing/public/{token}/accept": {
+      "post": {
+        "operationId": "acceptWorkspaceInviteLink",
+        "tags": [
+          "Workspace sharing"
+        ],
+        "summary": "Join the workspace via a shareable link",
+        "description": "Public endpoint, but the caller must be authenticated: the signed-in user joins the workspace with the member role.",
+        "security": [],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "token",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceInviteLinkAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sign in first",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "The invite link is expired, exhausted, or does not exist",
             "content": {
               "text/plain": {
                 "schema": {

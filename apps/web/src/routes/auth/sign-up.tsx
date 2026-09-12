@@ -26,6 +26,7 @@ const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as
 
 const signUpSearchSchema = z.object({
   invitationId: z.string().optional(),
+  inviteLinkToken: z.string().optional(),
   email: z.string().optional(),
 });
 
@@ -69,13 +70,16 @@ function SignUp() {
   }, [isInstanceStatusError, instanceStatusError, t]);
 
   const invitationId = search.invitationId;
+  const inviteLinkToken = search.inviteLinkToken;
   const prefillEmail = search.email;
   const isInstanceAdminSetup = instanceStatus?.hasUsers === false;
 
   const baseUrl = import.meta.env.VITE_CLIENT_URL ?? window.location.origin;
   const callbackURL = invitationId
     ? `${baseUrl}/invitation/accept/${invitationId}`
-    : `${baseUrl}/dashboard`;
+    : inviteLinkToken
+      ? `${baseUrl}/invitation/link/${inviteLinkToken}`
+      : `${baseUrl}/dashboard`;
   const errorCallbackURL = `${baseUrl}/auth/sign-up`;
 
   const handleGuestAccess = async () => {
@@ -116,7 +120,7 @@ function SignUp() {
               })
             : invitationId
               ? t("auth:signUp.subtitleInvitation")
-              : config?.disableRegistration
+              : config?.disableRegistration && !inviteLinkToken
                 ? t("auth:signUp.subtitleRegistrationDisabled")
                 : config?.disablePasswordRegistration
                   ? t("auth:signUp.subtitlePasswordDisabled")
@@ -133,6 +137,7 @@ function SignUp() {
           )}
           {config?.disableRegistration &&
             !invitationId &&
+            !inviteLinkToken &&
             !isInstanceAdminSetup && (
               <Alert>
                 <AlertDescription>
@@ -165,6 +170,7 @@ function SignUp() {
             const selfServiceAllowed =
               !config?.disableRegistration ||
               !!invitationId ||
+              !!inviteLinkToken ||
               isInstanceAdminSetup;
             const hasGuest =
               config?.hasGuestAccess &&
@@ -211,6 +217,7 @@ function SignUp() {
           {(!config?.disablePasswordRegistration || isInstanceAdminSetup) && (
             <SignUpForm
               invitationId={invitationId}
+              inviteLinkToken={inviteLinkToken}
               defaultEmail={prefillEmail}
               turnstileToken={captchaConfigured ? turnstileToken : undefined}
             />

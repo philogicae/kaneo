@@ -65,10 +65,12 @@ import { migrateNotificationPreferencesSchema } from "./utils/migrate-notificati
 import { migrateSessionColumn } from "./utils/migrate-session-column";
 import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
+import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
 import workflowRule from "./workflow-rule";
 import workspace from "./workspace";
+import workspaceSharing from "./workspace-sharing";
 import {
   addConnection,
   addUserConnection,
@@ -551,7 +553,12 @@ export function createApp() {
     if (
       path.startsWith("/api/mcp") ||
       path.startsWith("/api/.well-known/") ||
-      path === "/api/billing/webhook"
+      path === "/api/billing/webhook" ||
+      // Public invite-link lookups are anonymous by design (the web fetcher
+      // sends no credentials for signed-out visitors). The accept route is
+      // POST, so it still goes through authentication below.
+      (c.req.method === "GET" &&
+        path.startsWith("/api/workspace-sharing/public/"))
     ) {
       return next();
     }
@@ -619,6 +626,7 @@ export function createApp() {
   const workflowRuleApi = api.route("/workflow-rule", workflowRule);
   const invitationApi = api.route("/invitation", invitation);
   const workspaceApi = api.route("/workspace", workspace);
+  const workspaceSharingApi = api.route("/workspace-sharing", workspaceSharing);
   const customFieldApi = api.route("/custom-field", customField);
   const userApi = api.route("/user", user);
 
@@ -788,6 +796,7 @@ export function createApp() {
     userApi,
     workflowRuleApi,
     workspaceApi,
+    workspaceSharingApi,
     customFieldApi,
     oauthApi,
   };
@@ -824,6 +833,7 @@ export async function runStartupTasks() {
   await migrateGitHubIntegration();
   await migrateColumns();
   await seedDefaultWorkspaceRoles();
+  await seedDefaultWorkspaceInviteLinks();
 
   initializePlugins();
   initializeScheduler();
@@ -909,6 +919,7 @@ const {
   userApi,
   workflowRuleApi,
   workspaceApi,
+  workspaceSharingApi,
   customFieldApi,
   oauthApi,
 } = createdApp;
@@ -949,6 +960,7 @@ export type AppType =
   | typeof workflowRuleApi
   | typeof invitationApi
   | typeof workspaceApi
+  | typeof workspaceSharingApi
   | typeof customFieldApi
   | typeof userApi
   | typeof publicProjectApi

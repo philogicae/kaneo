@@ -53,6 +53,7 @@ import { getGithubSsoOAuthCredentials } from "./utils/github-sso-env";
 import { isCloud } from "./utils/is-cloud";
 import { isDisposableEmail } from "./utils/is-disposable-email";
 import { isLocalSignInPath } from "./utils/is-local-sign-in-path";
+import { createDefaultWorkspaceInviteLink } from "./utils/seed-default-workspace-invite-links";
 import { verifyTurnstile } from "./utils/verify-turnstile";
 
 config();
@@ -72,6 +73,14 @@ function normalizeInvitationId(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const normalized = value.trim();
   if (!/^[a-z0-9_-]{1,128}$/i.test(normalized)) return undefined;
+  return normalized;
+}
+
+/** base32 token for workspace invite links: also an id-shaped allowlist. */
+function normalizeInviteLinkToken(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim();
+  if (!/^[A-Za-z0-9_-]{16,128}$/.test(normalized)) return undefined;
   return normalized;
 }
 
@@ -448,6 +457,19 @@ export const auth = betterAuth({
             );
           }
 
+          // Create the workspace's default shareable invite link: no expiry,
+          // unlimited uses. Best-effort so a failure never blocks creation;
+          // the boot-time backfill is the belt-and-braces path.
+          try {
+            await createDefaultWorkspaceInviteLink(organization.id, user.id);
+          } catch (error) {
+            console.error(
+              "Failed to create default invite link for workspace",
+              organization.id,
+              error,
+            );
+          }
+
           publishEvent("workspace.created", {
             workspaceId: organization.id,
             workspaceName: organization.name,
@@ -603,10 +625,18 @@ export const auth = betterAuth({
               ctx?.query?.invitationId ||
               ctx?.headers?.get("x-invitation-id"),
           );
+          const inviteLinkToken = normalizeInviteLinkToken(
+            ctx?.body?.inviteLinkToken ||
+              ctx?.query?.inviteLinkToken ||
+              ctx?.headers?.get("x-invite-link-token"),
+          );
           const result = await checkRegistrationAllowed(
             user.email,
             invitationId,
-            { allowInvitationByEmail: isOAuthCallbackPath(ctx?.path) },
+            {
+              allowInvitationByEmail: isOAuthCallbackPath(ctx?.path),
+              inviteLinkToken,
+            },
           );
           if (!result.allowed) {
             throw new APIError("FORBIDDEN", {
@@ -766,7 +796,14 @@ export const auth = betterAuth({
       );
 
       if (ctx.path === "/sign-up/email") {
-        const result = await checkRegistrationAllowed(email, invitationId);
+        const inviteLinkToken = normalizeInviteLinkToken(
+          ctx.body?.inviteLinkToken ||
+            ctx.query?.inviteLinkToken ||
+            ctx.headers?.get("x-invite-link-token"),
+        );
+        const result = await checkRegistrationAllowed(email, invitationId, {
+          inviteLinkToken,
+        });
         if (!result.allowed) {
           throw new APIError("FORBIDDEN", {
             message: result.reason,
