@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import { apiKey } from "@better-auth/api-key";
 import {
   sendMagicLinkEmail,
@@ -54,6 +53,7 @@ import { getGithubSsoOAuthCredentials } from "./utils/github-sso-env";
 import { isCloud } from "./utils/is-cloud";
 import { isDisposableEmail } from "./utils/is-disposable-email";
 import { isLocalSignInPath } from "./utils/is-local-sign-in-path";
+import { createDefaultWorkspaceInviteLink } from "./utils/seed-default-workspace-invite-links";
 import { verifyTurnstile } from "./utils/verify-turnstile";
 
 config();
@@ -458,14 +458,10 @@ export const auth = betterAuth({
           }
 
           // Create the workspace's default shareable invite link: no expiry,
-          // unlimited uses. Best-effort so a failure never blocks creation.
+          // unlimited uses. Best-effort so a failure never blocks creation;
+          // the boot-time backfill is the belt-and-braces path.
           try {
-            await db.insert(schema.workspaceInviteLinkTable).values({
-              workspaceId: organization.id,
-              token: randomBytes(24).toString("base64url"),
-              role: "member",
-              createdBy: user.id,
-            });
+            await createDefaultWorkspaceInviteLink(organization.id, user.id);
           } catch (error) {
             console.error(
               "Failed to create default invite link for workspace",

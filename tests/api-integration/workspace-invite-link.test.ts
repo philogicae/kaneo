@@ -1,6 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import db, { schema } from "../../apps/api/src/database";
+import { seedDefaultWorkspaceInviteLinks } from "../../apps/api/src/utils/seed-default-workspace-invite-links";
 import {
   acceptInviteLink,
   createInviteLink,
@@ -60,5 +62,97 @@ describe("API integration: workspace invite links", () => {
       // must keep the counter clean so the use slot is not burned.
       expect(Number(after.usedCount)).toBe(0);
     }
+  });
+
+  it("backfills a default link for a pre-existing workspace, attributed to its owner, idempotently", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+
+    // A non-owner who joined earlier must not be preferred as creator.
+    const [earlier] = await db
+      .insert(schema.userTable)
+      .values({
+        id: `user-${randomUUID()}`,
+        email: `earlier-${randomUUID()}@example.test`,
+        emailVerified: true,
+        name: "Earlier member",
+      })
+      .returning();
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: owner.workspace.id,
+      userId: earlier.id,
+      role: "member",
+      joinedAt: new Date(0),
+    });
+
+    await seedDefaultWorkspaceInviteLinks();
+
+    const links = await db
+      .select()
+      .from(schema.workspaceInviteLinkTable)
+      .where(
+        eq(schema.workspaceInviteLinkTable.workspaceId, owner.workspace.id),
+      );
+
+    expect(links).toHaveLength(1);
+    expect(links[0]).toMatchObject({
+      role: "member",
+      expiresAt: null,
+      maxUses: null,
+      usedCount: 0,
+      createdBy: owner.user.id,
+    });
+    expect(links[0]?.token).toBeTruthy();
+
+    // Idempotent: a second run inserts nothing.
+    await seedDefaultWorkspaceInviteLinks();
+    const after = await db
+      .select({ id: schema.workspaceInviteLinkTable.id })
+      .from(schema.workspaceInviteLinkTable)
+      .where(
+        eq(schema.workspaceInviteLinkTable.workspaceId, owner.workspace.id),
+      );
+    expect(after).toHaveLength(1);
+  });
+
+  it("adds a default link when the workspace only has expiring or limited links", async () => {
+    const member = await createWorkspaceMember({ role: "owner" });
+    await createInviteLink(member.user.id, member.workspace.id, {
+      expiresInHours: 24,
+      maxUses: 1,
+    });
+
+    await seedDefaultWorkspaceInviteLinks();
+
+    const links = await db
+      .select()
+      .from(schema.workspaceInviteLinkTable)
+      .where(
+        eq(schema.workspaceInviteLinkTable.workspaceId, member.workspace.id),
+      );
+
+    expect(links).toHaveLength(2);
+    expect(
+      links.filter((link) => link.expiresAt === null && link.maxUses === null),
+    ).toHaveLength(1);
+  });
+
+  it("skips a memberless workspace without failing the seed", async () => {
+    const [orphan] = await db
+      .insert(schema.workspaceTable)
+      .values({
+        id: `workspace-${randomUUID()}`,
+        name: "Memberless workspace",
+        slug: `workspace-${randomUUID()}`,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    await expect(seedDefaultWorkspaceInviteLinks()).resolves.toBeUndefined();
+
+    const links = await db
+      .select({ id: schema.workspaceInviteLinkTable.id })
+      .from(schema.workspaceInviteLinkTable)
+      .where(eq(schema.workspaceInviteLinkTable.workspaceId, orphan.id));
+    expect(links).toHaveLength(0);
   });
 });

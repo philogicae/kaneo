@@ -65,6 +65,7 @@ import { migrateNotificationPreferencesSchema } from "./utils/migrate-notificati
 import { migrateSessionColumn } from "./utils/migrate-session-column";
 import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
+import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
 import workflowRule from "./workflow-rule";
@@ -832,6 +833,7 @@ export async function runStartupTasks() {
   await migrateGitHubIntegration();
   await migrateColumns();
   await seedDefaultWorkspaceRoles();
+  await seedDefaultWorkspaceInviteLinks();
 
   initializePlugins();
   initializeScheduler();
