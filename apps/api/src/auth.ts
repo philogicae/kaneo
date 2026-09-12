@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { apiKey } from "@better-auth/api-key";
 import {
   sendMagicLinkEmail,
@@ -451,6 +452,23 @@ export const auth = betterAuth({
           } catch (error) {
             console.error(
               "Failed to seed default workspace roles for workspace",
+              organization.id,
+              error,
+            );
+          }
+
+          // Create the workspace's default shareable invite link: no expiry,
+          // unlimited uses. Best-effort so a failure never blocks creation.
+          try {
+            await db.insert(schema.workspaceInviteLinkTable).values({
+              workspaceId: organization.id,
+              token: randomBytes(24).toString("base64url"),
+              role: "member",
+              createdBy: user.id,
+            });
+          } catch (error) {
+            console.error(
+              "Failed to create default invite link for workspace",
               organization.id,
               error,
             );

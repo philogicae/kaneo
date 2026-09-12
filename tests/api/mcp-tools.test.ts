@@ -35,6 +35,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 function lastRequest() {
@@ -244,7 +245,7 @@ describe("MCP tool catalog", () => {
     await call("list_task_time_entries", { taskId: "t1" });
     expect(lastRequest().url).toBe("http://api.test/api/time-entry/task/t1");
 
-    await call("get_time_entry", { id: "te1" });
+    await call("get_time_entry", { timeEntryId: "te1" });
     expect(lastRequest().url).toBe("http://api.test/api/time-entry/te1");
   });
 
@@ -264,7 +265,7 @@ describe("MCP tool catalog", () => {
 
   it("updates a time entry", async () => {
     await call("update_time_entry", {
-      id: "te1",
+      timeEntryId: "te1",
       startTime: "2026-08-10T09:00:00Z",
       endTime: "2026-08-10T10:30:00Z",
       description: "pairing",
@@ -370,6 +371,67 @@ describe("MCP telegram rule and project description tools", () => {
       workspaceId: "ws-1",
       icon: "Rocket",
       slug: "p",
+    });
+  });
+
+  it("registers the deprecated alias under the telegram_ prefix only", () => {
+    expect(tools.has("telegram_configure_notifications")).toBe(true);
+    expect(tools.has("configure_telegram_notifications")).toBe(false);
+  });
+});
+
+describe("MCP instance and workspace invite-link tools", () => {
+  const originalClientUrl = process.env.KANEO_CLIENT_URL;
+
+  beforeEach(() => {
+    process.env.KANEO_CLIENT_URL = "https://kaneo.example.com/";
+  });
+
+  afterEach(() => {
+    if (originalClientUrl === undefined) {
+      delete process.env.KANEO_CLIENT_URL;
+    } else {
+      process.env.KANEO_CLIENT_URL = originalClientUrl;
+    }
+  });
+
+  it("returns the public URL without a trailing slash", async () => {
+    const result = await call("get_public_url");
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      url: "https://kaneo.example.com",
+    });
+  });
+
+  it("returns the default workspace invite link as a full URL", async () => {
+    apiFetch.mockResolvedValueOnce(
+      Response.json([
+        {
+          token: "limited",
+          expiresAt: "2020-01-01T00:00:00.000Z",
+          maxUses: 1,
+          usedCount: 0,
+        },
+        {
+          token: "default",
+          expiresAt: null,
+          maxUses: null,
+          usedCount: 3,
+        },
+      ]),
+    );
+
+    const result = await call("get_workspace_invite_link", {
+      workspaceId: "ws 1",
+    });
+
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/workspace-sharing?workspaceId=ws%201",
+    );
+    expect(JSON.parse(result.content[0].text)).toMatchObject({
+      workspaceId: "ws 1",
+      url: "https://kaneo.example.com/invitation/link/default",
+      token: "default",
+      maxUses: null,
     });
   });
 });
