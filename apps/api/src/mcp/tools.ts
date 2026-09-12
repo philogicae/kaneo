@@ -246,6 +246,12 @@ export function registerMcpTools(
   token: string,
 ): void {
   const client = new ApiClient(baseUrl, token);
+  // Public web origin for user-facing links, not the internal API baseUrl.
+  const publicUrl = () =>
+    (process.env.KANEO_CLIENT_URL || "http://localhost:5173").replace(
+      /\/+$/,
+      "",
+    );
   const registerTool = <InputSchema extends z.ZodObject>(
     name: string,
     config: { description: string; inputSchema: InputSchema },
@@ -303,11 +309,16 @@ export function registerMcpTools(
   registerTool(
     "get_project",
     {
-      description: "Get a single project by ID.",
-      inputSchema: z.object({ id: nonEmptyString }),
+      description:
+        "Get a single project by its projectId, including its columns and metadata.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+      }),
     },
     async (args) =>
-      run(() => client.json(`/api/project/${encodeURIComponent(args.id)}`)),
+      run(() =>
+        client.json(`/api/project/${encodeURIComponent(args.projectId)}`),
+      ),
   );
 
   registerTool(
@@ -319,6 +330,7 @@ export function registerMcpTools(
         workspaceId: nonEmptyString,
         icon: nonEmptyString,
         slug: nonEmptyString,
+        description: z.string().optional(),
       }),
     },
     async (args) =>
@@ -330,6 +342,7 @@ export function registerMcpTools(
             workspaceId: args.workspaceId,
             icon: args.icon,
             slug: args.slug,
+            description: args.description,
           }),
         }),
       ),
@@ -341,7 +354,7 @@ export function registerMcpTools(
       description:
         "Update project metadata (PATCH-style: only provided fields are changed).",
       inputSchema: z.object({
-        id: nonEmptyString,
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
         name: optionalNonEmptyString,
         icon: z.string().optional(),
         slug: optionalNonEmptyString,
@@ -350,10 +363,10 @@ export function registerMcpTools(
       }),
     },
     async (args) => {
-      const { id, ...patch } = args;
+      const { projectId, ...patch } = args;
       return run(async () => {
         const existing = (await client.json(
-          `/api/project/${encodeURIComponent(id)}`,
+          `/api/project/${encodeURIComponent(projectId)}`,
           { method: "GET" },
         )) as Record<string, unknown>;
         const name =
@@ -382,7 +395,7 @@ export function registerMcpTools(
             : typeof existing.isPublic === "boolean"
               ? existing.isPublic
               : false;
-        return client.json(`/api/project/${encodeURIComponent(id)}`, {
+        return client.json(`/api/project/${encodeURIComponent(projectId)}`, {
           method: "PUT",
           body: JSON.stringify({ name, icon, slug, description, isPublic }),
         });
@@ -708,90 +721,629 @@ export function registerMcpTools(
       ),
   );
 
+  // Forum topic id schema: optional everywhere, null clears it. Positive
+  // chat ids (private chats) are rejected for topics in the shared helpers below.
+  const nullableThreadIdSchema = z.number().int().min(1).nullable().optional();
+
+  type TelegramConfigShape = {
+    bots: Array<{
+      id: string;
+      name: string | null;
+      events: Record<string, boolean>;
+      chats: Array<{
+        id: string;
+        chatId: string;
+        label: string | null;
+        rules: Array<{
+          id: string;
+          workspaceId: string;
+          workspaceName: string | null;
+          projectId: string | null;
+          projectName: string | null;
+          threadId: number | null;
+          isActive: boolean;
+        }>;
+      }>;
+    }>;
+  };
+
+  const getTelegramConfig = () =>
+    client.json<TelegramConfigShape>("/api/telegram-config", {
+      method: "GET",
+    });
+
+  const findBotOrFail = (
+    args: { botId: string },
+    config: TelegramConfigShape,
+  ) => {
+    const bot = config.bots.find((b) => b.id === args.botId);
+    if (!bot) {
+      const known = config.bots
+        .map((b) => `${b.id}${b.name ? ` (${b.name})` : ""}`)
+        .join(", ");
+      throw new Error(
+        `unknown_bot: bot ${args.botId} not found.${known ? ` Available bots: ${known}` : " No bots are configured yet."}`,
+      );
+    }
+    return bot;
+  };
+
+  const assertTopicAllowed = (threadId: unknown, chatId: string) => {
+    // Only numeric chat ids can be classified reliably: positive = private chat.
+    if (threadId == null || chatId.startsWith("@")) return;
+    const numeric = Number(chatId);
+    if (!Number.isNaN(numeric) && numeric > 0) {
+      throw new Error(
+        `topic_not_allowed_on_dm: chat ${chatId} is a private chat (positive id); a forum topic id is only valid on a forum group (negative id). Omit threadId for DMs.`,
+      );
+    }
+  };
+
+  /** Shared create-rule flow for telegram_create_rule and telegram_configure_notifications. */
+  const telegramCreateRule = async (args: {
+    botId: string;
+    telegramChatId?: string | null;
+    label?: string | null;
+    workspaceId: string;
+    projectId?: string | null;
+    threadId?: number | null;
+    isActive?: boolean;
+  }) => {
+    const bot = findBotOrFail({ botId: args.botId }, await getTelegramConfig());
+    const wanted = args.telegramChatId ?? "";
+    let chatRecord = bot.chats.find((c) => wanted && c.chatId === wanted);
+    assertTopicAllowed(args.threadId, chatRecord?.chatId ?? wanted);
+    if (!chatRecord) {
+      if (!wanted) {
+        throw new Error(
+          "telegramChatId is required when the chat does not already exist on the bot",
+        );
+      }
+      chatRecord = (await client.json(
+        `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            chatId: wanted,
+            label: args.label ?? wanted,
+          }),
+        },
+      )) as TelegramConfigShape["bots"][number]["chats"][number];
+    }
+
+    if (!args.workspaceId) {
+      return {
+        created: false,
+        chat: chatRecord,
+        note: "Chat linked to the bot. Pass workspaceId to route notifications.",
+      };
+    }
+
+    const existing = chatRecord.rules.find(
+      (r) =>
+        r.workspaceId === args.workspaceId &&
+        (r.projectId ?? null) === (args.projectId ?? null),
+    );
+    if (existing) {
+      return { created: false, rule: existing };
+    }
+
+    const [rule] = (await client.json(
+      `/api/telegram-config/telegram-chat/${encodeURIComponent(chatRecord.id)}/rules`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          scopes: [
+            {
+              workspaceId: args.workspaceId,
+              projectIds: args.projectId ? [args.projectId] : null,
+            },
+          ],
+          threadId: args.threadId ?? null,
+        }),
+      },
+    )) as Array<{
+      id: string;
+      workspaceId: string;
+      workspaceName: string | null;
+      projectId: string | null;
+      projectName: string | null;
+      threadId: number | null;
+      isActive: boolean;
+    }>;
+
+    if (rule && args.isActive === false) {
+      const [updated] = (await client.json(
+        `/api/telegram-config/telegram-rule/${encodeURIComponent(rule.id)}`,
+        { method: "PATCH", body: JSON.stringify({ isActive: false }) },
+      )) as Array<{ id: string; isActive: boolean }>;
+      return { created: true, rule: updated ?? rule };
+    }
+    return { created: true, rule };
+  };
+
   registerTool(
-    "configure_telegram_notifications",
+    "telegram_list_bots",
     {
       description:
-        "Configure Telegram notifications: link a chat to a stored bot, then route a workspace (or one project) into that chat, optionally into a forum topic (topicId). Existing duplicates are skipped. Requires workspace:manage_settings on the target workspace.",
+        "List the Telegram bots configured on the account, with their id, name and event filter. Call this first to get a botId for the chat/rule tools.",
+      inputSchema: z.object({}),
+    },
+    async () =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        return bots.map((b) => ({
+          id: b.id,
+          name: b.name,
+          events: b.events,
+        }));
+      }),
+  );
+
+  registerTool(
+    "telegram_list_config",
+    {
+      description:
+        "Show the full Telegram notification tree: each bot, its linked chats (telegramChatId, label, isGroup) and their routing rules (workspace/project scope, threadId, isActive). Read-only; use it to inspect routing before changing it.",
       inputSchema: z.object({
-        botId: nonEmptyString.describe(
-          "Stored bot id (from the config listing)",
+        botId: optionalNonEmptyString.describe(
+          "Only include this stored bot (omit for every bot)",
         ),
-        chatId: nonEmptyString.describe(
-          "Target Telegram chat id (numeric @getidsbot style, or @username)",
-        ),
-        workspaceId: optionalNonEmptyString.describe(
-          "Route the whole workspace (or the single projectId) into the chat",
-        ),
-        projectId: optionalNonEmptyString.describe(
-          "Restrict routing to one project of workspaceId",
-        ),
-        topicId: z
-          .number()
-          .int()
-          .positive()
-          .optional()
-          .describe("Forum topic/message_thread_id when the chat is a forum"),
       }),
     },
     async (args) =>
       run(async () => {
-        const config = await client.json<{
-          bots: Array<{
-            id: string;
-            name: string | null;
-            chats: Array<{ id: string; chatId: string }>;
-          }>;
-        }>("/api/telegram-config", { method: "GET" });
-        const bot = config.bots?.find((b) => b.id === args.botId);
-        if (!bot) {
-          const known = (config.bots ?? [])
-            .map((b) => `${b.id}${b.name ? ` (${b.name})` : ""}`)
-            .join(", ");
-          throw new Error(
-            `Telegram bot ${args.botId} not found.${known ? ` Available bots: ${known}` : " No bots are configured yet."}`,
-          );
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        const filtered = args.botId
+          ? bots.filter((b) => b.id === args.botId)
+          : bots;
+        if (args.botId && filtered.length === 0) {
+          findBotOrFail({ botId: args.botId }, { bots });
         }
+        return {
+          bots: filtered.map((b) => ({
+            id: b.id,
+            name: b.name,
+            chats: b.chats.map((c) => ({
+              id: c.id,
+              telegramChatId: c.chatId,
+              label: c.label,
+              isGroup: c.chatId.startsWith("-"),
+              rules: c.rules,
+            })),
+          })),
+        };
+      }),
+  );
 
-        let chatRow = (bot.chats ?? []).find((c) => c.chatId === args.chatId);
-        if (!chatRow) {
-          chatRow = (await client.json(
-            `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
-            {
-              method: "POST",
-              body: JSON.stringify({ chatId: args.chatId }),
-            },
-          )) as { id: string; chatId: string };
-        }
-        if (!chatRow) {
-          throw new Error(`Failed to register chat ${args.chatId} on the bot`);
-        }
+  registerTool(
+    "telegram_list_chats",
+    {
+      description:
+        "List the chats linked to one bot: internal record id, telegramChatId, label and isGroup. The internal `id` is the telegramChatRecordId the other tools expect.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot whose chats to list (from telegram_list_bots)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        const bot = findBotOrFail(args, { bots });
+        return bot.chats.map((c) => ({
+          id: c.id,
+          telegramChatId: c.chatId,
+          label: c.label,
+          isGroup: c.chatId.startsWith("-"),
+        }));
+      }),
+  );
 
-        if (!args.workspaceId) {
-          return {
-            bot: { id: bot.id, name: bot.name },
-            chat: chatRow,
-            rules: [],
-            note: "Chat linked to the bot. Pass workspaceId to route notifications.",
-          };
+  registerTool(
+    "telegram_list_rules",
+    {
+      description:
+        "List Telegram routing rules, optionally filtered. Each row carries botId, chatId (internal record), telegramChatId and the rule scope (workspace/project, threadId, isActive).",
+      inputSchema: z.object({
+        botId: optionalNonEmptyString.describe("Only rules of this stored bot"),
+        telegramChatRecordId: optionalNonEmptyString.describe(
+          "Only rules of this internal chat record (from telegram_list_chats)",
+        ),
+        workspaceId: optionalNonEmptyString.describe(
+          "Only rules routing this workspace",
+        ),
+        projectId: optionalNonEmptyString.describe(
+          "Only rules routing this project",
+        ),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        if (args.botId && !bots.some((b) => b.id === args.botId)) {
+          findBotOrFail({ botId: args.botId }, { bots });
         }
+        return bots.flatMap((b) =>
+          b.chats.flatMap((c) =>
+            c.rules
+              .filter(
+                (r) =>
+                  (args.botId == null || b.id === args.botId) &&
+                  (args.telegramChatRecordId == null ||
+                    c.id === args.telegramChatRecordId) &&
+                  (args.workspaceId == null ||
+                    r.workspaceId === args.workspaceId) &&
+                  (args.projectId == null || r.projectId === args.projectId),
+              )
+              .map((r) => ({ botId: b.id, chatId: c.id, ...r })),
+          ),
+        );
+      }),
+  );
 
-        return client.json(
-          `/api/telegram-config/telegram-chat/${encodeURIComponent(chatRow.id)}/rules`,
+  registerTool(
+    "telegram_get_rule",
+    {
+      description:
+        "Get one routing rule by its ruleId, with its bot, internal chatId, telegramChatId and scope.",
+      inputSchema: z.object({
+        ruleId: nonEmptyString.describe(
+          "Rule id from telegram_list_rules or telegram_create_rule",
+        ),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        for (const bot of bots) {
+          for (const chat of bot.chats) {
+            const rule = chat.rules.find((r) => r.id === args.ruleId);
+            if (rule) {
+              return {
+                botId: bot.id,
+                chatId: chat.id,
+                telegramChatId: chat.chatId,
+                ...rule,
+              };
+            }
+          }
+        }
+        throw new Error(`unknown_rule: rule ${args.ruleId} not found`);
+      }),
+  );
+
+  registerTool(
+    "telegram_create_bot",
+    {
+      description:
+        "Register a Telegram bot by its @BotFather token. The token shape is checked locally only, not against Telegram. Add routing afterwards with telegram_create_rule.",
+      inputSchema: z.object({
+        botToken: nonEmptyString.describe(
+          "Bot token from @BotFather, e.g. 123456789:AA...",
+        ),
+        name: optionalNonEmptyString.describe("Optional display name"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json("/api/telegram-config/bot", {
+          method: "POST",
+          body: JSON.stringify({
+            botToken: args.botToken,
+            ...(args.name ? { name: args.name } : {}),
+          }),
+        }),
+      ),
+  );
+
+  registerTool(
+    "telegram_update_bot",
+    {
+      description:
+        "Update a stored bot: rename it, rotate its token, or change which task events it sends. Omitted fields keep their current value.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot id (from telegram_list_bots)",
+        ),
+        name: nullableOptionalNonEmptyString.describe(
+          "New display name; null clears it",
+        ),
+        botToken: optionalNonEmptyString.describe(
+          "Replacement @BotFather token (rotates the stored one)",
+        ),
+        events: z
+          .object({
+            taskCreated: z.boolean().optional(),
+            taskStatusChanged: z.boolean().optional(),
+            taskPriorityChanged: z.boolean().optional(),
+            taskTitleChanged: z.boolean().optional(),
+            taskDescriptionChanged: z.boolean().optional(),
+            taskCommentCreated: z.boolean().optional(),
+          })
+          .optional(),
+      }),
+    },
+    async (args) => {
+      const body = Object.fromEntries(
+        Object.entries({
+          name: args.name,
+          botToken: args.botToken,
+          events: args.events,
+        }).filter(([, v]) => v !== undefined),
+      );
+      return run(() =>
+        client.json(
+          `/api/telegram-config/bot/${encodeURIComponent(args.botId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+          },
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "telegram_delete_bot",
+    {
+      description:
+        "Delete a stored bot and cascade to all its chats and routing rules. Irreversible; check telegram_list_config first.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot id (from telegram_list_bots)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/bot/${encodeURIComponent(args.botId)}`,
+          {
+            method: "DELETE",
+          },
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_create_chat",
+    {
+      description:
+        "Link a Telegram chat/group/channel to a bot. The label is the display name in workspace settings and defaults to the raw chat id. Linking alone sends nothing; use telegram_create_rule to route notifications.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot to attach the chat to (from telegram_list_bots)",
+        ),
+        telegramChatId: nonEmptyString.describe(
+          "Telegram chat id (negative, e.g. -1001234567890) or @username for a channel",
+        ),
+        label: optionalNonEmptyString.describe(
+          "Display label for the chat (defaults to the chat id)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
           {
             method: "POST",
             body: JSON.stringify({
-              scopes: [
-                {
-                  workspaceId: args.workspaceId,
-                  projectIds: args.projectId ? [args.projectId] : null,
-                },
-              ],
-              ...(args.topicId !== undefined ? { threadId: args.topicId } : {}),
+              chatId: args.telegramChatId,
+              ...(args.label ? { label: args.label } : {}),
             }),
           },
-        );
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_update_chat",
+    {
+      description:
+        "Update a linked chat's display label or its Telegram chat id. Identify the record by its internal telegramChatRecordId.",
+      inputSchema: z.object({
+        telegramChatRecordId: nonEmptyString.describe(
+          "Internal chat record id (from telegram_list_chats)",
+        ),
+        telegramChatId: optionalNonEmptyString.describe(
+          "Replacement Telegram chat id",
+        ),
+        label: nullableOptionalNonEmptyString.describe(
+          "New display label; null clears it",
+        ),
       }),
+    },
+    async (args) => {
+      const body = Object.fromEntries(
+        Object.entries({
+          chatId: args.telegramChatId,
+          label: args.label,
+        }).filter(([, v]) => v !== undefined),
+      );
+      return run(() =>
+        client.json(
+          `/api/telegram-config/telegram-chat/${encodeURIComponent(args.telegramChatRecordId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+          },
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "telegram_delete_chat",
+    {
+      description:
+        "Delete a linked chat record and cascade to all its routing rules. Irreversible.",
+      inputSchema: z.object({
+        telegramChatRecordId: nonEmptyString.describe(
+          "Internal chat record id (from telegram_list_chats)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/telegram-chat/${encodeURIComponent(args.telegramChatRecordId)}`,
+          { method: "DELETE" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_create_rule",
+    {
+      description:
+        "Route a bot's task notifications into a chat, for a whole workspace or a single project. Links the chat first when telegramChatId is new. A duplicate rule returns the existing one with created: false. Use threadId only for a forum topic (negative chat id); omit or null for DMs and plain groups.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot id (from telegram_list_bots)",
+        ),
+        telegramChatId: optionalNonEmptyString.describe(
+          "Telegram chat id; required only when the chat is not linked to the bot yet",
+        ),
+        label: optionalNonEmptyString.describe(
+          "Label for the chat if it gets linked now (defaults to the chat id)",
+        ),
+        workspaceId: nonEmptyString.describe(
+          "Workspace whose notifications route to the chat",
+        ),
+        projectId: nullableOptionalNonEmptyString.describe(
+          "Limit routing to this project; omit or null for the whole workspace",
+        ),
+        threadId: nullableThreadIdSchema.describe(
+          "Forum topic id (forum groups only); omit or null for no topic",
+        ),
+        isActive: z
+          .boolean()
+          .optional()
+          .describe("Whether the new rule is active (default true)"),
+      }),
+    },
+    async (args) => run(() => telegramCreateRule(args)),
+  );
+
+  registerTool(
+    "telegram_update_rule",
+    {
+      description:
+        "Update a routing rule. projectIds replaces the project scope (null routes the whole workspace), threadId null clears the forum topic, isActive toggles it. Only provided fields change.",
+      inputSchema: z.object({
+        ruleId: nonEmptyString.describe(
+          "Rule id (from telegram_list_rules or telegram_get_rule)",
+        ),
+        projectIds: z
+          .array(nonEmptyString)
+          .nullable()
+          .optional()
+          .describe(
+            "Replacement list of project ids; null routes every project of the workspace",
+          ),
+        threadId: nullableThreadIdSchema.describe(
+          "Forum topic id; null clears it (forum groups only)",
+        ),
+        isActive: z.boolean().optional().describe("Enable or disable the rule"),
+      }),
+    },
+    async (args) => {
+      const body = Object.fromEntries(
+        Object.entries({
+          projectIds: args.projectIds,
+          threadId: args.threadId,
+          isActive: args.isActive,
+        }).filter(([, v]) => v !== undefined),
+      );
+      return run(() =>
+        client.json(
+          `/api/telegram-config/telegram-rule/${encodeURIComponent(args.ruleId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+          },
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "telegram_delete_rule",
+    {
+      description:
+        "Delete a routing rule, stopping its notifications. The linked chat is kept; delete it separately with telegram_delete_chat.",
+      inputSchema: z.object({
+        ruleId: nonEmptyString.describe("Rule id (from telegram_list_rules)"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/telegram-rule/${encodeURIComponent(args.ruleId)}`,
+          { method: "DELETE" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_configure_notifications",
+    {
+      description:
+        "Link a Telegram chat to a bot and route a workspace's notifications into it. Omit workspaceId to only link the chat; omit projectId to route the whole workspace. A duplicate rule returns the existing one.",
+      inputSchema: z.object({
+        botId: nonEmptyString.describe(
+          "Stored bot id (from telegram_list_bots)",
+        ),
+        telegramChatId: optionalNonEmptyString.describe(
+          "Telegram chat id; required only when the chat is not linked to the bot yet",
+        ),
+        label: optionalNonEmptyString.describe(
+          "Label for the chat if it gets linked now (defaults to the chat id)",
+        ),
+        workspaceId: optionalNonEmptyString.describe(
+          "Workspace whose notifications route to the chat; omit to only link the chat",
+        ),
+        projectId: nullableOptionalNonEmptyString.describe(
+          "Limit routing to this project; omit or null for the whole workspace",
+        ),
+        threadId: nullableThreadIdSchema.describe(
+          "Forum topic id (forum groups only); omit or null for no topic",
+        ),
+        isActive: z
+          .boolean()
+          .optional()
+          .describe("Whether the new rule is active (default true)"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        telegramCreateRule({
+          botId: args.botId,
+          telegramChatId: args.telegramChatId,
+          label: args.label,
+          workspaceId: args.workspaceId ?? "",
+          projectId: args.projectId,
+          threadId: args.threadId ?? null,
+          isActive: args.isActive,
+        }),
+      ),
   );
 
   registerTool(
@@ -836,14 +1388,21 @@ export function registerMcpTools(
   registerTool(
     "delete_task_relation",
     {
-      description: "Delete a task relation by its relation ID.",
-      inputSchema: z.object({ id: nonEmptyString }),
+      description: "Delete a task relation by its relationId.",
+      inputSchema: z.object({
+        relationId: nonEmptyString.describe(
+          "Relation id (from get_task_relations)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
-        client.json(`/api/task-relation/${encodeURIComponent(args.id)}`, {
-          method: "DELETE",
-        }),
+        client.json(
+          `/api/task-relation/${encodeURIComponent(args.relationId)}`,
+          {
+            method: "DELETE",
+          },
+        ),
       ),
   );
 
@@ -851,12 +1410,16 @@ export function registerMcpTools(
     "delete_label",
     {
       description:
-        "Delete a label by ID. Deleting a workspace-level label (taskId null) also deletes its task-level copies.",
-      inputSchema: z.object({ id: nonEmptyString }),
+        "Delete a label by its labelId. Deleting a workspace-level label (taskId null) also deletes its task-level copies.",
+      inputSchema: z.object({
+        labelId: nonEmptyString.describe(
+          "Label id (from list_workspace_labels)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
-        client.json(`/api/label/${encodeURIComponent(args.id)}`, {
+        client.json(`/api/label/${encodeURIComponent(args.labelId)}`, {
           method: "DELETE",
         }),
       ),
@@ -875,6 +1438,67 @@ export function registerMcpTools(
           `/api/workspace/${encodeURIComponent(args.workspaceId)}/members`,
         ),
       ),
+  );
+
+  registerTool(
+    "get_public_url",
+    {
+      description:
+        "Return this Kaneo instance's public base URL (KANEO_CLIENT_URL). Use it to build user-facing links such as workspace invite links.",
+      inputSchema: z.object({}),
+    },
+    async () => textResult({ url: publicUrl() }),
+  );
+
+  registerTool(
+    "get_workspace_invite_link",
+    {
+      description:
+        "Return a workspace's shareable invite link URL. Prefers the default link (no expiry, unlimited uses) and falls back to another usable link; errors when every link is expired or exhausted.",
+      inputSchema: z.object({
+        workspaceId: nonEmptyString.describe(
+          "Workspace id (from list_workspaces)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const links = await client.json<
+          Array<{
+            token: string;
+            expiresAt: string | null;
+            maxUses: number | null;
+            usedCount: number;
+          }>
+        >(
+          `/api/workspace-sharing?workspaceId=${encodeURIComponent(args.workspaceId)}`,
+          { method: "GET" },
+        );
+        const usable = links.filter(
+          (link) =>
+            (link.expiresAt === null ||
+              Date.parse(link.expiresAt) > Date.now()) &&
+            (link.maxUses === null || link.usedCount < link.maxUses),
+        );
+        const link =
+          usable.find(
+            (candidate) =>
+              candidate.expiresAt === null && candidate.maxUses === null,
+          ) ?? usable[0];
+        if (!link) {
+          throw new Error(
+            "No usable invite link for this workspace; create one from workspace settings first.",
+          );
+        }
+        return {
+          workspaceId: args.workspaceId,
+          url: `${publicUrl()}/invitation/link/${link.token}`,
+          token: link.token,
+          expiresAt: link.expiresAt,
+          maxUses: link.maxUses,
+          usedCount: link.usedCount,
+        };
+      }),
   );
 
   registerTool(
@@ -1137,11 +1761,18 @@ export function registerMcpTools(
   registerTool(
     "get_time_entry",
     {
-      description: "Get a single time entry by ID.",
-      inputSchema: z.object({ id: nonEmptyString }),
+      description:
+        "Get a single time entry by its timeEntryId (from list_task_time_entries).",
+      inputSchema: z.object({
+        timeEntryId: nonEmptyString.describe(
+          "Time entry id (from list_task_time_entries)",
+        ),
+      }),
     },
     async (args) =>
-      run(() => client.json(`/api/time-entry/${encodeURIComponent(args.id)}`)),
+      run(() =>
+        client.json(`/api/time-entry/${encodeURIComponent(args.timeEntryId)}`),
+      ),
   );
 
   registerTool(
@@ -1174,9 +1805,11 @@ export function registerMcpTools(
     "update_time_entry",
     {
       description:
-        "Update a time entry. startTime is required; omitting endTime keeps the stored one. startTime cannot be later than the end time.",
+        "Update a time entry by its timeEntryId. startTime is required; omitting endTime keeps the stored one. startTime cannot be later than the end time.",
       inputSchema: z.object({
-        id: nonEmptyString,
+        timeEntryId: nonEmptyString.describe(
+          "Time entry id (from list_task_time_entries)",
+        ),
         startTime: isoDateTimeSchema,
         endTime: optionalIsoDateTimeSchema,
         description: optionalNonEmptyString,
@@ -1184,7 +1817,7 @@ export function registerMcpTools(
     },
     async (args) =>
       run(() =>
-        client.json(`/api/time-entry/${encodeURIComponent(args.id)}`, {
+        client.json(`/api/time-entry/${encodeURIComponent(args.timeEntryId)}`, {
           method: "PUT",
           body: JSON.stringify({
             startTime: args.startTime,
