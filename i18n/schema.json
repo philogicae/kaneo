@@ -9830,6 +9830,9 @@
 						"uses": {
 							"type": "string"
 						},
+						"usesUnlimited": {
+							"type": "string"
+						},
 						"never": {
 							"type": "string"
 						},
@@ -9873,6 +9876,7 @@
 						"createError",
 						"empty",
 						"uses",
+						"usesUnlimited",
 						"never",
 						"linkCopied",
 						"copyFailed",

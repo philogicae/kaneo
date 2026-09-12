@@ -2318,7 +2318,8 @@
 			"revokeIconAria": "Revoke the invite link",
 			"title": "Shareable invite links",
 			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}"
+			"workspace": "Workspace: {{workspaceName}}",
+			"usesUnlimited": "{{used}} uses"
 		}
 	},
 	"unified": {

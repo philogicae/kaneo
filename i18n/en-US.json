@@ -2357,6 +2357,7 @@
 			"createError": "Failed to create the invite link",
 			"empty": "No shareable invite links yet.",
 			"uses": "{{used}}/{{max}} uses",
+			"usesUnlimited": "{{used}} uses",
 			"never": "Never expires",
 			"linkCopied": "Invite link copied",
 			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",

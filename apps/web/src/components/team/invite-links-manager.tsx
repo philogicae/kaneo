@@ -165,10 +165,14 @@ function InviteLinksManager({ workspaceId }: { workspaceId: string }) {
                   {`${window.location.origin}/invitation/link/${link.token}`}
                 </span>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {t("team:inviteLinks.uses", {
-                    used: link.usedCount,
-                    max: link.maxUses,
-                  })}
+                  {link.maxUses == null
+                    ? t("team:inviteLinks.usesUnlimited", {
+                        used: link.usedCount,
+                      })
+                    : t("team:inviteLinks.uses", {
+                        used: link.usedCount,
+                        max: link.maxUses,
+                      })}
                 </span>
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
                   {link.expiresAt
@@ -177,28 +181,30 @@ function InviteLinksManager({ workspaceId }: { workspaceId: string }) {
                       })
                     : t("team:inviteLinks.never")}
                 </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  aria-label={t("team:inviteLinks.copyIconAria")}
-                  onClick={() => handleCopy(link.token)}
-                >
-                  {copiedToken === link.token ? (
-                    <CheckIcon className="size-3" />
-                  ) : (
-                    <CopyIcon className="size-3" />
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  aria-label={t("team:inviteLinks.revokeIconAria")}
-                  onClick={() => handleDelete(link.id)}
-                >
-                  <Trash2 className="size-3" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    aria-label={t("team:inviteLinks.copyIconAria")}
+                    onClick={() => handleCopy(link.token)}
+                  >
+                    {copiedToken === link.token ? (
+                      <CheckIcon className="size-3" />
+                    ) : (
+                      <CopyIcon className="size-3" />
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    aria-label={t("team:inviteLinks.revokeIconAria")}
+                    onClick={() => handleDelete(link.id)}
+                  >
+                    <Trash2 className="size-3" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

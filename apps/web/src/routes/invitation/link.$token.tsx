@@ -12,7 +12,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -167,18 +167,22 @@ function AcceptInviteLink() {
             <CheckCircle className="w-6 h-6 text-success-foreground" />
           </div>
           <p className="text-sm text-center">
-            {t("auth:inviteLink.joinPrompt", {
-              workspaceName: linkData.workspaceName,
-            })}
+            <Trans
+              i18nKey="auth:inviteLink.joinPrompt"
+              values={{ workspaceName: linkData.workspaceName }}
+              components={{ workspaceName: <strong /> }}
+            />
           </p>
 
           {isSignedIn ? (
             <>
               {session?.user?.email && (
                 <p className="text-xs text-center text-muted-foreground">
-                  {t("auth:invitation.signedInAs", {
-                    email: session.user.email,
-                  })}
+                  <Trans
+                    i18nKey="auth:invitation.signedInAs"
+                    values={{ email: session.user.email }}
+                    components={{ email: <strong /> }}
+                  />
                 </p>
               )}
               <Button
