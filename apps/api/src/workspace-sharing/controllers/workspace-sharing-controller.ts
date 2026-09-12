@@ -215,10 +215,13 @@ export async function acceptInviteLink(
         role: "member" as "owner",
       },
     })
-    .catch(() => null)) as { member: { id: string } } | null;
+    .catch(() => null)) as { member?: { id: string }; id?: string } | null;
 
+  // better-auth resolves with the member row itself in this version; the
+  // documented { member } wrapper is accepted for forward compatibility.
+  const memberCreated = Boolean(member && (member.id || member.member?.id));
   let role = "member";
-  if (!member?.member) {
+  if (!memberCreated) {
     // Roll the reservation back so burned use slots match real memberships.
     await db
       .update(schema.workspaceInviteLinkTable)
