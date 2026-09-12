@@ -552,7 +552,12 @@ export function createApp() {
     if (
       path.startsWith("/api/mcp") ||
       path.startsWith("/api/.well-known/") ||
-      path === "/api/billing/webhook"
+      path === "/api/billing/webhook" ||
+      // Public invite-link lookups are anonymous by design (the web fetcher
+      // sends no credentials for signed-out visitors). The accept route is
+      // POST, so it still goes through authentication below.
+      (c.req.method === "GET" &&
+        path.startsWith("/api/workspace-sharing/public/"))
     ) {
       return next();
     }

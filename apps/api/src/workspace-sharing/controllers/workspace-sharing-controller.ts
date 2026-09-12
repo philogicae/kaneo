@@ -6,6 +6,7 @@ import db, { schema } from "../../database";
 import {
   workspaceInviteLinkTable,
   workspaceTable,
+  workspaceUserTable,
 } from "../../database/schema";
 import type {
   WorkspaceInviteLink,
@@ -216,6 +217,7 @@ export async function acceptInviteLink(
     })
     .catch(() => null)) as { member: { id: string } } | null;
 
+  let role = "member";
   if (!member?.member) {
     // Roll the reservation back so burned use slots match real memberships.
     await db
@@ -229,7 +231,19 @@ export async function acceptInviteLink(
           sql`${schema.workspaceInviteLinkTable.usedCount} > 0`,
         ),
       );
-    throw new HTTPException(500, { message: "Failed to join the workspace" });
+
+    // Idempotent for existing members: re-clicking a link must succeed with
+    // their actual role instead of surfacing an addMember failure as a 500.
+    const existing = await db.query.workspaceUserTable.findFirst({
+      where: and(
+        eq(workspaceUserTable.workspaceId, link.workspaceId),
+        eq(workspaceUserTable.userId, userId),
+      ),
+    });
+    if (!existing) {
+      throw new HTTPException(500, { message: "Failed to join the workspace" });
+    }
+    role = existing.role;
   }
 
   const workspace = await db.query.workspaceTable.findFirst({
@@ -244,7 +258,7 @@ export async function acceptInviteLink(
   return {
     workspaceId: workspace.id,
     workspaceName: workspace.name,
-    role: "member",
+    role,
   };
 }
 

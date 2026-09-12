@@ -4,20 +4,28 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import * as schema from "../../../apps/api/src/database/schema";
 
 const mockSelect = vi.fn();
+const mockUpdate = vi.fn(() => ({
+  set: () => ({
+    where: () => ({
+      returning: () => mockUpdateReturning(),
+    }),
+  }),
+}));
+const mockUpdateReturning = vi.fn(() => Promise.resolve([]));
+const mockWorkspaceFindFirst = vi.fn(() => Promise.resolve(undefined));
+const mockMemberFindFirst = vi.fn(() => Promise.resolve(undefined));
+const mockAddMember = vi.fn();
 
 vi.mock("../../../apps/api/src/database", () => ({
   __esModule: true,
   default: {
-    update: () => ({
-      set: () => ({
-        where: () => ({
-          returning: () => Promise.resolve([]),
-        }),
-      }),
-    }),
+    update: () => mockUpdate(),
     query: {
       workspaceTable: {
-        findFirst: (...args: unknown[]) => Promise.resolve(args[0]?.rows),
+        findFirst: (...args: unknown[]) => mockWorkspaceFindFirst(...args),
+      },
+      workspaceUserTable: {
+        findFirst: (...args: unknown[]) => mockMemberFindFirst(...args),
       },
     },
     select: (...args: unknown[]) => mockSelect(...args),
@@ -25,7 +33,9 @@ vi.mock("../../../apps/api/src/database", () => ({
   schema,
 }));
 
-vi.mock("../../../apps/api/src/auth", () => ({ auth: {} }));
+vi.mock("../../../apps/api/src/auth", () => ({
+  auth: { api: { addMember: (...args: unknown[]) => mockAddMember(...args) } },
+}));
 
 // Regression coverage for the shareable invite link details endpoint: the
 // route contract is "always 200", unusable links are reported as
@@ -119,5 +129,54 @@ describe("workspace shareable invite links", () => {
     await expect(acceptInviteLink("user", "dead")).rejects.toThrow(
       HTTPException,
     );
+  });
+
+  it("returns idempotent success for an existing member instead of a 500", async () => {
+    mockUpdateReturning.mockReturnValueOnce(
+      Promise.resolve([{ workspaceId: "ws-1" }]),
+    );
+    vi.mocked(mockAddMember).mockRejectedValueOnce(new Error("member exists"));
+    mockMemberFindFirst.mockResolvedValueOnce({ role: "member" });
+    mockWorkspaceFindFirst.mockResolvedValueOnce({ id: "ws-1", name: "WS" });
+
+    const result = await acceptInviteLink("user-1", "fresh-token");
+
+    expect(result).toEqual({
+      workspaceId: "ws-1",
+      workspaceName: "WS",
+      role: "member",
+    });
+    // Consume and rollback both ran: no use slot is burned for a re-click.
+    expect(mockUpdate).toHaveBeenCalledTimes(2);
+  });
+
+  it("reports the existing role when an owner re-clicks the link", async () => {
+    mockUpdateReturning.mockReturnValueOnce(
+      Promise.resolve([{ workspaceId: "ws-1" }]),
+    );
+    vi.mocked(mockAddMember).mockRejectedValueOnce(new Error("member exists"));
+    mockMemberFindFirst.mockResolvedValueOnce({ role: "owner" });
+    mockWorkspaceFindFirst.mockResolvedValueOnce({ id: "ws-1", name: "WS" });
+
+    const result = await acceptInviteLink("user-1", "fresh-token");
+
+    expect(result).toEqual({
+      workspaceId: "ws-1",
+      workspaceName: "WS",
+      role: "owner",
+    });
+  });
+
+  it("still fails when addMember fails for a genuine non-member", async () => {
+    mockUpdateReturning.mockReturnValueOnce(
+      Promise.resolve([{ workspaceId: "ws-1" }]),
+    );
+    vi.mocked(mockAddMember).mockRejectedValueOnce(new Error("boom"));
+
+    await expect(acceptInviteLink("user-1", "fresh-token")).rejects.toThrow(
+      HTTPException,
+    );
+    // The reservation is rolled back before the failure surfaces.
+    expect(mockUpdate).toHaveBeenCalledTimes(2);
   });
 });

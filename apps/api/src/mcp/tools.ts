@@ -319,6 +319,7 @@ export function registerMcpTools(
         workspaceId: nonEmptyString,
         icon: nonEmptyString,
         slug: nonEmptyString,
+        description: z.string().optional(),
       }),
     },
     async (args) =>
@@ -330,6 +331,7 @@ export function registerMcpTools(
             workspaceId: args.workspaceId,
             icon: args.icon,
             slug: args.slug,
+            description: args.description,
           }),
         }),
       ),
@@ -823,7 +825,7 @@ export function registerMcpTools(
           scopes: [
             {
               workspaceId: args.workspaceId,
-              projectIds: args.projectId ?? null,
+              projectIds: args.projectId ? [args.projectId] : null,
             },
           ],
           threadId: args.threadId ?? null,
