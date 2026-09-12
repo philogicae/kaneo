@@ -1,6 +1,11 @@
 import { and, eq, gt } from "drizzle-orm";
 import db from "../database";
-import { invitationTable, userTable, workspaceTable } from "../database/schema";
+import {
+  invitationTable,
+  userTable,
+  workspaceInviteLinkTable,
+  workspaceTable,
+} from "../database/schema";
 
 type RegistrationCheckResult = {
   allowed: boolean;
@@ -19,7 +24,10 @@ type RegistrationCheckResult = {
 export async function checkRegistrationAllowed(
   email?: string,
   invitationId?: string,
-  options?: { allowInvitationByEmail?: boolean },
+  options?: {
+    allowInvitationByEmail?: boolean;
+    inviteLinkToken?: string;
+  },
 ): Promise<RegistrationCheckResult> {
   const isRegistrationDisabled = process.env.DISABLE_REGISTRATION === "true";
 
@@ -31,6 +39,13 @@ export async function checkRegistrationAllowed(
   }
 
   const canMatchByEmail = Boolean(options?.allowInvitationByEmail && email);
+
+  if (options?.inviteLinkToken) {
+    const link = await findUsableInviteLink(options.inviteLinkToken);
+    if (link) {
+      return { allowed: true, reason: "Valid invite link found", ...link };
+    }
+  }
 
   if (!invitationId && !canMatchByEmail) {
     return {
@@ -56,6 +71,44 @@ export async function checkRegistrationAllowed(
     invitation,
   };
 }
+
+/** A shareable link (expiry + usage limit) also unlocks signup when disabled. */
+export async function findUsableInviteLink(
+  token: string,
+): Promise<WorkspaceInviteLinkSummary | null> {
+  const [link] = await db
+    .select({
+      id: workspaceInviteLinkTable.id,
+      workspaceId: workspaceInviteLinkTable.workspaceId,
+      token: workspaceInviteLinkTable.token,
+      expiresAt: workspaceInviteLinkTable.expiresAt,
+      maxUses: workspaceInviteLinkTable.maxUses,
+      usedCount: workspaceInviteLinkTable.usedCount,
+      workspaceName: workspaceTable.name,
+    })
+    .from(workspaceInviteLinkTable)
+    .innerJoin(
+      workspaceTable,
+      eq(workspaceTable.id, workspaceInviteLinkTable.workspaceId),
+    )
+    .where(eq(workspaceInviteLinkTable.token, token))
+    .limit(1);
+
+  if (!link) return null;
+  if (link.expiresAt && link.expiresAt.getTime() < Date.now()) return null;
+  if (link.maxUses !== null && link.usedCount >= link.maxUses) return null;
+  return {
+    id: link.id,
+    workspaceId: link.workspaceId,
+    workspaceName: link.workspaceName,
+  };
+}
+
+type WorkspaceInviteLinkSummary = {
+  id: string;
+  workspaceId: string;
+  workspaceName: string;
+};
 
 async function findValidInvitation(
   email?: string,

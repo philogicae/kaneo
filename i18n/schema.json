@@ -1314,6 +1314,72 @@
 						"toast",
 						"validation"
 					]
+				},
+				"inviteLink": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitleAccept": {
+							"type": "string"
+						},
+						"pageTitleError": {
+							"type": "string"
+						},
+						"pageTitleInvalid": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"errorTitle": {
+							"type": "string"
+						},
+						"invalidTitle": {
+							"type": "string"
+						},
+						"linkExpired": {
+							"type": "string"
+						},
+						"errors": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"load": {
+									"type": "string"
+								},
+								"accept": {
+									"type": "string"
+								}
+							},
+							"required": ["load", "accept"]
+						},
+						"title": {
+							"type": "string"
+						},
+						"joinPrompt": {
+							"type": "string"
+						},
+						"signedOutPrompt": {
+							"type": "string"
+						},
+						"signedInAs": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"pageTitleAccept",
+						"pageTitleError",
+						"pageTitleInvalid",
+						"loading",
+						"errorTitle",
+						"invalidTitle",
+						"linkExpired",
+						"errors",
+						"title",
+						"joinPrompt",
+						"signedOutPrompt",
+						"signedInAs"
+					]
 				}
 			},
 			"required": [
@@ -1328,7 +1394,8 @@
 				"signUpForm",
 				"invitation",
 				"onboarding",
-				"profileSetup"
+				"profileSetup",
+				"inviteLink"
 			]
 		},
 		"settings": {
@@ -9716,6 +9783,106 @@
 						"roleUpdateSuccess",
 						"roleUpdateError"
 					]
+				},
+				"inviteLinks": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"expiryLabel": {
+							"type": "string"
+						},
+						"expiryNever": {
+							"type": "string"
+						},
+						"expiry24h": {
+							"type": "string"
+						},
+						"expiry7d": {
+							"type": "string"
+						},
+						"expiry30d": {
+							"type": "string"
+						},
+						"maxUsesLabel": {
+							"type": "string"
+						},
+						"maxUsesUnlimited": {
+							"type": "string"
+						},
+						"create": {
+							"type": "string"
+						},
+						"createSuccess": {
+							"type": "string"
+						},
+						"createError": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"uses": {
+							"type": "string"
+						},
+						"never": {
+							"type": "string"
+						},
+						"linkCopied": {
+							"type": "string"
+						},
+						"copyFailed": {
+							"type": "string"
+						},
+						"copyIconAria": {
+							"type": "string"
+						},
+						"revokeIconAria": {
+							"type": "string"
+						},
+						"deleteSuccess": {
+							"type": "string"
+						},
+						"deleteError": {
+							"type": "string"
+						},
+						"workspace": {
+							"type": "string"
+						},
+						"join": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"description",
+						"expiryLabel",
+						"expiryNever",
+						"expiry24h",
+						"expiry7d",
+						"expiry30d",
+						"maxUsesLabel",
+						"maxUsesUnlimited",
+						"create",
+						"createSuccess",
+						"createError",
+						"empty",
+						"uses",
+						"never",
+						"linkCopied",
+						"copyFailed",
+						"copyIconAria",
+						"revokeIconAria",
+						"deleteSuccess",
+						"deleteError",
+						"workspace",
+						"join"
+					]
 				}
 			},
 			"required": [
@@ -9723,7 +9890,8 @@
 				"members",
 				"invitations",
 				"inviteModal",
-				"membersTable"
+				"membersTable",
+				"inviteLinks"
 			]
 		},
 		"publicProject": {

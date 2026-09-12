@@ -333,6 +333,23 @@
 				"nameRequired": "Name is required",
 				"nameShort": "Name must be at least 2 characters"
 			}
+		},
+		"inviteLink": {
+			"pageTitleAccept": "Join Workspace",
+			"pageTitleError": "Invite Link Error",
+			"pageTitleInvalid": "Invite Link Invalid",
+			"loading": "Loading invite link...",
+			"errorTitle": "Invite Link Error",
+			"invalidTitle": "Invalid Invite Link",
+			"linkExpired": "Invite Link Expired",
+			"errors": {
+				"load": "Failed to load the invite link details.",
+				"accept": "Failed to join the workspace"
+			},
+			"title": "Join the workspace!",
+			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
+			"signedOutPrompt": "Create an account or sign in to join the workspace.",
+			"signedInAs": "Signed in as <email>{{email}}</email>"
 		}
 	},
 	"settings": {
@@ -2324,6 +2341,31 @@
 			"cancelInviteError": "Failed to cancel invitation",
 			"roleUpdateSuccess": "Role updated",
 			"roleUpdateError": "Failed to update role"
+		},
+		"inviteLinks": {
+			"title": "Shareable invite links",
+			"description": "Anyone with the link can join this workspace as a member — no email required.",
+			"expiryLabel": "Expiry",
+			"expiryNever": "Never expires",
+			"expiry24h": "24 hours",
+			"expiry7d": "7 days",
+			"expiry30d": "30 days",
+			"maxUsesLabel": "Max uses",
+			"maxUsesUnlimited": "Unlimited",
+			"create": "Create link",
+			"createSuccess": "Invite link created",
+			"createError": "Failed to create the invite link",
+			"empty": "No shareable invite links yet.",
+			"uses": "{{used}}/{{max}} uses",
+			"never": "Never expires",
+			"linkCopied": "Invite link copied",
+			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
+			"copyIconAria": "Copy the invite link",
+			"revokeIconAria": "Revoke the invite link",
+			"deleteSuccess": "Invite link revoked",
+			"deleteError": "Failed to revoke the invite link",
+			"workspace": "Workspace: {{workspaceName}}",
+			"join": "Join {{workspaceName}}"
 		}
 	},
 	"publicProject": {

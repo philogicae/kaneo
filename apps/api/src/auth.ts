@@ -75,6 +75,14 @@ function normalizeInvitationId(value: unknown): string | undefined {
   return normalized;
 }
 
+/** base32 token for workspace invite links: also an id-shaped allowlist. */
+function normalizeInviteLinkToken(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim();
+  if (!/^[A-Za-z0-9_-]{16,128}$/.test(normalized)) return undefined;
+  return normalized;
+}
+
 function isOAuthCallbackPath(path: unknown): boolean {
   if (typeof path !== "string") return false;
   return path.startsWith("/callback/") || path.startsWith("/oauth2/callback/");
@@ -603,10 +611,18 @@ export const auth = betterAuth({
               ctx?.query?.invitationId ||
               ctx?.headers?.get("x-invitation-id"),
           );
+          const inviteLinkToken = normalizeInviteLinkToken(
+            ctx?.body?.inviteLinkToken ||
+              ctx?.query?.inviteLinkToken ||
+              ctx?.headers?.get("x-invite-link-token"),
+          );
           const result = await checkRegistrationAllowed(
             user.email,
             invitationId,
-            { allowInvitationByEmail: isOAuthCallbackPath(ctx?.path) },
+            {
+              allowInvitationByEmail: isOAuthCallbackPath(ctx?.path),
+              inviteLinkToken,
+            },
           );
           if (!result.allowed) {
             throw new APIError("FORBIDDEN", {
@@ -766,7 +782,14 @@ export const auth = betterAuth({
       );
 
       if (ctx.path === "/sign-up/email") {
-        const result = await checkRegistrationAllowed(email, invitationId);
+        const inviteLinkToken = normalizeInviteLinkToken(
+          ctx.body?.inviteLinkToken ||
+            ctx.query?.inviteLinkToken ||
+            ctx.headers?.get("x-invite-link-token"),
+        );
+        const result = await checkRegistrationAllowed(email, invitationId, {
+          inviteLinkToken,
+        });
         if (!result.allowed) {
           throw new APIError("FORBIDDEN", {
             message: result.reason,

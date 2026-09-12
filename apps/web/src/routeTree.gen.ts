@@ -28,6 +28,7 @@ import { Route as LayoutAuthenticatedInvitationsRouteImport } from './routes/_la
 import { Route as LayoutAuthenticatedOnboardingRouteImport } from './routes/_layout/_authenticated/onboarding'
 import { Route as LayoutAuthenticatedProfileSetupRouteImport } from './routes/_layout/_authenticated/profile-setup'
 import { Route as InvitationAcceptInviteIdRouteImport } from './routes/invitation/accept.$inviteId'
+import { Route as InvitationLinkTokenRouteImport } from './routes/invitation/link.$token'
 import { Route as LayoutAuthenticatedDashboardIndexRouteImport } from './routes/_layout/_authenticated/dashboard/index'
 import { Route as LayoutAuthenticatedDashboardInvitationsRouteImport } from './routes/_layout/_authenticated/dashboard/invitations'
 import { Route as LayoutAuthenticatedDashboardSettingsRouteImport } from './routes/_layout/_authenticated/dashboard/settings'
@@ -159,6 +160,11 @@ const InvitationAcceptInviteIdRoute =
     path: '/invitation/accept/$inviteId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const InvitationLinkTokenRoute = InvitationLinkTokenRouteImport.update({
+  id: '/invitation/link/$token',
+  path: '/invitation/link/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutAuthenticatedDashboardIndexRoute =
   LayoutAuthenticatedDashboardIndexRouteImport.update({
     id: '/',
@@ -390,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof LayoutAuthenticatedOnboardingRoute
   '/profile-setup': typeof LayoutAuthenticatedProfileSetupRoute
   '/invitation/accept/$inviteId': typeof InvitationAcceptInviteIdRoute
+  '/invitation/link/$token': typeof InvitationLinkTokenRoute
   '/dashboard/invitations': typeof LayoutAuthenticatedDashboardInvitationsRoute
   '/dashboard/settings': typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
   '/dashboard/': typeof LayoutAuthenticatedDashboardIndexRoute
@@ -438,6 +445,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof LayoutAuthenticatedOnboardingRoute
   '/profile-setup': typeof LayoutAuthenticatedProfileSetupRoute
   '/invitation/accept/$inviteId': typeof InvitationAcceptInviteIdRoute
+  '/invitation/link/$token': typeof InvitationLinkTokenRoute
   '/dashboard/invitations': typeof LayoutAuthenticatedDashboardInvitationsRoute
   '/dashboard/settings': typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
   '/dashboard': typeof LayoutAuthenticatedDashboardIndexRoute
@@ -489,6 +497,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/onboarding': typeof LayoutAuthenticatedOnboardingRoute
   '/_layout/_authenticated/profile-setup': typeof LayoutAuthenticatedProfileSetupRoute
   '/invitation/accept/$inviteId': typeof InvitationAcceptInviteIdRoute
+  '/invitation/link/$token': typeof InvitationLinkTokenRoute
   '/_layout/_authenticated/': typeof LayoutAuthenticatedIndexRoute
   '/_layout/_authenticated/dashboard/invitations': typeof LayoutAuthenticatedDashboardInvitationsRoute
   '/_layout/_authenticated/dashboard/settings': typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
@@ -542,6 +551,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile-setup'
     | '/invitation/accept/$inviteId'
+    | '/invitation/link/$token'
     | '/dashboard/invitations'
     | '/dashboard/settings'
     | '/dashboard/'
@@ -590,6 +600,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile-setup'
     | '/invitation/accept/$inviteId'
+    | '/invitation/link/$token'
     | '/dashboard/invitations'
     | '/dashboard/settings'
     | '/dashboard'
@@ -640,6 +651,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/onboarding'
     | '/_layout/_authenticated/profile-setup'
     | '/invitation/accept/$inviteId'
+    | '/invitation/link/$token'
     | '/_layout/_authenticated/'
     | '/_layout/_authenticated/dashboard/invitations'
     | '/_layout/_authenticated/dashboard/settings'
@@ -682,6 +694,7 @@ export interface RootRouteChildren {
   McpAuthorizeRoute: typeof McpAuthorizeRoute
   PublicProjectProjectIdRoute: typeof PublicProjectProjectIdRoute
   InvitationAcceptInviteIdRoute: typeof InvitationAcceptInviteIdRoute
+  InvitationLinkTokenRoute: typeof InvitationLinkTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -817,6 +830,13 @@ declare module '@tanstack/react-router' {
       path: '/invitation/accept/$inviteId'
       fullPath: '/invitation/accept/$inviteId'
       preLoaderRoute: typeof InvitationAcceptInviteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invitation/link/$token': {
+      id: '/invitation/link/$token'
+      path: '/invitation/link/$token'
+      fullPath: '/invitation/link/$token'
+      preLoaderRoute: typeof InvitationLinkTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout/_authenticated/dashboard/': {
@@ -1272,6 +1292,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpAuthorizeRoute: McpAuthorizeRoute,
   PublicProjectProjectIdRoute: PublicProjectProjectIdRoute,
   InvitationAcceptInviteIdRoute: InvitationAcceptInviteIdRoute,
+  InvitationLinkTokenRoute: InvitationLinkTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -14,6 +14,7 @@ async function createProject(
   name: string,
   icon: string,
   slug: string,
+  description: string | null,
 ) {
   return db.transaction(async (tx) => {
     // Serialize ordering writes per workspace: without this, two concurrent
@@ -37,6 +38,7 @@ async function createProject(
         name,
         icon,
         slug,
+        description,
         position: maxPosition === null ? 0 : maxPosition + 1,
       })
       .returning();

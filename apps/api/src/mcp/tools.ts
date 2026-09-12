@@ -708,90 +708,556 @@ export function registerMcpTools(
       ),
   );
 
+  // Forum topic id schema: optional everywhere, null clears it. Positive
+  // chat ids (private chats) are rejected for topics in the shared helpers below.
+  const nullableThreadIdSchema = z.number().int().min(1).nullable().optional();
+
+  type TelegramConfigShape = {
+    bots: Array<{
+      id: string;
+      name: string | null;
+      events: Record<string, boolean>;
+      chats: Array<{
+        id: string;
+        chatId: string;
+        label: string | null;
+        rules: Array<{
+          id: string;
+          workspaceId: string;
+          workspaceName: string | null;
+          projectId: string | null;
+          projectName: string | null;
+          threadId: number | null;
+          isActive: boolean;
+        }>;
+      }>;
+    }>;
+  };
+
+  const getTelegramConfig = () =>
+    client.json<TelegramConfigShape>("/api/telegram-config", {
+      method: "GET",
+    });
+
+  const findBotOrFail = (
+    args: { botId: string },
+    config: TelegramConfigShape,
+  ) => {
+    const bot = config.bots.find((b) => b.id === args.botId);
+    if (!bot) {
+      const known = config.bots
+        .map((b) => `${b.id}${b.name ? ` (${b.name})` : ""}`)
+        .join(", ");
+      throw new Error(
+        `unknown_bot: bot ${args.botId} not found.${known ? ` Available bots: ${known}` : " No bots are configured yet."}`,
+      );
+    }
+    return bot;
+  };
+
+  const assertTopicAllowed = (threadId: unknown, chatId: string) => {
+    // Only numeric chat ids can be classified reliably: positive = private chat.
+    if (threadId == null || chatId.startsWith("@")) return;
+    const numeric = Number(chatId);
+    if (!Number.isNaN(numeric) && numeric > 0) {
+      throw new Error(
+        `topic_not_allowed_on_dm: chat ${chatId} is a private chat (positive id); a forum topic id is only valid on a forum group (negative id). Omit threadId for DMs.`,
+      );
+    }
+  };
+
+  /** Shared create-rule flow for telegram_create_rule and the deprecated alias. */
+  const telegramCreateRule = async (args: {
+    botId: string;
+    telegramChatId?: string | null;
+    label?: string | null;
+    workspaceId: string;
+    projectId?: string | null;
+    threadId?: number | null;
+    isActive?: boolean;
+  }) => {
+    const bot = findBotOrFail({ botId: args.botId }, await getTelegramConfig());
+    const wanted = args.telegramChatId ?? "";
+    let chatRecord = bot.chats.find((c) => wanted && c.chatId === wanted);
+    assertTopicAllowed(args.threadId, chatRecord?.chatId ?? wanted);
+    if (!chatRecord) {
+      if (!wanted) {
+        throw new Error(
+          "telegramChatId is required when the chat does not already exist on the bot",
+        );
+      }
+      chatRecord = (await client.json(
+        `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            chatId: wanted,
+            label: args.label ?? wanted,
+          }),
+        },
+      )) as TelegramConfigShape["bots"][number]["chats"][number];
+    }
+
+    if (!args.workspaceId) {
+      return {
+        created: false,
+        chat: chatRecord,
+        note: "Chat linked to the bot. Pass workspaceId to route notifications.",
+      };
+    }
+
+    const existing = chatRecord.rules.find(
+      (r) =>
+        r.workspaceId === args.workspaceId &&
+        (r.projectId ?? null) === (args.projectId ?? null),
+    );
+    if (existing) {
+      return { created: false, rule: existing };
+    }
+
+    const [rule] = (await client.json(
+      `/api/telegram-config/telegram-chat/${encodeURIComponent(chatRecord.id)}/rules`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          scopes: [
+            {
+              workspaceId: args.workspaceId,
+              projectIds: args.projectId ?? null,
+            },
+          ],
+          threadId: args.threadId ?? null,
+        }),
+      },
+    )) as Array<{
+      id: string;
+      workspaceId: string;
+      workspaceName: string | null;
+      projectId: string | null;
+      projectName: string | null;
+      threadId: number | null;
+      isActive: boolean;
+    }>;
+
+    if (rule && args.isActive === false) {
+      const [updated] = (await client.json(
+        `/api/telegram-config/telegram-rule/${encodeURIComponent(rule.id)}`,
+        { method: "PATCH", body: JSON.stringify({ isActive: false }) },
+      )) as Array<{ id: string; isActive: boolean }>;
+      return { created: true, rule: updated ?? rule };
+    }
+    return { created: true, rule };
+  };
+
+  registerTool(
+    "telegram_list_bots",
+    {
+      description:
+        "List Telegram bots configured on the account: id, name, and event filter.",
+      inputSchema: z.object({}),
+    },
+    async () =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        return bots.map((b) => ({
+          id: b.id,
+          name: b.name,
+          events: b.events,
+        }));
+      }),
+  );
+
+  registerTool(
+    "telegram_list_config",
+    {
+      description:
+        "List the full Telegram notification config tree: bots -> chats (telegramChatId, label, isGroup) -> rules (workspace/project scope, threadId, isActive).",
+      inputSchema: z.object({
+        botId: optionalNonEmptyString.describe("Filter to one stored bot"),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        const filtered = args.botId
+          ? bots.filter((b) => b.id === args.botId)
+          : bots;
+        if (args.botId && filtered.length === 0) {
+          findBotOrFail({ botId: args.botId }, { bots });
+        }
+        return {
+          bots: filtered.map((b) => ({
+            id: b.id,
+            name: b.name,
+            chats: b.chats.map((c) => ({
+              id: c.id,
+              telegramChatId: c.chatId,
+              label: c.label,
+              isGroup: c.chatId.startsWith("-"),
+              rules: c.rules,
+            })),
+          })),
+        };
+      }),
+  );
+
+  registerTool(
+    "telegram_list_chats",
+    {
+      description: "List chats attached to one stored bot.",
+      inputSchema: z.object({ botId: nonEmptyString }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        const bot = findBotOrFail(args, { bots });
+        return bot.chats.map((c) => ({
+          id: c.id,
+          telegramChatId: c.chatId,
+          label: c.label,
+          isGroup: c.chatId.startsWith("-"),
+        }));
+      }),
+  );
+
+  registerTool(
+    "telegram_list_rules",
+    {
+      description:
+        "List Telegram routing rules, optionally filtered by stored bot, internal chat record id, workspace, or project.",
+      inputSchema: z.object({
+        botId: optionalNonEmptyString,
+        telegramChatRecordId: optionalNonEmptyString.describe(
+          "Internal chat row id (the chatId field of rules)",
+        ),
+        workspaceId: optionalNonEmptyString,
+        projectId: optionalNonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        return bots.flatMap((b) =>
+          b.chats.flatMap((c) =>
+            c.rules
+              .filter(
+                (r) =>
+                  (args.telegramChatRecordId == null ||
+                    c.id === args.telegramChatRecordId) &&
+                  (args.workspaceId == null ||
+                    r.workspaceId === args.workspaceId) &&
+                  (args.projectId == null || r.projectId === args.projectId),
+              )
+              .map((r) => ({ botId: b.id, chatId: c.id, ...r })),
+          ),
+        );
+      }),
+  );
+
+  registerTool(
+    "telegram_get_rule",
+    {
+      description: "Get one Telegram routing rule by ID.",
+      inputSchema: z.object({ ruleId: nonEmptyString }),
+    },
+    async (args) =>
+      run(async () => {
+        const { bots } = await client.json<TelegramConfigShape>(
+          "/api/telegram-config",
+          { method: "GET" },
+        );
+        for (const bot of bots) {
+          for (const chat of bot.chats) {
+            const rule = chat.rules.find((r) => r.id === args.ruleId);
+            if (rule) {
+              return {
+                botId: bot.id,
+                chatId: chat.id,
+                telegramChatId: chat.chatId,
+                ...rule,
+              };
+            }
+          }
+        }
+        throw new Error(`unknown_rule: rule ${args.ruleId} not found`);
+      }),
+  );
+
+  registerTool(
+    "telegram_create_bot",
+    {
+      description:
+        "Register a Telegram bot token (name optional; the token is checkable for shape only, not against Telegram).",
+      inputSchema: z.object({
+        botToken: nonEmptyString,
+        name: optionalNonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json("/api/telegram-config/bot", {
+          method: "POST",
+          body: JSON.stringify({
+            botToken: args.botToken,
+            ...(args.name ? { name: args.name } : {}),
+          }),
+        }),
+      ),
+  );
+
+  registerTool(
+    "telegram_update_bot",
+    {
+      description:
+        "Rename a bot, rotate its token, or change its event filter. Omitted fields keep current values.",
+      inputSchema: z.object({
+        botId: nonEmptyString,
+        name: nullableOptionalNonEmptyString,
+        botToken: optionalNonEmptyString,
+        events: z
+          .object({
+            taskCreated: z.boolean().optional(),
+            taskStatusChanged: z.boolean().optional(),
+            taskPriorityChanged: z.boolean().optional(),
+            taskTitleChanged: z.boolean().optional(),
+            taskDescriptionChanged: z.boolean().optional(),
+            taskCommentCreated: z.boolean().optional(),
+          })
+          .optional(),
+      }),
+    },
+    async (args) => {
+      const body = Object.fromEntries(
+        Object.entries({
+          name: args.name,
+          botToken: args.botToken,
+          events: args.events,
+        }).filter(([, v]) => v !== undefined),
+      );
+      return run(() =>
+        client.json(
+          `/api/telegram-config/bot/${encodeURIComponent(args.botId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+          },
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "telegram_delete_bot",
+    {
+      description: "Remove a Telegram bot, its chats, and all their rules.",
+      inputSchema: z.object({ botId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/bot/${encodeURIComponent(args.botId)}`,
+          {
+            method: "DELETE",
+          },
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_create_chat",
+    {
+      description:
+        "Attach a Telegram chat/group/channel id to a stored bot. label is optional; omitting it leaves an unnamed chat record.",
+      inputSchema: z.object({
+        botId: nonEmptyString,
+        telegramChatId: nonEmptyString.describe(
+          "The Telegram chat id (e.g. -1001234567890), or @username",
+        ),
+        label: optionalNonEmptyString,
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              chatId: args.telegramChatId,
+              ...(args.label ? { label: args.label } : {}),
+            }),
+          },
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_update_chat",
+    {
+      description:
+        "Update a chat record: change the label or the chat id. Identifies the record by its internal id.",
+      inputSchema: z.object({
+        telegramChatRecordId: nonEmptyString.describe(
+          "Internal chat record id (from telegram_list_chats)",
+        ),
+        telegramChatId: optionalNonEmptyString,
+        label: nullableOptionalNonEmptyString,
+      }),
+    },
+    async (args) => {
+      const body = Object.fromEntries(
+        Object.entries({
+          chatId: args.telegramChatId,
+          label: args.label,
+        }).filter(([, v]) => v !== undefined),
+      );
+      return run(() =>
+        client.json(
+          `/api/telegram-config/telegram-chat/${encodeURIComponent(args.telegramChatRecordId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+          },
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "telegram_delete_chat",
+    {
+      description: "Remove a chat record and all its rules.",
+      inputSchema: z.object({
+        telegramChatRecordId: nonEmptyString.describe(
+          "Internal chat record id (from telegram_list_chats)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/telegram-chat/${encodeURIComponent(args.telegramChatRecordId)}`,
+          { method: "DELETE" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "telegram_create_rule",
+    {
+      description:
+        "Create or return an existing Telegram routing rule: ensures the chat exists on the bot, then routes a workspace (or one project; projectId null = whole workspace) into it. threadId is optional and only valid on a forum group (negative chat id); null means no topic. Returns created: true/false plus the rule.",
+      inputSchema: z.object({
+        botId: nonEmptyString,
+        telegramChatId: optionalNonEmptyString.describe(
+          "Telegram chat id; the chat record is created if it is not linked yet",
+        ),
+        label: optionalNonEmptyString.describe(
+          "Label for a newly created chat record (default: the chat id)",
+        ),
+        workspaceId: nonEmptyString.describe(
+          "Workspace to route into the chat",
+        ),
+        projectId: nullableOptionalNonEmptyString.describe(
+          "One project (or null/omitted = whole workspace)",
+        ),
+        threadId: nullableThreadIdSchema,
+        isActive: z.boolean().optional().describe("Default true"),
+      }),
+    },
+    async (args) => run(() => telegramCreateRule(args)),
+  );
+
+  registerTool(
+    "telegram_update_rule",
+    {
+      description:
+        "Update a routing rule: change the project scope (projectIds), set threadId (null clears the topic; topics are only valid on forum groups), or toggle isActive.",
+      inputSchema: z.object({
+        ruleId: nonEmptyString,
+        projectIds: z.array(nonEmptyString).nullable().optional(),
+        threadId: nullableThreadIdSchema,
+        isActive: z.boolean().optional(),
+      }),
+    },
+    async (args) => {
+      const body = Object.fromEntries(
+        Object.entries({
+          projectIds: args.projectIds,
+          threadId: args.threadId,
+          isActive: args.isActive,
+        }).filter(([, v]) => v !== undefined),
+      );
+      return run(() =>
+        client.json(
+          `/api/telegram-config/telegram-rule/${encodeURIComponent(args.ruleId)}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify(body),
+          },
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "telegram_delete_rule",
+    {
+      description: "Remove a routing rule.",
+      inputSchema: z.object({ ruleId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/telegram-config/telegram-rule/${encodeURIComponent(args.ruleId)}`,
+          { method: "DELETE" },
+        ),
+      ),
+  );
+
   registerTool(
     "configure_telegram_notifications",
     {
       description:
-        "Configure Telegram notifications: link a chat to a stored bot, then route a workspace (or one project) into that chat, optionally into a forum topic (topicId). Existing duplicates are skipped. Requires workspace:manage_settings on the target workspace.",
+        "Deprecated alias of telegram_create_rule: link a chat to a stored bot, then route a workspace (or one project) into that chat, optionally into a forum topic (topicId, forum groups only). Existing duplicates return the existing rule.",
       inputSchema: z.object({
-        botId: nonEmptyString.describe(
-          "Stored bot id (from the config listing)",
-        ),
+        botId: nonEmptyString,
         chatId: nonEmptyString.describe(
           "Target Telegram chat id (numeric @getidsbot style, or @username)",
         ),
+        chatLabel: optionalNonEmptyString,
         workspaceId: optionalNonEmptyString.describe(
           "Route the whole workspace (or the single projectId) into the chat",
         ),
         projectId: optionalNonEmptyString.describe(
           "Restrict routing to one project of workspaceId",
         ),
-        topicId: z
-          .number()
-          .int()
-          .positive()
-          .optional()
-          .describe("Forum topic/message_thread_id when the chat is a forum"),
+        topicId: z.number().int().positive().nullable().optional(),
       }),
     },
     async (args) =>
-      run(async () => {
-        const config = await client.json<{
-          bots: Array<{
-            id: string;
-            name: string | null;
-            chats: Array<{ id: string; chatId: string }>;
-          }>;
-        }>("/api/telegram-config", { method: "GET" });
-        const bot = config.bots?.find((b) => b.id === args.botId);
-        if (!bot) {
-          const known = (config.bots ?? [])
-            .map((b) => `${b.id}${b.name ? ` (${b.name})` : ""}`)
-            .join(", ");
-          throw new Error(
-            `Telegram bot ${args.botId} not found.${known ? ` Available bots: ${known}` : " No bots are configured yet."}`,
-          );
-        }
-
-        let chatRow = (bot.chats ?? []).find((c) => c.chatId === args.chatId);
-        if (!chatRow) {
-          chatRow = (await client.json(
-            `/api/telegram-config/bot/${encodeURIComponent(args.botId)}/chat`,
-            {
-              method: "POST",
-              body: JSON.stringify({ chatId: args.chatId }),
-            },
-          )) as { id: string; chatId: string };
-        }
-        if (!chatRow) {
-          throw new Error(`Failed to register chat ${args.chatId} on the bot`);
-        }
-
-        if (!args.workspaceId) {
-          return {
-            bot: { id: bot.id, name: bot.name },
-            chat: chatRow,
-            rules: [],
-            note: "Chat linked to the bot. Pass workspaceId to route notifications.",
-          };
-        }
-
-        return client.json(
-          `/api/telegram-config/telegram-chat/${encodeURIComponent(chatRow.id)}/rules`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              scopes: [
-                {
-                  workspaceId: args.workspaceId,
-                  projectIds: args.projectId ? [args.projectId] : null,
-                },
-              ],
-              ...(args.topicId !== undefined ? { threadId: args.topicId } : {}),
-            }),
-          },
-        );
-      }),
+      run(() =>
+        telegramCreateRule({
+          botId: args.botId,
+          telegramChatId: args.chatId,
+          label: args.chatLabel,
+          workspaceId: args.workspaceId ?? "",
+          projectId: args.projectId,
+          threadId: args.topicId ?? null,
+        }),
+      ),
   );
 
   registerTool(

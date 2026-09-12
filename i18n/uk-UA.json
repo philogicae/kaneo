@@ -289,6 +289,23 @@
 				"nameRequired": "Ім'я є обов'язковим",
 				"nameShort": "Ім'я має містити щонайменше 2 символи"
 			}
+		},
+		"inviteLink": {
+			"errors": {
+				"accept": "Failed to join the workspace",
+				"load": "Failed to load the invite link details."
+			},
+			"errorTitle": "Invite Link Error",
+			"invalidTitle": "Invalid Invite Link",
+			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Invite Link Expired",
+			"loading": "Loading invite link...",
+			"pageTitleAccept": "Join Workspace",
+			"pageTitleError": "Invite Link Error",
+			"pageTitleInvalid": "Invite Link Invalid",
+			"signedInAs": "Signed in as <email>{{email}}</email>",
+			"signedOutPrompt": "Create an account or sign in to join the workspace.",
+			"title": "Join the workspace!"
 		}
 	},
 	"common": {
@@ -2311,6 +2328,31 @@
 			"ariaInvitationActions": "Дії із запрошенням",
 			"roleUpdateSuccess": "Роль оновлено",
 			"roleUpdateError": "Не вдалося оновити роль"
+		},
+		"inviteLinks": {
+			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
+			"copyIconAria": "Copy the invite link",
+			"create": "Create link",
+			"createError": "Failed to create the invite link",
+			"createSuccess": "Invite link created",
+			"deleteError": "Failed to revoke the invite link",
+			"deleteSuccess": "Invite link revoked",
+			"description": "Anyone with the link can join this workspace as a member — no email required.",
+			"empty": "No shareable invite links yet.",
+			"expiry24h": "24 hours",
+			"expiry30d": "30 days",
+			"expiry7d": "7 days",
+			"expiryLabel": "Expiry",
+			"expiryNever": "Never expires",
+			"join": "Join {{workspaceName}}",
+			"linkCopied": "Invite link copied",
+			"maxUsesLabel": "Max uses",
+			"maxUsesUnlimited": "Unlimited",
+			"never": "Never expires",
+			"revokeIconAria": "Revoke the invite link",
+			"title": "Shareable invite links",
+			"uses": "{{used}}/{{max}} uses",
+			"workspace": "Workspace: {{workspaceName}}"
 		}
 	},
 	"unified": {

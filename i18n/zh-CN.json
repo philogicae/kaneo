@@ -289,6 +289,23 @@
 				"nameRequired": "名称不能为空",
 				"nameShort": "姓名至少需要 2 个字符"
 			}
+		},
+		"inviteLink": {
+			"errors": {
+				"accept": "Failed to join the workspace",
+				"load": "Failed to load the invite link details."
+			},
+			"errorTitle": "Invite Link Error",
+			"invalidTitle": "Invalid Invite Link",
+			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Invite Link Expired",
+			"loading": "Loading invite link...",
+			"pageTitleAccept": "Join Workspace",
+			"pageTitleError": "Invite Link Error",
+			"pageTitleInvalid": "Invite Link Invalid",
+			"signedInAs": "Signed in as <email>{{email}}</email>",
+			"signedOutPrompt": "Create an account or sign in to join the workspace.",
+			"title": "Join the workspace!"
 		}
 	},
 	"common": {
@@ -2260,6 +2277,31 @@
 			"cancelInviteError": "取消邀请失败",
 			"roleUpdateSuccess": "角色已更新",
 			"roleUpdateError": "更新角色失败"
+		},
+		"inviteLinks": {
+			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
+			"copyIconAria": "Copy the invite link",
+			"create": "Create link",
+			"createError": "Failed to create the invite link",
+			"createSuccess": "Invite link created",
+			"deleteError": "Failed to revoke the invite link",
+			"deleteSuccess": "Invite link revoked",
+			"description": "Anyone with the link can join this workspace as a member — no email required.",
+			"empty": "No shareable invite links yet.",
+			"expiry24h": "24 hours",
+			"expiry30d": "30 days",
+			"expiry7d": "7 days",
+			"expiryLabel": "Expiry",
+			"expiryNever": "Never expires",
+			"join": "Join {{workspaceName}}",
+			"linkCopied": "Invite link copied",
+			"maxUsesLabel": "Max uses",
+			"maxUsesUnlimited": "Unlimited",
+			"never": "Never expires",
+			"revokeIconAria": "Revoke the invite link",
+			"title": "Shareable invite links",
+			"uses": "{{used}}/{{max}} uses",
+			"workspace": "Workspace: {{workspaceName}}"
 		}
 	},
 	"unified": {

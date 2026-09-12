@@ -16,6 +16,7 @@ export const createProjectBody = z.object({
   workspaceId: z.string(),
   icon: z.string(),
   slug: z.string(),
+  description: z.string().optional(),
 });
 
 export const updateProjectBody = z.object({
