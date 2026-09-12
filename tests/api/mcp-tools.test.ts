@@ -374,9 +374,8 @@ describe("MCP telegram rule and project description tools", () => {
     });
   });
 
-  it("registers the deprecated alias under the telegram_ prefix only", () => {
+  it("registers telegram_configure_notifications", () => {
     expect(tools.has("telegram_configure_notifications")).toBe(true);
-    expect(tools.has("configure_telegram_notifications")).toBe(false);
   });
 });
 

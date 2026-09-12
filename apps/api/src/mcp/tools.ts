@@ -779,7 +779,7 @@ export function registerMcpTools(
     }
   };
 
-  /** Shared create-rule flow for telegram_create_rule and the deprecated alias. */
+  /** Shared create-rule flow for telegram_create_rule and telegram_configure_notifications. */
   const telegramCreateRule = async (args: {
     botId: string;
     telegramChatId?: string | null;
@@ -1306,35 +1306,42 @@ export function registerMcpTools(
     "telegram_configure_notifications",
     {
       description:
-        "Deprecated alias of telegram_create_rule, kept for one release. Prefer telegram_create_rule, whose args are telegramChatId/label/threadId; this alias keeps the legacy chatId/chatLabel/topicId names.",
+        "Link a Telegram chat to a bot and route a workspace's notifications into it. Omit workspaceId to only link the chat; omit projectId to route the whole workspace. A duplicate rule returns the existing one.",
       inputSchema: z.object({
         botId: nonEmptyString.describe(
           "Stored bot id (from telegram_list_bots)",
         ),
-        chatId: nonEmptyString.describe(
-          "Deprecated name for telegramChatId (numeric or @username)",
+        telegramChatId: optionalNonEmptyString.describe(
+          "Telegram chat id; required only when the chat is not linked to the bot yet",
         ),
-        chatLabel: optionalNonEmptyString.describe("Deprecated name for label"),
+        label: optionalNonEmptyString.describe(
+          "Label for the chat if it gets linked now (defaults to the chat id)",
+        ),
         workspaceId: optionalNonEmptyString.describe(
-          "Route the whole workspace (or the single projectId) into the chat",
+          "Workspace whose notifications route to the chat; omit to only link the chat",
         ),
-        projectId: optionalNonEmptyString.describe(
-          "Restrict routing to one project of workspaceId",
+        projectId: nullableOptionalNonEmptyString.describe(
+          "Limit routing to this project; omit or null for the whole workspace",
         ),
-        topicId: nullableThreadIdSchema.describe(
-          "Deprecated name for threadId (forum groups only)",
+        threadId: nullableThreadIdSchema.describe(
+          "Forum topic id (forum groups only); omit or null for no topic",
         ),
+        isActive: z
+          .boolean()
+          .optional()
+          .describe("Whether the new rule is active (default true)"),
       }),
     },
     async (args) =>
       run(() =>
         telegramCreateRule({
           botId: args.botId,
-          telegramChatId: args.chatId,
-          label: args.chatLabel,
+          telegramChatId: args.telegramChatId,
+          label: args.label,
           workspaceId: args.workspaceId ?? "",
           projectId: args.projectId,
-          threadId: args.topicId ?? null,
+          threadId: args.threadId ?? null,
+          isActive: args.isActive,
         }),
       ),
   );
