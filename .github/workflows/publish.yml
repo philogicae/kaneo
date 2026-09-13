@@ -2,8 +2,6 @@ name: Publish image
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "*.*.*"
   workflow_dispatch:
