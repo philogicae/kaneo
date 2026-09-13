@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useUpdateTaskDueDate } from "@/hooks/mutations/task/use-update-task-due-date";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
+import { formatDateWithTime } from "@/lib/format";
 import { toast } from "@/lib/toast";
 import type Task from "@/types/task";
 
@@ -94,6 +95,14 @@ export default function TaskRemindersPopover({
     (a, b) => a - b,
   );
 
+  // Reminders count down from the start date; the API stores UTC, so Intl
+  // renders the result in the browser's timezone.
+  const fireTime = (offset: number) => {
+    if (!task.startDate) return null;
+    const fireAt = new Date(task.startDate).getTime() - offset * 60_000;
+    return formatDateWithTime(fireAt);
+  };
+
   const save = async (next: number[]) => {
     try {
       await updateTaskDueDate({
@@ -134,7 +143,6 @@ export default function TaskRemindersPopover({
             variant="ghost"
             size="sm"
             className="h-7 px-1.5 gap-1.5"
-            disabled={!task.startDate}
             title={t("tasks:reminders.title")}
           >
             {offsets.length > 0 ? (
@@ -158,16 +166,6 @@ export default function TaskRemindersPopover({
             <p className="text-xs font-medium">{t("tasks:reminders.title")}</p>
 
             <div className="flex items-center gap-1.5">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 w-7 shrink-0 p-0"
-                disabled={!Number.isFinite(draftMinutes) || draftMinutes < 1}
-                onClick={addDraft}
-                aria-label={t("tasks:reminders.add")}
-              >
-                <Plus className="size-3.5" />
-              </Button>
               <Input
                 type="number"
                 inputMode="numeric"
@@ -175,6 +173,12 @@ export default function TaskRemindersPopover({
                 max={999}
                 value={draftAmount}
                 onChange={(event) => setDraftAmount(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void addDraft();
+                  }
+                }}
                 // The compact coss size keeps the inner input inside the
                 // bordered span; a smaller height plus extra padding left the
                 // value hidden under the native spinner.
@@ -206,6 +210,16 @@ export default function TaskRemindersPopover({
                   ))}
                 </SelectContent>
               </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 w-7 shrink-0 p-0"
+                disabled={!Number.isFinite(draftMinutes) || draftMinutes < 1}
+                onClick={addDraft}
+                aria-label={t("tasks:reminders.add")}
+              >
+                <Plus className="size-3.5" />
+              </Button>
             </div>
 
             {offsets.length === 0 ? (
@@ -214,25 +228,35 @@ export default function TaskRemindersPopover({
               </p>
             ) : (
               <div className="space-y-1">
-                {offsets.map((offset) => (
-                  <div
-                    key={offset}
-                    className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 shrink-0 p-0 text-muted-foreground hover:text-foreground"
-                      onClick={() => removeOffset(offset)}
-                      aria-label={t("tasks:reminders.remove")}
+                {offsets.map((offset) => {
+                  const fireAt = fireTime(offset);
+                  return (
+                    <div
+                      key={offset}
+                      className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1"
                     >
-                      <X className="size-3" />
-                    </Button>
-                    <span className="text-xs">
-                      {formatReminderOffsetLabel(offset, t)}
-                    </span>
-                  </div>
-                ))}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 shrink-0 p-0 text-muted-foreground hover:text-foreground"
+                        onClick={() => removeOffset(offset)}
+                        aria-label={t("tasks:reminders.remove")}
+                      >
+                        <X className="size-3" />
+                      </Button>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="text-xs">
+                          {formatReminderOffsetLabel(offset, t)}
+                        </span>
+                        {fireAt ? (
+                          <span className="text-[10px] text-muted-foreground">
+                            {fireAt}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
             <p className="text-xs text-muted-foreground">

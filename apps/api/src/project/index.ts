@@ -24,6 +24,7 @@ import {
 } from "./response";
 import {
   createProjectBody,
+  getProjectTasksQuery,
   listProjectsQuery,
   projectParam,
   reorderProjectsBody,
@@ -83,7 +84,7 @@ const getProjectRoute = createRoute({
   summary: "Get project",
   description: "Get a single project by ID.",
   middleware: [workspaceAccess.fromProject()] as const,
-  request: { params: projectParam },
+  request: { params: projectParam, query: getProjectTasksQuery },
   responses: {
     200: jsonResponse("Project details", projectSchema),
     400: errorResponse(
@@ -268,8 +269,12 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(getProjectRoute, async (c) => {
     const { id } = c.req.valid("param");
+    const { tasksLimit, tasksOffset } = c.req.valid("query");
     const workspaceId = c.get("workspaceId");
-    const projectData = await getProjectCtrl(id, workspaceId);
+    const projectData = await getProjectCtrl(id, workspaceId, {
+      tasksLimit,
+      tasksOffset,
+    });
     return c.json(projectData, 200);
   })
   .openapi(getProjectChartsRoute, async (c) => {

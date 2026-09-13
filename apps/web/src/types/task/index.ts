@@ -29,7 +29,7 @@ type Task = {
   priority: string | null;
   startDate: string | null;
   dueDate: string | null;
-  // Minutes before the due date at which Telegram reminders fire.
+  // Minutes before the task's start date at which Telegram reminders fire.
   reminderOffsets?: number[] | null;
   // Calendar-like recurrence; the next occurrence is spawned on completion.
   recurrence?: {
