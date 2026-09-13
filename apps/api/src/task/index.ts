@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
-import { requireEntitlement } from "../billing/require-entitlement-middleware";
 import db from "../database";
 import {
   assetTable,
@@ -14,12 +13,14 @@ import {
   createRoute,
   errorResponse,
   jsonResponse,
+  z,
 } from "../openapi";
 import {
   assertTaskImageKeyMatchesContext,
   createTaskImageUploadUrl,
   isImageContentType,
   validateTaskAssetUploadInput,
+  writeAssetObject,
 } from "../storage/s3";
 import { normalizeApiServerUrl } from "../utils/openapi-spec";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
@@ -37,7 +38,6 @@ import getTasks from "./controllers/get-tasks";
 import importTasks from "./controllers/import-tasks";
 import moveTask from "./controllers/move-task";
 import {
-  requireBulkTaskEntitlement,
   requireBulkTaskPermission,
   requireTaskAssigneePermission,
 } from "./controllers/require-task-permission";
@@ -105,11 +105,7 @@ const bulkUpdateTasksRoute = createRoute({
   summary: "Bulk update tasks",
   description:
     "Apply one operation to many tasks at once. Every task must be in the same workspace.",
-  middleware: [
-    workspaceAccess.fromTasks(),
-    requireBulkTaskPermission,
-    requireBulkTaskEntitlement,
-  ] as const,
+  middleware: [workspaceAccess.fromTasks(), requireBulkTaskPermission] as const,
   request: {
     body: {
       required: true,
@@ -139,7 +135,6 @@ const createTaskRoute = createRoute({
   middleware: [
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["create"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: projectIdParam,
@@ -186,7 +181,6 @@ const moveTaskRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -220,7 +214,6 @@ const updateTaskRoute = createRoute({
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
     requireTaskAssigneePermission,
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -268,7 +261,6 @@ const importTasksRoute = createRoute({
   middleware: [
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["create"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: projectIdParam,
@@ -320,7 +312,6 @@ const updateTaskStatusRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -348,7 +339,6 @@ const updateTaskPriorityRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -377,7 +367,6 @@ const updateTaskAssigneeRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["assign"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -406,7 +395,6 @@ const updateTaskDueDateRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -434,7 +422,6 @@ const updateTaskTitleRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -463,7 +450,6 @@ const createTaskImageUploadRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -494,7 +480,6 @@ const finalizeTaskImageUploadRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -515,6 +500,35 @@ const finalizeTaskImageUploadRoute = createRoute({
   },
 });
 
+const uploadTaskImageBlobRoute = createRoute({
+  method: "put",
+  operationId: "uploadTaskImageBlob",
+  path: "/image-upload/{id}/blob",
+  tags: ["Tasks"],
+  summary: "Upload image bytes",
+  description:
+    "Store the image bytes for an upload key issued by the create route.",
+  middleware: [
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ task: ["update"] }),
+  ] as const,
+  request: {
+    params: taskParam,
+    query: z.object({
+      key: z.string().min(1),
+      surface: z.enum(["description", "comment"]),
+    }),
+  },
+  responses: {
+    200: jsonResponse("The bytes were stored", z.object({ ok: z.boolean() })),
+    400: errorResponse("Invalid key, content type, or size"),
+    403: errorResponse(
+      "No workspace access, or missing task:update permission",
+    ),
+    404: errorResponse("Task not found"),
+  },
+});
+
 const updateTaskDescriptionRoute = createRoute({
   method: "put",
   operationId: "updateTaskDescription",
@@ -525,7 +539,6 @@ const updateTaskDescriptionRoute = createRoute({
   middleware: [
     workspaceAccess.fromTask(),
     requireWorkspacePermission({ task: ["update"] }),
-    requireEntitlement,
   ] as const,
   request: {
     params: taskParam,
@@ -930,6 +943,58 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       },
       200,
     );
+  })
+  .openapi(uploadTaskImageBlobRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const { key, surface } = c.req.valid("query");
+    const contentType = c.req.header("content-type") ?? "";
+
+    const [taskContext] = await db
+      .select({
+        taskId: taskTable.id,
+        projectId: taskTable.projectId,
+        workspaceId: workspaceTable.id,
+      })
+      .from(taskTable)
+      .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
+      .innerJoin(
+        workspaceTable,
+        eq(projectTable.workspaceId, workspaceTable.id),
+      )
+      .where(eq(taskTable.id, id))
+      .limit(1);
+
+    if (!taskContext) {
+      throw new HTTPException(404, { message: "Task not found" });
+    }
+
+    if (
+      !assertTaskImageKeyMatchesContext(key, {
+        workspaceId: taskContext.workspaceId,
+        projectId: taskContext.projectId,
+        taskId: taskContext.taskId,
+        surface,
+      })
+    ) {
+      throw new HTTPException(400, {
+        message: "Image upload key does not match the task context.",
+      });
+    }
+
+    const bytes = new Uint8Array(await c.req.arrayBuffer());
+
+    try {
+      validateTaskAssetUploadInput(contentType, bytes.byteLength);
+    } catch (error) {
+      throw new HTTPException(400, {
+        message:
+          error instanceof Error ? error.message : "Invalid image upload",
+      });
+    }
+
+    await writeAssetObject(key, bytes);
+
+    return c.json({ ok: true }, 200);
   })
   .openapi(updateTaskDescriptionRoute, async (c) => {
     const { id } = c.req.valid("param");

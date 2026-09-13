@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/node";
-
 type DiscordEmbedField = {
   name: string;
   value: string;
@@ -43,11 +41,6 @@ export async function postToDiscord(
   const timeoutId = setTimeout(() => controller.abort(), DISCORD_TIMEOUT_MS);
 
   try {
-    Sentry.addBreadcrumb({
-      category: "integration",
-      level: "info",
-      data: { integration: "discord" },
-    });
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {

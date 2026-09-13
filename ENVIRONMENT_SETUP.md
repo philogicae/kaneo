@@ -27,8 +27,8 @@ For development, you'll need at minimum:
 - `KANEO_API_URL` - The URL of the API (e.g., `http://localhost:1337`)
 - `AUTH_SECRET` - Secret key for JWT token generation (**must be at least 32 characters long**; use a long, random value in production)
 - `DEVICE_AUTH_CLIENT_IDS` - **Optional.** Comma-separated list of allowed device-flow OAuth client IDs. When unset, Kaneo implicitly allows `kaneo-cli` and `kaneo-mcp` by default (no extra configuration for the CLI or MCP). Override only when you need additional trusted clients, for example `kaneo-cli,kaneo-mcp,my-desktop-app`.
-- `DATABASE_PATH` - Path to the local libSQL/SQLite database file (`:memory:` supported). Defaults to `./data/kaneo.db`; Docker Compose sets `/data/kaneo.db` (mounted volume).
-- `KANEO_DATA_PATH` - Docker Compose only: host directory bind-mounted to `/data` (default `/mnt/user/appdata/kaneo/turso`).
+- `DATABASE_PATH` - Path to the local libSQL/SQLite database file (`:memory:` supported). Defaults to `./data/kaneo.db` (resolved from the repository root).
+- `KANEO_DATA_PATH` - Docker Compose only: host data directory bind-mounted to `/app/data` (default `./data/kaneo.db`).
 
 If your app uses a device client ID that is not included in the defaults, set `DEVICE_AUTH_CLIENT_IDS` to the full comma-separated list of allowed IDs (including any defaults you still need), so it includes the client ID your app sends to `/api/auth/device/code`.
 
@@ -47,29 +47,7 @@ Kaneo supports many optional configuration options including:
 - SMTP configuration for email
 - Access control settings
 - CORS configuration
-- Redis for horizontal scaling
 - Private-network notification receivers (`KANEO_ALLOW_PRIVATE_WEBHOOK_DESTINATIONS=true` lets ntfy/Gotify/webhook destinations resolve to private addresses; off by default to prevent SSRF)
-
-#### Redis Configuration
-
-Kaneo supports three Redis deployment modes for WebSocket Pub/Sub. When any Redis mode is configured, WebSocket broadcasts use Redis Pub/Sub, allowing multiple API instances to relay real-time updates. When none are set, an in-memory adapter is used (single-instance only).
-
-**Standalone (single server):**
-- `REDIS_URL` - Redis connection string (e.g., `redis://localhost:6379`)
-
-**Sentinel (high-availability with automatic failover):**
-- `REDIS_SENTINELS` - Comma-separated list of Sentinel nodes (e.g., `sentinel-1:26379,sentinel-2:26379,sentinel-3:26379`)
-- `REDIS_SENTINEL_MASTER_NAME` - Name of the Sentinel master group (default: `mymaster`)
-- `REDIS_SENTINEL_PASSWORD` - Password for Sentinel instances, if different from the Redis password (optional)
-- `REDIS_SENTINEL_TLS` - Set to `true` to enable TLS for Sentinel connections (default: `false`)
-
-**Cluster (horizontal sharding):**
-- `REDIS_CLUSTER_NODES` - Comma-separated list of cluster seed nodes (e.g., `node-1:6379,node-2:6379,node-3:6379`)
-
-**Shared (used by Sentinel and Cluster modes):**
-- `REDIS_PASSWORD` - Password for the Redis data nodes (used by both Sentinel and Cluster modes, not for Sentinel auth itself; use `REDIS_SENTINEL_PASSWORD` for that)
-
-> **Note:** Only one mode should be configured at a time. If multiple are set, the priority is: Cluster > Sentinel > Standalone.
 
 #### SMTP Configuration
 
@@ -86,27 +64,6 @@ For sending emails (workspace invitations, magic links, etc.), configure these v
 > **Note:** If you're using an SMTP server with a self-signed or invalid TLS certificate, set `SMTP_IGNORE_TLS=true` to bypass certificate validation.
 
 When SMTP is configured, sign-in uses email verification codes by default. Set `DISABLE_EMAIL_OTP_SIGN_IN=true` to use email/password sign-in instead (workspace invitation emails still use SMTP).
-
-#### Cloud-mode abuse mitigations
-
-Hosted multi-tenant instances should enable the cloud abuse gates. Self-hosted instances can leave these unset.
-
-- `KANEO_CLOUD` - Set to `true` to enable cloud-only protections: disposable-email signup block, Turnstile captcha enforcement, guest-account invite block, and tightened rate limits on `/sign-up/email` and `/organization/invite-member`.
-- `TURNSTILE_SECRET_KEY` - Cloudflare Turnstile secret key (API container, server-side verification). When unset, captcha verification is skipped.
-- `KANEO_TURNSTILE_SITE_KEY` - Cloudflare Turnstile site key, on the **web container**. The production web image bakes the literal placeholder `KANEO_TURNSTILE_SITE_KEY` into the bundle; `apps/web/env.sh` swaps it for the runtime value when the container starts.
-- `VITE_TURNSTILE_SITE_KEY` - Local dev only. Set in `apps/web/.env` when running `pnpm dev`; Vite reads this at build/dev time. Not used in the production image.
-
-#### Sentry (error monitoring)
-
-All Sentry integration is opt-in; leave these unset for zero telemetry.
-
-- `SENTRY_DSN` - Sentry DSN for the API. When unset, the Sentry SDK never initializes.
-- `SENTRY_ENVIRONMENT` - Environment tag for API events (defaults to `NODE_ENV`).
-- `SENTRY_TRACES_SAMPLE_RATE` - Fraction of API requests to trace for performance monitoring, `0`-`1` (default: `0`, tracing off).
-- `KANEO_SENTRY_DSN` - Sentry DSN for the **web container** (browser errors, tracing, session replay). Same runtime-placeholder mechanism as `KANEO_TURNSTILE_SITE_KEY`.
-- `VITE_SENTRY_DSN` - Local dev only. Set in `apps/web/.env` when running `pnpm dev`.
-
-For a complete list of all environment variables, their descriptions, and configuration options, see the [official documentation](https://kaneo.app/docs/core/installation/environment-variables).
 
 ## Common Issues & Troubleshooting
 

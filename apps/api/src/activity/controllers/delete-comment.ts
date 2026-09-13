@@ -3,7 +3,6 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { activityTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
-import { deleteOrphanedAssets } from "../../storage/cleanup-assets";
 
 async function deleteComment(userId: string, id: string) {
   const [existing] = await db
@@ -58,10 +57,6 @@ async function deleteComment(userId: string, id: string) {
       userId,
     });
   }
-
-  deleteOrphanedAssets(existing.content, null, {
-    taskId: existing.taskId,
-  }).catch(() => {});
 
   return deletedComment;
 }

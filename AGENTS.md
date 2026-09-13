@@ -18,7 +18,7 @@
 
 ## Project overview
 
-- **Stack**: TypeScript monorepo (pnpm 12 workspaces + turbo) — Hono API (`@hono/zod-openapi`, Better Auth, Drizzle/Turso-libSQL, optional Redis fan-out), React/Vite web (TanStack Router/Query, Tailwind 4, Biome), React Email templates.
+- **Stack**: TypeScript monorepo (pnpm 12 workspaces + turbo) — Hono API (`@hono/zod-openapi`, Better Auth, Drizzle/Turso-libSQL), React/Vite web (TanStack Router/Query, Tailwind 4, Biome), React Email templates.
 - **Workspaces**: `apps/api` (API authority: controllers, events, integrations, HTTP MCP, WebSockets) · `apps/web` (UI, fetchers, hooks, realtime cache updates) · `apps/docs` (docs content + committed `openapi.json`) · `packages/libs` (typed Hono client) · `packages/permissions` (permission vocabulary, built-in roles) · `packages/email` · `packages/planka-import` (published CLI).
 - **Deploy**: `compose.yml` builds locally via `Dockerfile.kaneo` (bundled API + web + Turso/libSQL, one Kaneo container) — Dokploy-friendly. No GHCR publishing, no Helm, no release automation.
 - **Tests**: `tests/api` (unit) and `tests/api-integration` (local libSQL/SQLite file; run under `apps/api`'s vitest config).

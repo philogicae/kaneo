@@ -16,6 +16,5 @@ export const configSchema = z
     disableLoginForm: z.boolean(),
     customOAuthAutoLogin: z.boolean(),
     customOAuthLogoutUrl: z.string().nullable(),
-    billingEnabled: z.boolean(),
   })
   .openapi("Config");

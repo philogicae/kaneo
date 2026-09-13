@@ -87,9 +87,6 @@
               "string",
               "null"
             ]
-          },
-          "billingEnabled": {
-            "type": "boolean"
           }
         },
         "required": [
@@ -106,8 +103,7 @@
           "hasGuestAccess",
           "disableLoginForm",
           "customOAuthAutoLogin",
-          "customOAuthLogoutUrl",
-          "billingEnabled"
+          "customOAuthLogoutUrl"
         ]
       },
       "McpClientRegistration": {
@@ -8331,6 +8327,100 @@
           },
           "400": {
             "description": "Invalid upload, or the key does not belong to this task",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/image-upload/{id}/blob": {
+      "put": {
+        "operationId": "uploadTaskImageBlob",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Upload image bytes",
+        "description": "Store the image bytes for an upload key issued by the create route.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "key",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "description",
+                "comment"
+              ]
+            },
+            "required": true,
+            "name": "surface",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The bytes were stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid key, content type, or size",
             "content": {
               "text/plain": {
                 "schema": {

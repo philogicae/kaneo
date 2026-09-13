@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { WSContext } from "hono/ws";
 import { subscribeToEvent } from "../events";
-import { isRedisConfigured } from "../redis";
 import type {
   BroadcastAdapter,
   BroadcastMessage,
@@ -10,7 +9,6 @@ import type {
   UserBroadcastMessage,
 } from "./broadcast-adapter";
 import { InMemoryBroadcastAdapter } from "./in-memory-broadcast-adapter";
-import { RedisBroadcastAdapter } from "./redis-broadcast-adapter";
 
 const INSTANCE_ID = randomUUID();
 
@@ -107,9 +105,7 @@ let adapter: BroadcastAdapter | null = null;
 export async function initializeWebSocketAdapter() {
   if (adapter) return;
 
-  const nextAdapter = isRedisConfigured()
-    ? new RedisBroadcastAdapter()
-    : new InMemoryBroadcastAdapter();
+  const nextAdapter = new InMemoryBroadcastAdapter();
 
   try {
     await nextAdapter.subscribe((msg: BroadcastMessage) => {

@@ -7,7 +7,6 @@ import {
   taskTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
-import { deleteOrphanedAssets } from "../../storage/cleanup-assets";
 import {
   assertAssignableUser,
   getProjectWorkspaceId,
@@ -150,9 +149,6 @@ async function updateTask(
   });
 
   if (existingTask.description !== description) {
-    deleteOrphanedAssets(existingTask.description, description, {
-      taskId: id,
-    }).catch(() => {});
   }
 
   return updatedTask;
