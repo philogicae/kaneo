@@ -8,6 +8,7 @@ export type GetActivitesByTaskIdRequest = InferRequestType<
 async function getActivitesByTaskId({ taskId }: GetActivitesByTaskIdRequest) {
   const response = await client.activity[":taskId"].$get({
     param: { taskId },
+    query: {},
   });
 
   if (!response.ok) {

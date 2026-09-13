@@ -1,10 +1,11 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, notLike } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
   columnTable,
   labelTable,
   projectTable,
+  taskReminderSentTable,
   taskTable,
   userTable,
   workspaceUserTable,
@@ -342,6 +343,11 @@ async function bulkUpdateTasks({
         }
       }
 
+      const changedTasks = tasks.filter(
+        (task) =>
+          (task.dueDate?.getTime() ?? null) !== (parsedDate?.getTime() ?? null),
+      );
+
       const result = await db
         .update(taskTable)
         .set({ dueDate: parsedDate })
@@ -349,7 +355,22 @@ async function bulkUpdateTasks({
 
       updatedCount = result.rowsAffected ?? foundIds.length;
 
-      for (const task of tasks) {
+      // Same contract as the single-task due-date endpoint: due-date driven
+      // reminder history must reset so the new date notifies, while
+      // start-anchored Telegram reminders stay untouched.
+      if (changedTasks.length > 0) {
+        await db.delete(taskReminderSentTable).where(
+          and(
+            inArray(
+              taskReminderSentTable.taskId,
+              changedTasks.map((task) => task.id),
+            ),
+            notLike(taskReminderSentTable.reminderType, "telegram_unified:%"),
+          ),
+        );
+      }
+
+      for (const task of changedTasks) {
         await publishEvent("task.due_date_changed", {
           taskId: task.id,
           projectId: task.projectId,
