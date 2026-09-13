@@ -13,6 +13,7 @@ import getComments from "./controllers/get-comments";
 import updateComment from "./controllers/update-comment";
 import { commentListSchema } from "./response";
 import {
+  commentListQuery,
   commentParam,
   createCommentBody,
   taskIdParam,
@@ -28,7 +29,7 @@ const getTaskCommentsRoute = createRoute({
   description:
     "Get every comment on a task, oldest first, each with its author's name and avatar.",
   middleware: [workspaceAccess.fromTaskId()] as const,
-  request: { params: taskIdParam },
+  request: { params: taskIdParam, query: commentListQuery },
   responses: {
     200: jsonResponse("List of comments for the task", commentListSchema),
     400: errorResponse(
@@ -115,9 +116,13 @@ const deleteTaskCommentRoute = createRoute({
 });
 
 const comment = apiRouter()
-  .openapi(getTaskCommentsRoute, async (c) =>
-    c.json(await getComments(c.req.valid("param").taskId), 200),
-  )
+  .openapi(getTaskCommentsRoute, async (c) => {
+    const { limit, offset } = c.req.valid("query");
+    return c.json(
+      await getComments(c.req.valid("param").taskId, { limit, offset }),
+      200,
+    );
+  })
   .openapi(createTaskCommentRoute, async (c) => {
     const { taskId } = c.req.valid("param");
     const { content, externalUserName, externalSource } = c.req.valid("json");

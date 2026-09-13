@@ -100,26 +100,23 @@ async function updateTask(
     });
   }
 
-  if (reminderOffsets !== undefined) {
-    const offsetsChanged =
-      JSON.stringify(reminderOffsets ?? null) !==
+  // Reminder history is keyed to the date the offsets count down from, so
+  // moving (or clearing) a date invalidates what has already been sent. This
+  // must run even when the caller did not send reminderOffsets, otherwise a
+  // start-date change elsewhere (e.g. MCP update_task) leaves a stale dedupe
+  // row that silently swallows the reminder for the new date.
+  const offsetsChanged =
+    reminderOffsets !== undefined &&
+    JSON.stringify(reminderOffsets ?? null) !==
       JSON.stringify(existingTask.reminderOffsets ?? null);
-    // Reminder history is keyed to the date the offsets count down from, so
-    // moving the start date invalidates what has already been sent.
-    const datesChanged =
-      (startDate?.getTime() ?? null) !==
-        (existingTask.startDate
-          ? new Date(existingTask.startDate).getTime()
-          : null) ||
-      (dueDate?.getTime() ?? null) !==
-        (existingTask.dueDate
-          ? new Date(existingTask.dueDate).getTime()
-          : null);
-    if (offsetsChanged || datesChanged) {
-      await db
-        .delete(taskReminderSentTable)
-        .where(eq(taskReminderSentTable.taskId, id));
-    }
+  const datesChanged =
+    (startDate?.getTime() ?? null) !==
+      (existingTask.startDate?.getTime() ?? null) ||
+    (dueDate?.getTime() ?? null) !== (existingTask.dueDate?.getTime() ?? null);
+  if (offsetsChanged || datesChanged) {
+    await db
+      .delete(taskReminderSentTable)
+      .where(eq(taskReminderSentTable.taskId, id));
   }
 
   if (existingTask.status !== status) {

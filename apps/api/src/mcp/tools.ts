@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolveDateTimeInput } from "./datetime";
 
 type McpToolResult = {
   content: Array<{ type: "text"; text: string }>;
@@ -91,8 +92,11 @@ function errorResult(message: string): McpToolResult {
   return textResult({ error: message }, true);
 }
 
-function run(fn: () => Promise<unknown>): Promise<McpToolResult> {
-  return fn()
+function run(fn: () => unknown): Promise<McpToolResult> {
+  // Promise.resolve().then(fn) also converts a synchronous throw into a
+  // rejection, so input normalization errors surface as tool errors.
+  return Promise.resolve()
+    .then(fn)
     .then((data) => textResult(data))
     .catch((e: unknown) =>
       errorResult(e instanceof Error ? e.message : String(e)),
@@ -112,10 +116,20 @@ function formatOptionalIso(value: unknown): string | undefined {
   return undefined;
 }
 
+type RecurrenceInput = {
+  frequency: "daily" | "weekly" | "monthly";
+  interval: number;
+};
+
+type FullTaskUpdateBody = Record<
+  string,
+  string | number | number[] | RecurrenceInput | null | undefined
+>;
+
 function buildFullTaskUpdateBody(
   existing: Record<string, unknown>,
   patch: Record<string, unknown>,
-): Record<string, string | number | undefined> {
+): FullTaskUpdateBody {
   const positionRaw = patch.position ?? existing.position;
   const position =
     typeof positionRaw === "number"
@@ -174,7 +188,7 @@ function buildFullTaskUpdateBody(
     patch.dueDate !== undefined ? patch.dueDate : existing.dueDate,
   );
 
-  const body: Record<string, string | number | undefined> = {
+  const body: FullTaskUpdateBody = {
     title,
     description,
     status,
@@ -185,6 +199,12 @@ function buildFullTaskUpdateBody(
   if (startDate !== undefined) body.startDate = startDate;
   if (dueDate !== undefined) body.dueDate = dueDate;
   if (userId !== undefined) body.userId = userId;
+  if (patch.reminderOffsets !== undefined) {
+    body.reminderOffsets = patch.reminderOffsets as number[] | null;
+  }
+  if (patch.recurrence !== undefined) {
+    body.recurrence = patch.recurrence as RecurrenceInput | null;
+  }
   return body;
 }
 
@@ -198,11 +218,57 @@ const prioritySchema = z.enum([
 const nonEmptyString = z.string().trim().min(1);
 const optionalNonEmptyString = nonEmptyString.optional();
 const nullableOptionalNonEmptyString = nonEmptyString.nullable().optional();
-const isoDateTimeSchema = z.string().datetime({ offset: true });
+
+// Accepts an offset-bearing ISO date-time as well as a local wall-clock time;
+// local values are converted with the caller-supplied `timezone` before they
+// reach the API (see resolveDateTimeInput in ./datetime).
+const ISO_DATE_TIME_PATTERN =
+  /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:?\d{2})?$/i;
+const ISO_DATE_TIME_DESCRIPTION =
+  "ISO 8601 date-time. Prefer an explicit offset (2026-09-14T14:00:00+03:00). A wall-clock time without offset (2026-09-14T14:00) requires `timezone`.";
+const isoDateTimeSchema = z
+  .string()
+  .regex(ISO_DATE_TIME_PATTERN, "Expected an ISO 8601 date-time")
+  .describe(ISO_DATE_TIME_DESCRIPTION);
 const optionalIsoDateTimeSchema = isoDateTimeSchema.optional();
 const nullableOptionalIsoDateTimeSchema = isoDateTimeSchema
   .nullable()
   .optional();
+
+const timezoneSchema = z
+  .string()
+  .optional()
+  .describe(
+    "IANA timezone of the user (e.g. Europe/Bucharest); ask if unknown. Required when a date/hour is a local time without offset.",
+  );
+
+const recurrenceSchema = z
+  .object({
+    frequency: z.enum(["daily", "weekly", "monthly"]),
+    interval: z.number().int().min(1).max(365),
+  })
+  .nullable()
+  .optional()
+  .describe(
+    "Recurrence rule; the next occurrence is spawned when the task completes. Null clears it.",
+  );
+
+// Minutes before the task's start date. Kept in sync with the API schema in
+// apps/api/src/task/schema.ts (10 offsets max, 1 minute – 30 days).
+const reminderOffsetsSchema = z
+  .array(
+    z
+      .number()
+      .int()
+      .min(1)
+      .max(60 * 24 * 30),
+  )
+  .max(10)
+  .nullable()
+  .optional()
+  .describe(
+    "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h). Reminders always count down from `startDate`, never from `dueDate`; null clears all reminders.",
+  );
 const hexColorSchema = z
   .string()
   .regex(
@@ -310,15 +376,35 @@ export function registerMcpTools(
     "get_project",
     {
       description:
-        "Get a single project by its projectId, including its columns and metadata.",
+        "Get a single project by its projectId: metadata plus its tasks (bounded, default 50, max 200 — page with tasksOffset). Use list_tasks for filtered/paginated task listings.",
       inputSchema: z.object({
         projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        tasksLimit: z
+          .number()
+          .int()
+          .min(1)
+          .max(200)
+          .optional()
+          .describe("Maximum tasks to embed (default 50)."),
+        tasksOffset: z
+          .number()
+          .int()
+          .min(0)
+          .optional()
+          .describe("Tasks to skip; use with tasksLimit to page."),
       }),
     },
-    async (args) =>
-      run(() =>
-        client.json(`/api/project/${encodeURIComponent(args.projectId)}`),
-      ),
+    async (args) => {
+      const qs = new URLSearchParams({
+        tasksLimit: String(args.tasksLimit ?? 50),
+        tasksOffset: String(args.tasksOffset ?? 0),
+      });
+      return run(() =>
+        client.json(
+          `/api/project/${encodeURIComponent(args.projectId)}?${qs.toString()}`,
+        ),
+      );
+    },
   );
 
   registerTool(
@@ -406,14 +492,15 @@ export function registerMcpTools(
   registerTool(
     "list_tasks",
     {
-      description: "List tasks for a project (optionally filtered/sorted).",
+      description:
+        "List tasks for a project (optionally filtered/sorted). Paginated: `page`/`limit` (limit max 100, default 50). Response is the project board (data.columns[].tasks, data.plannedTasks, data.archivedTasks) plus a `pagination` block; sort/pagination apply to the flat task list before grouping.",
       inputSchema: z.object({
         projectId: nonEmptyString,
         status: optionalNonEmptyString,
         priority: prioritySchema.optional(),
         assigneeId: optionalNonEmptyString,
         page: z.number().int().positive().optional(),
-        limit: z.number().int().positive().optional(),
+        limit: z.number().int().positive().max(100).optional(),
         sortBy: z
           .enum([
             "createdAt",
@@ -427,21 +514,36 @@ export function registerMcpTools(
         sortOrder: z.enum(["asc", "desc"]).optional(),
         dueBefore: optionalIsoDateTimeSchema,
         dueAfter: optionalIsoDateTimeSchema,
+        timezone: timezoneSchema,
       }),
     },
     async (args) => {
-      const { projectId, ...rest } = args;
-      const qs = new URLSearchParams();
-      for (const [k, v] of Object.entries(rest)) {
-        if (v !== undefined && v !== null) qs.set(k, String(v));
-      }
-      const q = qs.toString();
-      return run(() =>
-        client.json(
+      const { projectId, timezone, dueBefore, dueAfter, ...rest } = args;
+      return run(() => {
+        const qs = new URLSearchParams();
+        for (const [k, v] of Object.entries(rest)) {
+          if (v !== undefined && v !== null) qs.set(k, String(v));
+        }
+        if (!qs.has("page")) qs.set("page", "1");
+        if (!qs.has("limit")) qs.set("limit", "50");
+        if (dueBefore !== undefined) {
+          qs.set(
+            "dueBefore",
+            resolveDateTimeInput(dueBefore, timezone) as string,
+          );
+        }
+        if (dueAfter !== undefined) {
+          qs.set(
+            "dueAfter",
+            resolveDateTimeInput(dueAfter, timezone) as string,
+          );
+        }
+        const q = qs.toString();
+        return client.json(
           `/api/task/tasks/${encodeURIComponent(projectId)}${q ? `?${q}` : ""}`,
           { method: "GET" },
-        ),
-      );
+        );
+      });
     },
   );
 
@@ -462,7 +564,8 @@ export function registerMcpTools(
   registerTool(
     "create_task",
     {
-      description: "Create a task in a project.",
+      description:
+        "Create a task in a project. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
         projectId: nonEmptyString,
         title: nonEmptyString,
@@ -472,24 +575,43 @@ export function registerMcpTools(
         startDate: optionalIsoDateTimeSchema,
         dueDate: optionalIsoDateTimeSchema,
         userId: optionalNonEmptyString,
+        reminderOffsets: reminderOffsetsSchema,
+        recurrence: recurrenceSchema,
+        timezone: timezoneSchema,
       }),
     },
     async (args) => {
-      const body: Record<string, string | undefined> = {
+      const body: FullTaskUpdateBody = {
         title: args.title,
         description: args.description,
         priority: args.priority,
         status: args.status,
       };
-      if (args.startDate !== undefined) body.startDate = args.startDate;
-      if (args.dueDate !== undefined) body.dueDate = args.dueDate;
       if (args.userId !== undefined) body.userId = args.userId;
-      return run(() =>
-        client.json(`/api/task/${encodeURIComponent(args.projectId)}`, {
+      if (args.reminderOffsets !== undefined) {
+        body.reminderOffsets = args.reminderOffsets;
+      }
+      if (args.recurrence !== undefined) {
+        body.recurrence = args.recurrence as RecurrenceInput | null;
+      }
+      return run(() => {
+        if (args.startDate !== undefined) {
+          body.startDate = resolveDateTimeInput(
+            args.startDate,
+            args.timezone,
+          ) as string;
+        }
+        if (args.dueDate !== undefined) {
+          body.dueDate = resolveDateTimeInput(
+            args.dueDate,
+            args.timezone,
+          ) as string;
+        }
+        return client.json(`/api/task/${encodeURIComponent(args.projectId)}`, {
           method: "POST",
           body: JSON.stringify(body),
-        }),
-      );
+        });
+      });
     },
   );
 
@@ -497,7 +619,7 @@ export function registerMcpTools(
     "update_task",
     {
       description:
-        "Update a task (fetches current task, merges fields, then full update).",
+        "Update a task (fetches current task, merges fields, then full update). Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`. `reminderOffsets` are minutes before the task's start date; pass null to clear all reminders.",
       inputSchema: z.object({
         taskId: nonEmptyString,
         title: optionalNonEmptyString,
@@ -509,11 +631,24 @@ export function registerMcpTools(
         startDate: nullableOptionalIsoDateTimeSchema,
         dueDate: nullableOptionalIsoDateTimeSchema,
         userId: nullableOptionalNonEmptyString,
+        reminderOffsets: reminderOffsetsSchema,
+        recurrence: recurrenceSchema,
+        timezone: timezoneSchema,
       }),
     },
     async (args) => {
-      const { taskId, ...patch } = args;
+      const { taskId, timezone, ...patch } = args;
       return run(async () => {
+        if (patch.startDate !== undefined) {
+          patch.startDate = resolveDateTimeInput(patch.startDate, timezone) as
+            | string
+            | null;
+        }
+        if (patch.dueDate !== undefined) {
+          patch.dueDate = resolveDateTimeInput(patch.dueDate, timezone) as
+            | string
+            | null;
+        }
         const existing = (await client.json(
           `/api/task/${encodeURIComponent(taskId)}`,
           { method: "GET" },
@@ -570,15 +705,26 @@ export function registerMcpTools(
   registerTool(
     "list_task_comments",
     {
-      description: "List comments on a task.",
-      inputSchema: z.object({ taskId: nonEmptyString }),
+      description:
+        "List comments on a task (oldest first). Paginated: default limit 50; page with offset.",
+      inputSchema: z.object({
+        taskId: nonEmptyString,
+        limit: z.number().int().min(1).max(200).optional(),
+        offset: z.number().int().min(0).optional(),
+      }),
     },
-    async (args) =>
-      run(() =>
-        client.json(`/api/comment/${encodeURIComponent(args.taskId)}`, {
-          method: "GET",
-        }),
-      ),
+    async (args) => {
+      const qs = new URLSearchParams({
+        limit: String(args.limit ?? 50),
+        offset: String(args.offset ?? 0),
+      });
+      return run(() =>
+        client.json(
+          `/api/comment/${encodeURIComponent(args.taskId)}?${qs.toString()}`,
+          { method: "GET" },
+        ),
+      );
+    },
   );
 
   registerTool(
@@ -651,7 +797,7 @@ export function registerMcpTools(
     "create_label",
     {
       description:
-        "Create a label in a workspace (optionally attach to a task). color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
+        "Create a label in a workspace. Passing taskId creates (or returns) a task-scoped copy attached to that task instead of a workspace-level label. color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
       inputSchema: z.object({
         name: nonEmptyString,
         color: labelColorSchema,
@@ -677,7 +823,7 @@ export function registerMcpTools(
     "attach_label_to_task",
     {
       description:
-        "Attach an existing workspace-level label to a task (the API copies it onto the task). Attaching a label that is already attached to another task is refused: the API would move it, silently detaching it from that task.",
+        "Attach an existing workspace-level label to a task (the API copies it onto the task). Attaching a label already attached to another task is refused: the API would move it. To give the target task a copy of that label without moving it, call create_label with the same name/color and that taskId.",
       inputSchema: z.object({
         labelId: nonEmptyString,
         taskId: nonEmptyString,
@@ -1729,32 +1875,63 @@ export function registerMcpTools(
   registerTool(
     "update_task_due_date",
     {
-      description: "Set a task's due date. Omit dueDate to clear it.",
+      description:
+        "Set a task's due date. Omit dueDate to clear it. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
         taskId: nonEmptyString,
         dueDate: optionalIsoDateTimeSchema,
+        timezone: timezoneSchema,
       }),
     },
     async (args) =>
-      run(() =>
-        client.json(`/api/task/due-date/${encodeURIComponent(args.taskId)}`, {
-          method: "PUT",
-          body: JSON.stringify(
-            args.dueDate === undefined ? {} : { dueDate: args.dueDate },
-          ),
-        }),
-      ),
+      run(() => {
+        const dueDate = resolveDateTimeInput(args.dueDate, args.timezone);
+        return client.json(
+          `/api/task/due-date/${encodeURIComponent(args.taskId)}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(dueDate === undefined ? {} : { dueDate }),
+          },
+        );
+      }),
   );
 
   registerTool(
     "list_task_time_entries",
     {
-      description: "List the time entries logged against a task.",
-      inputSchema: z.object({ taskId: nonEmptyString }),
+      description:
+        "List the time entries logged against a task. Paginated: default limit 50; page with offset.",
+      inputSchema: z.object({
+        taskId: nonEmptyString,
+        limit: z.number().int().min(1).max(200).optional(),
+        offset: z.number().int().min(0).optional(),
+      }),
+    },
+    async (args) => {
+      const qs = new URLSearchParams({
+        limit: String(args.limit ?? 50),
+        offset: String(args.offset ?? 0),
+      });
+      return run(() =>
+        client.json(
+          `/api/time-entry/task/${encodeURIComponent(args.taskId)}?${qs.toString()}`,
+        ),
+      );
+    },
+  );
+
+  registerTool(
+    "delete_time_entry",
+    {
+      description:
+        "Delete a time entry, e.g. to cancel a mistaken log. Irreversible.",
+      inputSchema: z.object({ timeEntryId: nonEmptyString }),
     },
     async (args) =>
       run(() =>
-        client.json(`/api/time-entry/task/${encodeURIComponent(args.taskId)}`),
+        client.json(`/api/time-entry/${encodeURIComponent(args.timeEntryId)}`, {
+          method: "DELETE",
+        }),
       ),
   );
 
@@ -1779,12 +1956,13 @@ export function registerMcpTools(
     "create_time_entry",
     {
       description:
-        "Log time against a task. Omit endTime to leave the entry running.",
+        "Log time against a task. Omit endTime to leave the entry running. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
         taskId: nonEmptyString,
         startTime: isoDateTimeSchema,
         endTime: optionalIsoDateTimeSchema,
         description: optionalNonEmptyString,
+        timezone: timezoneSchema,
       }),
     },
     async (args) =>
@@ -1793,8 +1971,12 @@ export function registerMcpTools(
           method: "POST",
           body: JSON.stringify({
             taskId: args.taskId,
-            startTime: args.startTime,
-            ...(args.endTime ? { endTime: args.endTime } : {}),
+            startTime: resolveDateTimeInput(args.startTime, args.timezone),
+            ...(args.endTime !== undefined
+              ? {
+                  endTime: resolveDateTimeInput(args.endTime, args.timezone),
+                }
+              : {}),
             ...(args.description ? { description: args.description } : {}),
           }),
         }),
@@ -1805,7 +1987,7 @@ export function registerMcpTools(
     "update_time_entry",
     {
       description:
-        "Update a time entry by its timeEntryId. startTime is required; omitting endTime keeps the stored one. startTime cannot be later than the end time.",
+        "Update a time entry by its timeEntryId. startTime is required; omitting endTime keeps the stored one. startTime cannot be later than the end time. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
         timeEntryId: nonEmptyString.describe(
           "Time entry id (from list_task_time_entries)",
@@ -1813,6 +1995,7 @@ export function registerMcpTools(
         startTime: isoDateTimeSchema,
         endTime: optionalIsoDateTimeSchema,
         description: optionalNonEmptyString,
+        timezone: timezoneSchema,
       }),
     },
     async (args) =>
@@ -1820,8 +2003,12 @@ export function registerMcpTools(
         client.json(`/api/time-entry/${encodeURIComponent(args.timeEntryId)}`, {
           method: "PUT",
           body: JSON.stringify({
-            startTime: args.startTime,
-            ...(args.endTime ? { endTime: args.endTime } : {}),
+            startTime: resolveDateTimeInput(args.startTime, args.timezone),
+            ...(args.endTime !== undefined
+              ? {
+                  endTime: resolveDateTimeInput(args.endTime, args.timezone),
+                }
+              : {}),
             ...(args.description ? { description: args.description } : {}),
           }),
         }),
@@ -1831,19 +2018,31 @@ export function registerMcpTools(
   registerTool(
     "list_task_activity",
     {
-      description: "List a task's activity history.",
-      inputSchema: z.object({ taskId: nonEmptyString }),
+      description:
+        "List a task's activity feed (newest first). Paginated: default limit 50; page with offset.",
+      inputSchema: z.object({
+        taskId: nonEmptyString,
+        limit: z.number().int().min(1).max(200).optional(),
+        offset: z.number().int().min(0).optional(),
+      }),
     },
-    async (args) =>
-      run(() =>
-        client.json(`/api/activity/${encodeURIComponent(args.taskId)}`),
-      ),
+    async (args) => {
+      const qs = new URLSearchParams({
+        limit: String(args.limit ?? 50),
+        offset: String(args.offset ?? 0),
+      });
+      return run(() =>
+        client.json(
+          `/api/activity/${encodeURIComponent(args.taskId)}?${qs.toString()}`,
+        ),
+      );
+    },
   );
 
   registerTool(
     "list_notifications",
     {
-      description: "List the signed-in user's notifications.",
+      description: "List the signed-in user's notifications (50 most recent).",
       inputSchema: z.object({}),
     },
     async () => run(() => client.json("/api/notification")),

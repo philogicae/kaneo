@@ -26,7 +26,7 @@ export const taskSchema = z
     dueDate: nullableResponseTimestamp,
     reminderOffsets: z.array(z.number()).nullable().openapi({
       description:
-        "Reminder offsets in minutes before the due date (Telegram reminders).",
+        "Reminder offsets in minutes before the task's start date (Telegram reminders).",
     }),
     recurrence: z
       .object({
@@ -86,7 +86,7 @@ export const boardTaskSchema = z
     dueDate: nullableResponseTimestamp,
     reminderOffsets: z.array(z.number()).nullable().openapi({
       description:
-        "Reminder offsets in minutes before the due date (Telegram reminders).",
+        "Reminder offsets in minutes before the task's start date (Telegram reminders).",
     }),
     recurrence: z
       .object({

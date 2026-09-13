@@ -14,6 +14,7 @@ import getActivities from "./controllers/get-activities";
 import updateComment from "./controllers/update-comment";
 import { activityListSchema, activitySchema } from "./response";
 import {
+  activityListQuery,
   createActivityBody,
   createCommentBody,
   deleteCommentBody,
@@ -30,7 +31,7 @@ const getActivitiesRoute = createRoute({
   description:
     "Get a task's full activity feed, newest first: comments alongside system events such as status and assignee changes.",
   middleware: [workspaceAccess.fromTaskId()] as const,
-  request: { params: taskIdParam },
+  request: { params: taskIdParam, query: activityListQuery },
   responses: {
     200: jsonResponse("List of activities for the task", activityListSchema),
     400: errorResponse(
@@ -139,9 +140,13 @@ const deleteCommentRoute = createRoute({
 });
 
 const activity = apiRouter()
-  .openapi(getActivitiesRoute, async (c) =>
-    c.json(await getActivities(c.req.valid("param").taskId), 200),
-  )
+  .openapi(getActivitiesRoute, async (c) => {
+    const { limit, offset } = c.req.valid("query");
+    return c.json(
+      await getActivities(c.req.valid("param").taskId, { limit, offset }),
+      200,
+    );
+  })
   .openapi(createActivityRoute, async (c) => {
     const { taskId, message, type, eventData } = c.req.valid("json");
     return c.json(

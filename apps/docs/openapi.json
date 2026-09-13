@@ -335,7 +335,7 @@
             "items": {
               "type": "number"
             },
-            "description": "Reminder offsets in minutes before the due date (Telegram reminders)."
+            "description": "Reminder offsets in minutes before the task's start date (Telegram reminders)."
           },
           "recurrence": {
             "type": [
@@ -827,7 +827,7 @@
             "items": {
               "type": "number"
             },
-            "description": "Reminder offsets in minutes before the due date (Telegram reminders)."
+            "description": "Reminder offsets in minutes before the task's start date (Telegram reminders)."
           },
           "recurrence": {
             "type": [
@@ -6404,6 +6404,28 @@
             "required": true,
             "name": "id",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Maximum number of tasks to embed."
+            },
+            "required": false,
+            "description": "Maximum number of tasks to embed.",
+            "name": "tasksLimit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Number of tasks to skip; use with tasksLimit."
+            },
+            "required": false,
+            "description": "Number of tasks to skip; use with tasksLimit.",
+            "name": "tasksOffset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -7166,7 +7188,7 @@
                       "maximum": 43200
                     },
                     "maxItems": 10,
-                    "description": "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders."
+                    "description": "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date."
                   },
                   "recurrence": {
                     "type": [
@@ -7365,7 +7387,7 @@
                       "maximum": 43200
                     },
                     "maxItems": 10,
-                    "description": "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders."
+                    "description": "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date."
                   },
                   "recurrence": {
                     "type": [
@@ -8029,7 +8051,7 @@
                       "maximum": 43200
                     },
                     "maxItems": 10,
-                    "description": "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders."
+                    "description": "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date."
                   }
                 }
               }
@@ -8932,6 +8954,28 @@
             "required": true,
             "name": "taskId",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Maximum number of items to return."
+            },
+            "required": false,
+            "description": "Maximum number of items to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Number of items to skip; use with limit to page."
+            },
+            "required": false,
+            "description": "Number of items to skip; use with limit to page.",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -9287,6 +9331,28 @@
             "required": true,
             "name": "taskId",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Maximum number of items to return."
+            },
+            "required": false,
+            "description": "Maximum number of items to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Number of items to skip; use with limit to page."
+            },
+            "required": false,
+            "description": "Number of items to skip; use with limit to page.",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -9578,6 +9644,28 @@
             "required": true,
             "name": "taskId",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Maximum number of items to return."
+            },
+            "required": false,
+            "description": "Maximum number of items to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Number of items to skip; use with limit to page."
+            },
+            "required": false,
+            "description": "Number of items to skip; use with limit to page.",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -9732,6 +9820,59 @@
           },
           "400": {
             "description": "Invalid timestamps, or unknown entry",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTimeEntry",
+        "tags": [
+          "Time Entries"
+        ],
+        "summary": "Delete time entry",
+        "description": "Delete a time entry, e.g. to cancel a mistaken log. Irreversible.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted time entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown entry, or its workspace could not be determined",
             "content": {
               "text/plain": {
                 "schema": {

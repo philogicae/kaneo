@@ -1,6 +1,16 @@
 import { z } from "../openapi";
+import { pagingNumber } from "../utils/paging";
 
 export const projectParam = z.object({ id: z.string() });
+
+export const getProjectTasksQuery = z.object({
+  tasksLimit: pagingNumber(1, 200)
+    .optional()
+    .openapi({ description: "Maximum number of tasks to embed." }),
+  tasksOffset: pagingNumber(0, 1_000_000)
+    .optional()
+    .openapi({ description: "Number of tasks to skip; use with tasksLimit." }),
+});
 
 export const workspaceIdQuery = z.object({ workspaceId: z.string() });
 
