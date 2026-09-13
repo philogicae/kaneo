@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import db from "../database";
+import { jobLeaseTable } from "../database/schema";
 
 const INSTANCE_ID = randomUUID();
 
@@ -16,16 +17,39 @@ export async function withJobLease<T>(
 ): Promise<T> {
   const expiresAt = new Date(Date.now() + leaseMs);
 
-  const claimed = await db.execute(sql`
-    INSERT INTO job_lease ("name", "owner", "expires_at")
-    VALUES (${name}, ${INSTANCE_ID}, ${expiresAt})
-    ON CONFLICT ("name") DO UPDATE
-      SET "owner" = EXCLUDED."owner", "expires_at" = EXCLUDED."expires_at"
-      WHERE job_lease."expires_at" < now()
-    RETURNING "name";
-  `);
+  // Claim the lease in a short immediate transaction (SQLite serializes
+  // writers, so exactly one instance can hold it). Claiming is kept separate
+  // from the job itself so a long-running job never holds the write lock.
+  const claimed = await db.transaction(
+    async (tx) => {
+      const [existing] = await tx
+        .select()
+        .from(jobLeaseTable)
+        .where(eq(jobLeaseTable.name, name));
 
-  if ((claimed.rowCount ?? 0) === 0) {
+      if (existing && existing.expiresAt.getTime() >= Date.now()) {
+        return false;
+      }
+
+      if (existing) {
+        await tx
+          .update(jobLeaseTable)
+          .set({ owner: INSTANCE_ID, expiresAt })
+          .where(eq(jobLeaseTable.name, name));
+      } else {
+        await tx.insert(jobLeaseTable).values({
+          name,
+          owner: INSTANCE_ID,
+          expiresAt,
+        });
+      }
+
+      return true;
+    },
+    { behavior: "immediate" },
+  );
+
+  if (!claimed) {
     return whenHeldElsewhere();
   }
 
@@ -33,8 +57,9 @@ export async function withJobLease<T>(
     return await run();
   } finally {
     await db
-      .execute(
-        sql`DELETE FROM job_lease WHERE "name" = ${name} AND "owner" = ${INSTANCE_ID};`,
+      .delete(jobLeaseTable)
+      .where(
+        and(eq(jobLeaseTable.name, name), eq(jobLeaseTable.owner, INSTANCE_ID)),
       )
       .catch((error) => {
         console.error(`Failed to release the ${name} lease`, error);

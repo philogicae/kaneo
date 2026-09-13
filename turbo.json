@@ -57,7 +57,7 @@
 			"dependsOn": ["^build"],
 			"cache": false,
 			"outputs": ["coverage/**"],
-			"env": ["DATABASE_URL"]
+			"env": ["DATABASE_PATH"]
 		}
 	}
 }

@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { labelTable, projectTable, taskTable } from "../../database/schema";
@@ -76,10 +76,7 @@ async function createLabel(
   const [inserted] = await db
     .insert(labelTable)
     .values({ name, color, taskId: null, workspaceId })
-    .onConflictDoNothing({
-      target: [labelTable.workspaceId, labelTable.name],
-      where: sql`${labelTable.taskId} is null`,
-    })
+    .onConflictDoNothing()
     .returning();
 
   const label =

@@ -15,64 +15,66 @@ A customized fork of [Kaneo](https://github.com/usekaneo/kaneo) — the simple, 
 
 **This fork adds on top of upstream:**
 
+- **SQLite/libSQL storage** — PostgreSQL replaced by a single local [libSQL](https://github.com/tursodatabase/libsql) (Turso) file: one container, no database sidecar, no external service
 - **Telegram notifications** — unified bots / chats / rules configuration, per-task reminders, task recurrence, and notification templates
 - **MCP improvements** — extra tools (bulk task updates, Telegram management), API-key and OAuth hardening for the HTTP endpoint, in-app MCP setup docs
 - **Dashboard work** — unified all-projects view, weekly project charts, backlog tabs, collapsible sidebar with UI scale control
 - **Cross-workspace search** and small UX refinements across the board
-- **Self-hosted deployment** — a single `compose.yml` that builds locally via `Dockerfile.kaneo` (Dokploy-friendly), instead of the upstream image publishing pipeline
-- **Repo cleanup** — removed the upstream release/GHCR/Helm machinery, marketing site, and other pieces a self-hosted fork doesn't need
-
-Upstream roadmap item under study: a SQLite single-container mode (`plans/008-sqlite-single-container.md`).
+- **Self-hosted deployment** — a single `compose.yml` that builds locally via `Dockerfile.kaneo`, plus a GHCR image published by `.github/workflows/publish.yml`
 
 > This is a personal fork, not an official Kaneo release. For the upstream project, docs, cloud offering, and community, go to [usekaneo/kaneo](https://github.com/usekaneo/kaneo).
 
 ## Deploy (self-hosted)
 
-Requires Docker with Compose. The compose file builds the bundled image from source (API + web + PostgreSQL in one Kaneo container):
+Requires Docker with Compose. One container runs the API and the web app; the database is a local libSQL file bind-mounted from the host.
 
 ```bash
 git clone https://github.com/philogicae/kaneo.git
 cd kaneo
 cp .env.sample .env
-# set KANEO_CLIENT_URL, POSTGRES_PASSWORD, AUTH_SECRET (openssl rand -hex 32)
-# adjust the postgres volume bind mount in compose.yml to your host path
+# set KANEO_CLIENT_URL and AUTH_SECRET (openssl rand -hex 32)
 docker compose up -d --build
 ```
 
 Open [http://localhost:5173](http://localhost:5173).
 
-Environment variables: see [.env.sample](.env.sample) and [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md). Upstream's prebuilt `ghcr.io/usekaneo/kaneo` image also works with this compose file if you do not want to build locally.
+Database files live in `/mnt/user/appdata/kaneo/turso` by default — override the host directory with `KANEO_DATA_PATH` in `.env`. The directory must be writable by the container user:
+
+```bash
+chown 1001:1001 /mnt/user/appdata/kaneo/turso
+```
+
+Or run the prebuilt GHCR image instead of building locally:
+
+```bash
+docker compose -f compose.remote.yml up -d
+```
+
+Environment variables: see [.env.sample](.env.sample) and [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md).
 
 ## Development
 
-Requires Node.js ≥ 24 and pnpm 12 (see `packageManager`).
+Requires Node.js 26 and pnpm 12 (see `packageManager`).
 
 ```bash
 pnpm install
-pnpm dev          # start dev servers
-pnpm build        # build all workspaces
-pnpm test         # unit tests
-pnpm typecheck    # typecheck all workspaces
-pnpm lint         # biome (writes fixes)
-pnpm i18n:check   # locale files vs en-US source of truth
-pnpm openapi:check # API reference vs routes
+pnpm dev               # start dev servers
+pnpm build             # build all workspaces
+pnpm test              # unit tests
+pnpm test:integration  # API integration tests (local libSQL test file)
+pnpm typecheck         # typecheck all workspaces
+pnpm lint              # biome (writes fixes)
+pnpm i18n:check        # locale files vs en-US source of truth
+pnpm openapi:check     # API reference vs routes
 ```
 
-Read [AGENTS.md](AGENTS.md) for architecture, conventions, and boundaries before changing anything. Database schema lives in `apps/api/src/database/schema.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`.
-
-Tests: `pnpm test` (unit) and `pnpm test:integration` (needs PostgreSQL; see CI config for the expected environment).
+Read [AGENTS.md](AGENTS.md) for architecture, conventions, and boundaries before changing anything. The database schema lives in `apps/api/src/database/schema.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`.
 
 ## Acknowledgments
 
-All credit for Kaneo goes to the upstream team and contributors:
+All credit for Kaneo goes to the upstream team and contributors: [usekaneo/kaneo](https://github.com/usekaneo/kaneo) · [kaneo.app/docs](https://kaneo.app/docs/core).
 
-- Upstream repository: [usekaneo/kaneo](https://github.com/usekaneo/kaneo)
-- Documentation: [kaneo.app/docs](https://kaneo.app/docs/core)
-- Upstream repository: [usekaneo/kaneo](https://github.com/usekaneo/kaneo)
-- Documentation: [kaneo.app/docs](https://kaneo.app/docs/core)
-- MCP: this instance exposes the built-in HTTP endpoint at `/api/mcp` (see docs); upstream's stdio package [@kaneo/mcp](https://www.npmjs.com/package/@kaneo/mcp) is not used here
-
-This fork tracks upstream and stays close to it; divergences are the ones listed above.
+This fork tracks upstream and stays close to it; divergences are the ones listed above. MCP is exposed through the built-in HTTP endpoint at `/api/mcp`; upstream's stdio package [@kaneo/mcp](https://www.npmjs.com/package/@kaneo/mcp) is not used here.
 
 ## License
 

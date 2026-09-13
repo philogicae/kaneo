@@ -9,14 +9,13 @@ import { defaultGitHubConfig } from "./config";
 
 async function tableExists(tableName: string): Promise<boolean> {
   try {
-    const result = await db.execute(sql`
+    const rows = await db.all<{ present: number }>(sql`
 			SELECT EXISTS (
-				SELECT FROM information_schema.tables 
-				WHERE table_schema = 'public'
-				AND table_name = ${tableName}
-			);
+				SELECT 1 FROM sqlite_master
+				WHERE type = 'table' AND name = ${tableName}
+			) AS present;
 		`);
-    return (result.rows[0] as { exists: boolean })?.exists === true;
+    return Number(rows[0]?.present) === 1;
   } catch {
     return false;
   }
@@ -168,6 +167,6 @@ async function migrateTaskLinks() {
 
 async function dropOldTable() {
   console.log("🗑️ Dropping old github_integration table...");
-  await db.execute(sql`DROP TABLE IF EXISTS github_integration CASCADE`);
+  await db.run(sql`DROP TABLE IF EXISTS github_integration`);
   console.log("✓ Dropped github_integration table");
 }

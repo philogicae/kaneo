@@ -27,10 +27,8 @@ For development, you'll need at minimum:
 - `KANEO_API_URL` - The URL of the API (e.g., `http://localhost:1337`)
 - `AUTH_SECRET` - Secret key for JWT token generation (**must be at least 32 characters long**; use a long, random value in production)
 - `DEVICE_AUTH_CLIENT_IDS` - **Optional.** Comma-separated list of allowed device-flow OAuth client IDs. When unset, Kaneo implicitly allows `kaneo-cli` and `kaneo-mcp` by default (no extra configuration for the CLI or MCP). Override only when you need additional trusted clients, for example `kaneo-cli,kaneo-mcp,my-desktop-app`.
-- `DATABASE_URL` - PostgreSQL connection string
-- `POSTGRES_DB` - PostgreSQL database name
-- `POSTGRES_USER` - PostgreSQL username
-- `POSTGRES_PASSWORD` - PostgreSQL password
+- `DATABASE_PATH` - Path to the local libSQL/SQLite database file (`:memory:` supported). Defaults to `./data/kaneo.db`; Docker Compose sets `/data/kaneo.db` (mounted volume).
+- `KANEO_DATA_PATH` - Docker Compose only: host directory bind-mounted to `/data` (default `/mnt/user/appdata/kaneo/turso`).
 
 If your app uses a device client ID that is not included in the defaults, set `DEVICE_AUTH_CLIENT_IDS` to the full comma-separated list of allowed IDs (including any defaults you still need), so it includes the client ID your app sends to `/api/auth/device/code`.
 
@@ -144,30 +142,20 @@ For a complete list of all environment variables, their descriptions, and config
 
 ### Database Connection Issues
 
+Kaneo runs on a **local libSQL/SQLite file** (`@libsql/client`), configured with `DATABASE_PATH`.
+
 **Symptoms:**
 - "Database connection failed" errors
 - API server won't start
 
 **Solutions:**
 
-1. **Check PostgreSQL:**
-   - Ensure PostgreSQL is running
-   - Verify database exists and credentials are correct
-   - Test connection: `psql $DATABASE_URL`
-
-2. **Update DATABASE_URL:**
-   - Ensure the connection string format is correct
-   - Check username, password, host, port, and database name
-
-3. **Match the hostname to where the API runs:**
-   - Use `postgres` only when the API container is on the same Docker Compose network as the Postgres service
-   - Use `localhost` when the API runs directly on your host machine
-   - If you see `getaddrinfo EAI_AGAIN postgres`, the API is trying to resolve the Compose hostname from the wrong network context
-
-4. **Use the right configuration mode:**
-   - For host-native development, prefer an explicit `DATABASE_URL`
-   - If you derive from `POSTGRES_*`, set `POSTGRES_HOST=localhost` when running the API on your host
-   - `POSTGRES_DB` and `POSTGRES_USER` by themselves do not switch Kaneo into derived connection mode
+1. **Check the path:**
+   - Ensure the directory for `DATABASE_PATH` exists and is writable (the API creates it, but the container user needs write access to the mounted volume).
+   - For Docker named volumes this is automatic. For a **bind mount**, the host directory must be writable by the container user (uid 1001):
+     `chown 1001:1001 /path/on/host`.
+2. **Mount a directory, not the file:** mount the data directory (not just `kaneo.db`) so `kaneo.db-wal` and `kaneo.db-shm` can be written next to it.
+3. **Backups:** stop the container (or checkpoint) before copying `kaneo.db`, so the WAL is flushed.
 
 ### Authentication Issues
 

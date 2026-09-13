@@ -7,14 +7,14 @@ import { ensureTestDatabaseMigrated } from "./helpers/database";
 const LEASE = "integration-test-lease";
 
 async function clearLease() {
-  await db.execute(sql`DELETE FROM job_lease WHERE "name" = ${LEASE};`);
+  await db.run(sql`DELETE FROM job_lease WHERE "name" = ${LEASE};`);
 }
 
 async function readLease() {
-  const rows = await db.execute(
+  const rows = await db.all(
     sql`SELECT "owner", "expires_at" FROM job_lease WHERE "name" = ${LEASE};`,
   );
-  return rows.rows[0];
+  return rows[0];
 }
 
 beforeAll(async () => {
@@ -109,9 +109,9 @@ describe("withJobLease", () => {
   it("takes over a lease left behind by a crashed replica", async () => {
     await clearLease();
 
-    await db.execute(sql`
+    await db.run(sql`
       INSERT INTO job_lease ("name", "owner", "expires_at")
-      VALUES (${LEASE}, 'dead-replica', now() - interval '1 minute');
+      VALUES (${LEASE}, 'dead-replica', ${Date.now() - 60_000});
     `);
 
     const result = await withJobLease(
@@ -126,9 +126,9 @@ describe("withJobLease", () => {
   it("does not take over a lease that is still live", async () => {
     await clearLease();
 
-    await db.execute(sql`
+    await db.run(sql`
       INSERT INTO job_lease ("name", "owner", "expires_at")
-      VALUES (${LEASE}, 'other-replica', now() + interval '10 minutes');
+      VALUES (${LEASE}, 'other-replica', ${Date.now() + 10 * 60_000});
     `);
 
     const result = await withJobLease(

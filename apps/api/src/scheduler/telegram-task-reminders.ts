@@ -80,9 +80,9 @@ async function getTasksNeedingTelegramReminder(
       and(
         sql`EXISTS (
           SELECT 1
-          FROM jsonb_array_elements_text(${taskTable.reminderOffsets}) AS o
-          WHERE ${taskTable.startDate} - (o::int * interval '1 minute')
-            BETWEEN ${windowStart.toISOString()} AND ${windowEnd.toISOString()}
+          FROM json_each(${taskTable.reminderOffsets}) AS o
+          WHERE ${taskTable.startDate} - (CAST(o.value AS INTEGER) * ${MINUTE_MS})
+            BETWEEN ${windowStart.getTime()} AND ${windowEnd.getTime()}
         )`,
         // The EXISTS above guarantees a start date, but the planner still
         // needs the non-null predicate for the interval arithmetic.

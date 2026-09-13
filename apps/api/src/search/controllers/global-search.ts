@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, like, or, sql } from "drizzle-orm";
 import db from "../../database";
 import {
   activityTable,
@@ -196,11 +196,13 @@ async function globalSearch(params: SearchParams): Promise<{
           and(
             workspaceFilter,
             projectId ? eq(taskTable.projectId, projectId) : undefined,
-            // A project key may hold `_`, which `ilike` reads as "any one
+            // A project key may hold `_`, which `LIKE` reads as "any one
             // character", so `DE_-23` would also match a task in `DEP` and the
             // `limit(1)` below would pick whichever came back first. Escaping
-            // keeps the case-insensitive comparison and drops the wildcards.
-            ilike(projectTable.slug, escapeLikePattern(slug)),
+            // plus an explicit ESCAPE clause keeps the case-insensitive
+            // comparison and drops the wildcards (SQLite has no default escape
+            // character, unlike Postgres).
+            sql`${projectTable.slug} LIKE ${escapeLikePattern(slug)} ESCAPE '\\'`,
             eq(taskTable.number, taskNumber),
           ),
         )
@@ -265,8 +267,8 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(taskTable.projectId, projectId) : undefined,
           or(
-            ilike(taskTable.title, searchPattern),
-            ilike(taskTable.description, searchPattern),
+            like(taskTable.title, searchPattern),
+            like(taskTable.description, searchPattern),
           ),
         ),
       )
@@ -324,8 +326,8 @@ async function globalSearch(params: SearchParams): Promise<{
         and(
           workspaceFilter,
           or(
-            ilike(projectTable.name, searchPattern),
-            ilike(projectTable.description, searchPattern),
+            like(projectTable.name, searchPattern),
+            like(projectTable.description, searchPattern),
           ),
         ),
       )
@@ -376,8 +378,8 @@ async function globalSearch(params: SearchParams): Promise<{
         and(
           inArray(workspaceTable.id, accessibleWorkspaceIds),
           or(
-            ilike(workspaceTable.name, searchPattern),
-            ilike(workspaceTable.description, searchPattern),
+            like(workspaceTable.name, searchPattern),
+            like(workspaceTable.description, searchPattern),
           ),
         ),
       )
@@ -439,8 +441,8 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(taskTable.projectId, projectId) : undefined,
           or(
-            ilike(searchableActivityText, searchPattern),
-            ilike(taskTable.title, searchPattern),
+            like(searchableActivityText, searchPattern),
+            like(taskTable.title, searchPattern),
           ),
           type === "comments" ? eq(activityTable.type, "comment") : undefined,
         ),

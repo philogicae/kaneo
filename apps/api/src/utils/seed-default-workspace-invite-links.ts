@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, asc, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, inArray, isNull } from "drizzle-orm";
 import db, { schema } from "../database";
 
 /**
@@ -33,24 +33,6 @@ export async function createDefaultWorkspaceInviteLink(
  */
 export async function seedDefaultWorkspaceInviteLinks() {
   try {
-    const tableExists = await db.execute(sql`
-      SELECT EXISTS (
-        SELECT 1
-        FROM information_schema.tables
-        WHERE table_name = 'workspace_invite_link'
-      ) AS exists;
-    `);
-
-    const exists =
-      tableExists.rows[0]?.exists === true ||
-      tableExists.rows[0]?.exists === "t";
-    if (!exists) {
-      console.log(
-        "🛈 workspace_invite_link table does not exist; skipping default invite-link seed.",
-      );
-      return;
-    }
-
     const workspaces = await db
       .select({ id: schema.workspaceTable.id })
       .from(schema.workspaceTable);

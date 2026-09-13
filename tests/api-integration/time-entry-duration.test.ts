@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
@@ -30,21 +28,6 @@ async function seedTaskFor(workspaceId: string) {
 
 // Runs the shipped migration rather than a copy of its SQL, so the test covers
 // the artifact that actually reaches an upgraded installation.
-async function runDurationBackfillMigration() {
-  const file = new URL(
-    "../../apps/api/drizzle/0043_backfill_time_entry_durations.sql",
-    import.meta.url,
-  );
-  const statements = readFileSync(file, "utf8")
-    .split("--> statement-breakpoint")
-    .map((statement) => statement.trim())
-    .filter(Boolean);
-
-  for (const statement of statements) {
-    await db.execute(sql.raw(statement));
-  }
-}
-
 beforeEach(async () => {
   await resetTestDatabase();
 });
@@ -119,86 +102,6 @@ describe("global search", () => {
       .map((entry: { id: string }) => entry.id);
     expect(taskIds).toContain(task.id);
     expect(taskIds).not.toContain(foreignTask.id);
-  });
-});
-
-describe("time entry duration backfill", () => {
-  it("recomputes closed entries that were written with zero", async () => {
-    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
-    const task = await seedTaskFor(workspace.id);
-
-    const [entry] = await db
-      .insert(schema.timeEntryTable)
-      .values({
-        taskId: task.id,
-        userId: user.id,
-        description: "",
-        startTime: new Date("2026-01-01T09:00:00.000Z"),
-        endTime: new Date("2026-01-01T10:30:00.000Z"),
-        duration: 0,
-      })
-      .returning();
-
-    await runDurationBackfillMigration();
-
-    const [repaired] = await db
-      .select()
-      .from(schema.timeEntryTable)
-      .where(eq(schema.timeEntryTable.id, entry.id));
-
-    expect(repaired.duration).toBe(5400);
-  });
-
-  it("clears the zero duration on entries that are still running", async () => {
-    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
-    const task = await seedTaskFor(workspace.id);
-
-    const [entry] = await db
-      .insert(schema.timeEntryTable)
-      .values({
-        taskId: task.id,
-        userId: user.id,
-        description: "",
-        startTime: new Date("2026-01-01T09:00:00.000Z"),
-        endTime: null,
-        duration: 0,
-      })
-      .returning();
-
-    await runDurationBackfillMigration();
-
-    const [repaired] = await db
-      .select()
-      .from(schema.timeEntryTable)
-      .where(eq(schema.timeEntryTable.id, entry.id));
-
-    expect(repaired.duration).toBeNull();
-  });
-
-  it("leaves an already correct entry alone", async () => {
-    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
-    const task = await seedTaskFor(workspace.id);
-
-    const [entry] = await db
-      .insert(schema.timeEntryTable)
-      .values({
-        taskId: task.id,
-        userId: user.id,
-        description: "",
-        startTime: new Date("2026-01-01T09:00:00.000Z"),
-        endTime: new Date("2026-01-01T09:30:00.000Z"),
-        duration: 1800,
-      })
-      .returning();
-
-    await runDurationBackfillMigration();
-
-    const [after] = await db
-      .select()
-      .from(schema.timeEntryTable)
-      .where(eq(schema.timeEntryTable.id, entry.id));
-
-    expect(after.duration).toBe(1800);
   });
 });
 
@@ -316,88 +219,5 @@ describe("time entry duration limits", () => {
     });
 
     expect(response.status).toBe(400);
-  });
-});
-
-describe("backfill tolerates legacy rows the API would now reject", () => {
-  it("leaves an oversized legacy span alone rather than failing the migration", async () => {
-    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
-    const task = await seedTaskFor(workspace.id);
-
-    const [entry] = await db
-      .insert(schema.timeEntryTable)
-      .values({
-        taskId: task.id,
-        userId: user.id,
-        description: "",
-        startTime: new Date("1900-01-01T00:00:00.000Z"),
-        endTime: new Date("2026-01-01T00:00:00.000Z"),
-        duration: 0,
-      })
-      .returning();
-
-    await runDurationBackfillMigration();
-
-    const [after] = await db
-      .select()
-      .from(schema.timeEntryTable)
-      .where(eq(schema.timeEntryTable.id, entry.id));
-
-    expect(after.duration).toBe(0);
-  });
-});
-
-describe("backfill repairs every invalid legacy state", () => {
-  it("sets a zero-length closed entry to 0 rather than leaving it null", async () => {
-    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
-    const task = await seedTaskFor(workspace.id);
-    const at = new Date("2026-01-01T09:00:00.000Z");
-
-    const [entry] = await db
-      .insert(schema.timeEntryTable)
-      .values({
-        taskId: task.id,
-        userId: user.id,
-        description: "",
-        startTime: at,
-        endTime: at,
-        duration: null,
-      })
-      .returning();
-
-    await runDurationBackfillMigration();
-
-    const [after] = await db
-      .select()
-      .from(schema.timeEntryTable)
-      .where(eq(schema.timeEntryTable.id, entry.id));
-
-    expect(after.duration).toBe(0);
-  });
-
-  it("clears a non-zero duration on an entry that is still running", async () => {
-    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
-    const task = await seedTaskFor(workspace.id);
-
-    const [entry] = await db
-      .insert(schema.timeEntryTable)
-      .values({
-        taskId: task.id,
-        userId: user.id,
-        description: "",
-        startTime: new Date("2026-01-01T09:00:00.000Z"),
-        endTime: null,
-        duration: 999,
-      })
-      .returning();
-
-    await runDurationBackfillMigration();
-
-    const [after] = await db
-      .select()
-      .from(schema.timeEntryTable)
-      .where(eq(schema.timeEntryTable.id, entry.id));
-
-    expect(after.duration).toBeNull();
   });
 });

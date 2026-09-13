@@ -7,8 +7,8 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import * as Sentry from "@sentry/node";
 import type { Session, User } from "better-auth/types";
-import { eq, sql } from "drizzle-orm";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { eq } from "drizzle-orm";
+import { migrate } from "drizzle-orm/libsql/migrator";
 import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
@@ -21,9 +21,7 @@ import column from "./column";
 import comment from "./comment";
 import config from "./config";
 import customField from "./custom-field";
-import db, { getDatabase, schema } from "./database";
-import { prepareDatabaseStartup } from "./database/prepare-database-startup";
-import { waitForDatabase } from "./database/wait-for-database";
+import db, { applyDatabasePragmas, getDatabase, schema } from "./database";
 import discordIntegration from "./discord-integration";
 import { eventContext } from "./events";
 import externalLink from "./external-link";
@@ -60,10 +58,6 @@ import getAvatar from "./user/controllers/get-avatar";
 import { authenticateApiRequest } from "./utils/authenticate-api-request";
 import { authorizeAssetAccess } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
-import { migrateApiKeyReferenceId } from "./utils/migrate-apikey-reference-id";
-import { migrateNotificationPreferencesSchema } from "./utils/migrate-notification-preferences-schema";
-import { migrateSessionColumn } from "./utils/migrate-session-column";
-import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
 import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
@@ -805,31 +799,14 @@ export function createApp() {
 export async function runStartupTasks() {
   const currentDir = dirname(fileURLToPath(import.meta.url));
 
-  await prepareDatabaseStartup({
-    waitForDatabase: async () => {
-      await waitForDatabase({
-        query: async () => {
-          await getDatabase().execute(sql`SELECT 1`);
-        },
-      });
-    },
-    runStartupMigrations: async () => {
-      await migrateWorkspaceUserEmail();
-      await migrateSessionColumn();
+  await applyDatabasePragmas();
 
-      console.log("🔄 Migrating database...");
-      await migrate(getDatabase(), {
-        migrationsFolder: `${currentDir}/../drizzle`,
-      });
-      console.log("✅ Database migrated successfully!");
-    },
+  console.log("🔄 Migrating database...");
+  await migrate(getDatabase(), {
+    migrationsFolder: `${currentDir}/../drizzle`,
   });
+  console.log("✅ Database migrated successfully!");
 
-  // After Drizzle migrations: apikey table must exist so we can align columns
-  // with Better Auth (reference_id + nullable user_id).
-  await migrateApiKeyReferenceId();
-
-  await migrateNotificationPreferencesSchema();
   await migrateGitHubIntegration();
   await migrateColumns();
   await seedDefaultWorkspaceRoles();
