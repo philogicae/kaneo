@@ -77,7 +77,7 @@ export async function migrateColumns() {
         .where(
           sql`${taskTable.projectId} = ${project.id}
               AND ${taskTable.status} = ${slug}
-              AND ${taskTable.columnId} IS DISTINCT FROM ${columnId}`,
+              AND ${taskTable.columnId} IS NOT ${columnId}`,
         );
     }
 

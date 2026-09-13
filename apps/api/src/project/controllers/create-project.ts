@@ -1,4 +1,4 @@
-import { eq, max, sql } from "drizzle-orm";
+import { eq, max } from "drizzle-orm";
 import db from "../../database";
 import { columnTable, projectTable } from "../../database/schema";
 
@@ -16,47 +16,45 @@ async function createProject(
   slug: string,
   description: string | null,
 ) {
-  return db.transaction(async (tx) => {
-    // Serialize ordering writes per workspace: without this, two concurrent
-    // creates can read the same max(position) and land on the same slot, and a
-    // create can interleave with a reorder's renumber. `reorderProjects` takes
-    // the same lock with the same key.
-    await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(1524, hashtext(${workspaceId}))`,
-    );
+  return db.transaction(
+    async (tx) => {
+      // Serialize ordering writes per workspace: SQLite has a single writer,
+      // and the immediate transaction prevents a concurrent create from
+      // reading the same max(position) or interleaving with a reorder.
+      // New projects go to the bottom of the workspace's ordering.
+      const [{ maxPosition } = { maxPosition: null }] = await tx
+        .select({ maxPosition: max(projectTable.position) })
+        .from(projectTable)
+        .where(eq(projectTable.workspaceId, workspaceId));
 
-    // New projects go to the bottom of the workspace's ordering.
-    const [{ maxPosition } = { maxPosition: null }] = await tx
-      .select({ maxPosition: max(projectTable.position) })
-      .from(projectTable)
-      .where(eq(projectTable.workspaceId, workspaceId));
+      const [createdProject] = await tx
+        .insert(projectTable)
+        .values({
+          workspaceId,
+          name,
+          icon,
+          slug,
+          description,
+          position: maxPosition === null ? 0 : maxPosition + 1,
+        })
+        .returning();
 
-    const [createdProject] = await tx
-      .insert(projectTable)
-      .values({
-        workspaceId,
-        name,
-        icon,
-        slug,
-        description,
-        position: maxPosition === null ? 0 : maxPosition + 1,
-      })
-      .returning();
-
-    if (createdProject) {
-      for (const col of DEFAULT_PROJECT_COLUMNS) {
-        await tx.insert(columnTable).values({
-          projectId: createdProject.id,
-          name: col.name,
-          slug: col.slug,
-          position: col.position,
-          isFinal: col.isFinal,
-        });
+      if (createdProject) {
+        for (const col of DEFAULT_PROJECT_COLUMNS) {
+          await tx.insert(columnTable).values({
+            projectId: createdProject.id,
+            name: col.name,
+            slug: col.slug,
+            position: col.position,
+            isFinal: col.isFinal,
+          });
+        }
       }
-    }
 
-    return createdProject;
-  });
+      return createdProject;
+    },
+    { behavior: "immediate" },
+  );
 }
 
 export default createProject;

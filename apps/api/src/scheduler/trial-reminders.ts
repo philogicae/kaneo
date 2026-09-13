@@ -69,10 +69,10 @@ async function getWorkspacesNeedingReminder(type: ReminderType, now: Date) {
 
   // One row per owner, not per workspace: trials are granted per owner, so a
   // person with twenty workspaces must still get one email, not twenty.
-  // DISTINCT ON forces ORDER BY to lead with the owner, so urgency ordering
-  // has to happen outside it or the cap would drop the soonest expiries.
-  const owners = db
-    .selectDistinctOn([workspaceUserTable.userId], {
+  // SQLite has no DISTINCT ON, so candidates are ordered by owner then soonest
+  // expiry, deduped in JS, then ordered by urgency for the cap.
+  const candidates = await db
+    .select({
       userId: workspaceUserTable.userId,
       workspaceId: workspaceTable.id,
       workspaceName: workspaceTable.name,
@@ -112,14 +112,24 @@ async function getWorkspacesNeedingReminder(type: ReminderType, now: Date) {
     .orderBy(
       asc(workspaceUserTable.userId),
       asc(workspaceBillingTable.trialEndsAt),
-    )
-    .as("owners");
+    );
 
-  return db
-    .select()
-    .from(owners)
-    .orderBy(asc(owners.trialEndsAt))
-    .limit(maxPerRun());
+  const seenOwners = new Set<string>();
+  const owners: typeof candidates = [];
+  for (const row of candidates) {
+    if (seenOwners.has(row.userId)) {
+      continue;
+    }
+    seenOwners.add(row.userId);
+    owners.push(row);
+  }
+
+  return owners
+    .sort(
+      (a, b) =>
+        (a.trialEndsAt?.getTime() ?? 0) - (b.trialEndsAt?.getTime() ?? 0),
+    )
+    .slice(0, maxPerRun());
 }
 
 export async function checkTrialReminders(): Promise<{ degraded: boolean }> {

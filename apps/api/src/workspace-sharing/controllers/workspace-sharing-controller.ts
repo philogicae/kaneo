@@ -16,7 +16,7 @@ import type {
 
 const ACTIVE = or(
   isNull(workspaceInviteLinkTable.expiresAt),
-  gt(workspaceInviteLinkTable.expiresAt, sql`now()`),
+  gt(workspaceInviteLinkTable.expiresAt, new Date()),
 );
 
 const NOT_EXHAUSTED = or(

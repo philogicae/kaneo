@@ -1,14 +1,14 @@
 import { config } from "dotenv-mono";
 import { type Config, defineConfig } from "drizzle-kit";
-import { resolveDatabaseConnectionString } from "./src/database/resolve-database-url";
+import { resolveDatabasePath } from "./src/database/resolve-database-config";
 
 config();
 
 export default defineConfig({
   out: "./drizzle",
   schema: "./src/database/schema.ts",
-  dialect: "postgresql",
+  dialect: "sqlite",
   dbCredentials: {
-    url: resolveDatabaseConnectionString(),
+    url: resolveDatabasePath(),
   },
 }) satisfies Config;
