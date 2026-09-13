@@ -36,12 +36,13 @@ describe("resolve-database-config", () => {
     expect(resolveDatabaseUrl()).toBe("file:/data/kaneo.db");
   });
 
-  it("resolves a relative DATABASE_PATH against the working directory", () => {
+  it("resolves a relative DATABASE_PATH against the repository root", () => {
+    const repoRoot = resolve(import.meta.dirname, "../../..");
     process.env[KEY] = "./data/kaneo.db";
 
     expect(resolveDatabaseConfig()).toMatchObject({
-      path: resolve(process.cwd(), "./data/kaneo.db"),
-      url: `file:${resolve(process.cwd(), "./data/kaneo.db")}`,
+      path: resolve(repoRoot, "./data/kaneo.db"),
+      url: `file:${resolve(repoRoot, "./data/kaneo.db")}`,
       source: "DATABASE_PATH",
     });
   });
@@ -68,8 +69,10 @@ describe("resolve-database-config", () => {
   });
 
   it("falls back to ./data/kaneo.db when unset", () => {
+    const repoRoot = resolve(import.meta.dirname, "../../..");
+
     expect(resolveDatabaseConfig()).toMatchObject({
-      path: resolve(process.cwd(), "./data/kaneo.db"),
+      path: resolve(repoRoot, "./data/kaneo.db"),
       isMemory: false,
       source: "LOCAL_FALLBACK",
     });

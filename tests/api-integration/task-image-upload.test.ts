@@ -13,11 +13,7 @@ describe("API integration: task image upload finalize", () => {
   beforeEach(async () => {
     await resetTestDatabase();
 
-    process.env.S3_ENDPOINT = "https://storage.example.test";
-    process.env.S3_BUCKET = "test-bucket";
-    process.env.S3_ACCESS_KEY_ID = "test-access-key";
-    process.env.S3_SECRET_ACCESS_KEY = "test-secret-key";
-    delete process.env.S3_KEY_PREFIX;
+    delete process.env.STORAGE_KEY_PREFIX;
   });
 
   afterEach(() => {

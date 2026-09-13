@@ -4,7 +4,6 @@ import db from "../../database";
 import { taskTable, userTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import createNotification from "../../notification/controllers/create-notification";
-import { deleteOrphanedAssets } from "../../storage/cleanup-assets";
 import { parseMentionIds } from "../../utils/parse-mentions";
 
 async function updateTaskDescription({
@@ -46,10 +45,6 @@ async function updateTaskDescription({
     newDescription: description,
     type: "description_changed",
   });
-
-  deleteOrphanedAssets(existingTask.description, description, {
-    taskId: id,
-  }).catch(() => {});
 
   // Notify members newly @mentioned by this edit (skip ones already mentioned
   // in the previous description, and the editor themselves).
