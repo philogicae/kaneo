@@ -15,13 +15,10 @@ export default defineConfig({
       enabled: false,
     },
   },
-  esbuild: {
-    target: "node18",
-  },
   resolve: {
     alias: {
       "@kaneo/email": resolve(
-        __dirname,
+        import.meta.dirname,
         "../../tests/api-integration/mocks/email.ts",
       ),
     },

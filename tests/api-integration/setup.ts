@@ -20,29 +20,7 @@ function stripEnvValueQuotes(value: string) {
   return trimmed;
 }
 
-function deriveTestDatabaseUrl(connectionString: string) {
-  const url = new URL(connectionString);
-  const databaseName = url.pathname.replace(/^\//, "");
-
-  if (!databaseName || databaseName.endsWith("_test")) {
-    return connectionString;
-  }
-
-  url.pathname = `/${databaseName}_test`;
-  return url.toString();
-}
-
-function assertTestDatabaseUrl(connectionString: string) {
-  const url = new URL(connectionString);
-  const databaseName = url.pathname.replace(/^\//, "");
-  if (!databaseName.endsWith("_test")) {
-    throw new Error(
-      `Integration tests require DATABASE_URL to use a database name ending in _test (got "${databaseName}")`,
-    );
-  }
-}
-
-function readDatabaseUrlFromEnvFile() {
+function readDatabasePathFromEnvFile() {
   const currentDir = dirname(fileURLToPath(import.meta.url));
   const envPath = resolve(currentDir, "../../.env");
 
@@ -51,19 +29,38 @@ function readDatabaseUrlFromEnvFile() {
   }
 
   const envFile = readFileSync(envPath, "utf8");
-  const match = envFile.match(/^DATABASE_URL=(.+)$/m);
+  const match = envFile.match(/^DATABASE_PATH=(.+)$/m);
   const raw = match?.[1]?.trim();
   return raw ? stripEnvValueQuotes(raw) : null;
 }
 
-const defaultTestDatabaseUrl =
-  "postgresql://postgres:postgres@localhost:5432/kaneo_test";
-const envDatabaseUrl = process.env.DATABASE_URL?.trim();
-const fromEnv = envDatabaseUrl ? stripEnvValueQuotes(envDatabaseUrl) : "";
-const rawDatabaseUrl =
-  fromEnv || readDatabaseUrlFromEnvFile() || defaultTestDatabaseUrl;
-process.env.DATABASE_URL = deriveTestDatabaseUrl(rawDatabaseUrl);
-assertTestDatabaseUrl(process.env.DATABASE_URL);
+function toTestDatabasePath(input: string) {
+  if (input === ":memory:" || input === "file::memory:") {
+    return ":memory:";
+  }
+  if (/_test(\.\w+)?$/i.test(input)) {
+    return input;
+  }
+  return input.replace(/(\.[a-z0-9]+)?$/i, (match) => `_test${match || ".db"}`);
+}
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const envDatabasePath = process.env.DATABASE_PATH?.trim();
+const rawDatabasePath =
+  (envDatabasePath ? stripEnvValueQuotes(envDatabasePath) : "") ||
+  readDatabasePathFromEnvFile() ||
+  resolve(repoRoot, "data/kaneo.db");
+
+process.env.DATABASE_PATH = toTestDatabasePath(rawDatabasePath);
+
+if (
+  process.env.DATABASE_PATH !== ":memory:" &&
+  !/_test(\.\w+)?$/i.test(process.env.DATABASE_PATH)
+) {
+  throw new Error(
+    `Integration tests require DATABASE_PATH to point to a *_test database (got "${process.env.DATABASE_PATH}")`,
+  );
+}
 
 process.env.NODE_ENV = "test";
 process.env.AUTH_SECRET = "test-secret-with-at-least-32-chars";

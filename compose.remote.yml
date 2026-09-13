@@ -3,10 +3,7 @@ name: kaneo
 services:
   kaneo:
     container_name: kaneo
-    build:
-      context: .
-      dockerfile: Dockerfile.kaneo
-    image: kaneo-custom
+    image: ghcr.io/philogicae/kaneo:latest
     init: true
     restart: unless-stopped
     ports:

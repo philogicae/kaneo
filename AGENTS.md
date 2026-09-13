@@ -18,15 +18,15 @@
 
 ## Project overview
 
-- **Stack**: TypeScript monorepo (pnpm 12 workspaces + turbo) — Hono API (`@hono/zod-openapi`, Better Auth, Drizzle/PostgreSQL, optional Redis fan-out), React/Vite web (TanStack Router/Query, Tailwind 4, Biome), React Email templates.
+- **Stack**: TypeScript monorepo (pnpm 12 workspaces + turbo) — Hono API (`@hono/zod-openapi`, Better Auth, Drizzle/Turso-libSQL, optional Redis fan-out), React/Vite web (TanStack Router/Query, Tailwind 4, Biome), React Email templates.
 - **Workspaces**: `apps/api` (API authority: controllers, events, integrations, HTTP MCP, WebSockets) · `apps/web` (UI, fetchers, hooks, realtime cache updates) · `apps/docs` (docs content + committed `openapi.json`) · `packages/libs` (typed Hono client) · `packages/permissions` (permission vocabulary, built-in roles) · `packages/email` · `packages/planka-import` (published CLI).
-- **Deploy**: `compose.yml` builds locally via `Dockerfile.kaneo` (bundled API + web + PostgreSQL, one Kaneo container) — Dokploy-friendly. No GHCR publishing, no Helm, no release automation.
-- **Tests**: `tests/api` (unit) and `tests/api-integration` (PostgreSQL-backed; run under `apps/api`'s vitest config).
+- **Deploy**: `compose.yml` builds locally via `Dockerfile.kaneo` (bundled API + web + Turso/libSQL, one Kaneo container) — Dokploy-friendly. No GHCR publishing, no Helm, no release automation.
+- **Tests**: `tests/api` (unit) and `tests/api-integration` (local libSQL/SQLite file; run under `apps/api`'s vitest config).
 
 ## Setup commands
 
-- Node ≥ 24, pnpm 12 (`packageManager: pnpm@12.3.4`).
-- `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:integration` (needs PostgreSQL)
+- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.3.4`).
+- `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:integration` (local libSQL/SQLite file)
 - `pnpm lint` = Biome **--write** (rewrites files); CI gate is `pnpm exec biome ci .` — run that for a read-only check.
 - `pnpm i18n:check` / `i18n:schema` · `pnpm openapi:check` / `openapi:check:fix`
 - DB: schema in `apps/api/src/database/schema.ts`, relations in `database/relations.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`, inspect the SQL, existing installations must keep working.

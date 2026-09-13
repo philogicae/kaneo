@@ -119,7 +119,7 @@ async function bulkUpdateTasks({
           .set({ status: value, columnId: column?.id ?? null })
           .where(inArray(taskTable.id, projectTaskIds));
 
-        updatedCount += result.rowCount ?? projectTaskIds.length;
+        updatedCount += result.rowsAffected ?? projectTaskIds.length;
 
         for (const taskId of projectTaskIds) {
           await publishEvent("task.status_changed", {
@@ -150,7 +150,7 @@ async function bulkUpdateTasks({
         .set({ priority: value })
         .where(inArray(taskTable.id, foundIds));
 
-      updatedCount = result.rowCount ?? foundIds.length;
+      updatedCount = result.rowsAffected ?? foundIds.length;
 
       for (const task of tasks) {
         await publishEvent("task.priority_changed", {
@@ -186,7 +186,7 @@ async function bulkUpdateTasks({
         .set({ userId: assigneeId })
         .where(inArray(taskTable.id, foundIds));
 
-      updatedCount = result.rowCount ?? foundIds.length;
+      updatedCount = result.rowsAffected ?? foundIds.length;
 
       for (const task of tasks) {
         const eventType = assigneeId
@@ -211,7 +211,7 @@ async function bulkUpdateTasks({
         .delete(taskTable)
         .where(inArray(taskTable.id, foundIds));
 
-      updatedCount = result.rowCount ?? foundIds.length;
+      updatedCount = result.rowsAffected ?? foundIds.length;
 
       for (const task of tasks) {
         await publishEvent("task.deleted", {
@@ -347,7 +347,7 @@ async function bulkUpdateTasks({
         .set({ dueDate: parsedDate })
         .where(inArray(taskTable.id, foundIds));
 
-      updatedCount = result.rowCount ?? foundIds.length;
+      updatedCount = result.rowsAffected ?? foundIds.length;
 
       for (const task of tasks) {
         await publishEvent("task.due_date_changed", {

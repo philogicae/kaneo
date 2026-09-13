@@ -11,7 +11,4 @@ export default defineConfig({
       reportsDirectory: "./coverage",
     },
   },
-  esbuild: {
-    target: "node18",
-  },
 });

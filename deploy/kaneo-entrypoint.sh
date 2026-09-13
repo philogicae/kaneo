@@ -1,10 +1,6 @@
 #!/bin/sh
 set -eu
 
-urlencode() {
-  node -e 'const input = process.argv[1]; process.stdout.write(encodeURIComponent(input).replace(/[!\x27()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`));' "$1"
-}
-
 api_pid=""
 nginx_pid=""
 
@@ -28,22 +24,9 @@ if [ -z "${KANEO_API_URL:-}" ] && [ -n "$client_url" ]; then
   echo "KANEO_API_URL not set — derived from KANEO_CLIENT_URL: $KANEO_API_URL"
 fi
 
-# Derive DATABASE_URL for the bundled image when it is not explicitly set.
-# This image requires either DATABASE_URL or POSTGRES_PASSWORD so startup
-# fails fast instead of silently falling back to localhost inside the container.
-if [ -z "${DATABASE_URL:-}" ]; then
-  POSTGRES_DB="${POSTGRES_DB:-kaneo}"
-  POSTGRES_USER="${POSTGRES_USER:-kaneo}"
-  if [ -n "${POSTGRES_PASSWORD:-}" ]; then
-    encoded_user="$(urlencode "$POSTGRES_USER")"
-    encoded_password="$(urlencode "$POSTGRES_PASSWORD")"
-    export DATABASE_URL="postgresql://${encoded_user}:${encoded_password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}"
-    echo "DATABASE_URL not set — derived from POSTGRES_* vars"
-  else
-    echo "ERROR: DATABASE_URL is not set and POSTGRES_PASSWORD is not set for bundled-image startup" >&2
-    exit 1
-  fi
-fi
+# Default the SQLite database file to the mounted /data volume when the
+# deployment does not override DATABASE_PATH.
+export DATABASE_PATH="${DATABASE_PATH:-/data/kaneo.db}"
 
 # Auto-generate AUTH_SECRET if not set
 if [ -z "${AUTH_SECRET:-}" ]; then

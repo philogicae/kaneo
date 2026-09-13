@@ -238,8 +238,7 @@ async function importSingleIssue(
     const [lockedProject] = await tx
       .select()
       .from(projectTable)
-      .where(eq(projectTable.id, projectId))
-      .for("update");
+      .where(eq(projectTable.id, projectId));
 
     if (!lockedProject) {
       throw new Error("Project not found");
