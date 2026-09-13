@@ -1,4 +1,4 @@
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, eq, gte } from "drizzle-orm";
 import db from "../../database";
 import { activityTable, taskTable } from "../../database/schema";
 
@@ -18,6 +18,10 @@ function toWeekStart(date: Date): Date {
   return result;
 }
 
+function weekKey(date: Date): string {
+  return toWeekStart(date).toISOString().slice(0, 10);
+}
+
 async function getProjectCharts(
   projectId: string,
   months = 6,
@@ -29,24 +33,22 @@ async function getProjectCharts(
   start.setUTCHours(0, 0, 0, 0);
   const rangeStart = toWeekStart(start);
 
+  // Bucket by week in JS: SQLite has no date_trunc, and the rows in range are
+  // already bounded by project + window.
   const createdRows = await db
-    .select({
-      week: sql<string>`date_trunc('week', ${taskTable.createdAt})::date::text`,
-      total: sql<number>`count(*)::int`,
-    })
+    .select({ createdAt: taskTable.createdAt })
     .from(taskTable)
     .where(
       and(
         eq(taskTable.projectId, projectId),
         gte(taskTable.createdAt, rangeStart),
       ),
-    )
-    .groupBy(sql`1`);
+    );
 
   const completedRows = await db
     .select({
-      week: sql<string>`date_trunc('week', ${activityTable.createdAt})::date::text`,
-      total: sql<number>`count(*)::int`,
+      createdAt: activityTable.createdAt,
+      eventData: activityTable.eventData,
     })
     .from(activityTable)
     .innerJoin(taskTable, eq(activityTable.taskId, taskTable.id))
@@ -54,18 +56,25 @@ async function getProjectCharts(
       and(
         eq(taskTable.projectId, projectId),
         eq(activityTable.type, "status_changed"),
-        sql`${activityTable.eventData}->>'newStatus' in ('done', 'archived')`,
         gte(activityTable.createdAt, rangeStart),
       ),
-    )
-    .groupBy(sql`1`);
+    );
 
-  const createdByWeek = new Map(
-    createdRows.map((row) => [row.week, row.total]),
-  );
-  const completedByWeek = new Map(
-    completedRows.map((row) => [row.week, row.total]),
-  );
+  const createdByWeek = new Map<string, number>();
+  for (const row of createdRows) {
+    const key = weekKey(row.createdAt);
+    createdByWeek.set(key, (createdByWeek.get(key) ?? 0) + 1);
+  }
+
+  const completedByWeek = new Map<string, number>();
+  for (const row of completedRows) {
+    const status = (row.eventData as { newStatus?: string } | null)?.newStatus;
+    if (status !== "done" && status !== "archived") {
+      continue;
+    }
+    const key = weekKey(row.createdAt);
+    completedByWeek.set(key, (completedByWeek.get(key) ?? 0) + 1);
+  }
 
   const buckets: ProjectChartsBucket[] = [];
   const cursor = new Date(rangeStart);
