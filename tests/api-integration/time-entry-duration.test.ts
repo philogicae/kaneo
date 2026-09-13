@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
@@ -219,5 +220,42 @@ describe("time entry duration limits", () => {
     });
 
     expect(response.status).toBe(400);
+  });
+});
+
+describe("time entry deletion", () => {
+  it("deletes a logged entry", async () => {
+    const { user, workspace } = await createWorkspaceMember({ role: "owner" });
+    const task = await seedTaskFor(workspace.id);
+
+    mockAuthenticatedSession(user);
+    const { app } = createApp();
+
+    const createResponse = await app.request("/api/time-entry", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        taskId: task.id,
+        startTime: "2026-01-01T09:00:00.000Z",
+        endTime: "2026-01-01T10:00:00.000Z",
+      }),
+    });
+    const entry = await createResponse.json();
+
+    const deleteResponse = await app.request(`/api/time-entry/${entry.id}`, {
+      method: "DELETE",
+    });
+
+    expect(deleteResponse.status).toBe(200);
+    const remaining = await db
+      .select()
+      .from(schema.timeEntryTable)
+      .where(eq(schema.timeEntryTable.id, entry.id));
+    expect(remaining).toHaveLength(0);
+
+    const secondDelete = await app.request(`/api/time-entry/${entry.id}`, {
+      method: "DELETE",
+    });
+    expect(secondDelete.status).toBe(400);
   });
 });

@@ -128,6 +128,43 @@ describe("updateTask config clearing", () => {
     expect(mockDelete).toHaveBeenCalled();
   });
 
+  it("resets sent-reminder history when the start date moves without reminderOffsets", async () => {
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({
+          limit: async () => [
+            {
+              ...EXISTING_TASK,
+              startDate: new Date("2026-09-20T10:00:00Z"),
+              reminderOffsets: [60],
+            },
+          ],
+          orderBy: async () => [{ slug: "to-do" }],
+        }),
+      }),
+    });
+    const set = chainUpdate({ ...EXISTING_TASK, reminderOffsets: [60] });
+
+    await updateTask(
+      "task-1",
+      "Task",
+      "to-do",
+      new Date("2026-09-21T10:00:00Z"),
+      undefined,
+      "project-1",
+      "desc",
+      "medium",
+      0,
+      undefined,
+      "user-1",
+      undefined,
+      undefined,
+    );
+
+    expect(set.mock.calls[0][0]).not.toHaveProperty("reminderOffsets");
+    expect(mockDelete).toHaveBeenCalled();
+  });
+
   it("keeps config untouched when fields are omitted", async () => {
     const set = chainUpdate({ ...EXISTING_TASK });
 
@@ -150,5 +187,6 @@ describe("updateTask config clearing", () => {
     const values = set.mock.calls[0][0] as Record<string, unknown>;
     expect(values).not.toHaveProperty("recurrence");
     expect(values).not.toHaveProperty("reminderOffsets");
+    expect(mockDelete).not.toHaveBeenCalled();
   });
 });

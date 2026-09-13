@@ -10,6 +10,7 @@ export type GetProjectRequest = InferRequestType<
 async function getProject({ id }: GetProjectRequest) {
   const response = await client.project[":id"].$get({
     param: { id },
+    query: {},
   });
 
   if (!response.ok) {

@@ -241,9 +241,223 @@ describe("MCP tool catalog", () => {
     expect(apiFetch).not.toHaveBeenCalled();
   });
 
+  it("passes reminder offsets through update_task, including a clear", async () => {
+    const existingTask = {
+      id: "t1",
+      title: "Task",
+      description: "d",
+      status: "to-do",
+      priority: "medium",
+      projectId: "p1",
+      position: 1,
+      startDate: "2026-09-20T10:00:00.000Z",
+    };
+
+    apiFetch.mockResolvedValueOnce(Response.json(existingTask));
+    await call("update_task", { taskId: "t1", reminderOffsets: [120, 15] });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/task/t1",
+      method: "PUT",
+      body: expect.objectContaining({ reminderOffsets: [120, 15] }),
+    });
+
+    apiFetch.mockResolvedValueOnce(Response.json(existingTask));
+    await call("update_task", { taskId: "t1", reminderOffsets: null });
+    expect(lastRequest().body).toMatchObject({ reminderOffsets: null });
+  });
+
+  it("rejects invalid reminder offsets before calling the API", async () => {
+    const result = await call("update_task", {
+      taskId: "t1",
+      reminderOffsets: [0],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("accepts reminder offsets when creating a task", async () => {
+    await call("create_task", {
+      projectId: "p1",
+      title: "Task",
+      description: "",
+      priority: "medium",
+      status: "to-do",
+      startDate: "2026-09-20T10:00:00Z",
+      reminderOffsets: [1440],
+    });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/task/p1",
+      method: "POST",
+      body: expect.objectContaining({ reminderOffsets: [1440] }),
+    });
+  });
+
+  it("passes recurrence through create_task and update_task, including a clear", async () => {
+    await call("create_task", {
+      projectId: "p1",
+      title: "Task",
+      description: "",
+      priority: "medium",
+      status: "to-do",
+      recurrence: { frequency: "weekly", interval: 2 },
+    });
+
+    expect(lastRequest().body).toMatchObject({
+      recurrence: { frequency: "weekly", interval: 2 },
+    });
+
+    const existingTask = {
+      id: "t1",
+      title: "Task",
+      description: "d",
+      status: "to-do",
+      priority: "medium",
+      projectId: "p1",
+      position: 1,
+    };
+
+    apiFetch.mockResolvedValueOnce(Response.json(existingTask));
+    await call("update_task", {
+      taskId: "t1",
+      recurrence: { frequency: "monthly", interval: 1 },
+    });
+    expect(lastRequest().body).toMatchObject({
+      recurrence: { frequency: "monthly", interval: 1 },
+    });
+
+    apiFetch.mockResolvedValueOnce(Response.json(existingTask));
+    await call("update_task", { taskId: "t1", recurrence: null });
+    expect(lastRequest().body).toMatchObject({ recurrence: null });
+  });
+
+  it("rejects an invalid recurrence before calling the API", async () => {
+    const result = await call("create_task", {
+      projectId: "p1",
+      title: "Task",
+      description: "",
+      priority: "medium",
+      status: "to-do",
+      recurrence: { frequency: "yearly", interval: 1 },
+    });
+
+    expect(result.isError).toBe(true);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("deletes a time entry", async () => {
+    await call("delete_time_entry", { timeEntryId: "te1" });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/time-entry/te1",
+      method: "DELETE",
+    });
+  });
+
+  it("pages activity, comments and time entries with bounded defaults", async () => {
+    await call("list_task_activity", { taskId: "t1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/activity/t1?limit=50&offset=0",
+    );
+
+    await call("list_task_activity", { taskId: "t1", limit: 10, offset: 20 });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/activity/t1?limit=10&offset=20",
+    );
+
+    await call("list_task_comments", { taskId: "t1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/comment/t1?limit=50&offset=0",
+    );
+
+    await call("list_task_time_entries", { taskId: "t1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/time-entry/task/t1?limit=50&offset=0",
+    );
+  });
+
+  it("applies bounded defaults to list_tasks and get_project", async () => {
+    await call("list_tasks", { projectId: "p1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/task/tasks/p1?page=1&limit=50",
+    );
+
+    await call("list_tasks", { projectId: "p1", page: 3, limit: 25 });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/task/tasks/p1?page=3&limit=25",
+    );
+
+    await call("get_project", { projectId: "p1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/project/p1?tasksLimit=50&tasksOffset=0",
+    );
+
+    await call("get_project", {
+      projectId: "p1",
+      tasksLimit: 10,
+      tasksOffset: 20,
+    });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/project/p1?tasksLimit=10&tasksOffset=20",
+    );
+  });
+
+  it("converts local times with the user timezone (summer and winter)", async () => {
+    await call("create_task", {
+      projectId: "p1",
+      title: "Task",
+      description: "",
+      priority: "medium",
+      status: "to-do",
+      startDate: "2026-09-14T14:00:00",
+      timezone: "Europe/Bucharest",
+    });
+    expect(lastRequest().body).toMatchObject({
+      startDate: "2026-09-14T11:00:00.000Z",
+    });
+
+    await call("update_task_due_date", {
+      taskId: "t1",
+      dueDate: "2026-01-14T14:00:00",
+      timezone: "Europe/Bucharest",
+    });
+    expect(lastRequest().body).toEqual({
+      dueDate: "2026-01-14T12:00:00.000Z",
+    });
+  });
+
+  it("rejects a local time without a timezone before calling the API", async () => {
+    const result = await call("create_task", {
+      projectId: "p1",
+      title: "Task",
+      description: "",
+      priority: "medium",
+      status: "to-do",
+      startDate: "2026-09-14T14:00:00",
+    });
+
+    expect(result.isError).toBe(true);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("keeps an explicit offset untouched", async () => {
+    await call("update_task_due_date", {
+      taskId: "t1",
+      dueDate: "2026-09-14T14:00:00+03:00",
+    });
+
+    expect(lastRequest().body).toEqual({
+      dueDate: "2026-09-14T14:00:00+03:00",
+    });
+  });
+
   it("reads time entries for a task and by id", async () => {
     await call("list_task_time_entries", { taskId: "t1" });
-    expect(lastRequest().url).toBe("http://api.test/api/time-entry/task/t1");
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/time-entry/task/t1?limit=50&offset=0",
+    );
 
     await call("get_time_entry", { timeEntryId: "te1" });
     expect(lastRequest().url).toBe("http://api.test/api/time-entry/te1");
@@ -284,7 +498,9 @@ describe("MCP tool catalog", () => {
 
   it("reads task activity and notifications", async () => {
     await call("list_task_activity", { taskId: "t1" });
-    expect(lastRequest().url).toBe("http://api.test/api/activity/t1");
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/activity/t1?limit=50&offset=0",
+    );
 
     await call("list_notifications");
     expect(lastRequest().url).toBe("http://api.test/api/notification");

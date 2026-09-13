@@ -7,6 +7,7 @@ import {
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import createTimeEntry from "./controllers/create-time-entry";
+import deleteTimeEntry from "./controllers/delete-time-entry";
 import getTimeEntriesByTaskId from "./controllers/get-time-entries";
 import getTimeEntry from "./controllers/get-time-entry";
 import updateTimeEntry from "./controllers/update-time-entry";
@@ -14,6 +15,7 @@ import { timeEntryListSchema, timeEntrySchema } from "./response";
 import {
   createTimeEntryBody,
   taskIdParam,
+  timeEntryListQuery,
   timeEntryParam,
   updateTimeEntryBody,
 } from "./schema";
@@ -26,7 +28,7 @@ const getTaskTimeEntriesRoute = createRoute({
   summary: "Get task time entries",
   description: "Get every time entry logged against a task.",
   middleware: [workspaceAccess.fromTaskId()] as const,
-  request: { params: taskIdParam },
+  request: { params: taskIdParam, query: timeEntryListQuery },
   responses: {
     200: jsonResponse("List of time entries for the task", timeEntryListSchema),
     400: errorResponse(
@@ -109,10 +111,41 @@ const updateTimeEntryRoute = createRoute({
   },
 });
 
+const deleteTimeEntryRoute = createRoute({
+  method: "delete",
+  operationId: "deleteTimeEntry",
+  path: "/{id}",
+  tags: ["Time Entries"],
+  summary: "Delete time entry",
+  description:
+    "Delete a time entry, e.g. to cancel a mistaken log. Irreversible.",
+  middleware: [
+    workspaceAccess.fromTimeEntry(),
+    requireWorkspacePermission({ task: ["update"] }),
+  ] as const,
+  request: { params: timeEntryParam },
+  responses: {
+    200: jsonResponse("The deleted time entry", timeEntrySchema),
+    400: errorResponse(
+      "Unknown entry, or its workspace could not be determined",
+    ),
+    403: errorResponse(
+      "No workspace access, or missing task:update permission",
+    ),
+  },
+});
+
 const timeEntry = apiRouter()
-  .openapi(getTaskTimeEntriesRoute, async (c) =>
-    c.json(await getTimeEntriesByTaskId(c.req.valid("param").taskId), 200),
-  )
+  .openapi(getTaskTimeEntriesRoute, async (c) => {
+    const { limit, offset } = c.req.valid("query");
+    return c.json(
+      await getTimeEntriesByTaskId(c.req.valid("param").taskId, {
+        limit,
+        offset,
+      }),
+      200,
+    );
+  })
   .openapi(getTimeEntryRoute, async (c) =>
     c.json(await getTimeEntry(c.req.valid("param").id), 200),
   )
@@ -141,6 +174,9 @@ const timeEntry = apiRouter()
       }),
       200,
     );
-  });
+  })
+  .openapi(deleteTimeEntryRoute, async (c) =>
+    c.json(await deleteTimeEntry(c.req.valid("param").id), 200),
+  );
 
 export default timeEntry;

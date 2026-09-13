@@ -1,12 +1,6 @@
 import { z } from "../openapi";
+import { pagingNumber } from "../utils/paging";
 import { VALID_PRIORITIES } from "./validate-task-fields";
-
-const pagingNumber = (min: number, max: number) =>
-  z
-    .string()
-    .regex(/^\d+$/, "Expected a positive integer")
-    .transform(Number)
-    .pipe(z.number().int().min(min).max(max));
 
 export const taskParam = z.object({ id: z.string() });
 
@@ -74,7 +68,7 @@ export const reminderOffsets = z
   .optional()
   .openapi({
     description:
-      "Reminder offsets in minutes before the due date (e.g. 1440 = 24h, 120 = 2h). Null clears all reminders.",
+      "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date.",
   });
 
 export const createTaskBody = z.object({
