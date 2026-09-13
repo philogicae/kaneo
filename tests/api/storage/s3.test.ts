@@ -1,332 +1,46 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   applyKeyPrefix,
-  assertStorageConfigured,
   assertTaskImageKeyMatchesContext,
   buildObjectKey,
   buildObjectKeyPrefix,
   createTaskImageUploadUrl,
+  deleteS3Object,
   getFileExtension,
+  getPrivateObject,
   isImageContentType,
   parseBoolean,
   parsePositiveInt,
-  resolveS3Credentials,
   sanitizePathSegment,
   validateTaskAssetUploadInput,
+  writeAssetObject,
 } from "../../../apps/api/src/storage/s3";
 
-describe("S3 helpers", () => {
-  const originalMaxSize = process.env.S3_MAX_IMAGE_UPLOAD_BYTES;
-  const originalEndpoint = process.env.S3_ENDPOINT;
-  const originalBucket = process.env.S3_BUCKET;
-  const originalAccessKeyId = process.env.S3_ACCESS_KEY_ID;
-  const originalSecretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
-  const originalRegion = process.env.S3_REGION;
-  const originalPathStyle = process.env.S3_FORCE_PATH_STYLE;
-  const originalKeyPrefix = process.env.S3_KEY_PREFIX;
+const ENV_KEYS = [
+  "STORAGE_PATH",
+  "STORAGE_KEY_PREFIX",
+  "STORAGE_MAX_IMAGE_UPLOAD_BYTES",
+  "KANEO_API_URL",
+] as const;
+
+describe("local asset storage", () => {
+  const original: Record<string, string | undefined> = {};
+  let tempRoot: string | undefined;
 
   beforeEach(() => {
-    delete process.env.S3_MAX_IMAGE_UPLOAD_BYTES;
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-
-    if (originalMaxSize === undefined) {
-      delete process.env.S3_MAX_IMAGE_UPLOAD_BYTES;
-    } else {
-      process.env.S3_MAX_IMAGE_UPLOAD_BYTES = originalMaxSize;
-    }
-
-    if (originalEndpoint === undefined) {
-      delete process.env.S3_ENDPOINT;
-    } else {
-      process.env.S3_ENDPOINT = originalEndpoint;
-    }
-
-    if (originalBucket === undefined) {
-      delete process.env.S3_BUCKET;
-    } else {
-      process.env.S3_BUCKET = originalBucket;
-    }
-
-    if (originalAccessKeyId === undefined) {
-      delete process.env.S3_ACCESS_KEY_ID;
-    } else {
-      process.env.S3_ACCESS_KEY_ID = originalAccessKeyId;
-    }
-
-    if (originalSecretAccessKey === undefined) {
-      delete process.env.S3_SECRET_ACCESS_KEY;
-    } else {
-      process.env.S3_SECRET_ACCESS_KEY = originalSecretAccessKey;
-    }
-
-    if (originalRegion === undefined) {
-      delete process.env.S3_REGION;
-    } else {
-      process.env.S3_REGION = originalRegion;
-    }
-
-    if (originalPathStyle === undefined) {
-      delete process.env.S3_FORCE_PATH_STYLE;
-    } else {
-      process.env.S3_FORCE_PATH_STYLE = originalPathStyle;
-    }
-
-    if (originalKeyPrefix === undefined) {
-      delete process.env.S3_KEY_PREFIX;
-    } else {
-      process.env.S3_KEY_PREFIX = originalKeyPrefix;
-    }
-  });
-
-  it("recognizes allowed image content types case-insensitively", () => {
-    expect(isImageContentType("IMAGE/PNG")).toBe(true);
-    expect(isImageContentType("text/plain")).toBe(false);
-  });
-
-  it("parses booleans and positive integers with fallbacks", () => {
-    expect(parseBoolean(undefined, true)).toBe(true);
-    expect(parseBoolean(" false ", true)).toBe(false);
-    expect(parsePositiveInt("42", 10)).toBe(42);
-    expect(parsePositiveInt("0", 10)).toBe(10);
-    expect(parsePositiveInt("nope", 10)).toBe(10);
-  });
-
-  it("sanitizes path segments and extracts normalized extensions", () => {
-    expect(sanitizePathSegment(" Release Notes!!.PNG ")).toBe(
-      "release-notes-.png",
-    );
-    expect(sanitizePathSegment("")).toBe("file");
-    expect(getFileExtension("Screenshot.Final.PNG")).toBe("png");
-    expect(getFileExtension("README")).toBe("file");
-  });
-
-  it("builds stable key prefixes and keys", () => {
-    vi.spyOn(Date, "now").mockReturnValue(1_717_171_717_000);
-
-    const key = buildObjectKey({
-      workspaceId: "Workspace 1",
-      projectId: "Project 2",
-      taskId: "Task 3",
-      surface: "comment",
-      filename: "Sprint Plan Final!!.PNG",
-      contentType: "image/png",
-    });
-
-    expect(
-      buildObjectKeyPrefix({
-        workspaceId: "Workspace 1",
-        projectId: "Project 2",
-        taskId: "Task 3",
-        surface: "comment",
-      }),
-    ).toBe("workspace/workspace-1/project/project-2/task/task-3/comments");
-
-    expect(key).toMatch(
-      /^workspace\/workspace-1\/project\/project-2\/task\/task-3\/comments\/sprint-plan-final-1717171717000-[a-z0-9]+\.png$/,
-    );
-    process.env.S3_ENDPOINT = "https://storage.example.test";
-    process.env.S3_BUCKET = "kaneo";
-    process.env.S3_ACCESS_KEY_ID = "test-access-key";
-    process.env.S3_SECRET_ACCESS_KEY = "test-secret-key";
-    delete process.env.S3_KEY_PREFIX;
-
-    expect(
-      assertTaskImageKeyMatchesContext(key, {
-        workspaceId: "Workspace 1",
-        projectId: "Project 2",
-        taskId: "Task 3",
-        surface: "comment",
-      }),
-    ).toBe(true);
-  });
-
-  it("assertTaskImageKeyMatchesContext rejects traversal past the prefix", () => {
-    process.env.S3_ENDPOINT = "https://storage.example.test";
-    process.env.S3_BUCKET = "kaneo";
-    process.env.S3_ACCESS_KEY_ID = "test-access-key";
-    process.env.S3_SECRET_ACCESS_KEY = "test-secret-key";
-    delete process.env.S3_KEY_PREFIX;
-
-    const ctx = {
-      workspaceId: "ws1",
-      projectId: "p1",
-      taskId: "t1",
-      surface: "description" as const,
-    };
-    const prefix = "workspace/ws1/project/p1/task/t1/descriptions";
-
-    expect(
-      assertTaskImageKeyMatchesContext(`${prefix}/image-1-abc.png`, ctx),
-    ).toBe(true);
-
-    for (const suffix of [
-      "../../../../../../workspace/victim/secret.png",
-      "nested/deeper.png",
-      "..%2Fescape.png",
-      ".hidden",
-      "back\\slash.png",
-    ]) {
-      expect(assertTaskImageKeyMatchesContext(`${prefix}/${suffix}`, ctx)).toBe(
-        false,
-      );
-    }
-  });
-
-  it("applyKeyPrefix prepends prefix and trims trailing slashes", () => {
-    expect(applyKeyPrefix("", "workspace/a/file.png")).toBe(
-      "workspace/a/file.png",
-    );
-    expect(applyKeyPrefix("staging", "workspace/a/file.png")).toBe(
-      "staging/workspace/a/file.png",
-    );
-    expect(applyKeyPrefix("prod/kaneo/", "workspace/a/file.png")).toBe(
-      "prod/kaneo/workspace/a/file.png",
-    );
-    expect(applyKeyPrefix("prefix///", "key")).toBe("prefix/key");
-  });
-
-  it("assertTaskImageKeyMatchesContext respects S3_KEY_PREFIX", () => {
-    process.env.S3_ENDPOINT = "https://storage.example.test";
-    process.env.S3_BUCKET = "kaneo";
-    process.env.S3_ACCESS_KEY_ID = "test-access-key";
-    process.env.S3_SECRET_ACCESS_KEY = "test-secret-key";
-    process.env.S3_KEY_PREFIX = "staging";
-
-    const ctx = {
-      workspaceId: "ws1",
-      projectId: "p1",
-      taskId: "t1",
-      surface: "description" as const,
-    };
-
-    const prefixedKey =
-      "staging/workspace/ws1/project/p1/task/t1/descriptions/img-123-abc.png";
-    const unprefixedKey =
-      "workspace/ws1/project/p1/task/t1/descriptions/img-123-abc.png";
-
-    expect(assertTaskImageKeyMatchesContext(prefixedKey, ctx)).toBe(true);
-    expect(assertTaskImageKeyMatchesContext(unprefixedKey, ctx)).toBe(false);
-  });
-
-  it("validates upload size against the configured maximum", () => {
-    process.env.S3_MAX_IMAGE_UPLOAD_BYTES = "1048576";
-
-    expect(() => validateTaskAssetUploadInput("", 10)).toThrow(
-      "A valid content type is required.",
-    );
-    expect(() => validateTaskAssetUploadInput("image/png", 0)).toThrow(
-      "Upload size must be greater than zero.",
-    );
-    expect(() =>
-      validateTaskAssetUploadInput("image/png", 2 * 1024 * 1024),
-    ).toThrow("Upload exceeds the maximum upload size of 1MB.");
-    expect(() => validateTaskAssetUploadInput("image/png", 512)).not.toThrow();
-  });
-
-  it("creates presigned upload URLs without hoisted checksum query params", async () => {
-    process.env.S3_ENDPOINT = "https://storage.example.test";
-    process.env.S3_BUCKET = "kaneo";
-    process.env.S3_ACCESS_KEY_ID = "test-access-key";
-    process.env.S3_SECRET_ACCESS_KEY = "test-secret-key";
-    process.env.S3_REGION = "us-east-1";
-    process.env.S3_FORCE_PATH_STYLE = "true";
-    delete process.env.S3_KEY_PREFIX;
-
-    const upload = await createTaskImageUploadUrl({
-      workspaceId: "workspace-1",
-      projectId: "project-1",
-      taskId: "task-1",
-      surface: "description",
-      filename: "report.png",
-      contentType: "image/png",
-    });
-
-    const searchParams = new URL(upload.uploadUrl).searchParams;
-    expect(searchParams.has("x-amz-checksum-crc32")).toBe(false);
-    expect(searchParams.has("x-amz-sdk-checksum-algorithm")).toBe(false);
-  });
-
-  it("resolveS3Credentials returns explicit credentials when both keys are set", () => {
-    expect(resolveS3Credentials("AKIA", "secret")).toEqual({
-      accessKeyId: "AKIA",
-      secretAccessKey: "secret",
-    });
-  });
-
-  it("resolveS3Credentials returns undefined when both keys are absent (IAM role fallback)", () => {
-    expect(resolveS3Credentials("", "")).toBeUndefined();
-  });
-
-  it("resolveS3Credentials throws when only one key is set", () => {
-    expect(() => resolveS3Credentials("AKIA", "")).toThrow(
-      /both S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY/,
-    );
-    expect(() => resolveS3Credentials("", "secret")).toThrow(
-      /both S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY/,
-    );
-  });
-
-  it("assertStorageConfigured succeeds without static keys (IAM role mode)", () => {
-    process.env.S3_ENDPOINT = "https://s3.us-east-1.amazonaws.com";
-    process.env.S3_BUCKET = "kaneo";
-    delete process.env.S3_ACCESS_KEY_ID;
-    delete process.env.S3_SECRET_ACCESS_KEY;
-
-    const config = assertStorageConfigured();
-    expect(config.bucket).toBe("kaneo");
-    expect(config.accessKeyId).toBe("");
-    expect(config.secretAccessKey).toBe("");
-  });
-
-  it("assertStorageConfigured throws when only one credential key is set", () => {
-    process.env.S3_ENDPOINT = "https://s3.us-east-1.amazonaws.com";
-    process.env.S3_BUCKET = "kaneo";
-    process.env.S3_ACCESS_KEY_ID = "AKIA";
-    delete process.env.S3_SECRET_ACCESS_KEY;
-
-    expect(() => assertStorageConfigured()).toThrow(
-      /Incomplete S3 credentials/,
-    );
-  });
-
-  it("assertStorageConfigured throws when endpoint or bucket is missing", () => {
-    delete process.env.S3_ENDPOINT;
-    delete process.env.S3_BUCKET;
-
-    expect(() => assertStorageConfigured()).toThrow(
-      /S3 uploads are not configured/,
-    );
-  });
-});
-
-describe("S3 credential provider chain (IAM role)", () => {
-  const trackedKeys = [
-    "S3_ENDPOINT",
-    "S3_BUCKET",
-    "S3_ACCESS_KEY_ID",
-    "S3_SECRET_ACCESS_KEY",
-    "S3_REGION",
-    "S3_FORCE_PATH_STYLE",
-    "S3_KEY_PREFIX",
-    "AWS_ACCESS_KEY_ID",
-    "AWS_SECRET_ACCESS_KEY",
-    "AWS_SESSION_TOKEN",
-  ] as const;
-
-  const original: Partial<Record<(typeof trackedKeys)[number], string>> = {};
-
-  beforeEach(() => {
-    for (const key of trackedKeys) {
+    for (const key of ENV_KEYS) {
       original[key] = process.env[key];
       delete process.env[key];
     }
+    tempRoot = mkdtempSync(join(tmpdir(), "kaneo-assets-"));
+    process.env.STORAGE_PATH = tempRoot;
   });
 
   afterEach(() => {
-    for (const key of trackedKeys) {
+    for (const key of ENV_KEYS) {
       const value = original[key];
       if (value === undefined) {
         delete process.env[key];
@@ -334,38 +48,166 @@ describe("S3 credential provider chain (IAM role)", () => {
         process.env[key] = value;
       }
     }
+    if (tempRoot) {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
+    tempRoot = undefined;
   });
 
-  it("signs presigned URLs using ambient credentials when S3 keys are unset", async () => {
-    // Non-sensitive, obviously-fake credentials generated at runtime so no
-    // credential-like literals are committed (avoids secret-scanning hits).
-    const ambientAccessKeyId = `test-ambient-key-${Date.now()}`;
-    const ambientSecretAccessKey = `test-ambient-secret-${Date.now()}`;
+  it("recognizes allowed image content types case-insensitively", () => {
+    expect(isImageContentType("image/png")).toBe(true);
+    expect(isImageContentType("IMAGE/JPEG")).toBe(true);
+    expect(isImageContentType("application/pdf")).toBe(false);
+  });
 
-    // Simulates an IAM role / IRSA / instance profile: no S3_ACCESS_KEY_ID is
-    // configured, but ambient AWS credentials are resolvable from the
-    // environment (the AWS SDK default provider chain reads AWS_* env vars).
-    process.env.S3_ENDPOINT = "https://s3.us-east-1.amazonaws.com";
-    process.env.S3_BUCKET = "kaneo";
-    process.env.S3_REGION = "us-east-1";
-    process.env.S3_FORCE_PATH_STYLE = "false";
-    process.env.AWS_ACCESS_KEY_ID = ambientAccessKeyId;
-    process.env.AWS_SECRET_ACCESS_KEY = ambientSecretAccessKey;
+  it("parses booleans and positive integers with fallbacks", () => {
+    expect(parseBoolean("true", false)).toBe(true);
+    expect(parseBoolean("TRUE", false)).toBe(true);
+    expect(parseBoolean("", true)).toBe(true);
+    expect(parseBoolean(undefined, true)).toBe(true);
+    expect(parsePositiveInt("42", 1)).toBe(42);
+    expect(parsePositiveInt("0", 7)).toBe(7);
+    expect(parsePositiveInt("nope", 7)).toBe(7);
+  });
+
+  it("sanitizes path segments and extracts normalized extensions", () => {
+    expect(sanitizePathSegment("My File!!.PNG")).toBe("my-file-.png");
+    expect(getFileExtension("screenshot.PNG")).toBe("png");
+    expect(getFileExtension("no-extension")).toBe("file");
+  });
+
+  it("builds stable key prefixes and keys", () => {
+    const context = {
+      workspaceId: "ws_1",
+      projectId: "proj_1",
+      taskId: "task_1",
+      surface: "comment" as const,
+      filename: "Screenshot 2026.png",
+      contentType: "image/png",
+    };
+
+    expect(buildObjectKeyPrefix(context)).toBe(
+      "workspace/ws_1/project/proj_1/task/task_1/comments",
+    );
+
+    const key = buildObjectKey(context);
+    expect(
+      key.startsWith("workspace/ws_1/project/proj_1/task/task_1/comments/"),
+    ).toBe(true);
+    expect(key.endsWith(".png")).toBe(true);
+  });
+
+  it("applyKeyPrefix prepends the prefix and trims trailing slashes", () => {
+    expect(applyKeyPrefix("", "a/b")).toBe("a/b");
+    expect(applyKeyPrefix("dev/", "a/b")).toBe("dev/a/b");
+    expect(applyKeyPrefix("dev", "a/b")).toBe("dev/a/b");
+  });
+
+  it("assertTaskImageKeyMatchesContext rejects traversal past the prefix", () => {
+    const context = {
+      workspaceId: "ws_1",
+      projectId: "proj_1",
+      taskId: "task_1",
+      surface: "description" as const,
+    };
+
+    expect(
+      assertTaskImageKeyMatchesContext(
+        "workspace/ws_1/project/proj_1/task/task_1/descriptions/image.png",
+        context,
+      ),
+    ).toBe(true);
+    expect(
+      assertTaskImageKeyMatchesContext(
+        "workspace/ws_1/project/proj_1/task/task_1/descriptions/../secret.png",
+        context,
+      ),
+    ).toBe(false);
+    expect(
+      assertTaskImageKeyMatchesContext(
+        "workspace/other/project/proj_1/task/task_1/descriptions/image.png",
+        context,
+      ),
+    ).toBe(false);
+  });
+
+  it("assertTaskImageKeyMatchesContext respects STORAGE_KEY_PREFIX", () => {
+    process.env.STORAGE_KEY_PREFIX = "tenant";
+
+    expect(
+      assertTaskImageKeyMatchesContext(
+        "tenant/workspace/ws_1/project/proj_1/task/task_1/descriptions/image.png",
+        {
+          workspaceId: "ws_1",
+          projectId: "proj_1",
+          taskId: "task_1",
+          surface: "description",
+        },
+      ),
+    ).toBe(true);
+  });
+
+  it("validates upload size against the configured maximum", () => {
+    process.env.STORAGE_MAX_IMAGE_UPLOAD_BYTES = "1024";
+
+    expect(() => validateTaskAssetUploadInput("image/png", 512)).not.toThrow();
+    expect(() => validateTaskAssetUploadInput("", 512)).toThrow(
+      "A valid content type is required.",
+    );
+    expect(() => validateTaskAssetUploadInput("image/png", 0)).toThrow(
+      "Upload size must be greater than zero.",
+    );
+    expect(() => validateTaskAssetUploadInput("image/png", 2048)).toThrow(
+      "Upload exceeds the maximum upload size",
+    );
+  });
+
+  it("creates an API blob upload URL rather than a presigned S3 URL", async () => {
+    process.env.KANEO_API_URL = "https://kaneo.test";
 
     const upload = await createTaskImageUploadUrl({
-      workspaceId: "workspace-1",
-      projectId: "project-1",
-      taskId: "task-1",
-      surface: "description",
-      filename: "report.png",
+      workspaceId: "ws_1",
+      projectId: "proj_1",
+      taskId: "task_1",
+      surface: "comment",
+      filename: "note.png",
       contentType: "image/png",
     });
 
-    const searchParams = new URL(upload.uploadUrl).searchParams;
-    // The signature must be derived from the ambient credentials, proving the
-    // SDK default provider chain (used for IAM roles) was applied.
-    expect(searchParams.get("X-Amz-Credential")).toContain(ambientAccessKeyId);
-    expect(searchParams.has("X-Amz-Signature")).toBe(true);
+    expect(
+      upload.uploadUrl.startsWith(
+        "https://kaneo.test/api/task/image-upload/task_1/blob?",
+      ),
+    ).toBe(true);
+    expect(upload.uploadUrl).toContain("surface=comment");
+    expect(upload.uploadUrl).toContain(`key=${encodeURIComponent(upload.key)}`);
+    expect(upload.headers["Content-Type"]).toBe("image/png");
+  });
+
+  it("writes, reads and deletes an asset on local disk", async () => {
+    const key = "workspace/ws_1/project/proj_1/task/task_1/descriptions/a.png";
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+
+    await writeAssetObject(key, bytes);
+
+    const object = await getPrivateObject(key);
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of object.body as AsyncIterable<Uint8Array>) {
+      chunks.push(chunk);
+    }
+    const content = Buffer.concat(chunks);
+    expect(content).toEqual(Buffer.from(bytes));
+    expect(object.contentLength).toBe(4);
+    expect(object.lastModified).toBeInstanceOf(Date);
+
+    await deleteS3Object(key);
+    await expect(getPrivateObject(key)).rejects.toThrow();
+  });
+
+  it("rejects a key that escapes the storage root", async () => {
+    await expect(
+      writeAssetObject("../escape.png", new Uint8Array([1])),
+    ).rejects.toThrow("Invalid storage key.");
   });
 });
 

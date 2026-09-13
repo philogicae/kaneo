@@ -35,8 +35,6 @@ overrides:
   '@babel/core': '>=7.29.6 <8'
 allowBuilds:
   '@prisma/engines': true
-  '@sentry/cli': true
-  '@sentry/node-cpu-profiler': true
   esbuild: true
   msw: true
   prisma: true

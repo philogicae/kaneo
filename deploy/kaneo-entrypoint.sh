@@ -24,10 +24,6 @@ if [ -z "${KANEO_API_URL:-}" ] && [ -n "$client_url" ]; then
   echo "KANEO_API_URL not set — derived from KANEO_CLIENT_URL: $KANEO_API_URL"
 fi
 
-# Default the SQLite database file to the mounted /data volume when the
-# deployment does not override DATABASE_PATH.
-export DATABASE_PATH="${DATABASE_PATH:-/data/kaneo.db}"
-
 # Auto-generate AUTH_SECRET if not set
 if [ -z "${AUTH_SECRET:-}" ]; then
   export AUTH_SECRET="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"

@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/node";
 import { assertPublicDestination } from "../../../utils/assert-public-destination";
 import type { GiteaConfig } from "../config";
 import { normalizeGiteaBaseUrl } from "../config";
@@ -97,11 +96,6 @@ export async function giteaFetch<T>(
   }
 
   try {
-    Sentry.addBreadcrumb({
-      category: "integration",
-      level: "info",
-      data: { integration: "gitea" },
-    });
     const res = await fetch(url, {
       ...init,
       signal: controller.signal,

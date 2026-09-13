@@ -5,7 +5,7 @@ import {
   redirect,
   useLocation,
 } from "@tanstack/react-router";
-import { CreditCard, Settings, Shield, Tag } from "lucide-react";
+import { Settings, Shield, Tag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SettingsSidebar from "@/components/SettingsSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,7 +18,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import getWorkspaces from "@/fetchers/workspace/get-workspaces";
-import useGetConfig from "@/hooks/queries/config/use-get-config";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
@@ -67,7 +66,6 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { t } = useTranslation();
   const { workspace, role } = useWorkspacePermission();
-  const { data: config } = useGetConfig();
   const location = useLocation();
   const menuItems = [
     {
@@ -85,15 +83,6 @@ function RouteComponent() {
       url: "/dashboard/settings/workspace/labels",
       icon: Tag,
     },
-    ...(config?.billingEnabled
-      ? [
-          {
-            title: "Billing",
-            url: "/dashboard/settings/workspace/billing",
-            icon: CreditCard,
-          },
-        ]
-      : []),
   ];
   const isActivePath = (path: string) => location.pathname === path;
   const workspaceInitials = getInitials(workspace?.name, "WS");

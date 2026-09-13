@@ -57,7 +57,12 @@
 			"dependsOn": ["^build"],
 			"cache": false,
 			"outputs": ["coverage/**"],
-			"env": ["DATABASE_PATH"]
+			"env": [
+				"DATABASE_PATH",
+				"STORAGE_PATH",
+				"STORAGE_KEY_PREFIX",
+				"STORAGE_MAX_IMAGE_UPLOAD_BYTES"
+			]
 		}
 	}
 }

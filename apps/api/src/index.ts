@@ -1,11 +1,8 @@
-import "./instrument";
-
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/node";
 import type { Session, User } from "better-auth/types";
 import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/libsql/migrator";
@@ -16,7 +13,6 @@ import { HTTPException } from "hono/http-exception";
 import activity from "./activity";
 import { auth } from "./auth";
 import { organizationRoutes } from "./auth-openapi";
-import billing from "./billing";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
@@ -140,16 +136,9 @@ export function createApp() {
 
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
-      // expected errors (401/404/...) are not reported; real failures are
-      if (err.status >= 500) {
-        Sentry.captureException(err);
-      }
       return err.getResponse();
     }
 
-    Sentry.captureException(err);
-    // Without a DSN, Sentry capture is a no-op and these failures would be
-    // completely silent (schema drift on existing installs, bugs, ...).
     console.error(`Unhandled error on ${c.req.method} ${c.req.path}:`, err);
     return c.json({ message: "Internal Server Error" }, 500);
   });
@@ -547,7 +536,6 @@ export function createApp() {
     if (
       path.startsWith("/api/mcp") ||
       path.startsWith("/api/.well-known/") ||
-      path === "/api/billing/webhook" ||
       // Public invite-link lookups are anonymous by design (the web fetcher
       // sends no credentials for signed-out visitors). The accept route is
       // POST, so it still goes through authentication below.
@@ -556,29 +544,23 @@ export function createApp() {
     ) {
       return next();
     }
-    return Sentry.withIsolationScope(async () => {
-      Sentry.setUser(null);
-      try {
-        await authenticateApiRequest(c);
-        const windowId = c.req.header("X-Kaneo-Window-Id");
-        const userId = c.get("userId");
-        const initiatorId = windowId ? `${userId}:${windowId}` : userId;
-        return await eventContext.run({ initiatorId }, next);
-      } catch (error) {
-        if (!(error instanceof HTTPException)) {
-          console.error("API authentication failed:", error);
-          throw new HTTPException(500, { message: "Internal Server Error" });
-        }
-        throw error;
-      } finally {
-        Sentry.setUser(null);
+    try {
+      await authenticateApiRequest(c);
+      const windowId = c.req.header("X-Kaneo-Window-Id");
+      const userId = c.get("userId");
+      const initiatorId = windowId ? `${userId}:${windowId}` : userId;
+      return await eventContext.run({ initiatorId }, next);
+    } catch (error) {
+      if (!(error instanceof HTTPException)) {
+        console.error("API authentication failed:", error);
+        throw new HTTPException(500, { message: "Internal Server Error" });
       }
-    });
+      throw error;
+    }
   });
 
   const oauthApi = api.route("/oauth", oauth);
 
-  const billingApi = api.route("/billing", billing);
   const projectApi = api.route("/project", project);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
@@ -763,7 +745,6 @@ export function createApp() {
     api,
     injectWebSocket,
     activityApi,
-    billingApi,
     columnApi,
     commentApi,
     configApi,
@@ -869,7 +850,6 @@ const {
   app,
   injectWebSocket,
   activityApi,
-  billingApi,
   columnApi,
   commentApi,
   configApi,
@@ -912,7 +892,6 @@ if (isMainModule) {
 }
 
 export type AppType =
-  | typeof billingApi
   | typeof configApi
   | typeof projectApi
   | typeof taskApi
