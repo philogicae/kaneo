@@ -5,7 +5,6 @@ import { NavProjects } from "@/components/nav-projects";
 import { NavUnified } from "@/components/nav-unified";
 import { SidebarHeaderControls } from "@/components/sidebar-header-controls";
 import { ThemeToggleDropdown } from "@/components/theme-toggle-dropdown";
-import { TrialCard } from "@/components/trial-card";
 import {
   Sidebar,
   SidebarContent,
@@ -46,7 +45,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects />
       </SidebarContent>
       <SidebarFooter className="group-data-[collapsible=icon]:hidden">
-        <TrialCard />
         <div className="flex items-center justify-between">
           <UiScaleControl />
           <ThemeToggleDropdown />

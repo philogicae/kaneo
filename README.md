@@ -38,10 +38,10 @@ docker compose up -d --build
 
 Open [http://localhost:5173](http://localhost:5173).
 
-Database files live in `/mnt/user/appdata/kaneo/turso` by default — override the host directory with `KANEO_DATA_PATH` in `.env`. The directory must be writable by the container user:
+The database lives at `./data/kaneo.db` (resolved from the repository root; the container bind-mounts the host directory at `/app/data`) — override the host directory with `KANEO_DATA_PATH` in `.env`. The directory must be writable by the container user:
 
 ```bash
-chown 1001:1001 /mnt/user/appdata/kaneo/turso
+chown 1001:1001 ./data/kaneo.db
 ```
 
 Or run the prebuilt GHCR image instead of building locally:

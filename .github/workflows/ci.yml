@@ -95,7 +95,7 @@ jobs:
 
   typecheck:
     name: Typecheck 🧠
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7

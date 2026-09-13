@@ -34,11 +34,6 @@ import type { AccessControl } from "better-auth/plugins/access";
 import type { UserWithAnonymous } from "better-auth/plugins/anonymous";
 import { config } from "dotenv-mono";
 import { count, eq } from "drizzle-orm";
-import {
-  findBillableWorkspaces,
-  formatBillableWorkspacesMessage,
-} from "./billing/controllers/find-billable-workspaces";
-import { syncWorkspaceSeats } from "./billing/controllers/sync-seats";
 import db, { schema } from "./database";
 import { publishEvent } from "./events";
 import deleteAccountData from "./user/controllers/delete-account-data";
@@ -476,30 +471,6 @@ export const auth = betterAuth({
             ownerEmail: user.name,
             ownerId: user.id,
           });
-        },
-        beforeDeleteOrganization: async ({ organization }) => {
-          const billable = await findBillableWorkspaces([organization.id]);
-          if (billable.length > 0) {
-            throw new APIError("CONFLICT", {
-              message: formatBillableWorkspacesMessage(
-                billable.map((workspace) => workspace.name),
-              ),
-            });
-          }
-        },
-        afterAddMember: async ({ member }) => {
-          if (member?.organizationId) {
-            void syncWorkspaceSeats(member.organizationId).catch((error) => {
-              console.error("Seat sync after member add failed:", error);
-            });
-          }
-        },
-        afterRemoveMember: async ({ member }) => {
-          if (member?.organizationId) {
-            void syncWorkspaceSeats(member.organizationId).catch((error) => {
-              console.error("Seat sync after member remove failed:", error);
-            });
-          }
         },
       },
       async sendInvitationEmail(data) {

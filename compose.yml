@@ -13,10 +13,8 @@ services:
       - "5173:5173"
     env_file:
       - .env
-    environment:
-      DATABASE_PATH: /data/kaneo.db
     volumes:
-      - ${KANEO_DATA_PATH:-/mnt/user/appdata/kaneo/turso}:/data
+      - ${KANEO_DATA_PATH:-./data/kaneo.db}:/app/data
     healthcheck:
       test:
         [
