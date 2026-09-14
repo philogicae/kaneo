@@ -53,10 +53,9 @@ import { TaskLabels } from "./task-labels";
 
 type TaskCardProps = {
   task: Task;
-  disableDragDrop?: boolean;
 };
 
-function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
+function TaskCard({ task }: TaskCardProps) {
   const { t } = useTranslation();
   const {
     attributes,
@@ -65,7 +64,7 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id, disabled: disableDragDrop });
+  } = useSortable({ id: task.id });
   const { project } = useProjectStore();
   const taskIsCompleted = isTaskCompleted(task.status, project?.columns);
   const { data: workspace } = useActiveWorkspace();
@@ -208,9 +207,7 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
           {/** biome-ignore lint/a11y/noStaticElementInteractions: false positive for onClick and onKeyDown */}
           <div
             onClick={handleTaskCardClick}
-            className={`group relative rounded-lg border bg-background p-3 shadow-xs/5 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98] ${
-              disableDragDrop ? "cursor-default" : "cursor-move"
-            } ${
+            className={`group relative rounded-lg border bg-background p-3 shadow-xs/5 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98] cursor-move ${
               isDragging
                 ? "border-ring/40 bg-card shadow-lg"
                 : "hover:bg-background hover:shadow-sm"

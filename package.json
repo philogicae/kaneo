@@ -29,7 +29,7 @@
   "engines": {
     "node": ">=26.0.0"
   },
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@12.4.1",
   "version": "2.25.0",
   "dependencies": {
     "dotenv-mono": "^1.5.1"

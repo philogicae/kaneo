@@ -910,7 +910,7 @@ function RouteComponent() {
           {sortedProject ? (
             <BacklogListView
               project={sortedProject}
-              disableDragDrop={sort.field !== "position"}
+              sortActive={sort.field !== "position"}
             />
           ) : (
             <div className="flex h-full items-center justify-center">
