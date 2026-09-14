@@ -62,11 +62,21 @@ export type TelegramVerifyResult = {
     id: number;
     username: string | null;
     name: string | null;
+    canJoinGroups: boolean | null;
   } | null;
   chat: {
     id: number;
     title: string | null;
     username: string | null;
     isForum: boolean | null;
+    botMemberStatus:
+      | "creator"
+      | "administrator"
+      | "member"
+      | "restricted"
+      | "left"
+      | "kicked"
+      | null;
+    botCanPost: boolean | null;
   } | null;
 };

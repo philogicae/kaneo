@@ -11,8 +11,10 @@ import {
 } from "../../database/schema";
 import {
   getTelegramChat,
+  getTelegramChatMember,
   getTelegramMe,
   getTelegramUpdates,
+  type TelegramChatMember,
 } from "../../plugins/telegram/client";
 import {
   defaultTelegramEvents,
@@ -20,6 +22,7 @@ import {
   telegramEventKeys,
 } from "../../plugins/telegram/config";
 import { hasWorkspacePermission } from "../../utils/require-workspace-permission";
+import { describeTelegramFailure, evaluateChatMembership } from "../verify";
 
 function maskBotToken(value: string): string {
   const [prefix, suffix = ""] = value.split(":", 2);
@@ -618,12 +621,17 @@ export type TelegramVerifyResult = {
     id: number;
     username: string | null;
     name: string | null;
+    // False when the bot is not allowed to be added to groups; notifications
+    // for groups/channels then cannot be delivered.
+    canJoinGroups: boolean | null;
   } | null;
   chat: {
     id: number;
     title: string | null;
     username: string | null;
     isForum: boolean | null;
+    botMemberStatus: TelegramChatMember["status"] | null;
+    botCanPost: boolean | null;
   } | null;
 };
 
@@ -666,16 +674,22 @@ export async function verifyTelegram(
   void c;
   const result: TelegramVerifyResult = { bot: null, chat: null };
 
-  // Verify the bot itself whenever a raw token or stored bot was provided.
+  // getMe always runs first: it validates the token (also for stored bots,
+  // whose token may have been revoked) and yields the bot's own id, which
+  // getChatMember needs to check membership.
+  const me = await getTelegramMe(botToken);
+  if (!me.ok) {
+    throw new HTTPException(400, {
+      message: describeTelegramFailure(me, "getMe"),
+    });
+  }
+
   if (body.botToken || body.botId) {
-    const me = await getTelegramMe(botToken);
-    if (!me.ok) {
-      throw new HTTPException(400, { message: `Telegram: ${me.error}` });
-    }
     result.bot = {
       id: me.bot.id,
       username: me.bot.username ?? null,
       name: me.bot.first_name ?? null,
+      canJoinGroups: me.bot.can_join_groups ?? null,
     };
   }
 
@@ -683,14 +697,38 @@ export async function verifyTelegram(
     const chatResult = await getTelegramChat(botToken, chatId);
     if (!chatResult.ok) {
       throw new HTTPException(400, {
-        message: `Telegram: ${chatResult.error}`,
+        message: describeTelegramFailure(chatResult, "getChat"),
       });
     }
+
+    // getChat can succeed for chats the bot cannot post in (public channels
+    // especially); membership is what notifications actually require.
+    const memberResult = await getTelegramChatMember(
+      botToken,
+      chatId,
+      me.bot.id,
+    );
+    if (!memberResult.ok) {
+      throw new HTTPException(400, {
+        message: describeTelegramFailure(memberResult, "getChatMember"),
+      });
+    }
+
+    const membership = evaluateChatMembership({
+      chatType: chatResult.chat.type,
+      member: memberResult.member,
+    });
+    if (!membership.ok) {
+      throw new HTTPException(400, { message: membership.message });
+    }
+
     result.chat = {
       id: chatResult.chat.id,
       title: chatResult.chat.title ?? null,
       username: chatResult.chat.username ?? null,
       isForum: chatResult.chat.is_forum ?? null,
+      botMemberStatus: membership.status,
+      botCanPost: membership.canPost,
     };
   }
 
@@ -705,6 +743,10 @@ export type TelegramTopic = {
 // Live topic discovery for the rule dialog: while it is open, the UI polls
 // this and the user posts a message inside a forum topic, which the bot
 // receives through getUpdates (topics cannot be listed any other way).
+// Titles come from creation/edition service messages and from replies to the
+// topic root (which carries the creation message even when it is older than
+// the update window); topics never named by an event fall back to a
+// placeholder the user can identify by id.
 export async function listTelegramTopics(
   userId: string,
   chatRowId: string,
@@ -713,10 +755,13 @@ export async function listTelegramTopics(
 
   const result = await getTelegramUpdates(bot.botToken);
   if (!result.ok) {
-    throw new HTTPException(400, { message: `Telegram: ${result.error}` });
+    throw new HTTPException(400, {
+      message: describeTelegramFailure(result, "getUpdates"),
+    });
   }
 
-  const topics = new Map<number, string>();
+  const named = new Map<number, string>();
+  const seen = new Set<number>();
   for (const update of result.updates) {
     const message = update.message ?? update.edited_message;
     const threadId = message?.message_thread_id;
@@ -724,11 +769,19 @@ export async function listTelegramTopics(
     if (!message || threadId === undefined || chatId === undefined) continue;
     if (String(chatId) !== chat.chatId) continue;
 
-    const title = message.forum_topic_created?.title;
-    if (title || !topics.has(threadId)) {
-      topics.set(threadId, title || `Topic ${threadId}`);
+    seen.add(threadId);
+    const title =
+      message.forum_topic_created?.title ??
+      message.forum_topic_edited?.title ??
+      message.reply_to_message?.forum_topic_created?.title ??
+      message.reply_to_message?.forum_topic_edited?.title;
+    if (title) {
+      named.set(threadId, title);
     }
   }
 
-  return [...topics.entries()].map(([id, title]) => ({ id, title }));
+  return [...seen].map((id) => ({
+    id,
+    title: named.get(id) ?? `Topic ${id}`,
+  }));
 }

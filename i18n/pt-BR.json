@@ -1526,7 +1526,7 @@
 			"unknownProject": "Unknown project",
 			"unnamedBot": "Unnamed bot",
 			"verify": "Verify",
-			"verifyBotOk": "Bot verified: @{username}",
+			"verifyBotOk": "Bot verified: {{username}}",
 			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
 			"wholeWorkspace": "Entire workspace",
 			"accountHint": "{{count}} bot(s) connected to your account",
@@ -1548,7 +1548,14 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics"
+			"detectedTopicsLabel": "Detected topics",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat."
 		},
 		"workflowEditor": {
 			"loading": "Carregando...",
@@ -2256,6 +2263,14 @@
 		"view": {
 			"board": "Quadro",
 			"list": "Lista"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "Labels",
+			"noLabel": "No label",
+			"none": "No grouping"
 		}
 	},
 	"team": {
@@ -2342,7 +2357,11 @@
 	"unified": {
 		"empty": {
 			"description": "Assim que você criar um projeto, os de todos os seus espaços de trabalho aparecerão aqui.",
-			"title": "Ainda não há projetos"
+			"title": "Ainda não há projetos",
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet"
 		},
 		"pageTitle": "Todos os projetos",
 		"section": {
@@ -2366,7 +2385,19 @@
 		},
 		"tabs": {
 			"charts": "Gráficos",
-			"overview": "Visão geral"
+			"overview": "Visão geral",
+			"backlog": "Backlog",
+			"tasks": "Tasks"
+		},
+		"consolidated": {
+			"backlogCount_many": "{{count}} tasks in backlog",
+			"backlogCount_one": "{{count}} task in backlog",
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_many": "{{count}} active tasks",
+			"tasksCount_one": "{{count}} active task",
+			"tasksCount_other": "{{count}} active tasks"
 		}
 	},
 	"workspace": {

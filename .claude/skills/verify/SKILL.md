@@ -13,7 +13,8 @@ description: Build/launch/drive recipe for verifying Kaneo changes end-to-end on
 
 ## Database access
 
-- `DATABASE_URL=$(grep "^DATABASE_URL" .env | cut -d= -f2-); psql "$DATABASE_URL"` gives direct Postgres access for asserting rows (notification, task_reminder_sent, user_notification_preference).
+- The API uses a local libSQL/SQLite file: `DATABASE_PATH` (from root `.env`, default `./data/kaneo.db`). Read-only peek: `sqlite3 "file:data/kaneo.db?mode=ro"` (WAL sidecars appear while a connection is open; they vanish on clean close).
+- Treat `data/kaneo.db` as the prod-like database — never write to it from testing; use the test database configured in `.env` (`DATABASE_PATH=./data/kaneo_test.db`) or a dedicated throwaway file.
 - Gotcha: `task.userId` in Drizzle maps to column `assignee_id`, not `user_id`.
 - When replicating scheduler SQL by hand, `SET timezone = 'UTC'` first; timestamps are naive UTC.
 

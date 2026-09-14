@@ -561,13 +561,20 @@
 			"chatLabelPlaceholder": "Ops chat",
 			"addRule": "Add rule",
 			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
 			"topicId": "Topic ID (optional)",
 			"topicIdPlaceholder": "Forum topic id",
 			"topicHint": "Topics are detected live while this dialog is open: send a message inside a topic and it appears in the list above. You can also type the id manually. Leave empty to post in the chat.",
 			"verify": "Verify",
-			"verifyBotOk": "Bot verified: @{username}",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
 			"isForumHint": " (forum: a topic id is required)",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"save": "Save",
 			"toastSaved": "Saved",
 			"toastDeleted": "Deleted",
@@ -2046,6 +2053,14 @@
 		"kanban": {
 			"addTask": "Add task"
 		},
+		"boardGroup": {
+			"label": "Group",
+			"groupBy": "Group by",
+			"none": "No grouping",
+			"labels": "Labels",
+			"noLabel": "No label",
+			"dragDisabled": "Drag & drop is disabled while grouping is active"
+		},
 		"pr": {
 			"merged": "Merged",
 			"draft": "Draft",
@@ -2209,12 +2224,22 @@
 		"pageTitle": "All projects",
 		"tabs": {
 			"overview": "Overview",
-			"charts": "Charts"
+			"charts": "Charts",
+			"backlog": "Backlog",
+			"tasks": "Tasks"
 		},
 		"charts": {
 			"tasks": "Tasks",
 			"backlog": "Backlog",
 			"empty": "No task activity in the last 6 months."
+		},
+		"consolidated": {
+			"taskNumber": "#{{number}}",
+			"dueDate": "Due date",
+			"backlogCount_one": "{{count}} task in backlog",
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"tasksCount_one": "{{count}} active task",
+			"tasksCount_other": "{{count}} active tasks"
 		},
 		"stats": {
 			"projects": "Projects",
@@ -2231,7 +2256,11 @@
 		},
 		"empty": {
 			"title": "No projects yet",
-			"description": "Projects from all your workspaces will show up here as soon as you create one."
+			"description": "Projects from all your workspaces will show up here as soon as you create one.",
+			"backlogTitle": "Backlog is empty",
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"tasksTitle": "No tasks yet",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created."
 		}
 	},
 	"workspace": {

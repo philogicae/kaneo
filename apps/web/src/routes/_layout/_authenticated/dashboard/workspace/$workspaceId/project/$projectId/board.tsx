@@ -15,6 +15,7 @@ import useGetCustomFieldsByProject from "@/hooks/queries/custom-field/use-get-cu
 import useGetLabelsByWorkspace from "@/hooks/queries/label/use-get-labels-by-workspace";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
+import { useBoardGrouping } from "@/hooks/use-board-grouping";
 import { useBoardSort } from "@/hooks/use-board-sort";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useTaskFiltersWithLabelsSupport } from "@/hooks/use-task-filters-with-labels-support";
@@ -87,6 +88,7 @@ function RouteComponent() {
   const [boardSearchQuery, setBoardSearchQuery] = useState("");
   const boardSearchInput = useRef<HTMLInputElement | null>(null);
   const { sort, setSort } = useBoardSort(projectId);
+  const { groupBy, setGroupBy } = useBoardGrouping(projectId);
 
   const { data: users } = useGetActiveWorkspaceUsers(workspaceId);
   const { data: workspaceLabels = [] } = useGetLabelsByWorkspace(workspaceId);
@@ -212,6 +214,8 @@ function RouteComponent() {
           setViewMode={setViewMode}
           sort={sort}
           onSortChange={setSort}
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
           customFieldDefinitions={customFieldDefinitions}
           usedCustomFieldValues={usedCustomFieldValues}
           searchQuery={boardSearchQuery}
@@ -225,6 +229,7 @@ function RouteComponent() {
               <KanbanBoard
                 project={sortedProject}
                 sortActive={sort.field !== "position"}
+                groupActive={groupBy === "labels"}
               />
             ) : (
               <ListView
