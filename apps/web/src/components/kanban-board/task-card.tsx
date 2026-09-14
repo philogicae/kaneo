@@ -53,9 +53,12 @@ import { TaskLabels } from "./task-labels";
 
 type TaskCardProps = {
   task: Task;
+  // While the board is grouped, cards are read-only: groups mix tasks from
+  // several status columns, so a drop would have no unambiguous meaning.
+  dragDisabled?: boolean;
 };
 
-function TaskCard({ task }: TaskCardProps) {
+function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
   const { t } = useTranslation();
   const {
     attributes,
@@ -64,7 +67,7 @@ function TaskCard({ task }: TaskCardProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id });
+  } = useSortable({ id: task.id, disabled: dragDisabled });
   const { project } = useProjectStore();
   const taskIsCompleted = isTaskCompleted(task.status, project?.columns);
   const { data: workspace } = useActiveWorkspace();
@@ -201,13 +204,22 @@ function TaskCard({ task }: TaskCardProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    // Drag wiring is skipped when grouping disables card dragging, so the
+    // card keeps its normal accessibility without dnd-kit's aria-disabled
+    // state.
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...(dragDisabled ? {} : { ...attributes, ...listeners })}
+    >
       <ContextMenu>
         <ContextMenuTrigger asChild>
           {/** biome-ignore lint/a11y/noStaticElementInteractions: false positive for onClick and onKeyDown */}
           <div
             onClick={handleTaskCardClick}
-            className={`group relative rounded-lg border bg-background p-3 shadow-xs/5 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98] cursor-move ${
+            className={`group relative rounded-lg border bg-background p-3 shadow-xs/5 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98] ${
+              dragDisabled ? "cursor-default" : "cursor-move"
+            } ${
               isDragging
                 ? "border-ring/40 bg-card shadow-lg"
                 : "hover:bg-background hover:shadow-sm"

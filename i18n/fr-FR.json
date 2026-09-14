@@ -1516,6 +1516,9 @@
 			"chatLabelPlaceholder": "Discussion ops",
 			"addRule": "Ajouter une règle",
 			"addRuleDescription": "Routez les notifications vers cette discussion, éventuellement dans un topic de forum.",
+			"editRule": "Modifier la règle",
+			"editRuleDescription": "Modifiez le périmètre (workspaces/projets) et le topic de cette discussion. L'enregistrement remplace les règles de ce workspace sur la discussion.",
+			"editRuleScopeHint": "Modifie le périmètre des règles de ce workspace sur cette discussion.",
 			"ruleWorkspaces": "Espaces de travail",
 			"allWorkspaces": "Tous les espaces",
 			"ruleProjects": "Projets",
@@ -1525,9 +1528,10 @@
 			"topicHint": "Les topics sont détectés en direct pendant que cette fenêtre est ouverte : envoyez un message dans un topic et il apparaît dans la liste ci-dessus. Vous pouvez aussi saisir l'ID manuellement. Vide = publier dans la discussion.",
 			"verify": "Vérifier",
 			"save": "Enregistrer",
-			"verifyBotOk": "Bot vérifié : @{username}",
+			"verifyBotOk": "Bot vérifié : {{username}}",
 			"verifyChatOk": "Discussion vérifiée : {{title}}{{forum}}",
 			"isForumHint": " (forum : un ID de topic est requis)",
+			"topicsOnlyInGroups": "Les topics de forum n'existent que dans les groupes : cette discussion est une discussion simple, les notifications vont donc toujours à la discussion elle-même.",
 			"ruleActive": "Règle active",
 			"unnamedBot": "Bot sans nom",
 			"emptyChats": "Aucune discussion rattachée à ce bot.",
@@ -1548,7 +1552,10 @@
 			"editChat": "Modifier la discussion",
 			"editChatDescription": "Changez l'ID de discussion ou son libellé.",
 			"deleteBot": "Supprimer le bot",
-			"deleteChat": "Supprimer la discussion"
+			"deleteChat": "Supprimer la discussion",
+			"topicDiscoveryUnavailable": "La détection automatique des topics est indisponible pour ce bot (probablement consommé par un webhook ou une autre application). Saisissez l'ID de topic manuellement.",
+			"verifyBotGroupsDisabled": "Ce bot ne peut pas être invité à de nouveaux groupes (mode confidentialité dans @BotFather). Les discussions où il est déjà membre continuent de recevoir les notifications ; ajoutez-le manuellement aux nouvelles.",
+			"verifyChatMembershipOk": "Le bot peut poster dans cette discussion ({{status}})"
 		},
 		"workflowEditor": {
 			"loading": "Chargement...",
@@ -2256,6 +2263,14 @@
 		"view": {
 			"board": "Tableau",
 			"list": "Liste"
+		},
+		"boardGroup": {
+			"dragDisabled": "Le glisser-déposer est désactivé quand un regroupement est actif",
+			"groupBy": "Regrouper par",
+			"label": "Grouper",
+			"labels": "Labels",
+			"noLabel": "Sans label",
+			"none": "Aucun regroupement"
 		}
 	},
 	"team": {
@@ -2357,7 +2372,11 @@
 		},
 		"empty": {
 			"title": "Aucun projet pour le moment",
-			"description": "Les projets de tous vos espaces de travail apparaîtront ici dès que vous en créerez un."
+			"description": "Les projets de tous vos espaces de travail apparaîtront ici dès que vous en créerez un.",
+			"backlogDescription": "Les tâches planifiées de tous vos projets apparaîtront ici.",
+			"backlogTitle": "Backlog vide",
+			"tasksDescription": "Les tâches de tous vos projets apparaîtront ici dès leur création.",
+			"tasksTitle": "Aucune tâche"
 		},
 		"charts": {
 			"backlog": "Backlog",
@@ -2366,7 +2385,19 @@
 		},
 		"tabs": {
 			"charts": "Graphiques",
-			"overview": "Vue d'ensemble"
+			"overview": "Vue d'ensemble",
+			"backlog": "Backlog",
+			"tasks": "Tâches"
+		},
+		"consolidated": {
+			"backlogCount_many": "{{count}} tâches dans le backlog",
+			"backlogCount_one": "{{count}} tâche dans le backlog",
+			"backlogCount_other": "{{count}} tâches dans le backlog",
+			"dueDate": "Échéance",
+			"taskNumber": "n°{{number}}",
+			"tasksCount_many": "{{count}} tâches actives",
+			"tasksCount_one": "{{count}} tâche active",
+			"tasksCount_other": "{{count}} tâches actives"
 		}
 	},
 	"workspace": {

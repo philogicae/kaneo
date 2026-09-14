@@ -1523,7 +1523,7 @@
 			"unknownProject": "Unknown project",
 			"unnamedBot": "Unnamed bot",
 			"verify": "Verify",
-			"verifyBotOk": "Bot verified: @{username}",
+			"verifyBotOk": "Bot verified: {{username}}",
 			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
 			"wholeWorkspace": "Entire workspace",
 			"accountHint": "{{count}} bot(s) connected to your account",
@@ -1544,7 +1544,14 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics"
+			"detectedTopicsLabel": "Detected topics",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat."
 		},
 		"workflowEditor": {
 			"loading": "Φόρτωση...",
@@ -2239,6 +2246,14 @@
 		"view": {
 			"board": "Πίνακας",
 			"list": "Λίστα"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "Labels",
+			"noLabel": "No label",
+			"none": "No grouping"
 		}
 	},
 	"team": {
@@ -2325,7 +2340,11 @@
 	"unified": {
 		"empty": {
 			"description": "Μόλις δημιουργήσετε ένα έργο, τα έργα από όλους τους χώρους εργασίας σας θα εμφανιστούν εδώ.",
-			"title": "Δεν υπάρχουν ακόμη έργα"
+			"title": "Δεν υπάρχουν ακόμη έργα",
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet"
 		},
 		"pageTitle": "Όλα τα έργα",
 		"section": {
@@ -2348,7 +2367,17 @@
 		},
 		"tabs": {
 			"charts": "Γραφήματα",
-			"overview": "Επισκόπηση"
+			"overview": "Επισκόπηση",
+			"backlog": "Backlog",
+			"tasks": "Tasks"
+		},
+		"consolidated": {
+			"backlogCount_one": "{{count}} task in backlog",
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_one": "{{count}} active task",
+			"tasksCount_other": "{{count}} active tasks"
 		}
 	},
 	"workspace": {

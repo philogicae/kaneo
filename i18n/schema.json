@@ -2207,6 +2207,15 @@
 						"addRuleDescription": {
 							"type": "string"
 						},
+						"editRule": {
+							"type": "string"
+						},
+						"editRuleDescription": {
+							"type": "string"
+						},
+						"editRuleScopeHint": {
+							"type": "string"
+						},
 						"topicId": {
 							"type": "string"
 						},
@@ -2222,10 +2231,22 @@
 						"verifyBotOk": {
 							"type": "string"
 						},
+						"verifyBotGroupsDisabled": {
+							"type": "string"
+						},
 						"verifyChatOk": {
 							"type": "string"
 						},
+						"verifyChatMembershipOk": {
+							"type": "string"
+						},
 						"isForumHint": {
+							"type": "string"
+						},
+						"topicsOnlyInGroups": {
+							"type": "string"
+						},
+						"topicDiscoveryUnavailable": {
 							"type": "string"
 						},
 						"save": {
@@ -2357,13 +2378,20 @@
 						"chatLabelPlaceholder",
 						"addRule",
 						"addRuleDescription",
+						"editRule",
+						"editRuleDescription",
+						"editRuleScopeHint",
 						"topicId",
 						"topicIdPlaceholder",
 						"topicHint",
 						"verify",
 						"verifyBotOk",
+						"verifyBotGroupsDisabled",
 						"verifyChatOk",
+						"verifyChatMembershipOk",
 						"isForumHint",
+						"topicsOnlyInGroups",
+						"topicDiscoveryUnavailable",
 						"save",
 						"toastSaved",
 						"toastDeleted",
@@ -8325,6 +8353,38 @@
 					},
 					"required": ["addTask"]
 				},
+				"boardGroup": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"label": {
+							"type": "string"
+						},
+						"groupBy": {
+							"type": "string"
+						},
+						"none": {
+							"type": "string"
+						},
+						"labels": {
+							"type": "string"
+						},
+						"noLabel": {
+							"type": "string"
+						},
+						"dragDisabled": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"label",
+						"groupBy",
+						"none",
+						"labels",
+						"noLabel",
+						"dragDisabled"
+					]
+				},
 				"pr": {
 					"type": "object",
 					"additionalProperties": false,
@@ -9112,6 +9172,7 @@
 				"archive",
 				"listView",
 				"kanban",
+				"boardGroup",
 				"pr",
 				"assignee",
 				"dueDate",
@@ -9260,9 +9321,15 @@
 						},
 						"charts": {
 							"type": "string"
+						},
+						"backlog": {
+							"type": "string"
+						},
+						"tasks": {
+							"type": "string"
 						}
 					},
-					"required": ["overview", "charts"]
+					"required": ["overview", "charts", "backlog", "tasks"]
 				},
 				"charts": {
 					"type": "object",
@@ -9279,6 +9346,55 @@
 						}
 					},
 					"required": ["tasks", "backlog", "empty"]
+				},
+				"consolidated": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"taskNumber": {
+							"type": "string"
+						},
+						"dueDate": {
+							"type": "string"
+						},
+						"backlogCount_one": {
+							"type": "string"
+						},
+						"backlogCount_zero": {
+							"type": "string"
+						},
+						"backlogCount_two": {
+							"type": "string"
+						},
+						"backlogCount_few": {
+							"type": "string"
+						},
+						"backlogCount_many": {
+							"type": "string"
+						},
+						"backlogCount_other": {
+							"type": "string"
+						},
+						"tasksCount_one": {
+							"type": "string"
+						},
+						"tasksCount_zero": {
+							"type": "string"
+						},
+						"tasksCount_two": {
+							"type": "string"
+						},
+						"tasksCount_few": {
+							"type": "string"
+						},
+						"tasksCount_many": {
+							"type": "string"
+						},
+						"tasksCount_other": {
+							"type": "string"
+						}
+					},
+					"required": ["taskNumber", "dueDate"]
 				},
 				"stats": {
 					"type": "object",
@@ -9343,15 +9459,35 @@
 						},
 						"description": {
 							"type": "string"
+						},
+						"backlogTitle": {
+							"type": "string"
+						},
+						"backlogDescription": {
+							"type": "string"
+						},
+						"tasksTitle": {
+							"type": "string"
+						},
+						"tasksDescription": {
+							"type": "string"
 						}
 					},
-					"required": ["title", "description"]
+					"required": [
+						"title",
+						"description",
+						"backlogTitle",
+						"backlogDescription",
+						"tasksTitle",
+						"tasksDescription"
+					]
 				}
 			},
 			"required": [
 				"pageTitle",
 				"tabs",
 				"charts",
+				"consolidated",
 				"stats",
 				"table",
 				"section",

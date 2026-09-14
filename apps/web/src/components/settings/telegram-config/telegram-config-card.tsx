@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   Bot as BotIcon,
   Check,
   ChevronDown,
@@ -78,6 +79,10 @@ export function TelegramConfigCard() {
   const [chatDialog, setChatDialog] = useState<ChatDialog>(null);
   const [addRulesForChat, setAddRulesForChat] =
     useState<TelegramConfigChat | null>(null);
+  const [editRuleFor, setEditRuleFor] = useState<{
+    chat: TelegramConfigChat;
+    rule: TelegramConfigChat["rules"][number];
+  } | null>(null);
 
   const bots = config?.bots ?? [];
 
@@ -123,7 +128,14 @@ export function TelegramConfigCard() {
               onEditBot={() => setBotDialog({ mode: "edit", bot })}
               onAddChat={() => setChatDialog({ mode: "add", bot })}
               onEditChat={(chat) => setChatDialog({ mode: "edit", bot, chat })}
-              onAddRules={(chat) => setAddRulesForChat(chat)}
+              onAddRules={(chat) => {
+                setEditRuleFor(null);
+                setAddRulesForChat(chat);
+              }}
+              onEditRule={(chat, rule) => {
+                setAddRulesForChat(null);
+                setEditRuleFor({ chat, rule });
+              }}
             />
           ))}
         </div>
@@ -139,11 +151,11 @@ export function TelegramConfigCard() {
         verifying={verify.isPending}
         onVerify={async (botToken) => {
           const result = await verify.mutateAsync({ botToken });
-          return result.bot?.username ?? null;
+          return result.bot ?? null;
         }}
         onVerifyStored={async (botId) => {
           const result = await verify.mutateAsync({ botId });
-          return result.bot?.username ?? null;
+          return result.bot ?? null;
         }}
         onVerifyError={handleMutationError}
         onSaveError={handleMutationError}
@@ -166,6 +178,11 @@ export function TelegramConfigCard() {
         chat={addRulesForChat}
         onClose={() => setAddRulesForChat(null)}
       />
+      <EditRuleDialog
+        chat={editRuleFor?.chat ?? null}
+        rule={editRuleFor?.rule ?? null}
+        onClose={() => setEditRuleFor(null)}
+      />
     </div>
   );
 }
@@ -187,12 +204,17 @@ function BotSection({
   onAddChat,
   onEditChat,
   onAddRules,
+  onEditRule,
 }: {
   bot: TelegramConfigBot;
   onEditBot: () => void;
   onAddChat: () => void;
   onEditChat: (chat: TelegramConfigChat) => void;
   onAddRules: (chat: TelegramConfigChat) => void;
+  onEditRule: (
+    chat: TelegramConfigChat,
+    rule: TelegramConfigChat["rules"][number],
+  ) => void;
 }) {
   const { t } = useTranslation();
   const deleteBot = useDeleteTelegramConfigBot();
@@ -278,6 +300,7 @@ function BotSection({
               chat={chat}
               onEditChat={onEditChat}
               onAddRules={onAddRules}
+              onEditRule={onEditRule}
             />
           ))
         )}
@@ -327,10 +350,15 @@ function ChatSection({
   chat,
   onEditChat,
   onAddRules,
+  onEditRule,
 }: {
   chat: TelegramConfigChat;
   onEditChat: (chat: TelegramConfigChat) => void;
   onAddRules: (chat: TelegramConfigChat) => void;
+  onEditRule: (
+    chat: TelegramConfigChat,
+    rule: TelegramConfigChat["rules"][number],
+  ) => void;
 }) {
   const { t } = useTranslation();
   // Server-built trees normally carry arrays, but a null here crashes the
@@ -449,6 +477,15 @@ function ChatSection({
                 <Button
                   size="sm"
                   variant="ghost"
+                  className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                  onClick={() => onEditRule(chat, rule)}
+                  aria-label={t("settings:telegramUnified.editRule")}
+                >
+                  <Pencil className="size-3.5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
                   className="h-7 text-destructive hover:text-destructive"
                   disabled={deleteRule.isPending}
                   onClick={() => removeRule(rule)}
@@ -477,9 +514,9 @@ function BotFormDialog({
   onClose: () => void;
   verifying: boolean;
   // Raw token (either mode).
-  onVerify: (botToken: string) => Promise<string | null>;
+  onVerify: (botToken: string) => Promise<TelegramVerifyResult["bot"]>;
   // Stored token (edit mode with an untouched token field).
-  onVerifyStored: (botId: string) => Promise<string | null>;
+  onVerifyStored: (botId: string) => Promise<TelegramVerifyResult["bot"]>;
   onVerifyError: (error: unknown) => void;
   onSaveError: (error: unknown) => void;
 }) {
@@ -490,28 +527,29 @@ function BotFormDialog({
   const open = dialog !== null;
   const [botToken, setBotToken] = useState("");
   const [name, setName] = useState("");
-  const [verifiedUsername, setVerifiedUsername] = useState<string | null>(null);
+  const [verifiedBot, setVerifiedBot] =
+    useState<TelegramVerifyResult["bot"]>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
       setBotToken("");
       setName(editing?.name ?? "");
-      setVerifiedUsername(null);
+      setVerifiedBot(null);
     }
   }, [open, editing]);
 
   const handleVerify = async () => {
-    setVerifiedUsername(null);
+    setVerifiedBot(null);
     try {
       // With no token entered, an existing bot verifies against its stored
       // token (rotate-friendly).
-      const username = botToken
+      const bot = botToken
         ? await onVerify(botToken)
         : editing
           ? await onVerifyStored(editing.id)
           : null;
-      setVerifiedUsername(username);
+      setVerifiedBot(bot);
     } catch (error) {
       onVerifyError(error);
     }
@@ -592,13 +630,21 @@ function BotFormDialog({
               onChange={(event) => setName(event.target.value)}
             />
           </div>
-          {verifiedUsername && (
-            <p className="flex items-center gap-1.5 text-xs text-success-foreground">
-              <Check className="size-3.5" />
-              {t("settings:telegramUnified.verifyBotOk", {
-                username: verifiedUsername,
-              })}
-            </p>
+          {verifiedBot && (
+            <div className="space-y-1.5">
+              <p className="flex items-center gap-1.5 text-xs text-success-foreground">
+                <Check className="size-3.5" />
+                {t("settings:telegramUnified.verifyBotOk", {
+                  username: verifiedBot.username ?? "—",
+                })}
+              </p>
+              {verifiedBot.canJoinGroups === false && (
+                <p className="flex items-start gap-1.5 text-xs text-warning-foreground">
+                  <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+                  {t("settings:telegramUnified.verifyBotGroupsDisabled")}
+                </p>
+              )}
+            </div>
           )}
         </div>
         <DialogFooter className="gap-2 sm:gap-2">
@@ -751,15 +797,25 @@ function ChatFormDialog({
             />
           </div>
           {verifiedChat && (
-            <p className="flex items-center gap-1.5 text-xs text-success-foreground">
-              <Check className="size-3.5" />
-              {t("settings:telegramUnified.verifyChatOk", {
-                title: verifiedChat.title ?? "—",
-                forum: verifiedChat.isForum
-                  ? t("settings:telegramUnified.isForumHint")
-                  : "",
-              })}
-            </p>
+            <div className="space-y-1.5">
+              <p className="flex items-center gap-1.5 text-xs text-success-foreground">
+                <Check className="size-3.5" />
+                {t("settings:telegramUnified.verifyChatOk", {
+                  title: verifiedChat.title ?? "—",
+                  forum: verifiedChat.isForum
+                    ? t("settings:telegramUnified.isForumHint")
+                    : "",
+                })}
+              </p>
+              {verifiedChat.botCanPost && (
+                <p className="flex items-center gap-1.5 text-xs text-success-foreground">
+                  <Check className="size-3.5" />
+                  {t("settings:telegramUnified.verifyChatMembershipOk", {
+                    status: verifiedChat.botMemberStatus ?? "member",
+                  })}
+                </p>
+              )}
+            </div>
           )}
         </div>
         <DialogFooter className="gap-2 sm:gap-2">
@@ -788,39 +844,56 @@ function ChatFormDialog({
   );
 }
 
-function AddRulesDialog({
-  chat,
-  onClose,
-}: {
-  chat: TelegramConfigChat | null;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation();
-  const { data: workspacesData } = useGetWorkspaces();
-  const workspaces = workspacesData ?? [];
-  const createRules = useCreateTelegramConfigRules();
+// Shared topic detection for the rule dialogs: a read-only chat check tells
+// whether the chat is a forum (positive Telegram ids are private chats, which
+// never are), and while the dialog is open the bot's recent updates are
+// polled so a message posted inside a topic makes it appear.
+function useTopicDiscovery(chat: TelegramConfigChat | null) {
+  const verify = useVerifyTelegramConfig();
   const { mutateAsync: discoverTopics } = useDiscoverTelegramTopics();
-  const [selectedWorkspaces, setSelectedWorkspaces] = useState<Set<string>>(
-    new Set(),
-  );
-  const [selection, setSelection] = useState<
-    Record<string, WorkspaceSelection>
-  >({});
   const [threadId, setThreadId] = useState("");
   const [detectedTopics, setDetectedTopics] = useState<TelegramTopic[]>([]);
-  const [saving, setSaving] = useState(false);
+  const [discoveryUnavailable, setDiscoveryUnavailable] = useState(false);
+  // null = not determined yet (verification pending or failed); the topic
+  // field stays visible with the default hint until then.
+  const [forumKnown, setForumKnown] = useState<boolean | null>(null);
 
-  const open = Boolean(chat);
   const chatId = chat?.id;
+  // Telegram id shapes: a positive id is a private chat, which can never be
+  // a forum; supergroups/channels (negative, -100… for public ones) may be.
+  const isPrivateChat = Boolean(
+    chat && /^-?\d+$/.test(chat.chatId) && Number(chat.chatId) > 0,
+  );
+  const topicsApply = !isPrivateChat && forumKnown !== false;
 
+  // Fresh detection state for every opened dialog, keyed on the chat id:
+  // identity-only config refreshes (same chat) must not clobber in-progress
+  // edits.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset deliberately keyed on chat.id only
   useEffect(() => {
-    if (open) {
-      setSelectedWorkspaces(new Set());
-      setSelection({});
-      setThreadId("");
-      setDetectedTopics([]);
-    }
-  }, [open]);
+    setThreadId("");
+    setDetectedTopics([]);
+    setDiscoveryUnavailable(false);
+    setForumKnown(null);
+  }, [chatId]);
+
+  // Read-only chat check: confirms whether this chat is a forum (and that its
+  // bot token still works). Failure keeps the manual flow as-is.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on refresh is idempotent, chat.id keys the request
+  useEffect(() => {
+    if (!chat) return;
+    let cancelled = false;
+    verify
+      .mutateAsync({ telegramChatId: chat.id })
+      .then((result) => {
+        if (!cancelled) setForumKnown(result.chat?.isForum ?? null);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // verify.mutateAsync is stable.
+  }, [chatId, chat, verify]);
 
   // Live topic detection: while the dialog is open, poll the bot's recent
   // updates; a message posted inside a forum topic makes it appear here.
@@ -830,7 +903,7 @@ function AddRulesDialog({
   // when the bot is consumed by a webhook or another long-polling process
   // (Telegram answers 409/400 for as long as that holds).
   useEffect(() => {
-    if (!open || !chatId) return;
+    if (!chatId || !topicsApply) return;
     let cancelled = false;
     let inFlight = false;
     let failures = 0;
@@ -854,10 +927,14 @@ function AddRulesDialog({
         }
       } catch {
         // Best effort: suggestions are optional and the manual input keeps
-        // working; a bot consumed elsewhere fails permanently, so stop
-        // after a few tries instead of flooding.
+        // working; a bot consumed elsewhere fails permanently, so stop after
+        // a few tries instead of flooding — and say so instead of failing
+        // silently.
         failures += 1;
-        if (failures >= 5) stop();
+        if (failures >= 5) {
+          if (!cancelled) setDiscoveryUnavailable(true);
+          stop();
+        }
       } finally {
         inFlight = false;
       }
@@ -869,7 +946,127 @@ function AddRulesDialog({
       cancelled = true;
       stop();
     };
-  }, [open, chatId, discoverTopics]);
+  }, [chatId, topicsApply, discoverTopics]);
+
+  return {
+    threadId,
+    setThreadId,
+    detectedTopics,
+    discoveryUnavailable,
+    topicsApply,
+  };
+}
+
+// Topic field shared by the add and edit rule dialogs.
+function RuleTopicField({
+  threadId,
+  onThreadIdChange,
+  detectedTopics,
+  discoveryUnavailable,
+  inputId = "telegram-rule-topic",
+}: {
+  threadId: string;
+  onThreadIdChange: (value: string) => void;
+  detectedTopics: TelegramTopic[];
+  discoveryUnavailable: boolean;
+  inputId?: string;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-medium" htmlFor={inputId}>
+        {t("settings:telegramUnified.topicId")}
+      </label>
+      {discoveryUnavailable && (
+        <p className="flex items-start gap-1.5 text-xs text-warning-foreground">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+          {t("settings:telegramUnified.topicDiscoveryUnavailable")}
+        </p>
+      )}
+      {detectedTopics.length > 0 && (
+        <Select
+          value={
+            detectedTopics.some((topic) => String(topic.id) === threadId)
+              ? threadId
+              : undefined
+          }
+          onValueChange={(value) => onThreadIdChange(String(value ?? ""))}
+        >
+          <SelectTrigger
+            className="h-8 w-full"
+            aria-label={t("settings:telegramUnified.detectedTopicsLabel")}
+          >
+            <SelectValue>
+              {threadId
+                ? `#${threadId}`
+                : t("settings:telegramUnified.detectedTopics", {
+                    count: detectedTopics.length,
+                  })}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {detectedTopics.map((topic) => (
+              <SelectItem
+                key={topic.id}
+                value={String(topic.id)}
+                className="text-xs"
+              >
+                {`${topic.title} (${topic.id})`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      <Input
+        id={inputId}
+        type="number"
+        min={1}
+        value={threadId}
+        placeholder={t("settings:telegramUnified.topicIdPlaceholder")}
+        onChange={(event) => onThreadIdChange(event.target.value)}
+      />
+      <p className="text-xs text-muted-foreground">
+        {t("settings:telegramUnified.topicHint")}
+      </p>
+    </div>
+  );
+}
+
+function AddRulesDialog({
+  chat,
+  onClose,
+}: {
+  chat: TelegramConfigChat | null;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const { data: workspacesData } = useGetWorkspaces();
+  const workspaces = workspacesData ?? [];
+  const createRules = useCreateTelegramConfigRules();
+  const [selectedWorkspaces, setSelectedWorkspaces] = useState<Set<string>>(
+    new Set(),
+  );
+  const [selection, setSelection] = useState<
+    Record<string, WorkspaceSelection>
+  >({});
+  const [saving, setSaving] = useState(false);
+  const {
+    threadId,
+    setThreadId,
+    detectedTopics,
+    discoveryUnavailable,
+    topicsApply,
+  } = useTopicDiscovery(chat);
+
+  const open = Boolean(chat);
+
+  useEffect(() => {
+    if (open) {
+      setSelectedWorkspaces(new Set());
+      setSelection({});
+    }
+  }, [open]);
 
   const allSelected =
     workspaces.length > 0 &&
@@ -965,7 +1162,7 @@ function AddRulesDialog({
       await createRules.mutateAsync({
         telegramChatId: chat.id,
         scopes,
-        threadId: threadId ? Number(threadId) : null,
+        threadId: topicsApply && threadId ? Number(threadId) : null,
       });
       toast.success(t("settings:telegramUnified.toastSaved"));
       onClose();
@@ -1058,64 +1255,160 @@ function AddRulesDialog({
             </div>
           )}
 
-          <div className="space-y-1.5">
-            <label
-              className="text-xs font-medium"
-              htmlFor="telegram-rule-topic"
-            >
-              {t("settings:telegramUnified.topicId")}
-            </label>
-            {detectedTopics.length > 0 && (
-              <Select
-                value={
-                  detectedTopics.some((topic) => String(topic.id) === threadId)
-                    ? threadId
-                    : undefined
-                }
-                onValueChange={(value) => setThreadId(String(value ?? ""))}
-              >
-                <SelectTrigger
-                  className="h-8 w-full"
-                  aria-label={t("settings:telegramUnified.detectedTopicsLabel")}
-                >
-                  <SelectValue>
-                    {threadId
-                      ? `#${threadId}`
-                      : t("settings:telegramUnified.detectedTopics", {
-                          count: detectedTopics.length,
-                        })}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {detectedTopics.map((topic) => (
-                    <SelectItem
-                      key={topic.id}
-                      value={String(topic.id)}
-                      className="text-xs"
-                    >
-                      {`${topic.title} (${topic.id})`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            <Input
-              id="telegram-rule-topic"
-              type="number"
-              min={1}
-              value={threadId}
-              placeholder={t("settings:telegramUnified.topicIdPlaceholder")}
-              onChange={(event) => setThreadId(event.target.value)}
+          {topicsApply ? (
+            <RuleTopicField
+              threadId={threadId}
+              onThreadIdChange={setThreadId}
+              detectedTopics={detectedTopics}
+              discoveryUnavailable={discoveryUnavailable}
             />
-            <p className="text-xs text-muted-foreground">
-              {t("settings:telegramUnified.topicHint")}
+          ) : (
+            <p className="rounded-md bg-muted/30 px-2.5 py-2 text-xs text-muted-foreground">
+              {t("settings:telegramUnified.topicsOnlyInGroups")}
             </p>
-          </div>
+          )}
         </div>
         <DialogFooter className="gap-2 sm:gap-2">
           <Button
             size="sm"
             disabled={saving || invalidScope || selectedWorkspaces.size === 0}
+            onClick={handleSave}
+            className="gap-2"
+          >
+            {saving && <Spinner className="size-3" />}
+            {t("settings:telegramUnified.save")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Editing a rule rewrites the whole workspace scope of this chat through
+// updateTelegramRule (the API replaces every rule of that workspace on this
+// chat), so the form pre-selects the combined scope of all the workspace's
+// rules here, and the topic is set for the rewritten set.
+function EditRuleDialog({
+  chat,
+  rule,
+  onClose,
+}: {
+  chat: TelegramConfigChat | null;
+  rule: TelegramConfigChat["rules"][number] | null;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const updateRule = useUpdateTelegramConfigRule();
+  const [selection, setSelection] = useState<WorkspaceSelection>({
+    all: true,
+    projectIds: new Set(),
+  });
+  const [saving, setSaving] = useState(false);
+  const {
+    threadId,
+    setThreadId,
+    detectedTopics,
+    discoveryUnavailable,
+    topicsApply,
+  } = useTopicDiscovery(chat);
+
+  const open = Boolean(chat && rule);
+  const ruleId = rule?.id;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: chat/rule are read from the closure on purpose — re-initialising on every config refresh would clobber in-progress edits
+  useEffect(() => {
+    if (!open || !chat) return;
+    // Combined scope of every rule this workspace has on this chat: the API
+    // replaces that whole scope on save.
+    const scopeRules = (chat.rules ?? []).filter(
+      (candidate) => candidate.workspaceId === rule?.workspaceId,
+    );
+    setSelection({
+      all: scopeRules.some((candidate) => candidate.projectId === null),
+      projectIds: new Set(
+        scopeRules
+          .map((candidate) => candidate.projectId)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    });
+    setThreadId(
+      rule?.threadId !== null && rule?.threadId !== undefined
+        ? String(rule.threadId)
+        : "",
+    );
+  }, [open, ruleId]);
+
+  const invalidScope = !selection.all && selection.projectIds.size === 0;
+
+  const handleSave = async () => {
+    if (!rule) return;
+    setSaving(true);
+    try {
+      await updateRule.mutateAsync({
+        telegramRuleId: rule.id,
+        projectIds: selection.all ? null : [...selection.projectIds],
+        threadId: topicsApply && threadId ? Number(threadId) : null,
+      });
+      toast.success(t("settings:telegramUnified.toastSaved"));
+      onClose();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const workspaceName = rule?.workspaceName ?? rule?.workspaceId ?? "—";
+
+  return (
+    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+      <DialogContent className="max-w-130">
+        <DialogHeader>
+          <DialogTitle>{t("settings:telegramUnified.editRule")}</DialogTitle>
+          <DialogDescription>
+            {t("settings:telegramUnified.editRuleDescription")}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[50vh] space-y-4 overflow-y-auto px-6 py-2">
+          <div className="rounded-md border border-border/50 p-2">
+            <p className="text-xs font-medium">{workspaceName}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("settings:telegramUnified.editRuleScopeHint")}
+            </p>
+          </div>
+
+          <WorkspaceProjectPicker
+            workspaceId={rule?.workspaceId ?? ""}
+            workspaceName={workspaceName}
+            selection={selection}
+            onChange={(update) =>
+              setSelection((previous) => ({
+                ...previous,
+                all: false,
+                projectIds: new Set(),
+                ...update,
+              }))
+            }
+          />
+
+          {topicsApply ? (
+            <RuleTopicField
+              inputId="telegram-edit-rule-topic"
+              threadId={threadId}
+              onThreadIdChange={setThreadId}
+              detectedTopics={detectedTopics}
+              discoveryUnavailable={discoveryUnavailable}
+            />
+          ) : (
+            <p className="rounded-md bg-muted/30 px-2.5 py-2 text-xs text-muted-foreground">
+              {t("settings:telegramUnified.topicsOnlyInGroups")}
+            </p>
+          )}
+        </div>
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button
+            size="sm"
+            disabled={saving || invalidScope || updateRule.isPending}
             onClick={handleSave}
             className="gap-2"
           >
