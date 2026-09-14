@@ -79,6 +79,10 @@ export const telegramVerifyResultSchema = z
         id: z.number(),
         username: z.string().nullable(),
         name: z.string().nullable(),
+        canJoinGroups: z.boolean().nullable().openapi({
+          description:
+            "False when the bot is not allowed to be added to groups; group and channel notifications then cannot be delivered.",
+        }),
       })
       .nullable(),
     chat: z
@@ -89,6 +93,24 @@ export const telegramVerifyResultSchema = z
         isForum: z.boolean().nullable().openapi({
           description:
             "True when the chat is a forum group; a topic id is then required to route into a topic.",
+        }),
+        botMemberStatus: z
+          .enum([
+            "creator",
+            "administrator",
+            "member",
+            "restricted",
+            "left",
+            "kicked",
+          ])
+          .nullable()
+          .openapi({
+            description:
+              "The bot's membership in the chat, as reported by getChatMember.",
+          }),
+        botCanPost: z.boolean().nullable().openapi({
+          description:
+            "Whether the bot has the right to send messages in the chat; notifications require it.",
         }),
       })
       .nullable(),

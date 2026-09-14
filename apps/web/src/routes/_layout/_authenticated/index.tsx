@@ -2,10 +2,17 @@ import type { client } from "@kaneo/libs";
 import { useQueries } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import type { InferResponseType } from "hono/client";
-import { ArrowUpDown, ChartLine, LayoutGrid } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChartLine,
+  Inbox,
+  LayoutGrid,
+  ListChecks,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Layout from "@/components/common/layout";
+import ConsolidatedTaskList from "@/components/dashboard/consolidated-task-list";
 import ProgressChart from "@/components/dashboard/progress-chart";
 import PageTitle from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
@@ -259,7 +266,9 @@ function ProjectChartPanel({ projectId }: { projectId: string }) {
 
 function RouteComponent() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"overview" | "charts">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "charts" | "backlog" | "tasks"
+  >("overview");
   const { data: workspaces, isLoading: workspacesLoading } = useGetWorkspaces();
   const {
     workspaceSort,
@@ -367,7 +376,13 @@ function RouteComponent() {
               <Tabs
                 value={activeTab}
                 onValueChange={(value) =>
-                  setActiveTab(value === "charts" ? "charts" : "overview")
+                  setActiveTab(
+                    value === "charts" ||
+                      value === "backlog" ||
+                      value === "tasks"
+                      ? value
+                      : "overview",
+                  )
                 }
               >
                 <TabsList className="h-8 bg-card/60">
@@ -390,6 +405,26 @@ function RouteComponent() {
                       className="mr-1 h-3 w-3 shrink-0"
                     />
                     {t("unified:tabs.charts")}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                    value="backlog"
+                  >
+                    <Inbox
+                      aria-hidden="true"
+                      className="mr-1 h-3 w-3 shrink-0"
+                    />
+                    {t("unified:tabs.backlog")}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                    value="tasks"
+                  >
+                    <ListChecks
+                      aria-hidden="true"
+                      className="mr-1 h-3 w-3 shrink-0"
+                    />
+                    {t("unified:tabs.tasks")}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -538,6 +573,12 @@ function RouteComponent() {
                       ),
                     )
                   : null}
+                {(activeTab === "backlog" || activeTab === "tasks") && (
+                  <ConsolidatedTaskList
+                    projects={allProjects}
+                    mode={activeTab}
+                  />
+                )}
                 {activeTab === "overview" ? (
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-4 items-stretch">
                     {sections.map(({ workspace, projects }) =>

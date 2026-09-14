@@ -1520,7 +1520,7 @@
 			"unknownProject": "Unknown project",
 			"unnamedBot": "Unnamed bot",
 			"verify": "Verify",
-			"verifyBotOk": "Bot verified: @{username}",
+			"verifyBotOk": "Bot verified: {{username}}",
 			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
 			"wholeWorkspace": "Entire workspace",
 			"accountHint": "{{count}} bot(s) connected to your account",
@@ -1540,7 +1540,14 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics"
+			"detectedTopicsLabel": "Detected topics",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat."
 		},
 		"workflowEditor": {
 			"loading": "Đang tải...",
@@ -2222,6 +2229,14 @@
 		"view": {
 			"board": "Bảng",
 			"list": "Danh sách"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "Labels",
+			"noLabel": "No label",
+			"none": "No grouping"
 		}
 	},
 	"team": {
@@ -2308,7 +2323,11 @@
 	"unified": {
 		"empty": {
 			"description": "Ngay khi bạn tạo một dự án, các dự án từ mọi không gian làm việc sẽ hiển thị tại đây.",
-			"title": "Chưa có dự án nào"
+			"title": "Chưa có dự án nào",
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet"
 		},
 		"pageTitle": "Tất cả dự án",
 		"section": {
@@ -2330,7 +2349,15 @@
 		},
 		"tabs": {
 			"charts": "Biểu đồ",
-			"overview": "Tổng quan"
+			"overview": "Tổng quan",
+			"backlog": "Backlog",
+			"tasks": "Tasks"
+		},
+		"consolidated": {
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_other": "{{count}} active tasks"
 		}
 	},
 	"workspace": {

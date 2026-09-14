@@ -18,7 +18,18 @@ async function verifyTelegramConfig(body: VerifyTelegramRequest) {
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(error);
+    // Validation failures can come back as JSON error bodies; prefer their
+    // message over the raw JSON dump.
+    let message = error;
+    try {
+      const parsed = JSON.parse(error) as { message?: unknown };
+      if (typeof parsed.message === "string") {
+        message = parsed.message;
+      }
+    } catch {
+      // Plain-text error body: already the message.
+    }
+    throw new Error(message);
   }
 
   return (await response.json()) as TelegramVerifyResult;

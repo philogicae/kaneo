@@ -63,13 +63,25 @@ type TelegramApiCall<T> = {
   ok: boolean;
   result?: T;
   description?: string;
+  error_code?: number;
 };
+
+// Telegram reports errors both as its own error_code (e.g. 401 for a bad
+// token, 409 while a webhook owns getUpdates) and as an HTTP status; callers
+// map them to user-facing messages, so both are surfaced.
+export type TelegramApiFailure = {
+  ok: false;
+  error: string;
+  errorCode?: number;
+};
+
+type TelegramApiSuccess<T> = { ok: true; result: T };
 
 async function callTelegramApi<T>(
   botToken: string,
   method: string,
   body: Record<string, unknown>,
-): Promise<{ ok: true; result: T } | { ok: false; error: string }> {
+): Promise<TelegramApiSuccess<T> | TelegramApiFailure> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TELEGRAM_TIMEOUT_MS);
 
@@ -92,6 +104,7 @@ async function callTelegramApi<T>(
       return {
         ok: false,
         error: result?.description || `Telegram ${method} failed`,
+        errorCode: result?.error_code ?? response.status,
       };
     }
 
@@ -113,6 +126,13 @@ export type TelegramBotInfo = {
   id: number;
   username?: string;
   first_name?: string;
+  // False when the bot's privacy settings forbid being added to groups;
+  // group/channel notifications then cannot work.
+  can_join_groups?: boolean;
+  // False under privacy mode: the bot only sees commands in groups. Posting
+  // notifications still works, but topic detection through getUpdates is
+  // limited to messages the bot receives.
+  can_read_all_group_messages?: boolean;
 };
 
 export type TelegramChatInfo = {
@@ -125,7 +145,7 @@ export type TelegramChatInfo = {
 
 export async function getTelegramMe(
   botToken: string,
-): Promise<{ ok: true; bot: TelegramBotInfo } | { ok: false; error: string }> {
+): Promise<{ ok: true; bot: TelegramBotInfo } | TelegramApiFailure> {
   const result = await callTelegramApi<TelegramBotInfo>(botToken, "getMe", {});
   if (!result.ok) return result;
   return { ok: true, bot: result.result };
@@ -134,14 +154,44 @@ export async function getTelegramMe(
 export async function getTelegramChat(
   botToken: string,
   chatId: string,
-): Promise<
-  { ok: true; chat: TelegramChatInfo } | { ok: false; error: string }
-> {
+): Promise<{ ok: true; chat: TelegramChatInfo } | TelegramApiFailure> {
   const result = await callTelegramApi<TelegramChatInfo>(botToken, "getChat", {
     chat_id: chatId,
   });
   if (!result.ok) return result;
   return { ok: true, chat: result.result };
+}
+
+export type TelegramChatMember = {
+  status:
+    | "creator"
+    | "administrator"
+    | "member"
+    | "restricted"
+    | "left"
+    | "kicked";
+  // administrator only.
+  can_post_messages?: boolean;
+  // restricted only; absent means unrestricted membership.
+  is_member?: boolean;
+  can_send_messages?: boolean;
+};
+
+// getChat alone succeeds for public channels the bot cannot post in;
+// getChatMember is what proves the bot is actually in the chat with the
+// rights notifications require.
+export async function getTelegramChatMember(
+  botToken: string,
+  chatId: string,
+  userId: number,
+): Promise<{ ok: true; member: TelegramChatMember } | TelegramApiFailure> {
+  const result = await callTelegramApi<TelegramChatMember>(
+    botToken,
+    "getChatMember",
+    { chat_id: chatId, user_id: userId },
+  );
+  if (!result.ok) return result;
+  return { ok: true, member: result.result };
 }
 
 export type TelegramUpdate = {
@@ -150,6 +200,14 @@ export type TelegramUpdate = {
     chat?: { id?: number };
     message_thread_id?: number;
     forum_topic_created?: { title?: string };
+    forum_topic_edited?: { title?: string };
+    // Replies inside a forum topic carry the replied-to message; when the user
+    // replies to the topic root, that object exposes the creation service
+    // message even if it predates the update window.
+    reply_to_message?: {
+      forum_topic_created?: { title?: string };
+      forum_topic_edited?: { title?: string };
+    };
   };
   edited_message?: TelegramUpdate["message"];
 };
@@ -160,9 +218,7 @@ export type TelegramUpdate = {
 // webhook error, since getUpdates is forbidden while a webhook is set).
 export async function getTelegramUpdates(
   botToken: string,
-): Promise<
-  { ok: true; updates: TelegramUpdate[] } | { ok: false; error: string }
-> {
+): Promise<{ ok: true; updates: TelegramUpdate[] } | TelegramApiFailure> {
   const result = await callTelegramApi<TelegramUpdate[]>(
     botToken,
     "getUpdates",

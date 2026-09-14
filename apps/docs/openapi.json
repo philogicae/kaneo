@@ -3110,12 +3110,20 @@
                   "string",
                   "null"
                 ]
+              },
+              "canJoinGroups": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "False when the bot is not allowed to be added to groups; group and channel notifications then cannot be delivered."
               }
             },
             "required": [
               "id",
               "username",
-              "name"
+              "name",
+              "canJoinGroups"
             ]
           },
           "chat": {
@@ -3145,13 +3153,38 @@
                   "null"
                 ],
                 "description": "True when the chat is a forum group; a topic id is then required to route into a topic."
+              },
+              "botMemberStatus": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "creator",
+                  "administrator",
+                  "member",
+                  "restricted",
+                  "left",
+                  "kicked",
+                  null
+                ],
+                "description": "The bot's membership in the chat, as reported by getChatMember."
+              },
+              "botCanPost": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "Whether the bot has the right to send messages in the chat; notifications require it."
               }
             },
             "required": [
               "id",
               "title",
               "username",
-              "isForum"
+              "isForum",
+              "botMemberStatus",
+              "botCanPost"
             ]
           }
         },
@@ -14678,7 +14711,7 @@
           "Telegram"
         ],
         "summary": "Verify a bot token or chat against Telegram",
-        "description": "Calls the Telegram Bot API (getMe / getChat) with the given or stored token. getChat also reports isForum, which tells whether a topic id is needed. Note the Bot API cannot list forum topics.",
+        "description": "Calls the Telegram Bot API with the given or stored token: getMe validates the bot, getChat reports isForum (whether a topic id is needed) and getChatMember confirms the bot can actually post in the chat (membership and permissions). Verification fails with an actionable message when the bot is not a member or cannot send messages.",
         "requestBody": {
           "required": true,
           "content": {

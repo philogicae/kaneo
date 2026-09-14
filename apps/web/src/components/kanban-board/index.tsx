@@ -14,23 +14,32 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { applyTaskDrop } from "@/lib/apply-task-drop";
+import { buildLabelGroups } from "@/lib/group-tasks";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
 import type { ProjectWithTasks } from "@/types/project";
 import BulkToolbar from "../bulk-selection/bulk-toolbar";
 import Column from "./column";
+import GroupColumn from "./group-column";
 import TaskCard from "./task-card";
 
 type KanbanBoardProps = {
   project: ProjectWithTasks;
   sortActive?: boolean;
+  // Display-only label grouping: replaces the status columns with one column
+  // per label and disables drag & drop.
+  groupActive?: boolean;
 };
 
-function KanbanBoard({ project, sortActive = false }: KanbanBoardProps) {
+function KanbanBoard({
+  project,
+  sortActive = false,
+  groupActive = false,
+}: KanbanBoardProps) {
   const { setProject } = useProjectStore();
   const {
     setAvailableTasks,
@@ -43,14 +52,24 @@ function KanbanBoard({ project, sortActive = false }: KanbanBoardProps) {
   const { mutate: updateTask } = useUpdateTask();
   const navigate = useNavigate();
 
+  const groups = useMemo(
+    () =>
+      groupActive && project.columns ? buildLabelGroups(project.columns) : null,
+    [groupActive, project.columns],
+  );
+
   useEffect(() => {
     if (project?.columns) {
-      const allTaskIds = project.columns.flatMap((column) =>
-        column.tasks.map((task) => task.id),
-      );
+      // Keep keyboard selection in sync with what is on screen: grouped
+      // columns reorder tasks by label, so the focus list follows the groups.
+      const allTaskIds = groups
+        ? groups.flatMap((group) => group.tasks.map((task) => task.id))
+        : project.columns.flatMap((column) =>
+            column.tasks.map((task) => task.id),
+          );
       setAvailableTasks(allTaskIds);
     }
-  }, [project, setAvailableTasks]);
+  }, [project, groups, setAvailableTasks]);
 
   useEffect(() => {
     clearFocus();
@@ -191,6 +210,25 @@ function KanbanBoard({ project, sortActive = false }: KanbanBoardProps) {
         .flatMap((col) => col.tasks)
         .find((task) => task.id === activeId)
     : null;
+
+  if (groupActive) {
+    return (
+      <div className="flex h-full w-full flex-col bg-linear-to-b from-muted/20 to-background">
+        <div className="min-h-0 flex-1 overflow-x-auto [-webkit-overflow-scrolling:touch]">
+          <div className="flex h-full min-w-max gap-4 px-4 py-4 md:px-5">
+            {(groups ?? []).map((group) => (
+              <div
+                key={group.id}
+                className="h-full max-w-96 min-w-80 shrink-0 flex-1"
+              >
+                <GroupColumn group={group} projectId={project.id} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DndContext

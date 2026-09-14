@@ -1,6 +1,7 @@
 import { Filter, PanelsTopLeft, Rows3, X } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 import { useTranslation } from "react-i18next";
+import GroupControl from "@/components/common/group-control";
 import SortControl from "@/components/common/sort-control";
 import TaskSearchInput from "@/components/common/task-search-input";
 import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
@@ -23,6 +24,7 @@ import {
 } from "@/hooks/use-task-filters";
 import { getColumnIcon } from "@/lib/column";
 import { getInitials } from "@/lib/get-initials";
+import type { BoardGroupBy } from "@/lib/group-tasks";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { resolveLabelColor } from "@/lib/label-color";
 import { getPriorityIcon } from "@/lib/priority";
@@ -62,6 +64,8 @@ type BoardToolbarProps = {
   setViewMode: (mode: "board" | "list") => void;
   sort: SortConfig;
   onSortChange: (sort: SortConfig) => void;
+  groupBy: BoardGroupBy;
+  onGroupByChange: (groupBy: BoardGroupBy) => void;
   customFieldDefinitions?: CustomFieldDefinition[];
   usedCustomFieldValues?: Record<string, string[]>;
   searchQuery: string;
@@ -154,6 +158,8 @@ export default function BoardToolbar({
   setViewMode,
   sort,
   onSortChange,
+  groupBy,
+  onGroupByChange,
   customFieldDefinitions = [],
   usedCustomFieldValues = {},
   searchQuery,
@@ -688,6 +694,8 @@ export default function BoardToolbar({
             </DropdownMenu>
 
             <SortControl sort={sort} onSortChange={onSortChange} />
+
+            <GroupControl groupBy={groupBy} onGroupByChange={onGroupByChange} />
 
             <TaskSearchInput
               value={searchQuery}

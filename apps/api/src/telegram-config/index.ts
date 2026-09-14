@@ -276,7 +276,7 @@ const verifyRoute = createRoute({
   tags: ["Telegram"],
   summary: "Verify a bot token or chat against Telegram",
   description:
-    "Calls the Telegram Bot API (getMe / getChat) with the given or stored token. getChat also reports isForum, which tells whether a topic id is needed. Note the Bot API cannot list forum topics.",
+    "Calls the Telegram Bot API with the given or stored token: getMe validates the bot, getChat reports isForum (whether a topic id is needed) and getChatMember confirms the bot can actually post in the chat (membership and permissions). Verification fails with an actionable message when the bot is not a member or cannot send messages.",
   request: {
     body: {
       required: true,

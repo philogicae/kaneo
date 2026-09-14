@@ -40,6 +40,7 @@
 - Keep API handlers thin; domain behavior lives in controllers/focused utilities. Keep web requests in `apps/web/src/fetchers/` and server state in TanStack Query hooks, using the `@kaneo/libs` client — no parallel untyped request layer.
 - Mutations that affect realtime state must consider `publishEvent()`, WebSocket delivery, and client cache invalidation. Do not expose secrets or private workspace data through responses, logs, events, WebSockets, or MCP tools.
 - User-facing copy uses static i18n keys (`i18n/en-US.json` source of truth).
+- Never reference board tasks (KAN-XX, TASK-XX, task IDs or numbers) in code, comments, commit messages, or docs — task coordination lives in Kaneo only.
 - Prefer inferred TypeScript types and `type` over `interface` unless extension/declaration merging is required. Comments explain constraints, not code.
 - Conventional Commits are enforced by commitlint (`feat:`/`fix:`/… ); no release automation consumes them today.
 
