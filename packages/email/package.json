@@ -17,6 +17,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "test": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "test:watch": "vitest --config vitest.config.ts"
   },
   "dependencies": {

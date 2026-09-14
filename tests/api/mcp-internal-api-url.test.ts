@@ -56,7 +56,7 @@ async function loadMcpRoutes(internalApiUrl?: string) {
 
 beforeAll(async () => {
   await loadMcpRoutes();
-}, 30_000);
+}, 60_000);
 
 afterEach(() => {
   vi.unstubAllGlobals();

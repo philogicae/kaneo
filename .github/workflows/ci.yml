@@ -123,7 +123,10 @@ jobs:
   unit:
     name: Tests 🧪
     needs: build
-    runs-on: ubuntu-slim
+    # ubuntu-slim's 2 vCPUs starve the parallel coverage runs (9 turbo tasks ×
+    # 3 vitest workers) — tests flake past testTimeout at 10-15x their local
+    # wall time; ubuntu-latest (4 vCPUs) keeps them comfortably under budget.
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -139,8 +142,18 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
-      - name: Run unit tests
-        run: pnpm test
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage
+      - name: Publish coverage summary
+        if: always()
+        run: >
+          node .github/scripts/coverage-summary.mjs
+          apps/api/coverage/coverage-summary.json
+          apps/web/coverage/coverage-summary.json
+          packages/email/coverage/coverage-summary.json
+          packages/libs/coverage/coverage-summary.json
+          packages/permissions/coverage/coverage-summary.json
+          packages/planka-import/coverage/coverage-summary.json
 
   integration:
     name: Integration 🔌
