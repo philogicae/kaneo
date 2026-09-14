@@ -5,10 +5,9 @@ import { ColumnHeader } from "./column-header";
 
 type ColumnProps = {
   column: ProjectWithTasks["columns"][number];
-  disableDragDrop?: boolean;
 };
 
-function Column({ column, disableDragDrop = false }: ColumnProps) {
+function Column({ column }: ColumnProps) {
   const [isDropzoneOver, setIsDropzoneOver] = useState(false);
 
   return (
@@ -23,11 +22,7 @@ function Column({ column, disableDragDrop = false }: ColumnProps) {
         <ColumnHeader column={column} />
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 [-webkit-overflow-scrolling:touch]">
-        <ColumnDropzone
-          column={column}
-          disableDragDrop={disableDragDrop}
-          onIsOverChange={setIsDropzoneOver}
-        />
+        <ColumnDropzone column={column} onIsOverChange={setIsDropzoneOver} />
       </div>
     </div>
   );

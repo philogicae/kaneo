@@ -27,6 +27,7 @@ import { useTranslation } from "react-i18next";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { applyTaskDrop } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
 import { getColumnIcon } from "@/lib/column";
 import { toast } from "@/lib/toast";
@@ -40,10 +41,10 @@ import TaskRow from "./task-row";
 
 type ListViewProps = {
   project: ProjectWithTasks;
-  disableDragDrop?: boolean;
+  sortActive?: boolean;
 };
 
-function ListView({ project, disableDragDrop = false }: ListViewProps) {
+function ListView({ project, sortActive = false }: ListViewProps) {
   const { t } = useTranslation();
   const { setProject } = useProjectStore();
   const {
@@ -121,11 +122,11 @@ function ListView({ project, disableDragDrop = false }: ListViewProps) {
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: disableDragDrop ? 999999 : 8 },
+      activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: disableDragDrop ? 999999 : 200,
+        delay: 200,
         tolerance: 8,
       },
     }),
@@ -167,75 +168,20 @@ function ListView({ project, disableDragDrop = false }: ListViewProps) {
 
     if (!over || !project?.columns) return;
 
-    const activeTaskId = active.id.toString();
-    const overId = over.id.toString();
-
-    const updatedProject = produce(project, (draft) => {
-      const sourceColumn = draft?.columns?.find((col) =>
-        col.tasks.some((task) => task.id === activeTaskId),
-      );
-      const destinationColumn = draft?.columns?.find(
-        (col) =>
-          col.id === overId || col.tasks.some((task) => task.id === overId),
-      );
-
-      if (!sourceColumn || !destinationColumn) return;
-
-      const sourceTaskIndex = sourceColumn.tasks.findIndex(
-        (task) => task.id === activeTaskId,
-      );
-      const task = sourceColumn.tasks[sourceTaskIndex];
-
-      sourceColumn.tasks = sourceColumn.tasks.filter(
-        (t) => t.id !== activeTaskId,
-      );
-
-      if (sourceColumn.id === destinationColumn.id) {
-        let destinationIndex = destinationColumn.tasks.findIndex(
-          (t) => t.id === overId,
-        );
-        if (sourceTaskIndex <= destinationIndex) {
-          destinationIndex += 1;
-        }
-        destinationColumn.tasks.splice(destinationIndex, 0, task);
-
-        destinationColumn.tasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            status: destinationColumn.slug,
-            position: index,
-          });
-        });
-      } else {
-        // A task's status is a column slug. The column id is only the
-        // droppable identity here, and the two are interchangeable only
-        // because the tasks endpoint happens to return `id: column.slug`.
-        task.status = destinationColumn.slug;
-        const destinationIndex =
-          overId === destinationColumn.id
-            ? destinationColumn.tasks.length
-            : destinationColumn.tasks.findIndex((t) => t.id === overId) + 1;
-
-        destinationColumn.tasks.splice(destinationIndex, 0, task);
-
-        destinationColumn.tasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            status: destinationColumn.slug,
-            position: index,
-          });
-        });
-
-        sourceColumn.tasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            position: index,
-          });
-        });
-      }
+    const { project: updatedProject, updates } = applyTaskDrop({
+      project,
+      activeTaskId: active.id.toString(),
+      overId: over.id.toString(),
+      sortActive,
     });
 
-    setProject(updatedProject);
+    for (const task of updates) {
+      updateTask(task);
+    }
+
+    if (updates.length > 0) {
+      setProject(updatedProject);
+    }
   };
 
   const toggleSection = (sectionId: string) => {

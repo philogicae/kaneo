@@ -224,12 +224,12 @@ function RouteComponent() {
             viewMode === "board" ? (
               <KanbanBoard
                 project={sortedProject}
-                disableDragDrop={sort.field !== "position"}
+                sortActive={sort.field !== "position"}
               />
             ) : (
               <ListView
                 project={sortedProject}
-                disableDragDrop={sort.field !== "position"}
+                sortActive={sort.field !== "position"}
               />
             )
           ) : (
