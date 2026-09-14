@@ -8,6 +8,7 @@
 	"scripts": {
 		"lint": "biome check --write .",
 		"test": "vitest run --config vitest.config.ts",
+		"test:coverage": "vitest run --config vitest.config.ts --coverage",
 		"typecheck": "tsc --noEmit -p tsconfig.json",
 		"test:watch": "vitest --config vitest.config.ts"
 	},

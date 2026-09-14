@@ -10,6 +10,7 @@
 		"lint": "biome check --write .",
 		"typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
 		"test": "vitest run --config vitest.config.ts",
+		"test:coverage": "vitest run --config vitest.config.ts --coverage",
 		"test:watch": "vitest --config vitest.config.ts"
 	},
 	"dependencies": {

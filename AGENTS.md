@@ -26,7 +26,7 @@
 ## Setup commands
 
 - Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.4.1`).
-- `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:integration` (local libSQL/SQLite file)
+- `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:coverage` (unit + coverage, aggregated per workspace in the CI job summary) · `pnpm test:integration` (local libSQL/SQLite file)
 - `pnpm lint` = Biome **--write** (rewrites files); CI gate is `pnpm exec biome ci .` — run that for a read-only check.
 - `pnpm i18n:check` / `i18n:schema` · `pnpm openapi:check` / `openapi:check:fix`
 - DB: schema in `apps/api/src/database/schema.ts`, relations in `database/relations.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`, inspect the SQL, existing installations must keep working.
