@@ -94,6 +94,20 @@ describe("buildLabelGroups", () => {
     expect(groups[0]?.tasks.map((t) => t.id)).toEqual(["t1", "t2"]);
   });
 
+  it("merges same-name copies even when a legacy copy drifted to another color", () => {
+    const groups = buildLabelGroups(
+      columns([
+        [task("t1", [{ id: "copy-1", name: "API", color: "teal" }])],
+        [task("t2", [{ id: "copy-2", name: "API", color: "#0D9488" }])],
+      ]),
+    );
+
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.name).toBe("API");
+    expect(groups[0]?.color).toBe("teal");
+    expect(groups[0]?.tasks.map((t) => t.id)).toEqual(["t1", "t2"]);
+  });
+
   it("returns no groups for an empty board", () => {
     expect(buildLabelGroups(columns([[]]))).toEqual([]);
   });

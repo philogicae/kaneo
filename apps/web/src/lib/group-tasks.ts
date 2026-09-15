@@ -20,8 +20,11 @@ const UNLABELED_GROUP_ID = "label:none";
 export function buildLabelGroups(
   columns: ProjectWithTasks["columns"],
 ): LabelGroup[] {
-  // Tasks can carry task-level label copies (same label registered under
-  // several ids), so groups are keyed by name + color like the filter UI.
+  // A label name identifies one label per workspace, so groups are keyed by
+  // name alone: task-level copies of the same workspace label (which carry
+  // their own row ids) always land in a single group, even when a legacy copy
+  // drifted to a different color. The first copy's color wins; the
+  // label-color migration keeps copies mirroring the workspace definition.
   const groups = new Map<string, LabelGroup>();
   const unlabeled: LabelGroup = {
     id: UNLABELED_GROUP_ID,
@@ -34,8 +37,7 @@ export function buildLabelGroups(
     for (const task of column.tasks) {
       let placed = false;
       for (const label of task.labels ?? []) {
-        const key = `${label.name}::${label.color}`;
-        let group = groups.get(key);
+        let group = groups.get(label.name);
         if (!group) {
           group = {
             id: `label:${label.id}`,
@@ -43,7 +45,7 @@ export function buildLabelGroups(
             color: label.color,
             tasks: [],
           };
-          groups.set(key, group);
+          groups.set(label.name, group);
         }
         group.tasks.push(task);
         placed = true;
