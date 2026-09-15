@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { useBoardSort } from "./use-board-sort";
 
@@ -70,5 +71,29 @@ describe("useBoardSort", () => {
         direction: "asc",
       });
     });
+  });
+
+  // React StrictMode double-mounts effects in dev: the pre-hydration write
+  // effect used to clobber the stored value with the default, so the second
+  // mount restored the default and the chosen sort vanished on reload.
+  it("survives a StrictMode double-mount with the stored sort intact", async () => {
+    window.localStorage.setItem(
+      storageKey,
+      JSON.stringify({ field: "priority", direction: "desc" }),
+    );
+
+    const { result } = renderHook(() => useBoardSort("project-1"), {
+      wrapper: StrictMode,
+    });
+
+    await waitFor(() => {
+      expect(result.current.sort).toEqual({
+        field: "priority",
+        direction: "desc",
+      });
+    });
+    expect(window.localStorage.getItem(storageKey)).toBe(
+      JSON.stringify({ field: "priority", direction: "desc" }),
+    );
   });
 });

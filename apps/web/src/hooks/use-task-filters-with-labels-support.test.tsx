@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { useTaskFiltersWithLabelsSupport } from "./use-task-filters-with-labels-support";
 
@@ -13,13 +14,14 @@ function createTestQueryClient() {
   });
 }
 
-function createWrapper() {
+function createWrapper(options?: { strict?: boolean }) {
   const queryClient = createTestQueryClient();
 
   return function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
+    const content = (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
+    return options?.strict ? <StrictMode>{content}</StrictMode> : content;
   };
 }
 
@@ -208,4 +210,26 @@ describe("useTaskFiltersWithLabelsSupport", () => {
       ]);
     },
   );
+
+  // React StrictMode double-mounts effects in dev: the pre-hydration write
+  // effect used to clobber the stored value with the default, so the second
+  // mount restored the default and chosen filters vanished on reload.
+  it("survives a StrictMode double-mount with the stored filters intact", async () => {
+    window.localStorage.setItem(
+      storageKey,
+      JSON.stringify({ status: ["todo"] }),
+    );
+
+    const { result } = renderHook(
+      () => useTaskFiltersWithLabelsSupport(null, "project-1"),
+      { wrapper: createWrapper({ strict: true }) },
+    );
+
+    await waitFor(() => {
+      expect(result.current.filters.status).toEqual(["todo"]);
+    });
+    expect(JSON.parse(window.localStorage.getItem(storageKey) ?? "{}")).toEqual(
+      expect.objectContaining({ status: ["todo"] }),
+    );
+  });
 });
