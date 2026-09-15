@@ -848,8 +848,10 @@ function ChatFormDialog({
 // whether the chat is a forum (positive Telegram ids are private chats, which
 // never are), and while the dialog is open the bot's recent updates are
 // polled so a message posted inside a topic makes it appear.
-function useTopicDiscovery(chat: TelegramConfigChat | null) {
-  const verify = useVerifyTelegramConfig();
+// Shared by the add and edit rule dialogs; exported for regression tests
+// (the verify effect must not re-fire per mutation state change).
+export function useTopicDiscovery(chat: TelegramConfigChat | null) {
+  const { mutateAsync: verifyChat } = useVerifyTelegramConfig();
   const { mutateAsync: discoverTopics } = useDiscoverTelegramTopics();
   const [threadId, setThreadId] = useState("");
   const [detectedTopics, setDetectedTopics] = useState<TelegramTopic[]>([]);
@@ -878,13 +880,14 @@ function useTopicDiscovery(chat: TelegramConfigChat | null) {
   }, [chatId]);
 
   // Read-only chat check: confirms whether this chat is a forum (and that its
-  // bot token still works). Failure keeps the manual flow as-is.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on refresh is idempotent, chat.id keys the request
+  // bot token still works). Failure keeps the manual flow as-is. Only the
+  // stable mutateAsync goes into the deps: the useMutation result object is
+  // recreated on every render, so keying on it re-fires the request in a
+  // loop (each run's state change recreates the object).
   useEffect(() => {
-    if (!chat) return;
+    if (!chatId) return;
     let cancelled = false;
-    verify
-      .mutateAsync({ telegramChatId: chat.id })
+    verifyChat({ telegramChatId: chatId })
       .then((result) => {
         if (!cancelled) setForumKnown(result.chat?.isForum ?? null);
       })
@@ -892,8 +895,7 @@ function useTopicDiscovery(chat: TelegramConfigChat | null) {
     return () => {
       cancelled = true;
     };
-    // verify.mutateAsync is stable.
-  }, [chatId, chat, verify]);
+  }, [chatId, verifyChat]);
 
   // Live topic detection: while the dialog is open, poll the bot's recent
   // updates; a message posted inside a forum topic makes it appear here.

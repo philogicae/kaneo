@@ -70,6 +70,10 @@ export function useTaskFilters(
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
   const storageKey = projectId ? `kaneo:board-filters:${projectId}` : null;
   const [filters, setFilters] = useState<BoardFilters>(DEFAULT_FILTERS);
+  // StrictMode remounts effects on the first commit: without this gate the
+  // write effect would clobber the stored value with the default before the
+  // read effect restored it (filters reset on every dev reload).
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (!storageKey || typeof window === "undefined") return;
@@ -85,13 +89,15 @@ export function useTaskFilters(
       setFilters(normalizeFilters(parsed));
     } catch {
       setFilters(DEFAULT_FILTERS);
+    } finally {
+      setHydrated(true);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (!storageKey || typeof window === "undefined") return;
+    if (!hydrated || !storageKey || typeof window === "undefined") return;
     window.localStorage.setItem(storageKey, JSON.stringify(filters));
-  }, [filters, storageKey]);
+  }, [filters, storageKey, hydrated]);
 
   const filterTasks = (tasks: Task[]): Task[] => {
     return tasks.filter((task) => {

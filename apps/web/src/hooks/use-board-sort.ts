@@ -51,6 +51,10 @@ function normalizeSort(value: unknown): SortConfig {
 export function useBoardSort(projectId: string | undefined) {
   const storageKey = projectId ? `kaneo:board-sort:${projectId}` : null;
   const [sort, setSort] = useState<SortConfig>(DEFAULT_SORT);
+  // StrictMode remounts effects on the first commit: without this gate the
+  // write effect would clobber the stored value with the default before the
+  // read effect restored it (the sort then resets on every dev reload).
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (!storageKey || typeof window === "undefined") return;
@@ -66,17 +70,19 @@ export function useBoardSort(projectId: string | undefined) {
       setSort(normalizeSort(parsed));
     } catch {
       setSort(DEFAULT_SORT);
+    } finally {
+      setHydrated(true);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (!storageKey || typeof window === "undefined") return;
+    if (!hydrated || !storageKey || typeof window === "undefined") return;
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(sort));
     } catch {
       // persistence is best-effort; private mode or quota can block writes
     }
-  }, [sort, storageKey]);
+  }, [sort, storageKey, hydrated]);
 
   return { sort, setSort };
 }

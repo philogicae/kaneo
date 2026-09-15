@@ -797,7 +797,7 @@ export function registerMcpTools(
     "create_label",
     {
       description:
-        "Create a label in a workspace. Passing taskId creates (or returns) a task-scoped copy attached to that task instead of a workspace-level label. color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
+        "Create a label in a workspace. Passing taskId creates (or returns) a task-scoped copy attached to that task instead of a workspace-level label; when a workspace-level label with the same name already exists, the copy mirrors that label's color. color accepts a hex code (#4A5568) or a semantic palette name (dark-gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald, gray).",
       inputSchema: z.object({
         name: nonEmptyString,
         color: labelColorSchema,
