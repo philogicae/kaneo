@@ -1,4 +1,4 @@
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, or } from "drizzle-orm";
 import db from "../../database";
 import {
   projectTable,
@@ -28,6 +28,7 @@ const EVENT_KEY_BY_ACTION: Record<
   titleChanged: "taskTitleChanged",
   descriptionChanged: "taskDescriptionChanged",
   commentCreated: "taskCommentCreated",
+  mentioned: "taskMentionCreated",
   appointmentCreated: "appointmentCreated",
   appointmentRescheduled: "appointmentUpdated",
   appointmentReassigned: "appointmentUpdated",
@@ -37,7 +38,13 @@ const EVENT_KEY_BY_ACTION: Record<
 // table backs the message data.
 export type UnifiedTelegramDispatchEvent =
   | { taskId: string; projectId: string; userId: string | null }
-  | { appointmentId: string; projectId: string; userId: string | null };
+  | { appointmentId: string; projectId: string; userId: string | null }
+  | {
+      taskId: string;
+      projectId: string;
+      userId: string | null;
+      mentionedUserIds: string[];
+    };
 
 // Unified rules supersede the per-project telegram integration: when any
 // active rule matches, the legacy per-project config is skipped so a project
@@ -48,7 +55,11 @@ export async function dispatchUnifiedTelegram(
 ): Promise<boolean> {
   const entityId =
     "appointmentId" in event ? event.appointmentId : event.taskId;
-  const matches = await getMatchingRules(event.projectId);
+  // Mentions are personal: only rules owned by a mentioned member receive
+  // them, never the project-wide channels.
+  const mentionedUserIds =
+    "mentionedUserIds" in event ? event.mentionedUserIds : undefined;
+  const matches = await getMatchingRules(event.projectId, mentionedUserIds);
   if (matches.length === 0) {
     // The dispatch is fire-and-forget on the event bus; without this line a
     // dead rule produces zero evidence (seen live: a hung pool connection
@@ -58,7 +69,9 @@ export async function dispatchUnifiedTelegram(
       entityId,
       action: action.kind,
     });
-    return false;
+    // A mention with no matching personal rule stays silent instead of
+    // falling back to the project channel.
+    return mentionedUserIds !== undefined;
   }
 
   const data =
@@ -135,7 +148,10 @@ export async function getUnifiedTelegramTargets(projectId: string) {
   return getMatchingRules(projectId);
 }
 
-async function getMatchingRules(projectId: string) {
+async function getMatchingRules(
+  projectId: string,
+  mentionedUserIds?: string[],
+) {
   return db
     .select({
       rule: telegramRuleTable,
@@ -162,6 +178,11 @@ async function getMatchingRules(projectId: string) {
           isNull(telegramRuleTable.projectId),
           eq(telegramRuleTable.projectId, projectId),
         ),
+        // Mention dispatches only reach rules whose bot belongs to a
+        // mentioned member.
+        ...(mentionedUserIds && mentionedUserIds.length > 0
+          ? [inArray(telegramBotTable.userId, mentionedUserIds)]
+          : []),
       ),
     );
 }

@@ -102,7 +102,7 @@ const getProjectChartsRoute = createRoute({
   tags: ["Projects"],
   summary: "Get project charts",
   description:
-    "Weekly task-creation and completion counts for the last months (default 6), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Narrow or widen the window with `months`.",
+    'Weekly task-creation and completion counts for the selected range (default "6m"), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Ranges: "1w", "1m", "3m", "6m", "12m" or "all".',
   middleware: [workspaceAccess.fromProject()] as const,
   request: { params: projectParam, query: projectChartsQuery },
   responses: {
@@ -280,8 +280,8 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(getProjectChartsRoute, async (c) => {
     const { id } = c.req.valid("param");
-    const { months } = c.req.valid("query");
-    const buckets = await getProjectCharts(id, months ?? 6);
+    const { range } = c.req.valid("query");
+    const buckets = await getProjectCharts(id, range ?? "6m");
     return c.json(buckets, 200);
   })
   .openapi(reorderProjectsRoute, async (c) => {

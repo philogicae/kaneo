@@ -2759,7 +2759,7 @@
             "description": "The webhook URL with its secret path segment masked, or an empty string when none is set."
           },
           "events": {
-            "$ref": "#/components/schemas/IntegrationEvents"
+            "$ref": "#/components/schemas/MentionIntegrationEvents"
           },
           "isActive": {
             "type": [
@@ -2786,6 +2786,24 @@
           "isActive",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "MentionIntegrationEvents": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IntegrationEvents"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "taskMentionCreated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "taskMentionCreated"
+            ]
+          }
         ]
       },
       "MattermostIntegration": {
@@ -2869,7 +2887,7 @@
             "description": "The webhook URL with its secret path segment masked, or an empty string when none is set."
           },
           "events": {
-            "$ref": "#/components/schemas/IntegrationEvents"
+            "$ref": "#/components/schemas/MentionIntegrationEvents"
           },
           "isActive": {
             "type": [
@@ -2935,7 +2953,7 @@
             "type": "string"
           },
           "events": {
-            "$ref": "#/components/schemas/IntegrationEvents"
+            "$ref": "#/components/schemas/MentionIntegrationEvents"
           },
           "isActive": {
             "type": [
@@ -3037,6 +3055,9 @@
           "taskCommentCreated": {
             "type": "boolean"
           },
+          "taskMentionCreated": {
+            "type": "boolean"
+          },
           "appointmentCreated": {
             "type": "boolean"
           },
@@ -3051,6 +3072,7 @@
           "taskTitleChanged",
           "taskDescriptionChanged",
           "taskCommentCreated",
+          "taskMentionCreated",
           "appointmentCreated",
           "appointmentUpdated"
         ],
@@ -6786,7 +6808,7 @@
           "Projects"
         ],
         "summary": "Get project charts",
-        "description": "Weekly task-creation and completion counts for the last months (default 6), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Narrow or widen the window with `months`.",
+        "description": "Weekly task-creation and completion counts for the selected range (default \"6m\"), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Ranges: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\".",
         "parameters": [
           {
             "schema": {
@@ -6799,12 +6821,19 @@
           {
             "schema": {
               "type": "string",
-              "pattern": "^\\d+$",
-              "description": "Months of weekly buckets to return (default 6, max 24)."
+              "enum": [
+                "1w",
+                "1m",
+                "3m",
+                "6m",
+                "12m",
+                "all"
+              ],
+              "description": "Window of weekly buckets: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\" (default \"6m\")."
             },
             "required": false,
-            "description": "Months of weekly buckets to return (default 6, max 24).",
-            "name": "months",
+            "description": "Window of weekly buckets: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\" (default \"6m\").",
+            "name": "range",
             "in": "query"
           }
         ],
@@ -13361,6 +13390,9 @@
                       },
                       "taskCommentCreated": {
                         "type": "boolean"
+                      },
+                      "taskMentionCreated": {
+                        "type": "boolean"
                       }
                     }
                   }
@@ -13463,6 +13495,9 @@
                         "type": "boolean"
                       },
                       "taskCommentCreated": {
+                        "type": "boolean"
+                      },
+                      "taskMentionCreated": {
                         "type": "boolean"
                       }
                     }
@@ -14029,6 +14064,9 @@
                       },
                       "taskCommentCreated": {
                         "type": "boolean"
+                      },
+                      "taskMentionCreated": {
+                        "type": "boolean"
                       }
                     }
                   }
@@ -14131,6 +14169,9 @@
                         "type": "boolean"
                       },
                       "taskCommentCreated": {
+                        "type": "boolean"
+                      },
+                      "taskMentionCreated": {
                         "type": "boolean"
                       }
                     }
@@ -14371,6 +14412,9 @@
                       },
                       "taskCommentCreated": {
                         "type": "boolean"
+                      },
+                      "taskMentionCreated": {
+                        "type": "boolean"
                       }
                     }
                   }
@@ -14483,6 +14527,9 @@
                         "type": "boolean"
                       },
                       "taskCommentCreated": {
+                        "type": "boolean"
+                      },
+                      "taskMentionCreated": {
                         "type": "boolean"
                       }
                     }
@@ -14748,6 +14795,9 @@
                       "taskCommentCreated": {
                         "type": "boolean"
                       },
+                      "taskMentionCreated": {
+                        "type": "boolean"
+                      },
                       "appointmentCreated": {
                         "type": "boolean"
                       },
@@ -14755,7 +14805,7 @@
                         "type": "boolean"
                       }
                     },
-                    "description": "Per-bot event filter; omitted keys keep the plugin default (created and comments on)."
+                    "description": "Per-bot event filter; omitted keys keep the plugin default (created, comments and mentions on)."
                   }
                 }
               }

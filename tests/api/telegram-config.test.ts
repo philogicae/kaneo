@@ -81,6 +81,7 @@ describe("telegram config schema", () => {
       taskTitleChanged: false,
       taskDescriptionChanged: false,
       taskCommentCreated: true,
+      taskMentionCreated: true,
       appointmentCreated: true,
       appointmentUpdated: true,
     });

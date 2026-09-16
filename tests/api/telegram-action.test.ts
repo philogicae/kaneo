@@ -18,6 +18,30 @@ describe("buildTelegramAction", () => {
     );
   });
 
+  it("describes a mention separately from a comment", () => {
+    expect(
+      buildTelegramAction({
+        kind: "mentioned",
+        mentionedUserNames: ["Dana"],
+        source: "comment",
+      }),
+    ).toBe("Mention: Dana in a comment");
+    expect(
+      buildTelegramAction({
+        kind: "mentioned",
+        mentionedUserNames: ["Dana", "Sam"],
+        source: "description",
+      }),
+    ).toBe("Mention: Dana, Sam in the task description");
+    expect(
+      buildTelegramAction({
+        kind: "mentioned",
+        mentionedUserNames: [],
+        source: "description",
+      }),
+    ).toBe("Mention: A member in the task description");
+  });
+
   it("describes a status transition", () => {
     expect(
       buildTelegramAction({

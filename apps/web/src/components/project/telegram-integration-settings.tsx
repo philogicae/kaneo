@@ -34,6 +34,7 @@ type TelegramIntegrationFormValues = {
   taskTitleChanged: boolean;
   taskDescriptionChanged: boolean;
   taskCommentCreated: boolean;
+  taskMentionCreated: boolean;
 };
 
 function EventToggle({
@@ -50,6 +51,7 @@ function EventToggle({
     | "taskTitleChanged"
     | "taskDescriptionChanged"
     | "taskCommentCreated"
+    | "taskMentionCreated"
   >;
   label: string;
 }) {
@@ -99,6 +101,7 @@ export function TelegramIntegrationSettings({
         taskTitleChanged: z.boolean(),
         taskDescriptionChanged: z.boolean(),
         taskCommentCreated: z.boolean(),
+        taskMentionCreated: z.boolean(),
       }),
     [],
   );
@@ -127,6 +130,7 @@ export function TelegramIntegrationSettings({
       taskDescriptionChanged:
         integration?.events?.taskDescriptionChanged ?? false,
       taskCommentCreated: integration?.events?.taskCommentCreated ?? true,
+      taskMentionCreated: integration?.events?.taskMentionCreated ?? true,
     }),
     [integration],
   );
@@ -144,6 +148,7 @@ export function TelegramIntegrationSettings({
       taskTitleChanged: false,
       taskDescriptionChanged: false,
       taskCommentCreated: true,
+      taskMentionCreated: true,
     },
   });
   const { reset } = form;
@@ -191,6 +196,7 @@ export function TelegramIntegrationSettings({
         taskTitleChanged: values.taskTitleChanged,
         taskDescriptionChanged: values.taskDescriptionChanged,
         taskCommentCreated: values.taskCommentCreated,
+        taskMentionCreated: values.taskMentionCreated,
       };
 
       if (!trimmedChatId) {
@@ -299,6 +305,7 @@ export function TelegramIntegrationSettings({
         taskTitleChanged: false,
         taskDescriptionChanged: false,
         taskCommentCreated: true,
+        taskMentionCreated: true,
       });
       toast.success(t("settings:telegramIntegration.toast.removed"));
     } catch (error) {

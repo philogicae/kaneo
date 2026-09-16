@@ -12,6 +12,7 @@ import {
   CardPanel,
   CardTitle,
 } from "@/components/ui/card";
+import { getSkillUrl } from "@/lib/get-skill-url";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/settings/account/skills",
@@ -125,6 +126,7 @@ function SkillInstallCard({ install }: { install: SkillInstall }) {
 
 function RouteComponent() {
   const { t } = useTranslation();
+  const skillUrl = getSkillUrl();
 
   return (
     <>
@@ -154,6 +156,14 @@ function RouteComponent() {
 
           <Card className="rounded-none!">
             <CardPanel className="space-y-4 p-4">
+              <CopyableBlock
+                value={skillUrl}
+                label={t("settings:skillsPage.skillUrlLabel")}
+                labelHint={t("settings:skillsPage.skillUrlDescription")}
+                copyLabel={t("settings:skillsPage.copy")}
+                copiedLabel={t("settings:skillsPage.copied")}
+              />
+
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/60 bg-muted/40 p-3">
                 <p className="text-sm text-muted-foreground">
                   {t("settings:skillsPage.mcpRequirement")}

@@ -10,6 +10,7 @@ export const slackEventKeys = [
   "taskTitleChanged",
   "taskDescriptionChanged",
   "taskCommentCreated",
+  "taskMentionCreated",
 ] as const;
 
 export type SlackEventKey = (typeof slackEventKeys)[number];
@@ -28,6 +29,7 @@ export const slackConfigSchema = v.object({
       taskTitleChanged: v.optional(v.boolean()),
       taskDescriptionChanged: v.optional(v.boolean()),
       taskCommentCreated: v.optional(v.boolean()),
+      taskMentionCreated: v.optional(v.boolean()),
     }),
   ),
 });
@@ -41,6 +43,7 @@ export const defaultSlackEvents: Record<SlackEventKey, boolean> = {
   taskTitleChanged: false,
   taskDescriptionChanged: false,
   taskCommentCreated: true,
+  taskMentionCreated: true,
 };
 
 export function normalizeSlackConfig(config: SlackConfig): SlackConfig {

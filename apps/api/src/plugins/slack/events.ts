@@ -11,6 +11,7 @@ import type {
   TaskCommentCreatedEvent,
   TaskCreatedEvent,
   TaskDescriptionChangedEvent,
+  TaskMentionCreatedEvent,
   TaskPriorityChangedEvent,
   TaskStatusChangedEvent,
   TaskTitleChangedEvent,
@@ -289,6 +290,34 @@ export async function handleTaskCommentCreated(
     config,
     "New task comment",
     truncate(event.comment.replace(/\s+/g, " "), 200),
+    data,
+  );
+}
+
+export async function handleTaskMentionCreated(
+  event: TaskMentionCreatedEvent,
+  context: PluginContext,
+): Promise<void> {
+  const config = normalizeSlackConfig(context.config as SlackConfig);
+  if (!isEnabled(config, "taskMentionCreated")) return;
+
+  const data = await getSlackEventData(
+    event.taskId,
+    event.projectId,
+    event.userId,
+  );
+  if (!data) return;
+
+  const names =
+    event.mentionedUserNames.length > 0
+      ? event.mentionedUserNames.join(", ")
+      : "A member";
+  const where = event.source === "comment" ? "a comment" : "the description";
+
+  await sendSlackMessage(
+    config,
+    "Task mention",
+    `*${names}* was mentioned in ${where} on *${event.title}*.`,
     data,
   );
 }

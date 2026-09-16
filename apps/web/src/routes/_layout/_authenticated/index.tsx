@@ -1,19 +1,33 @@
 import { useQueries } from "@tanstack/react-query";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import {
   ArrowUpDown,
+  Blocks,
+  CalendarClock,
+  CalendarDays,
+  CalendarRange,
   ChartLine,
   Inbox,
   LayoutGrid,
   ListChecks,
+  Sparkles,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Layout from "@/components/common/layout";
 import UnifiedCharts from "@/components/dashboard/charts/unified-charts";
 import ConsolidatedTaskList from "@/components/dashboard/consolidated-task-list";
+import UnifiedAppointments from "@/components/dashboard/unified-appointments";
+import UnifiedCalendar from "@/components/dashboard/unified-calendar";
+import UnifiedGantt from "@/components/dashboard/unified-gantt";
 import PageTitle from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardFrame,
@@ -96,6 +110,22 @@ type ProjectWithWorkspace = {
   workspaceName: string;
   project: ProjectListItem;
 };
+
+const UNIFIED_TABS = [
+  "overview",
+  "charts",
+  "backlog",
+  "tasks",
+  "appointments",
+  "calendar",
+  "gantt",
+] as const;
+
+type UnifiedTab = (typeof UNIFIED_TABS)[number];
+
+function isUnifiedTab(value: string): value is UnifiedTab {
+  return (UNIFIED_TABS as readonly string[]).includes(value);
+}
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
@@ -228,9 +258,7 @@ function ProjectTileRow({ project }: { project: ProjectWithWorkspace }) {
 
 function RouteComponent() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "charts" | "backlog" | "tasks"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<UnifiedTab>("overview");
   const { data: workspaces, isLoading: workspacesLoading } = useGetWorkspaces();
   const {
     workspaceSort,
@@ -335,61 +363,112 @@ function RouteComponent() {
             <div className="flex items-center gap-1.5 w-full min-w-0">
               <SidebarTrigger className="-ml-1 h-6 w-6" />
               <div className="mx-1.5 h-4 w-px shrink-0 bg-border/80" />
-              <Tabs
-                value={activeTab}
-                onValueChange={(value) =>
-                  setActiveTab(
-                    value === "charts" ||
-                      value === "backlog" ||
-                      value === "tasks"
-                      ? value
-                      : "overview",
-                  )
-                }
-              >
-                <TabsList className="h-8 bg-card/60">
-                  <TabsTrigger
-                    className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
-                    value="overview"
+              <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                <div className="min-w-0 overflow-x-auto">
+                  <Tabs
+                    value={activeTab}
+                    onValueChange={(value) =>
+                      setActiveTab(isUnifiedTab(value) ? value : "overview")
+                    }
                   >
-                    <LayoutGrid
-                      aria-hidden="true"
-                      className="mr-1 h-3 w-3 shrink-0"
-                    />
-                    {t("unified:tabs.overview")}
-                  </TabsTrigger>
-                  <TabsTrigger
-                    className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
-                    value="charts"
+                    <TabsList className="h-8 w-max bg-card/60">
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="overview"
+                      >
+                        <LayoutGrid
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.overview")}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="charts"
+                      >
+                        <ChartLine
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.charts")}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="backlog"
+                      >
+                        <Inbox
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.backlog")}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="tasks"
+                      >
+                        <ListChecks
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.tasks")}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="appointments"
+                      >
+                        <CalendarClock
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.appointments")}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="calendar"
+                      >
+                        <CalendarRange
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.calendar")}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
+                        value="gantt"
+                      >
+                        <CalendarDays
+                          aria-hidden="true"
+                          className="mr-1 h-3 w-3 shrink-0 max-2xl:hidden"
+                        />
+                        {t("unified:tabs.gantt")}
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-0.5">
+                  <Button
+                    render={<Link to="/dashboard/settings/account/mcp" />}
+                    variant="ghost"
+                    size="xs"
+                    className="h-8 gap-1.5 px-2 text-xs text-muted-foreground"
+                    title={t("settings:mcpPage.pageTitle")}
                   >
-                    <ChartLine
-                      aria-hidden="true"
-                      className="mr-1 h-3 w-3 shrink-0"
-                    />
-                    {t("unified:tabs.charts")}
-                  </TabsTrigger>
-                  <TabsTrigger
-                    className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
-                    value="backlog"
+                    <Blocks aria-hidden="true" className="h-3.5 w-3.5" />
+                    {t("unified:links.mcp")}
+                  </Button>
+                  <Button
+                    render={<Link to="/dashboard/settings/account/skills" />}
+                    variant="ghost"
+                    size="xs"
+                    className="h-8 gap-1.5 px-2 text-xs text-muted-foreground"
+                    title={t("settings:skillsPage.pageTitle")}
                   >
-                    <Inbox
-                      aria-hidden="true"
-                      className="mr-1 h-3 w-3 shrink-0"
-                    />
-                    {t("unified:tabs.backlog")}
-                  </TabsTrigger>
-                  <TabsTrigger
-                    className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
-                    value="tasks"
-                  >
-                    <ListChecks
-                      aria-hidden="true"
-                      className="mr-1 h-3 w-3 shrink-0"
-                    />
-                    {t("unified:tabs.tasks")}
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+                    <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
+                    {t("unified:links.skills")}
+                  </Button>
+                </div>
+              </div>
               <div className="flex items-center gap-1 ml-auto shrink-0">
                 <SortControl
                   label={t("navigation:workspaceSwitcher.workspaces")}
@@ -498,6 +577,15 @@ function RouteComponent() {
                     mode={activeTab}
                   />
                 )}
+                {activeTab === "appointments" ? (
+                  <UnifiedAppointments projects={allProjects} />
+                ) : null}
+                {activeTab === "calendar" ? (
+                  <UnifiedCalendar projects={allProjects} />
+                ) : null}
+                {activeTab === "gantt" ? (
+                  <UnifiedGantt projects={allProjects} />
+                ) : null}
                 {activeTab === "overview" ? (
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-4 items-stretch">
                     {sections.map(({ workspace, projects }) =>
