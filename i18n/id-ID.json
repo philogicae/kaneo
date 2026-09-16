@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Gagal bergabung ke ruang kerja",
+				"load": "Gagal memuat detail tautan undangan."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Kesalahan tautan undangan",
+			"invalidTitle": "Tautan undangan tidak valid",
+			"joinPrompt": "Anda memiliki tautan undangan untuk bergabung ke <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Tautan undangan kedaluwarsa",
+			"loading": "Memuat tautan undangan...",
+			"pageTitleAccept": "Gabung ke ruang kerja",
+			"pageTitleError": "Kesalahan tautan undangan",
+			"pageTitleInvalid": "Tautan undangan tidak valid",
+			"signedInAs": "Masuk sebagai <email>{{email}}</email>",
+			"signedOutPrompt": "Buat akun atau masuk untuk bergabung ke ruang kerja.",
+			"title": "Gabung ke ruang kerja!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Ruang kerja",
 				"comment": "Komentar",
 				"activity": "Aktivitas",
-				"fallback": "Hasil"
+				"fallback": "Hasil",
+				"appointment": "Janji"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Tugas terlambat",
 				"content": "{{taskTitle}} telah melewati tenggatnya"
+			},
+			"appointment_created": {
+				"title": "Janji temu ditugaskan kepada Anda",
+				"content": "Anda ditugaskan pada janji temu: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Janji temu diperbarui",
+				"contentAssignee": "Anda ditugaskan pada janji temu: {{appointmentTitle}}",
+				"contentRescheduled": "Janji temu \"{{appointmentTitle}}\" telah dijadwalkan ulang."
 			}
 		},
 		"reminderLeadTime": {
@@ -788,27 +798,27 @@
 			"add": "Tambah"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
+			"addButton": "Tambah",
+			"createError": "Gagal membuat bidang khusus.",
+			"createSuccess": "Bidang khusus dibuat.",
 			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"defaultValuePlaceholder": "Nilai default",
+			"deleteButton": "Hapus",
+			"deleteError": "Gagal menghapus bidang khusus.",
+			"deleteSuccess": "Bidang khusus dihapus.",
+			"empty": "Belum ada bidang khusus yang dikonfigurasi.",
+			"loading": "Memuat bidang khusus...",
+			"namePlaceholder": "Nama bidang",
+			"noOptionsPlaceholder": "Tidak ada opsi",
+			"optionsPlaceholder": "Opsi dipisahkan koma",
+			"required": "Wajib",
+			"typePlaceholder": "Pilih jenis bidang",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
+				"date": "Tanggal",
 				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"number": "Angka",
+				"text": "Teks"
 			}
 		},
 		"developer": "Pengembang",
@@ -1130,22 +1140,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Buat kunci API terlebih dahulu, lalu ganti placeholder <YOUR_API_KEY> dengannya.",
+			"authModeApiKey": "Kunci API",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Pilih mode autentikasi, lalu jalankan perintah instalasi atau tempel konfigurasi ke agen Anda.",
+			"cardTitle": "Hubungkan agen",
+			"copied": "Disalin",
+			"copy": "Salin",
+			"createApiKey": "Buat kunci API",
+			"followUpLabel": "Lalu autentikasi",
+			"installCommandLabel": "Perintah instalasi",
+			"manualConfigLabel": "Konfigurasi manual",
+			"oauthNote": "OAuth adalah default: koneksi pertama membuka Kaneo di browser Anda untuk mengotorisasi agen, lalu token dikelola oleh agen itu sendiri.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "endpoint MCP HTTP bawaan instans ini",
+			"serverUrlLabel": "URL server",
+			"subtitle": "Hubungkan agen AI seperti Claude, Codex, Gemini, atau OpenCode ke instans Kaneo ini melalui server MCP HTTP bawaan.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Notifikasi",
@@ -1365,8 +1375,8 @@
 			"columnsDescription": "Kelola kolom yang muncul di papan Anda. Seret untuk mengurutkan ulang. Aktifkan \"Kolom selesai\" untuk tahap yang mewakili pekerjaan selesai.",
 			"automationTitle": "Aturan Otomatisasi",
 			"automationDescription": "Petakan event integrasi ke kolom. Saat event terjadi, tugas tertaut berpindah ke kolom yang ditentukan.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Kelola bidang khusus untuk proyek ini. Seret untuk mengurutkan.",
+			"customFieldsTitle": "Bidang khusus"
 		},
 		"repositoryBrowser": {
 			"title": "Pilih Repositori",
@@ -1483,7 +1493,9 @@
 				"taskPriorityChanged": "Perubahan prioritas",
 				"taskTitleChanged": "Perubahan judul",
 				"taskDescriptionChanged": "Perubahan deskripsi",
-				"taskCommentCreated": "Komentar baru"
+				"taskCommentCreated": "Komentar baru",
+				"appointmentCreated": "Janji temu baru",
+				"appointmentUpdated": "Perubahan janji temu"
 			},
 			"connect": "Hubungkan Telegram",
 			"saveChanges": "Simpan perubahan",
@@ -1540,7 +1552,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Topik terdeteksi",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1770,6 +1782,25 @@
 				"title": "Hapus peran",
 				"description": "Ini akan menghapus peran \"{{role}}\" secara permanen. Anggota yang memakai peran ini akan kehilangan izinnya."
 			}
+		},
+		"skills": "Skill",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Jalankan perintah ini dari akar checkout Kaneo Anda, lalu mulai ulang agen Anda.",
+			"cardTitle": "Pasang skill Kaneo",
+			"copied": "Disalin",
+			"copy": "Salin",
+			"destinationLabel": "Tujuan",
+			"installCommandLabel": "Perintah instalasi",
+			"mcpRequirement": "Skill ini dibangun di atas koneksi MCP: konfigurasikan dulu.",
+			"openMcpSettings": "Buka pengaturan MCP",
+			"pageTitle": "Skill",
+			"projectScope": "proyek",
+			"subtitle": "Pasang skill Kaneo agar agen AI mengikuti konvensi instans ini dan menggunakan alat MCP dengan benar.",
+			"title": "Skill agen",
+			"updateDescription": "Skill dibaca dari disk: salin ulang folder setelah memperbarui Kaneo untuk menerapkan perubahan.",
+			"userScope": "pengguna",
+			"verifyLabel": "Verifikasi"
 		}
 	},
 	"tasks": {
@@ -1830,8 +1861,8 @@
 				"isAnyOf": "adalah salah satu dari",
 				"includeAnyOf": "menyertakan salah satu dari"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Semua",
+			"noValuesUsedYet": "Belum ada nilai yang digunakan"
 		},
 		"boardSearchPlaceholder": "Cari tiket...",
 		"bulk": {
@@ -1884,7 +1915,7 @@
 			"loadingTask": "Memuat tugas...",
 			"taskNotFound": "Tugas tidak ditemukan",
 			"taskNotFoundDescription": "Tugas yang Anda cari tidak ada atau telah dihapus.",
-			"customFields": "Custom Fields"
+			"customFields": "Bidang khusus"
 		},
 		"contextMenu": {
 			"copyLink": "Salin tautan",
@@ -1900,7 +1931,7 @@
 		"detail": {
 			"activity": "Aktivitas",
 			"addDescription": "Tambahkan deskripsi...",
-			"customFieldUpdated": "Field updated",
+			"customFieldUpdated": "Bidang diperbarui",
 			"editor": {
 				"ariaLabel": "Editor deskripsi tugas",
 				"placeholder": "Tulis deskripsi...",
@@ -2001,7 +2032,7 @@
 			},
 			"noActivity": "Tidak ada aktivitas ditemukan",
 			"openInFullPage": "Buka di halaman penuh",
-			"selectOption": "Select option",
+			"selectOption": "Pilih opsi",
 			"subtaskOf": "Subtugas dari",
 			"titlePlaceholder": "Klik untuk menambahkan judul"
 		},
@@ -2180,7 +2211,7 @@
 			"unitDay_other": "days",
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "menit",
 			"unitWeek_other": "weeks",
 			"weeksBefore_other": "{{count}} weeks before"
 		},
@@ -2234,7 +2265,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Label",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2294,30 +2325,30 @@
 			"ariaInvitationActions": "Tindakan undangan"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Gagal menyalin otomatis. Pilih tautan dan tekan Ctrl+C.",
+			"copyIconAria": "Salin tautan undangan",
+			"create": "Buat tautan",
+			"createError": "Gagal membuat tautan undangan",
+			"createSuccess": "Tautan undangan dibuat",
+			"deleteError": "Gagal mencabut tautan undangan",
+			"deleteSuccess": "Tautan undangan dicabut",
+			"description": "Siapa pun yang memiliki tautan dapat bergabung ke ruang kerja ini sebagai anggota — tanpa perlu email.",
+			"empty": "Belum ada tautan undangan yang dapat dibagikan.",
+			"expiry24h": "24 jam",
+			"expiry30d": "30 hari",
+			"expiry7d": "7 hari",
+			"expiryLabel": "Kedaluwarsa",
+			"expiryNever": "Tidak pernah kedaluwarsa",
+			"join": "Gabung ke {{workspaceName}}",
+			"linkCopied": "Tautan undangan disalin",
+			"maxUsesLabel": "Maks. penggunaan",
+			"maxUsesUnlimited": "Tak terbatas",
+			"never": "Tidak pernah kedaluwarsa",
+			"revokeIconAria": "Cabut tautan undangan",
+			"title": "Tautan undangan yang dapat dibagikan",
+			"uses": "{{used}}/{{max}} penggunaan",
+			"workspace": "Ruang kerja: {{workspaceName}}",
+			"usesUnlimited": "{{used}} penggunaan"
 		}
 	},
 	"unified": {
@@ -2345,7 +2376,26 @@
 		"charts": {
 			"backlog": "Backlog",
 			"empty": "Tidak ada aktivitas tugas dalam 6 bulan terakhir.",
-			"tasks": "Tugas"
+			"tasks": "Tugas",
+			"byProject": "Per proyek",
+			"completed": "Selesai",
+			"created": "Dibuat",
+			"noTasks": "Tidak ada tugas untuk didistribusikan.",
+			"other": "Lainnya",
+			"period": "Periode",
+			"periodSummary": "{{created}} dibuat · {{completed}} selesai",
+			"perWeek": "{{value}}/minggu",
+			"range_other": "{{count}} bulan",
+			"statusDescription": "Posisi tugas semua proyek saat ini.",
+			"statusTitle": "Rincian status",
+			"unassigned": "Belum ditugaskan",
+			"velocity4w": "Kecepatan (4 minggu)",
+			"velocityDescription": "Tugas yang dibuat dan diselesaikan per minggu di semua proyek.",
+			"velocityTitle": "Kecepatan",
+			"workloadDescription": "Tugas papan terbuka per penerima, di semua proyek.",
+			"workloadEmpty": "Tidak ada pekerjaan terbuka yang ditugaskan.",
+			"workloadTitle": "Beban kerja",
+			"range_one": "{{count}} bulan"
 		},
 		"tabs": {
 			"charts": "Grafik",
@@ -2412,5 +2462,45 @@
 			"success": "Ruang kerja berhasil dibuat",
 			"error": "Gagal membuat ruang kerja"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Ditugaskan",
+			"create": "Buat",
+			"createTitle": "Janji baru",
+			"delete": "Hapus",
+			"description": "Janji dijadwalkan seperti tugas tetapi tidak pernah muncul di papan atau backlog.",
+			"descriptionLabel": "Deskripsi",
+			"editTitle": "Edit janji",
+			"endLabel": "Selesai",
+			"priorityLabel": "Prioritas",
+			"rangeError": "Waktu selesai harus setelah waktu mulai.",
+			"save": "Simpan",
+			"startLabel": "Mulai",
+			"titleLabel": "Judul",
+			"titlePlaceholder": "mis. Tinjauan desain",
+			"unassigned": "Belum ditugaskan"
+		},
+		"empty": {
+			"description": "Janji ada di sini, bukan di papan atau backlog.",
+			"title": "Belum ada janji"
+		},
+		"loadError": "Tidak dapat memuat janji.",
+		"moveFromBacklog": "Pindahkan ke janji",
+		"newAppointment": "Janji baru",
+		"nextWeek": "Minggu berikutnya",
+		"pageTitle": "Janji · {{name}}",
+		"previousWeek": "Minggu sebelumnya",
+		"tab": "Janji",
+		"toast": {
+			"created": "Janji dibuat",
+			"deleted": "Janji dihapus",
+			"error": "Terjadi kesalahan",
+			"moved": "Dipindahkan ke janji",
+			"updated": "Janji diperbarui"
+		},
+		"today": "Hari ini",
+		"weekHint": "Klik slot kosong untuk menambah janji; klik janji untuk mengeditnya.",
+		"unscheduled": "Tidak terjadwal"
 	}
 }

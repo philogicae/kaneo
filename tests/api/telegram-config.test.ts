@@ -81,6 +81,8 @@ describe("telegram config schema", () => {
       taskTitleChanged: false,
       taskDescriptionChanged: false,
       taskCommentCreated: true,
+      appointmentCreated: true,
+      appointmentUpdated: true,
     });
     expect(normalized.threadId).toBeUndefined();
   });

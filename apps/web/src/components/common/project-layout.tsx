@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  CalendarClock,
   CalendarDays,
   CalendarRange,
   SquareKanban,
@@ -32,7 +33,7 @@ type ProjectLayoutProps = {
   headerActions?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
-  activeView?: "backlog" | "board" | "calendar" | "gantt";
+  activeView?: "backlog" | "board" | "calendar" | "gantt" | "appointments";
 };
 
 export default function ProjectLayout({
@@ -56,11 +57,13 @@ export default function ProjectLayout({
     activeView ??
     (location.pathname.includes("/backlog")
       ? "backlog"
-      : location.pathname.includes("/calendar")
-        ? "calendar"
-        : location.pathname.includes("/gantt")
-          ? "gantt"
-          : "board");
+      : location.pathname.includes("/appointments")
+        ? "appointments"
+        : location.pathname.includes("/calendar")
+          ? "calendar"
+          : location.pathname.includes("/gantt")
+            ? "gantt"
+            : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -72,6 +75,13 @@ export default function ProjectLayout({
   const handleNavigateToBoard = () => {
     navigate({
       to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
+      params: { workspaceId, projectId },
+    });
+  };
+
+  const handleNavigateToAppointments = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/appointments",
       params: { workspaceId, projectId },
     });
   };
@@ -95,11 +105,13 @@ export default function ProjectLayout({
       to:
         resolvedView === "backlog"
           ? "/dashboard/workspace/$workspaceId/project/$projectId/backlog"
-          : resolvedView === "calendar"
-            ? "/dashboard/workspace/$workspaceId/project/$projectId/calendar"
-            : resolvedView === "gantt"
-              ? "/dashboard/workspace/$workspaceId/project/$projectId/gantt"
-              : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+          : resolvedView === "appointments"
+            ? "/dashboard/workspace/$workspaceId/project/$projectId/appointments"
+            : resolvedView === "calendar"
+              ? "/dashboard/workspace/$workspaceId/project/$projectId/calendar"
+              : resolvedView === "gantt"
+                ? "/dashboard/workspace/$workspaceId/project/$projectId/gantt"
+                : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -152,6 +164,7 @@ export default function ProjectLayout({
                 activeView={resolvedView}
                 onSelectBacklog={handleNavigateToBacklog}
                 onSelectBoard={handleNavigateToBoard}
+                onSelectAppointments={handleNavigateToAppointments}
                 onSelectCalendar={handleNavigateToCalendar}
                 onSelectGantt={handleNavigateToGantt}
                 onSelectProject={handleProjectSwitch}
@@ -184,6 +197,20 @@ export default function ProjectLayout({
                 >
                   <SquareKanban className="size-3.5" />
                   {t("tasks:title")}
+                </Button>
+                <Button
+                  variant={
+                    resolvedView === "appointments" ? "secondary" : "ghost"
+                  }
+                  size="xs"
+                  onClick={handleNavigateToAppointments}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "appointments" && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarClock className="size-3.5" />
+                  {t("appointments:tab")}
                 </Button>
                 <Button
                   variant={resolvedView === "calendar" ? "secondary" : "ghost"}

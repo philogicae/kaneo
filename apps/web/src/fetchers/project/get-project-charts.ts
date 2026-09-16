@@ -8,9 +8,10 @@ type ProjectChartsBucket = {
 
 export type { ProjectChartsBucket };
 
-async function getProjectCharts(projectId: string) {
+async function getProjectCharts(projectId: string, months: number) {
   const response = await client.project[":id"].charts.$get({
     param: { id: projectId },
+    query: { months: String(months) },
   });
 
   if (!response.ok) {

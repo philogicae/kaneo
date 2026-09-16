@@ -196,6 +196,8 @@ const BOT_EVENT_KEYS = [
   "taskTitleChanged",
   "taskDescriptionChanged",
   "taskCommentCreated",
+  "appointmentCreated",
+  "appointmentUpdated",
 ] as const;
 
 function BotSection({

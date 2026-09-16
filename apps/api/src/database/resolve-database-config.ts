@@ -1,5 +1,5 @@
-import { existsSync } from "node:fs";
-import { dirname, isAbsolute, join, resolve } from "node:path";
+import { isAbsolute, resolve } from "node:path";
+import { findWorkspaceRoot } from "../utils/find-workspace-root";
 
 const LOCAL_FALLBACK_PATH = "./data/kaneo.db";
 
@@ -22,20 +22,6 @@ export type ResolvedDatabaseConfig = {
 // directory holding pnpm-workspace.yaml), so `./data/kaneo.db` points to the
 // same file whether the API runs from apps/api, the repo root, or /app in the
 // container.
-function findWorkspaceRoot(startDir: string): string {
-  let dir = startDir;
-  while (true) {
-    if (existsSync(join(dir, "pnpm-workspace.yaml"))) {
-      return dir;
-    }
-    const parent = dirname(dir);
-    if (parent === dir) {
-      return startDir;
-    }
-    dir = parent;
-  }
-}
-
 export function resolveDatabaseConfig(): ResolvedDatabaseConfig {
   const raw = process.env.DATABASE_PATH?.trim();
   const source: DatabaseConfigSource =

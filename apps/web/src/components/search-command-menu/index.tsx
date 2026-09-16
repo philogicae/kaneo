@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
+  CalendarDays,
   FileText,
   FolderKanban,
   Hash,
@@ -34,7 +35,13 @@ type SearchResultItem = {
   title: string;
   description?: string;
   content?: string;
-  type: "task" | "project" | "workspace" | "comment" | "activity";
+  type:
+    | "task"
+    | "appointment"
+    | "project"
+    | "workspace"
+    | "comment"
+    | "activity";
   projectId?: string;
   workspaceId?: string;
   taskNumber?: number;
@@ -104,6 +111,17 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
           });
         }
         break;
+      case "appointment":
+        if (item.projectId && targetWorkspaceId) {
+          navigate({
+            to: "/dashboard/workspace/$workspaceId/project/$projectId/appointments",
+            params: {
+              workspaceId: targetWorkspaceId,
+              projectId: item.projectId,
+            },
+          });
+        }
+        break;
       case "project":
         if (item.id && targetWorkspaceId) {
           navigate({
@@ -145,6 +163,8 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
     switch (type) {
       case "task":
         return Hash;
+      case "appointment":
+        return CalendarDays;
       case "project":
         return FolderKanban;
       case "workspace":
@@ -174,6 +194,8 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
       switch (type as SearchResultItem["type"]) {
         case "task":
           return t("navigation:search.groups.task");
+        case "appointment":
+          return t("navigation:search.groups.appointment");
         case "project":
           return t("navigation:search.groups.project");
         case "workspace":

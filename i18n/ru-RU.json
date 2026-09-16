@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Не удалось присоединиться к рабочему пространству",
+				"load": "Не удалось загрузить сведения о ссылке-приглашении."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Ошибка ссылки-приглашения",
+			"invalidTitle": "Недействительная ссылка-приглашение",
+			"joinPrompt": "У вас есть ссылка-приглашение для присоединения к <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Ссылка-приглашение истекла",
+			"loading": "Загрузка ссылки-приглашения...",
+			"pageTitleAccept": "Присоединиться к рабочему пространству",
+			"pageTitleError": "Ошибка ссылки-приглашения",
+			"pageTitleInvalid": "Недействительная ссылка-приглашение",
+			"signedInAs": "Вы вошли как <email>{{email}}</email>",
+			"signedOutPrompt": "Создайте аккаунт или войдите, чтобы присоединиться к рабочему пространству.",
+			"title": "Присоединяйтесь к рабочему пространству!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Рабочие области",
 				"comment": "Комментарии",
 				"activity": "Активности",
-				"fallback": "Результаты"
+				"fallback": "Результаты",
+				"appointment": "Встречи"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Задача просрочена",
 				"content": "Срок выполнения задачи «{{taskTitle}}» истёк"
+			},
+			"appointment_created": {
+				"title": "Вам назначена встреча",
+				"content": "Вам назначена встреча: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Встреча обновлена",
+				"contentAssignee": "Вам назначена встреча: {{appointmentTitle}}",
+				"contentRescheduled": "Встреча \"{{appointmentTitle}}\" перенесена."
 			}
 		},
 		"reminderLeadTime": {
@@ -797,27 +807,27 @@
 			"add": "Добавить"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Добавить",
+			"createError": "Не удалось создать настраиваемое поле.",
+			"createSuccess": "Настраиваемое поле создано.",
+			"defaultLabel": "По умолчанию",
+			"defaultValuePlaceholder": "Значение по умолчанию",
+			"deleteButton": "Удалить",
+			"deleteError": "Не удалось удалить настраиваемое поле.",
+			"deleteSuccess": "Настраиваемое поле удалено.",
+			"empty": "Настраиваемые поля ещё не настроены.",
+			"loading": "Загрузка настраиваемых полей...",
+			"namePlaceholder": "Имя поля",
+			"noOptionsPlaceholder": "Нет вариантов",
+			"optionsPlaceholder": "Варианты через запятую",
+			"required": "Обязательное",
+			"typePlaceholder": "Выберите тип поля",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"date": "Дата",
+				"dropdown": "Выпадающий список",
+				"number": "Число",
+				"text": "Текст"
 			}
 		},
 		"developer": "Разработчик",
@@ -1139,22 +1149,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Сначала создайте ключ API, затем замените им заполнитель <YOUR_API_KEY>.",
+			"authModeApiKey": "Ключ API",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Выберите способ аутентификации, затем выполните команду установки или вставьте конфигурацию в вашего агента.",
+			"cardTitle": "Подключить агента",
+			"copied": "Скопировано",
+			"copy": "Копировать",
+			"createApiKey": "Создать ключ API",
+			"followUpLabel": "Затем аутентифицируйтесь",
+			"installCommandLabel": "Команда установки",
+			"manualConfigLabel": "Ручная конфигурация",
+			"oauthNote": "OAuth используется по умолчанию: первое подключение открывает Kaneo в браузере для авторизации агента, после чего токеном управляет сам агент.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "встроенный HTTP MCP-эндпоинт этого экземпляра",
+			"serverUrlLabel": "URL сервера",
+			"subtitle": "Подключите ИИ-агентов, таких как Claude, Codex, Gemini или OpenCode, к этому экземпляру Kaneo через встроенный HTTP MCP-сервер.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Уведомления",
@@ -1374,8 +1384,8 @@
 			"columnsDescription": "Управляйте колонками на доске. Перетаскивайте для изменения порядка. Включите «Колонка завершения» для этапов, обозначающих выполненную работу.",
 			"automationTitle": "Правила автоматизации",
 			"automationDescription": "Привяжите события интеграций к колонкам. При наступлении события связанная задача перемещается в указанную колонку.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Управляйте настраиваемыми полями этого проекта. Перетащите для изменения порядка.",
+			"customFieldsTitle": "Настраиваемые поля"
 		},
 		"repositoryBrowser": {
 			"title": "Выберите репозиторий",
@@ -1500,7 +1510,9 @@
 				"taskPriorityChanged": "Изменения приоритета",
 				"taskTitleChanged": "Изменения названия",
 				"taskDescriptionChanged": "Изменения описания",
-				"taskCommentCreated": "Новые комментарии"
+				"taskCommentCreated": "Новые комментарии",
+				"appointmentCreated": "Новые встречи",
+				"appointmentUpdated": "Изменения встреч"
 			},
 			"connect": "Подключить Telegram",
 			"saveChanges": "Сохранить изменения",
@@ -1560,7 +1572,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Обнаруженные темы",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1793,6 +1805,25 @@
 				"title": "Удалить роль",
 				"description": "Роль «{{role}}» будет безвозвратно удалена. Участники с этой ролью потеряют её права."
 			}
+		},
+		"skills": "Навыки",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Выполните эти команды из корня репозитория Kaneo, затем перезапустите агента.",
+			"cardTitle": "Установить навык Kaneo",
+			"copied": "Скопировано",
+			"copy": "Копировать",
+			"destinationLabel": "Назначение",
+			"installCommandLabel": "Команда установки",
+			"mcpRequirement": "Навык опирается на подключение MCP: сначала настройте его.",
+			"openMcpSettings": "Открыть настройки MCP",
+			"pageTitle": "Навыки",
+			"projectScope": "проект",
+			"subtitle": "Установите навык Kaneo, чтобы ИИ-агенты следовали соглашениям этого экземпляра и правильно использовали инструменты MCP.",
+			"title": "Навыки агентов",
+			"updateDescription": "Навыки читаются с диска: повторно скопируйте папку после обновления Kaneo, чтобы применить изменения.",
+			"userScope": "пользователь",
+			"verifyLabel": "Проверить"
 		}
 	},
 	"tasks": {
@@ -1865,8 +1896,8 @@
 				"includeAnyOf": "включает любой из"
 			},
 			"selectedCount": "{{count}} выбрано",
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Все",
+			"noValuesUsedYet": "Значения ещё не использовались"
 		},
 		"boardSearchPlaceholder": "Поиск задач...",
 		"bulk": {
@@ -1955,7 +1986,7 @@
 			"loadingTask": "Загрузка задачи...",
 			"taskNotFound": "Задача не найдена",
 			"taskNotFoundDescription": "Задача, которую вы ищете, не существует или была удалена.",
-			"customFields": "Custom Fields"
+			"customFields": "Настраиваемые поля"
 		},
 		"contextMenu": {
 			"copyLink": "Скопировать ссылку",
@@ -2073,8 +2104,8 @@
 					"renderFailed": "Не удалось отобразить диаграмму Mermaid"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Поле обновлено",
+			"selectOption": "Выбрать вариант"
 		},
 		"dueDate": {
 			"label": "Срок выполнения",
@@ -2281,7 +2312,7 @@
 			"unitMinute_few": "minutes",
 			"unitMinute_many": "minutes",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "минуты",
 			"unitWeek_few": "weeks",
 			"unitWeek_many": "weeks",
 			"unitWeek_one": "week",
@@ -2341,7 +2372,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Метки",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2401,30 +2432,30 @@
 			"roleUpdateError": "Не удалось обновить роль"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Не удалось скопировать автоматически. Выделите ссылку и нажмите Ctrl+C.",
+			"copyIconAria": "Скопировать ссылку-приглашение",
+			"create": "Создать ссылку",
+			"createError": "Не удалось создать ссылку-приглашение",
+			"createSuccess": "Ссылка-приглашение создана",
+			"deleteError": "Не удалось отозвать ссылку-приглашение",
+			"deleteSuccess": "Ссылка-приглашение отозвана",
+			"description": "Любой, у кого есть ссылка, может присоединиться к этому рабочему пространству как участник — почта не нужна.",
+			"empty": "Пока нет общих ссылок-приглашений.",
+			"expiry24h": "24 часа",
+			"expiry30d": "30 дней",
+			"expiry7d": "7 дней",
+			"expiryLabel": "Срок действия",
+			"expiryNever": "Никогда не истекает",
+			"join": "Присоединиться к {{workspaceName}}",
+			"linkCopied": "Ссылка-приглашение скопирована",
+			"maxUsesLabel": "Макс. использований",
+			"maxUsesUnlimited": "Без ограничений",
+			"never": "Никогда не истекает",
+			"revokeIconAria": "Отозвать ссылку-приглашение",
+			"title": "Общие ссылки-приглашения",
+			"uses": "{{used}}/{{max}} использований",
+			"workspace": "Рабочее пространство: {{workspaceName}}",
+			"usesUnlimited": "{{used}} использований"
 		}
 	},
 	"unified": {
@@ -2455,7 +2486,28 @@
 		"charts": {
 			"backlog": "Бэклог",
 			"empty": "Нет активности по задачам за последние 6 месяцев.",
-			"tasks": "Задачи"
+			"tasks": "Задачи",
+			"byProject": "По проектам",
+			"completed": "Завершено",
+			"created": "Создано",
+			"noTasks": "Нет задач для распределения.",
+			"other": "Другое",
+			"period": "Период",
+			"periodSummary": "{{created}} создано · {{completed}} завершено",
+			"perWeek": "{{value}}/неделю",
+			"range_few": "{{count}} months",
+			"range_many": "{{count}} months",
+			"range_one": "{{count}} месяц",
+			"range_other": "{{count}} месяцев",
+			"statusDescription": "Где сейчас находятся задачи всех проектов.",
+			"statusTitle": "Распределение по статусам",
+			"unassigned": "Не назначено",
+			"velocity4w": "Скорость (4 недели)",
+			"velocityDescription": "Задачи, созданные и завершённые за неделю, по всем проектам.",
+			"velocityTitle": "Скорость",
+			"workloadDescription": "Открытые задачи доски по исполнителям, по всем проектам.",
+			"workloadEmpty": "Открытая работа не назначена.",
+			"workloadTitle": "Нагрузка"
 		},
 		"tabs": {
 			"charts": "Графики",
@@ -2531,5 +2583,45 @@
 			"success": "Рабочая область успешно создана",
 			"error": "Не удалось создать рабочую область"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Назначено",
+			"create": "Создать",
+			"createTitle": "Новая встреча",
+			"delete": "Удалить",
+			"description": "Встречи планируются как задачи, но никогда не появляются на доске или в бэклоге.",
+			"descriptionLabel": "Описание",
+			"editTitle": "Редактировать встречу",
+			"endLabel": "Окончание",
+			"priorityLabel": "Приоритет",
+			"rangeError": "Окончание должно быть позже начала.",
+			"save": "Сохранить",
+			"startLabel": "Начало",
+			"titleLabel": "Название",
+			"titlePlaceholder": "напр. Обзор дизайна",
+			"unassigned": "Не назначено"
+		},
+		"empty": {
+			"description": "Встречи живут здесь, а не на доске или в бэклоге.",
+			"title": "Пока нет встреч"
+		},
+		"loadError": "Не удалось загрузить встречи.",
+		"moveFromBacklog": "Переместить во встречи",
+		"newAppointment": "Новая встреча",
+		"nextWeek": "Следующая неделя",
+		"pageTitle": "Встречи · {{name}}",
+		"previousWeek": "Предыдущая неделя",
+		"tab": "Встречи",
+		"toast": {
+			"created": "Встреча создана",
+			"deleted": "Встреча удалена",
+			"error": "Что-то пошло не так",
+			"moved": "Перемещено во встречи",
+			"updated": "Встреча обновлена"
+		},
+		"today": "Сегодня",
+		"weekHint": "Нажмите на пустой слот, чтобы добавить встречу; нажмите на встречу, чтобы изменить её.",
+		"unscheduled": "Не запланировано"
 	}
 }

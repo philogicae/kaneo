@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
+import {
+  cumulativeBuckets,
+  formatMonth,
+  formatWeekStart,
+  monthTickIndexes,
+  niceMax,
+} from "./charts/chart-utils";
 
 type ProgressChartProps = {
   buckets: ProjectChartsBucket[] | undefined;
@@ -8,42 +16,16 @@ type ProgressChartProps = {
   height?: number;
 };
 
-// Scale ceilings with integer halves so the 50% tick label stays clean.
-const SCALE_STEPS = [
-  2, 4, 6, 8, 12, 16, 20, 30, 40, 60, 80, 100, 150, 200, 300, 500, 1000,
-];
-
-function niceMax(value: number) {
-  return (
-    SCALE_STEPS.find((step) => step >= value) ?? Math.ceil(value / 1000) * 1000
-  );
-}
-
-function cumulative(buckets: ProjectChartsBucket[]) {
-  let created = 0;
-  let completed = 0;
-  return buckets.map((bucket) => {
-    created += bucket.created;
-    completed += bucket.completed;
-    return {
-      weekStart: bucket.weekStart,
-      tasks: created,
-      // "Backlog" is the remaining work: created minus finished, floored at 0
-      // so data gaps (deleted tasks) can't make it negative.
-      backlog: Math.max(0, created - completed),
-    };
-  });
-}
-
 // Lightweight dependency-free SVG line chart: two cumulative lines (total
 // tasks and remaining backlog) over the covered weeks, with adaptive tick
-// density based on the render width.
+// density based on the render width and a per-week hover cursor.
 export default function ProgressChart({
   buckets,
   isLoading,
   height = 120,
 }: ProgressChartProps) {
   const { t } = useTranslation();
+  const [hovered, setHovered] = useState<number | null>(null);
 
   if (isLoading) {
     return <Skeleton className="w-full" style={{ height }} />;
@@ -52,7 +34,7 @@ export default function ProgressChart({
   if (!buckets || buckets.length === 0) {
     return (
       <div
-        className="flex items-center justify-center text-muted-foreground text-xs"
+        className="flex items-center justify-center text-xs text-muted-foreground"
         style={{ height }}
       >
         {t("unified:charts.empty")}
@@ -60,7 +42,7 @@ export default function ProgressChart({
     );
   }
 
-  const data = cumulative(buckets);
+  const data = cumulativeBuckets(buckets);
   const width = 100; // viewBox units; the SVG scales to its container.
   const padding = { top: 6, right: 2, bottom: 14, left: 2 };
   const plotHeight = height - padding.top - padding.bottom;
@@ -78,21 +60,12 @@ export default function ProgressChart({
   const toPoints = (key: "tasks" | "backlog") =>
     data.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
 
-  const monthTickIndexes = data
-    .map((point, index) => ({ point, index }))
-    .filter(
-      ({ point, index }, _, arr) =>
-        index === 0 ||
-        point.weekStart.slice(5, 7) !==
-          arr[index - 1]?.point.weekStart.slice(5, 7),
-    )
-    // Adaptive density: skip labels when they would collide.
-    .filter(
-      ({ index }, _, all) =>
-        all.length <= 7 ||
-        index % Math.ceil(all.length / 6) === 0 ||
-        index === all.length - 1,
-    );
+  const ticks = monthTickIndexes(buckets);
+  const hoveredPoint = hovered !== null ? data[hovered] : undefined;
+  const tooltipLeft =
+    hovered !== null
+      ? Math.min(90, Math.max(10, ((hovered + 0.5) / data.length) * 100))
+      : 0;
 
   return (
     <div>
@@ -106,64 +79,117 @@ export default function ProgressChart({
           <span>{Math.round(maxValue / 2)}</span>
           <span>0</span>
         </div>
-        <svg
-          aria-hidden="true"
-          className="min-w-0 flex-1"
-          preserveAspectRatio="none"
-          role="img"
-          style={{ height }}
-          viewBox={`0 0 ${width} ${height}`}
-        >
-          {/* Horizontal grid at 0%, 50% and 100% of the scale. */}
-          {[0, 0.5, 1].map((ratio) => (
-            <line
-              key={ratio}
-              className="stroke-border/60"
-              strokeWidth="0.5"
-              x1={padding.left}
-              x2={width - padding.right}
-              y1={padding.top + ratio * plotHeight}
-              y2={padding.top + ratio * plotHeight}
-            />
-          ))}
-          <polyline
-            className="stroke-info"
-            fill="none"
-            points={toPoints("tasks")}
-            strokeWidth="1.4"
-            vectorEffect="non-scaling-stroke"
-          />
-          <polyline
-            fill="none"
-            points={toPoints("backlog")}
-            strokeWidth="1.4"
-            style={{ stroke: "var(--chart-2)" }}
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
-      <div className="flex justify-between pl-10 text-[10px] text-muted-foreground">
-        {monthTickIndexes.map(({ point }) => (
-          <span key={point.weekStart}>
-            {new Date(`${point.weekStart}T00:00:00Z`).toLocaleDateString(
-              undefined,
-              { month: "short", timeZone: "UTC" },
+        <div className="relative min-w-0 flex-1">
+          <svg
+            aria-hidden="true"
+            className="w-full"
+            preserveAspectRatio="none"
+            role="img"
+            style={{ height }}
+            viewBox={`0 0 ${width} ${height}`}
+          >
+            {/* Horizontal grid at 0%, 50% and 100% of the scale. */}
+            {[0, 0.5, 1].map((ratio) => (
+              <line
+                key={ratio}
+                className="stroke-border/60"
+                strokeWidth="0.5"
+                x1={padding.left}
+                x2={width - padding.right}
+                y1={padding.top + ratio * plotHeight}
+                y2={padding.top + ratio * plotHeight}
+              />
+            ))}
+            {hovered !== null && (
+              <line
+                className="stroke-border"
+                strokeDasharray="2 2"
+                strokeWidth="0.5"
+                x1={x(hovered)}
+                x2={x(hovered)}
+                y1={padding.top}
+                y2={padding.top + plotHeight}
+              />
             )}
-          </span>
-        ))}
-      </div>
-      <div className="mt-1 flex items-center gap-4 pl-10 text-[10px] text-muted-foreground">
-        <span className="inline-flex items-center gap-1">
-          <span className="inline-block h-0.5 w-3 rounded bg-info" />
-          {t("unified:charts.tasks")}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span
-            className="inline-block h-0.5 w-3 rounded"
-            style={{ backgroundColor: "var(--chart-2)" }}
-          />
-          {t("unified:charts.backlog")}
-        </span>
+            <polyline
+              className="stroke-info"
+              fill="none"
+              points={toPoints("tasks")}
+              strokeWidth="1.4"
+              vectorEffect="non-scaling-stroke"
+            />
+            <polyline
+              fill="none"
+              points={toPoints("backlog")}
+              strokeWidth="1.4"
+              style={{ stroke: "var(--chart-2)" }}
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          {/* Hover columns sit above the SVG so every week is a hit target. */}
+          <div className="absolute inset-0 flex">
+            {data.map((point, index) => (
+              // biome-ignore lint/a11y/noStaticElementInteractions: hover-only tooltip cursor over the plot
+              <div
+                key={point.weekStart}
+                className="h-full flex-1"
+                onMouseEnter={() => setHovered(index)}
+                onMouseLeave={() => setHovered(null)}
+              />
+            ))}
+          </div>
+          {hoveredPoint && (
+            <div
+              className="pointer-events-none absolute top-0 z-10 -translate-x-1/2"
+              style={{ left: `${tooltipLeft}%` }}
+            >
+              <div className="space-y-0.5 rounded-md border border-border bg-popover px-2 py-1 text-[10px] whitespace-nowrap text-popover-foreground shadow-md">
+                <p className="font-medium">
+                  {formatWeekStart(hoveredPoint.weekStart)}
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-info" />
+                  {t("unified:charts.tasks")}: {hoveredPoint.tasks}
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: "var(--chart-2)" }}
+                  />
+                  {t("unified:charts.backlog")}: {hoveredPoint.backlog}
+                </p>
+                <p className="text-muted-foreground">
+                  {t("unified:charts.created")}: {hoveredPoint.created} ·{" "}
+                  {t("unified:charts.completed")}: {hoveredPoint.completed}
+                </p>
+              </div>
+            </div>
+          )}
+          <div className="relative mt-1 h-3 text-[10px] text-muted-foreground">
+            {ticks.map(({ bucket, index }) => (
+              <span
+                key={bucket.weekStart}
+                className="absolute -translate-x-1/2 whitespace-nowrap"
+                style={{ left: `${((index + 0.5) / data.length) * 100}%` }}
+              >
+                {formatMonth(bucket.weekStart)}
+              </span>
+            ))}
+          </div>
+          <div className="mt-1 flex items-center gap-4 text-[10px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-0.5 w-3 rounded bg-info" />
+              {t("unified:charts.tasks")}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span
+                className="inline-block h-0.5 w-3 rounded"
+                style={{ backgroundColor: "var(--chart-2)" }}
+              />
+              {t("unified:charts.backlog")}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

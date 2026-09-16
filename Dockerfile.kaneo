@@ -1,7 +1,7 @@
 FROM --platform=$BUILDPLATFORM platformatic/node-caged:26-alpine AS api-builder
 
 RUN apk add --no-cache python3 make g++ && \
-  npm install --global pnpm@12.4.1
+  npm install --global pnpm@12.4.2
 
 WORKDIR /app
 
@@ -19,6 +19,7 @@ COPY packages/email ./packages/email
 COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
+COPY skills ./skills
 COPY apps/api ./apps/api
 
 WORKDIR /app/packages/email
@@ -46,18 +47,19 @@ COPY --from=api-builder /app/packages/email/package.json ./packages/email/
 COPY --from=api-builder /app/packages/permissions/package.json ./packages/permissions/
 
 RUN sed -i 's/"prepare": "husky"/"prepare": ""/g' package.json && \
-  npm install --global pnpm@12.4.1 && \
+  npm install --global pnpm@12.4.2 && \
   HUSKY=0 NODE_ENV=production pnpm install --prod --frozen-lockfile
 
 COPY --from=api-builder /app/apps/api/dist ./apps/api/dist
 COPY --from=api-builder /app/apps/api/drizzle ./apps/api/drizzle
+COPY --from=api-builder /app/skills ./skills
 COPY --from=api-builder /app/packages/email ./packages/email
 COPY --from=api-builder /app/packages/permissions ./packages/permissions
 
 FROM --platform=$BUILDPLATFORM platformatic/node-caged:26-alpine AS web-builder
 
 RUN apk add --no-cache python3 make g++ && \
-  npm install --global pnpm@12.4.1
+  npm install --global pnpm@12.4.2
 
 WORKDIR /app
 

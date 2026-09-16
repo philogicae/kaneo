@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "वर्कस्पेस से जुड़ना विफल",
+				"load": "आमंत्रण लिंक का विवरण लोड नहीं हो सका।"
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "आमंत्रण लिंक त्रुटि",
+			"invalidTitle": "अमान्य आमंत्रण लिंक",
+			"joinPrompt": "आपके पास <workspaceName>{{workspaceName}}</workspaceName> से जुड़ने का आमंत्रण लिंक है।",
+			"linkExpired": "आमंत्रण लिंक समाप्त",
+			"loading": "आमंत्रण लिंक लोड हो रहा है...",
+			"pageTitleAccept": "वर्कस्पेस से जुड़ें",
+			"pageTitleError": "आमंत्रण लिंक त्रुटि",
+			"pageTitleInvalid": "अमान्य आमंत्रण लिंक",
+			"signedInAs": "<email>{{email}}</email> के रूप में साइन इन",
+			"signedOutPrompt": "वर्कस्पेस से जुड़ने के लिए खाता बनाएँ या साइन इन करें।",
+			"title": "वर्कस्पेस से जुड़ें!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "वर्कस्पेस",
 				"comment": "टिप्पणियाँ",
 				"activity": "गतिविधियाँ",
-				"fallback": "परिणाम"
+				"fallback": "परिणाम",
+				"appointment": "अपॉइंटमेंट"
 			}
 		},
 		"settingsLayout": {
@@ -669,6 +670,15 @@
 				"title": "समय ट्रैकिंग शुरू",
 				"contentWithTask": "कार्य पर समय ट्रैकिंग शुरू: {{taskTitle}}",
 				"contentWithoutTask": "एक कार्य पर समय ट्रैकिंग शुरू"
+			},
+			"appointment_created": {
+				"title": "आपको अपॉइंटमेंट सौंपा गया",
+				"content": "आपको अपॉइंटमेंट सौंपा गया: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "अपॉइंटमेंट अपडेट हुआ",
+				"contentAssignee": "आपको अपॉइंटमेंट सौंपा गया: {{appointmentTitle}}",
+				"contentRescheduled": "\"{{appointmentTitle}}\" अपॉइंटमेंट फिर से शेड्यूल किया गया।"
 			}
 		}
 	},
@@ -791,27 +801,27 @@
 			"add": "जोड़ें"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "जोड़ें",
+			"createError": "कस्टम फ़ील्ड बनाने में विफल।",
+			"createSuccess": "कस्टम फ़ील्ड बनाया गया।",
+			"defaultLabel": "डिफ़ॉल्ट",
+			"defaultValuePlaceholder": "डिफ़ॉल्ट मान",
+			"deleteButton": "हटाएँ",
+			"deleteError": "कस्टम फ़ील्ड हटाने में विफल।",
+			"deleteSuccess": "कस्टम फ़ील्ड हटाया गया।",
+			"empty": "अभी कोई कस्टम फ़ील्ड कॉन्फ़िगर नहीं है।",
+			"loading": "कस्टम फ़ील्ड लोड हो रहे हैं...",
+			"namePlaceholder": "फ़ील्ड नाम",
+			"noOptionsPlaceholder": "कोई विकल्प नहीं",
+			"optionsPlaceholder": "विकल्प कॉमा से अलग करें",
+			"required": "आवश्यक",
+			"typePlaceholder": "फ़ील्ड प्रकार चुनें",
 			"types": {
-				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"boolean": "बूलियन",
+				"date": "दिनांक",
+				"dropdown": "ड्रॉपडाउन",
+				"number": "संख्या",
+				"text": "टेक्स्ट"
 			}
 		},
 		"developer": "डेवलपर",
@@ -1133,22 +1143,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "पहले एक API कुंजी बनाएँ, फिर <YOUR_API_KEY> प्लेसहोल्डर को उससे बदलें।",
+			"authModeApiKey": "API कुंजी",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "प्रमाणीकरण मोड चुनें, फिर इंस्टॉल कमांड चलाएँ या कॉन्फ़िगरेशन अपने एजेंट में पेस्ट करें।",
+			"cardTitle": "एजेंट कनेक्ट करें",
+			"copied": "कॉपी किया गया",
+			"copy": "कॉपी करें",
+			"createApiKey": "API कुंजी बनाएँ",
+			"followUpLabel": "फिर प्रमाणित करें",
+			"installCommandLabel": "इंस्टॉल कमांड",
+			"manualConfigLabel": "मैन्युअल कॉन्फ़िगरेशन",
+			"oauthNote": "OAuth डिफ़ॉल्ट है: पहला कनेक्शन एजेंट को अधिकृत करने के लिए आपके ब्राउज़र में Kaneo खोलता है, फिर टोकन एजेंट स्वयं प्रबंधित करता है।",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "इस इंस्टेंस का अंतर्निहित HTTP MCP एंडपॉइंट",
+			"serverUrlLabel": "सर्वर URL",
+			"subtitle": "Claude, Codex, Gemini या OpenCode जैसे AI एजेंट को अंतर्निहित HTTP MCP सर्वर के माध्यम से इस Kaneo इंस्टेंस से कनेक्ट करें।",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "सूचनाएँ",
@@ -1368,8 +1378,8 @@
 			"columnsDescription": "अपने बोर्ड पर दिखाई देने वाले कॉलम प्रबंधित करें। पुनर्क्रम के लिए खींचें। पूर्ण कार्य को दर्शाने वाले चरणों के लिए \"Done column\" चालू करें।",
 			"automationTitle": "ऑटोमेशन नियम",
 			"automationDescription": "एकीकरण इवेंट को कॉलम से मैप करें। जब कोई इवेंट होता है, तो लिंक किया गया कार्य निर्दिष्ट कॉलम में चला जाता है।",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "इस प्रोजेक्ट के कस्टम फ़ील्ड प्रबंधित करें। क्रम बदलने के लिए खींचें।",
+			"customFieldsTitle": "कस्टम फ़ील्ड"
 		},
 		"repositoryBrowser": {
 			"title": "रिपॉज़िटरी चुनें",
@@ -1486,7 +1496,9 @@
 				"taskPriorityChanged": "प्राथमिकता परिवर्तन",
 				"taskTitleChanged": "शीर्षक परिवर्तन",
 				"taskDescriptionChanged": "विवरण परिवर्तन",
-				"taskCommentCreated": "नई टिप्पणियाँ"
+				"taskCommentCreated": "नई टिप्पणियाँ",
+				"appointmentCreated": "नए अपॉइंटमेंट",
+				"appointmentUpdated": "अपॉइंटमेंट बदलाव"
 			},
 			"connect": "Telegram कनेक्ट करें",
 			"saveChanges": "परिवर्तन सहेजें",
@@ -1544,7 +1556,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "पता लगाए गए विषय",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1775,6 +1787,25 @@
 				"title": "भूमिका हटाएँ",
 				"description": "यह भूमिका \"{{role}}\" को स्थायी रूप से हटा देगा। इस भूमिका वाले सदस्य इसकी अनुमतियाँ खो देंगे।"
 			}
+		},
+		"skills": "स्किल्स",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "इन कमांड को अपने Kaneo चेकआउट की जड़ से चलाएँ, फिर अपने एजेंट को पुनः आरंभ करें।",
+			"cardTitle": "Kaneo स्किल इंस्टॉल करें",
+			"copied": "कॉपी किया गया",
+			"copy": "कॉपी करें",
+			"destinationLabel": "गंतव्य",
+			"installCommandLabel": "इंस्टॉल कमांड",
+			"mcpRequirement": "यह स्किल MCP कनेक्शन पर आधारित है: पहले उसे कॉन्फ़िगर करें।",
+			"openMcpSettings": "MCP सेटिंग्स खोलें",
+			"pageTitle": "स्किल्स",
+			"projectScope": "प्रोजेक्ट",
+			"subtitle": "Kaneo स्किल इंस्टॉल करें ताकि AI एजेंट इस इंस्टेंस के सम्मेलनों का पालन करें और MCP टूल्स का सही उपयोग करें।",
+			"title": "एजेंट स्किल्स",
+			"updateDescription": "स्किल्स डिस्क से पढ़े जाते हैं: बदलाव लागू करने के लिए Kaneo अपडेट के बाद फ़ोल्डर को फिर से कॉपी करें।",
+			"userScope": "उपयोगकर्ता",
+			"verifyLabel": "सत्यापित करें"
 		}
 	},
 	"tasks": {
@@ -1835,8 +1866,8 @@
 				"isAnyOf": "में से कोई है",
 				"includeAnyOf": "में से कोई शामिल है"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "सभी",
+			"noValuesUsedYet": "अभी कोई मान उपयोग नहीं"
 		},
 		"boardSearchPlaceholder": "टिकट खोजें...",
 		"bulk": {
@@ -1889,7 +1920,7 @@
 			"loadingTask": "कार्य लोड हो रहा है...",
 			"taskNotFound": "कार्य नहीं मिला",
 			"taskNotFoundDescription": "जो कार्य आप खोज रहे हैं वह मौजूद नहीं है या हटा दिया गया है।",
-			"customFields": "Custom Fields"
+			"customFields": "कस्टम फ़ील्ड"
 		},
 		"contextMenu": {
 			"copyLink": "लिंक कॉपी करें",
@@ -2007,8 +2038,8 @@
 					"renderFailed": "Mermaid डायग्राम प्रस्तुत नहीं किया जा सका"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "फ़ील्ड अपडेट हुआ",
+			"selectOption": "विकल्प चुनें"
 		},
 		"dueDate": {
 			"label": "नियत तारीख",
@@ -2195,7 +2226,7 @@
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "मिनट",
 			"unitWeek_one": "week",
 			"unitWeek_other": "weeks",
 			"weeksBefore_one": "{{count}} week before",
@@ -2251,7 +2282,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "लेबल",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2311,30 +2342,30 @@
 			"roleUpdateError": "भूमिका अपडेट करने में विफल"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "स्वतः कॉपी नहीं हो सका। लिंक चुनें और Ctrl+C दबाएँ।",
+			"copyIconAria": "आमंत्रण लिंक कॉपी करें",
+			"create": "लिंक बनाएँ",
+			"createError": "आमंत्रण लिंक बनाने में विफल",
+			"createSuccess": "आमंत्रण लिंक बनाया गया",
+			"deleteError": "आमंत्रण लिंक रद्द करने में विफल",
+			"deleteSuccess": "आमंत्रण लिंक रद्द किया गया",
+			"description": "लिंक वाला कोई भी व्यक्ति सदस्य के रूप में इस वर्कस्पेस से जुड़ सकता है — ईमेल आवश्यक नहीं।",
+			"empty": "अभी कोई साझा करने योग्य आमंत्रण लिंक नहीं।",
+			"expiry24h": "24 घंटे",
+			"expiry30d": "30 दिन",
+			"expiry7d": "7 दिन",
+			"expiryLabel": "समाप्ति",
+			"expiryNever": "कभी समाप्त नहीं होता",
+			"join": "{{workspaceName}} से जुड़ें",
+			"linkCopied": "आमंत्रण लिंक कॉपी किया गया",
+			"maxUsesLabel": "अधिकतम उपयोग",
+			"maxUsesUnlimited": "असीमित",
+			"never": "कभी समाप्त नहीं होता",
+			"revokeIconAria": "आमंत्रण लिंक रद्द करें",
+			"title": "साझा करने योग्य आमंत्रण लिंक",
+			"uses": "{{used}}/{{max}} उपयोग",
+			"workspace": "वर्कस्पेस: {{workspaceName}}",
+			"usesUnlimited": "{{used}} उपयोग"
 		}
 	},
 	"unified": {
@@ -2363,7 +2394,26 @@
 		"charts": {
 			"backlog": "बैकलॉग",
 			"empty": "पिछले 6 महीनों में कोई कार्य गतिविधि नहीं।",
-			"tasks": "कार्य"
+			"tasks": "कार्य",
+			"byProject": "परियोजना के अनुसार",
+			"completed": "पूरे हुए",
+			"created": "बनाए गए",
+			"noTasks": "वितरित करने के लिए कोई कार्य नहीं।",
+			"other": "अन्य",
+			"period": "अवधि",
+			"periodSummary": "{{created}} बनाए गए · {{completed}} पूरे हुए",
+			"perWeek": "{{value}}/सप्ताह",
+			"range_one": "{{count}} माह",
+			"range_other": "{{count}} माह",
+			"statusDescription": "सभी परियोजनाओं के कार्य वर्तमान में कहाँ हैं।",
+			"statusTitle": "स्थिति विभाजन",
+			"unassigned": "असाइन नहीं किया गया",
+			"velocity4w": "वेग (4 सप्ताह)",
+			"velocityDescription": "सभी परियोजनाओं में प्रति सप्ताह बनाए और पूरे किए गए कार्य।",
+			"velocityTitle": "वेग",
+			"workloadDescription": "सभी परियोजनाओं में प्रति असाइनी खुले बोर्ड कार्य।",
+			"workloadEmpty": "कोई खुला कार्य असाइन नहीं है।",
+			"workloadTitle": "कार्यभार"
 		},
 		"tabs": {
 			"charts": "चार्ट",
@@ -2433,5 +2483,45 @@
 			"success": "वर्कस्पेस सफलतापूर्वक बनाया गया",
 			"error": "वर्कस्पेस बनाने में विफल"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "असाइन किया गया",
+			"create": "बनाएँ",
+			"createTitle": "नई अपॉइंटमेंट",
+			"delete": "हटाएँ",
+			"description": "अपॉइंटमेंट कार्यों की तरह निर्धारित होती हैं, लेकिन बोर्ड या बैकलॉग में कभी नहीं दिखतीं।",
+			"descriptionLabel": "विवरण",
+			"editTitle": "अपॉइंटमेंट संपादित करें",
+			"endLabel": "समाप्ति",
+			"priorityLabel": "प्राथमिकता",
+			"rangeError": "समाप्ति शुरुआत के बाद होनी चाहिए।",
+			"save": "सहेजें",
+			"startLabel": "शुरुआत",
+			"titleLabel": "शीर्षक",
+			"titlePlaceholder": "जैसे डिज़ाइन समीक्षा",
+			"unassigned": "असाइन नहीं किया गया"
+		},
+		"empty": {
+			"description": "अपॉइंटमेंट यहाँ रहती हैं, बोर्ड या बैकलॉग में नहीं।",
+			"title": "अभी कोई अपॉइंटमेंट नहीं"
+		},
+		"loadError": "अपॉइंटमेंट लोड नहीं हो सकीं।",
+		"moveFromBacklog": "अपॉइंटमेंट में ले जाएँ",
+		"newAppointment": "नई अपॉइंटमेंट",
+		"nextWeek": "अगला सप्ताह",
+		"pageTitle": "अपॉइंटमेंट · {{name}}",
+		"previousWeek": "पिछला सप्ताह",
+		"tab": "अपॉइंटमेंट",
+		"toast": {
+			"created": "अपॉइंटमेंट बनाई गई",
+			"deleted": "अपॉइंटमेंट हटाई गई",
+			"error": "कुछ गलत हो गया",
+			"moved": "अपॉइंटमेंट में ले जाया गया",
+			"updated": "अपॉइंटमेंट अपडेट हुई"
+		},
+		"today": "आज",
+		"weekHint": "अपॉइंटमेंट जोड़ने के लिए खाली स्लॉट पर क्लिक करें; संपादित करने के लिए अपॉइंटमेंट पर क्लिक करें।",
+		"unscheduled": "अनिर्धारित"
 	}
 }

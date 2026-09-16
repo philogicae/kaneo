@@ -7,6 +7,8 @@ export const telegramEventKeys = [
   "taskTitleChanged",
   "taskDescriptionChanged",
   "taskCommentCreated",
+  "appointmentCreated",
+  "appointmentUpdated",
 ] as const;
 
 export type TelegramEventKey = (typeof telegramEventKeys)[number];
@@ -62,6 +64,8 @@ export const defaultTelegramEvents: Record<TelegramEventKey, boolean> = {
   taskTitleChanged: false,
   taskDescriptionChanged: false,
   taskCommentCreated: true,
+  appointmentCreated: true,
+  appointmentUpdated: true,
 };
 
 export function normalizeTelegramConfig(

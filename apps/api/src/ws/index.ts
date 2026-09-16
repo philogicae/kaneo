@@ -282,6 +282,15 @@ const taskUpdateEvents = [
   "comment.updated",
 ];
 
+// Appointments live in their own collection: viewers of the Appointments,
+// Calendar and Gantt views get dedicated messages so they can invalidate the
+// appointment queries without refetching the board.
+const appointmentUpdateEvents = [
+  "appointment.created",
+  "appointment.updated",
+  "appointment.deleted",
+];
+
 subscribeToEvent<{
   taskId: string;
   userId: string;
@@ -381,6 +390,32 @@ for (const eventName of taskUpdateEvents) {
         sourceTaskId: data.sourceTaskId,
         targetTaskId: data.targetTaskId,
       },
+      initiatorId,
+    );
+  });
+}
+
+type AppointmentEvent = {
+  appointmentId: string;
+  projectId: string;
+  initiatorId?: string;
+};
+
+for (const eventName of appointmentUpdateEvents) {
+  subscribeToEvent<AppointmentEvent>(eventName, async (data) => {
+    const { projectId, appointmentId, initiatorId } = data;
+    if (!projectId || !appointmentId) return;
+
+    const type =
+      eventName === "appointment.created"
+        ? "APPOINTMENT_CREATED"
+        : eventName === "appointment.deleted"
+          ? "APPOINTMENT_DELETED"
+          : "APPOINTMENT_UPDATED";
+
+    broadcastToProject(
+      projectId,
+      { type, projectId, appointmentId },
       initiatorId,
     );
   });

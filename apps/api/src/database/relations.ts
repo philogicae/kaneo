@@ -3,6 +3,7 @@ import {
   accountTable,
   activityTable,
   apikeyTable,
+  appointmentTable,
   assetTable,
   columnTable,
   commentTable,
@@ -36,12 +37,27 @@ import {
   workspaceUserTable,
 } from "./schema";
 
+export const appointmentTableRelations = relations(
+  appointmentTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [appointmentTable.projectId],
+      references: [projectTable.id],
+    }),
+    assignee: one(userTable, {
+      fields: [appointmentTable.userId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
 export const userTableRelations = relations(userTable, ({ many, one }) => ({
   sessions: many(sessionTable),
   accounts: many(accountTable),
   teamMembers: many(teamMemberTable),
   workspaceMemberships: many(workspaceUserTable),
   assignedTasks: many(taskTable),
+  assignedAppointments: many(appointmentTable),
   timeEntries: many(timeEntryTable),
   activities: many(activityTable),
   comments: many(commentTable),
@@ -106,6 +122,7 @@ export const projectTableRelations = relations(
       references: [workspaceTable.id],
     }),
     tasks: many(taskTable),
+    appointments: many(appointmentTable),
     assets: many(assetTable),
     columns: many(columnTable),
     workflowRules: many(workflowRuleTable),

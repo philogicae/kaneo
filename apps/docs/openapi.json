@@ -1266,6 +1266,138 @@
           "externalUrl"
         ]
       },
+      "AppointmentList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Appointment"
+        }
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "position": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Manual order among the project's appointments, ascending."
+          },
+          "number": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Per-project appointment counter."
+          },
+          "userId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The assignee, if any."
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "description": "One of: no-priority, low, medium, high, urgent."
+          },
+          "startDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "reminderOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "number"
+            },
+            "description": "Reminder offsets in minutes before the appointment's start date (Telegram reminders)."
+          },
+          "recurrence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly"
+                ]
+              },
+              "interval": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "frequency",
+              "interval"
+            ],
+            "description": "Recurrence of the appointment; the next occurrence is spawned when the current one ends."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "assigneeName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assigneeId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "position",
+          "number",
+          "userId",
+          "title",
+          "description",
+          "priority",
+          "startDate",
+          "dueDate",
+          "reminderOffsets",
+          "recurrence",
+          "createdAt",
+          "assigneeName",
+          "assigneeId"
+        ]
+      },
       "Comment": {
         "type": "object",
         "properties": {
@@ -1777,6 +1909,7 @@
             "type": "string",
             "enum": [
               "task",
+              "appointment",
               "project",
               "workspace",
               "comment",
@@ -2903,6 +3036,12 @@
           },
           "taskCommentCreated": {
             "type": "boolean"
+          },
+          "appointmentCreated": {
+            "type": "boolean"
+          },
+          "appointmentUpdated": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -2911,7 +3050,9 @@
           "taskPriorityChanged",
           "taskTitleChanged",
           "taskDescriptionChanged",
-          "taskCommentCreated"
+          "taskCommentCreated",
+          "appointmentCreated",
+          "appointmentUpdated"
         ],
         "description": "Effective per-bot event filter (defaults merged in when the stored filter omits a key)."
       },
@@ -6645,7 +6786,7 @@
           "Projects"
         ],
         "summary": "Get project charts",
-        "description": "Weekly task-creation and completion counts for the last months (default 6), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status.",
+        "description": "Weekly task-creation and completion counts for the last months (default 6), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Narrow or widen the window with `months`.",
         "parameters": [
           {
             "schema": {
@@ -6654,6 +6795,17 @@
             "required": true,
             "name": "id",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Months of weekly buckets to return (default 6, max 24)."
+            },
+            "required": false,
+            "description": "Months of weekly buckets to return (default 6, max 24).",
+            "name": "months",
+            "in": "query"
           }
         ],
         "responses": {
@@ -9348,6 +9500,540 @@
         }
       }
     },
+    "/appointment": {
+      "get": {
+        "operationId": "listAppointments",
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "List appointments",
+        "description": "List a project's appointments, sorted by start date. Appointments never appear in the board or backlog.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The project's appointments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No access to the project's workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createAppointment",
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Create appointment",
+        "description": "Add an appointment to a project. It is a task-like scheduled item that stays out of the board and backlog.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "startDate": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": [
+                      "no-priority",
+                      "low",
+                      "medium",
+                      "high",
+                      "urgent"
+                    ]
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "Assignee, if any."
+                  },
+                  "reminderOffsets": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 43200
+                    },
+                    "maxItems": 10,
+                    "description": "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date."
+                  },
+                  "recurrence": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "frequency": {
+                        "type": "string",
+                        "enum": [
+                          "daily",
+                          "weekly",
+                          "monthly"
+                        ]
+                      },
+                      "interval": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 365
+                      }
+                    },
+                    "required": [
+                      "frequency",
+                      "interval"
+                    ],
+                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created appointment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Appointment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or unknown project",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:create permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointment/from-task": {
+      "post": {
+        "operationId": "createAppointmentFromTask",
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Move a backlog task to appointments",
+        "description": "Convert a planned (backlog) task into an appointment. The task row is removed, so the item lives only in the appointment collection.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "taskId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "taskId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created appointment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Appointment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The task is not a backlog task, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task permissions",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown task",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointment/{id}": {
+      "get": {
+        "operationId": "getAppointment",
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Get appointment",
+        "description": "Get a single appointment by ID.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointment details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Appointment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown appointment, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No access to the project's workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateAppointment",
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Update appointment",
+        "description": "Update an appointment's title, description, dates, priority, or assignee.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "startDate": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": [
+                      "no-priority",
+                      "low",
+                      "medium",
+                      "high",
+                      "urgent"
+                    ]
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "Assignee, if any."
+                  },
+                  "reminderOffsets": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 43200
+                    },
+                    "maxItems": 10,
+                    "description": "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date."
+                  },
+                  "recurrence": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "frequency": {
+                        "type": "string",
+                        "enum": [
+                          "daily",
+                          "weekly",
+                          "monthly"
+                        ]
+                      },
+                      "interval": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 365
+                      }
+                    },
+                    "required": [
+                      "frequency",
+                      "interval"
+                    ],
+                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated appointment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Appointment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or unknown appointment",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteAppointment",
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Delete appointment",
+        "description": "Delete an appointment. Returns the deleted ID.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted appointment ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown appointment",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:delete permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/comment/{taskId}": {
       "get": {
         "operationId": "getTaskComments",
@@ -11065,7 +11751,7 @@
           "Search"
         ],
         "summary": "Global search",
-        "description": "Search across tasks, projects, workspaces, comments, and activities, ranked by relevance and returned as a single flat list, each entry tagged with its `type`. Scoped to the given workspace, or — when `workspaceId` is omitted — to every workspace the user is a member of.",
+        "description": "Search across tasks, appointments, projects, workspaces, comments, and activities, ranked by relevance and returned as a single flat list, each entry tagged with its `type`. Scoped to the given workspace, or — when `workspaceId` is omitted — to every workspace the user is a member of.",
         "parameters": [
           {
             "schema": {
@@ -11082,6 +11768,7 @@
               "enum": [
                 "all",
                 "tasks",
+                "appointments",
                 "projects",
                 "workspaces",
                 "comments",
@@ -14059,6 +14746,12 @@
                         "type": "boolean"
                       },
                       "taskCommentCreated": {
+                        "type": "boolean"
+                      },
+                      "appointmentCreated": {
+                        "type": "boolean"
+                      },
+                      "appointmentUpdated": {
                         "type": "boolean"
                       }
                     },

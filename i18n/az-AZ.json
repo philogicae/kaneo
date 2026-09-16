@@ -336,20 +336,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "İş sahəsinə qoşulmaq alınmadı",
+				"load": "Dəvət linkinin təfərrüatları yüklənə bilmədi."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Dəvət linki xətası",
+			"invalidTitle": "Yanlış dəvət linki",
+			"joinPrompt": "<workspaceName>{{workspaceName}}</workspaceName> sahəsinə qoşulmaq üçün dəvət linkiniz var.",
+			"linkExpired": "Dəvət linkinin vaxtı bitdi",
+			"loading": "Dəvət linki yüklənir...",
+			"pageTitleAccept": "İş sahəsinə qoşul",
+			"pageTitleError": "Dəvət linki xətası",
+			"pageTitleInvalid": "Yanlış dəvət linki",
+			"signedInAs": "<email>{{email}}</email> kimi daxil olmusunuz",
+			"signedOutPrompt": "İş sahəsinə qoşulmaq üçün hesab yaradın və ya daxil olun.",
+			"title": "İş sahəsinə qoşulun!"
 		}
 	},
 	"settings": {
@@ -883,8 +883,8 @@
 			"columnsDescription": "Lövhənizdə görünən sütunları idarə edin. Sıralamaq üçün sürükləyin. Tamamlanmış işi bildirən mərhələlər üçün «Tamamlanma sütunu» seçimini aktivləşdirin.",
 			"automationTitle": "Avtomatlaşdırma qaydaları",
 			"automationDescription": "İnteqrasiya hadisələrini sütunlarla əlaqələndirin. Hadisə baş verdikdə əlaqəli tapşırıq göstərilən sütuna keçir.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Bu layihənin fərdi sahələrini idarə edin. Sıralamaq üçün dartın.",
+			"customFieldsTitle": "Fərdi sahələr"
 		},
 		"projectSwitcher": {
 			"selectProject": "Layihə seç",
@@ -1245,7 +1245,9 @@
 				"taskPriorityChanged": "Prioritet dəyişiklikləri",
 				"taskTitleChanged": "Başlıq dəyişiklikləri",
 				"taskDescriptionChanged": "Təsvir dəyişiklikləri",
-				"taskCommentCreated": "Yeni şərhlər"
+				"taskCommentCreated": "Yeni şərhlər",
+				"appointmentCreated": "Yeni görüşlər",
+				"appointmentUpdated": "Görüş dəyişiklikləri"
 			},
 			"connect": "Telegram-a qoşul",
 			"saveChanges": "Dəyişiklikləri yadda saxla",
@@ -1316,47 +1318,47 @@
 			"open": "Açıq"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Əlavə et",
+			"createError": "Fərdi sahə yaradıla bilmədi.",
+			"createSuccess": "Fərdi sahə yaradıldı.",
+			"defaultLabel": "Standart",
+			"defaultValuePlaceholder": "Standart dəyər",
+			"deleteButton": "Sil",
+			"deleteError": "Fərdi sahə silinə bilmədi.",
+			"deleteSuccess": "Fərdi sahə silindi.",
+			"empty": "Hələ fərdi sahə konfiqurasiya edilməyib.",
+			"loading": "Fərdi sahələr yüklənir...",
+			"namePlaceholder": "Sahə adı",
+			"noOptionsPlaceholder": "Seçim yoxdur",
+			"optionsPlaceholder": "Seçimlər vergüllə ayrılır",
+			"required": "Məcburi",
+			"typePlaceholder": "Sahə növünü seçin",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"date": "Tarix",
+				"dropdown": "Açılan siyahı",
+				"number": "Rəqəm",
+				"text": "Mətn"
 			}
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Əvvəlcə API açarı yaradın, sonra <YOUR_API_KEY> yer tutucusunu onunla əvəz edin.",
+			"authModeApiKey": "API açarı",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Doğrulama rejimini seçin, sonra quraşdırma əmrini işlədin və ya konfiqurasiyanı agentinizə yapışdırın.",
+			"cardTitle": "Agent qoşun",
+			"copied": "Kopyalandı",
+			"copy": "Kopyala",
+			"createApiKey": "API açarı yarat",
+			"followUpLabel": "Sonra doğrulayın",
+			"installCommandLabel": "Quraşdırma əmri",
+			"manualConfigLabel": "Manual konfiqurasiya",
+			"oauthNote": "OAuth standartdır: ilk qoşulma agenti avtorizasiya etmək üçün Kaneo-nu brauzerinizdə açır, sonra token agentin özü tərəfindən idarə olunur.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "bu instansiyanın daxili HTTP MCP son nöqtəsi",
+			"serverUrlLabel": "Server URL-i",
+			"subtitle": "Claude, Codex, Gemini və ya OpenCode kimi AI agentlərini daxili HTTP MCP serveri vasitəsilə bu Kaneo instansiyasına qoşun.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"telegramUnified": {
@@ -1383,7 +1385,7 @@
 			"deleteChat": "Delete chat",
 			"detectedTopics_one": "{{count}} topic detected",
 			"detectedTopics_other": "{{count}} topics detected",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Aşkar edilən mövzular",
 			"editBot": "Edit bot",
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
@@ -1419,6 +1421,25 @@
 			"editRule": "Edit rule",
 			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
 			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat."
+		},
+		"skills": "Bacarıqlar",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Bu əmrləri Kaneo repozitoriyasının kökündən işlədin, sonra agentinizi yenidən başladın.",
+			"cardTitle": "Kaneo bacarığını quraşdır",
+			"copied": "Kopyalandı",
+			"copy": "Kopyala",
+			"destinationLabel": "Təyinat",
+			"installCommandLabel": "Quraşdırma əmri",
+			"mcpRequirement": "Bacarıq MCP bağlantısına əsaslanır: əvvəlcə onu konfiqurasiya edin.",
+			"openMcpSettings": "MCP parametrlərini aç",
+			"pageTitle": "Bacarıqlar",
+			"projectScope": "layihə",
+			"subtitle": "Kaneo bacarığını quraşdırın ki, AI agentləri bu instansiyanın konvensiyalarına əməl etsin və MCP alətlərindən düzgün istifadə etsin.",
+			"title": "Agent bacarıqları",
+			"updateDescription": "Bacarıqlar diskdən oxunur: dəyişiklikləri almaq üçün Kaneo yeniləndikdən sonra qovluğu yenidən kopyalayın.",
+			"userScope": "istifadəçi",
+			"verifyLabel": "Yoxla"
 		}
 	},
 	"navigation": {
@@ -1477,7 +1498,8 @@
 				"workspace": "İş sahələri",
 				"comment": "Şərhlər",
 				"activity": "Fəaliyyətlər",
-				"fallback": "Nəticələr"
+				"fallback": "Nəticələr",
+				"appointment": "Görüşlər"
 			}
 		},
 		"settingsLayout": {
@@ -1595,6 +1617,15 @@
 				"title": "Vaxtın izlənməsi başladı",
 				"contentWithTask": "Tapşırıqda vaxtın izlənməsi başladı: {{taskTitle}}",
 				"contentWithoutTask": "Tapşırıqda vaxtın izlənməsi başladı"
+			},
+			"appointment_created": {
+				"title": "Görüş sizə təyin edildi",
+				"content": "Görüş sizə təyin edildi: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Görüş yeniləndi",
+				"contentAssignee": "Görüş sizə təyin edildi: {{appointmentTitle}}",
+				"contentRescheduled": "\"{{appointmentTitle}}\" görüşünün vaxtı dəyişdirildi."
 			}
 		}
 	},
@@ -1740,7 +1771,7 @@
 			"loadingTask": "Tapşırıq yüklənir...",
 			"taskNotFound": "Tapşırıq tapılmadı",
 			"taskNotFoundDescription": "Axtardığınız tapşırıq mövcud deyil və ya silinib.",
-			"customFields": "Custom Fields"
+			"customFields": "Fərdi sahələr"
 		},
 		"detail": {
 			"subtaskOf": "Əsas tapşırıq",
@@ -1847,8 +1878,8 @@
 					"renderFailed": "Mermaid diaqramını göstərmək mümkün olmadı"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Sahə yeniləndi",
+			"selectOption": "Seçim seçin"
 		},
 		"entity": {
 			"task": "Tapşırıq"
@@ -2002,8 +2033,8 @@
 				"isAnyOf": "Bunlardan biridir",
 				"includeAnyOf": "Bunlardan hər hansı birini ehtiva edir"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Hamısı",
+			"noValuesUsedYet": "Hələ dəyər istifadə edilməyib"
 		},
 		"calendar": {
 			"pageTitle": "{{name}} – Təqvim",
@@ -2173,7 +2204,7 @@
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "dəqiqə",
 			"unitWeek_one": "week",
 			"unitWeek_other": "weeks",
 			"updateError": "Failed to update reminders",
@@ -2185,7 +2216,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Etiketlər",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2329,30 +2360,30 @@
 			"roleUpdateError": "Rolu yeniləmək alınmadı"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Avtomatik kopyalama alınmadı. Linki seçin və Ctrl+C basın.",
+			"copyIconAria": "Dəvət linkini kopyala",
+			"create": "Link yarat",
+			"createError": "Dəvət linki yaradıla bilmədi",
+			"createSuccess": "Dəvət linki yaradıldı",
+			"deleteError": "Dəvət linki ləğv edilə bilmədi",
+			"deleteSuccess": "Dəvət linki ləğv edildi",
+			"description": "Linki olan hər kəs bu iş sahəsinə üzv kimi qoşula bilər — e-poçt tələb olunmur.",
+			"empty": "Hələ paylaşıla bilən dəvət linki yoxdur.",
+			"expiry24h": "24 saat",
+			"expiry30d": "30 gün",
+			"expiry7d": "7 gün",
+			"expiryLabel": "Bitmə vaxtı",
+			"expiryNever": "Heç vaxt bitmir",
+			"join": "{{workspaceName}} sahəsinə qoşul",
+			"linkCopied": "Dəvət linki kopyalandı",
+			"maxUsesLabel": "Maks. istifadə",
+			"maxUsesUnlimited": "Limitsiz",
+			"never": "Heç vaxt bitmir",
+			"revokeIconAria": "Dəvət linkini ləğv et",
+			"title": "Paylaşıla bilən dəvət linkləri",
+			"uses": "{{used}}/{{max}} istifadə",
+			"workspace": "İş sahəsi: {{workspaceName}}",
+			"usesUnlimited": "{{used}} istifadə"
 		}
 	},
 	"publicProject": {
@@ -2395,7 +2426,26 @@
 		"charts": {
 			"backlog": "Backlog",
 			"empty": "No task activity in the last 6 months.",
-			"tasks": "Tasks"
+			"tasks": "Tasks",
+			"byProject": "Layihəyə görə",
+			"completed": "Tamamlandı",
+			"created": "Yaradıldı",
+			"noTasks": "Paylaşılacaq tapşırıq yoxdur.",
+			"other": "Digər",
+			"period": "Dövr",
+			"periodSummary": "{{created}} yaradıldı · {{completed}} tamamlandı",
+			"perWeek": "{{value}}/həftə",
+			"range_one": "{{count}} ay",
+			"range_other": "{{count}} ay",
+			"statusDescription": "Bütün layihələrin tapşırıqlarının hazırkı vəziyyəti.",
+			"statusTitle": "Status bölgüsü",
+			"unassigned": "Təyin edilməyib",
+			"velocity4w": "Sürət (4 həftə)",
+			"velocityDescription": "Bütün layihələr üzrə həftəlik yaradılan və tamamlanan tapşırıqlar.",
+			"velocityTitle": "Sürət",
+			"workloadDescription": "Bütün layihələr üzrə təyin edilənə görə açıq lövhə tapşırıqları.",
+			"workloadEmpty": "Açıq iş təyin edilməyib.",
+			"workloadTitle": "İş yükü"
 		},
 		"empty": {
 			"description": "Projects from all your workspaces will show up here as soon as you create one.",
@@ -2433,5 +2483,45 @@
 			"tasksCount_one": "{{count}} active task",
 			"tasksCount_other": "{{count}} active tasks"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Təyin edilib",
+			"create": "Yarat",
+			"createTitle": "Yeni görüş",
+			"delete": "Sil",
+			"description": "Görüşlər tapşırıqlar kimi planlaşdırılır, lakin heç vaxt lövhədə və ya backlogda görünmür.",
+			"descriptionLabel": "Təsvir",
+			"editTitle": "Görüşü redaktə et",
+			"endLabel": "Bitmə",
+			"priorityLabel": "Prioritet",
+			"rangeError": "Bitmə başlanğıcdan sonra olmalıdır.",
+			"save": "Yadda saxla",
+			"startLabel": "Başlanğıc",
+			"titleLabel": "Başlıq",
+			"titlePlaceholder": "məs. Dizayn baxışı",
+			"unassigned": "Təyin edilməyib"
+		},
+		"empty": {
+			"description": "Görüşlər burada yaşayır, lövhədə və ya backlogda deyil.",
+			"title": "Hələ görüş yoxdur"
+		},
+		"loadError": "Görüşlər yüklənə bilmədi.",
+		"moveFromBacklog": "Görüşlərə köçür",
+		"newAppointment": "Yeni görüş",
+		"nextWeek": "Növbəti həftə",
+		"pageTitle": "Görüşlər · {{name}}",
+		"previousWeek": "Əvvəlki həftə",
+		"tab": "Görüşlər",
+		"toast": {
+			"created": "Görüş yaradıldı",
+			"deleted": "Görüş silindi",
+			"error": "Nəsə səhv getdi",
+			"moved": "Görüşlərə köçürüldü",
+			"updated": "Görüş yeniləndi"
+		},
+		"today": "Bugün",
+		"weekHint": "Görüş əlavə etmək üçün boş yuvaya klikləyin; redaktə etmək üçün görüşə klikləyin.",
+		"unscheduled": "Planlaşdırılmamış"
 	}
 }

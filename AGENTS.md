@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> **Project management.** For the full project-delivery workflow, use the `project-management` skill.
+> **Project management.** For Kaneo operations, use the `kaneo` skill distributed in `skills/kaneo/SKILL.md`; its references cover setup, task lifecycle and MCP usage. Editing or auditing the skill itself does not start a live board workflow.
 >
 > **Audience.** AI agents working inside the Kaneo fork (self-hosted instance customization: Hono API + React web).
 >
@@ -25,10 +25,11 @@
 
 ## Setup commands
 
-- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.4.1`).
+- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.4.2`).
 - `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:coverage` (unit + coverage, aggregated per workspace in the CI job summary) · `pnpm test:integration` (local libSQL/SQLite file)
 - `pnpm lint` = Biome **--write** (rewrites files); CI gate is `pnpm exec biome ci .` — run that for a read-only check.
 - `pnpm i18n:check` / `i18n:schema` · `pnpm openapi:check` / `openapi:check:fix`
+- Skill/MCP contract: `pnpm --filter @kaneo/api exec vitest run --config vitest.config.ts ../../tests/api/mcp-tools.test.ts` checks the skill's local Markdown links, catalog parity with the registered tools, and JSON call examples against strict tool schemas without network access. Keep the distributed bundle in `skills/kaneo/`; validate the connected catalog separately because deployment may lag behind the source.
 - DB: schema in `apps/api/src/database/schema.ts`, relations in `database/relations.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`, inspect the SQL, existing installations must keep working.
 - Server env comes from root `.env`; Vite-only overrides in `apps/web/.env.local` (see `ENVIRONMENT_SETUP.md`).
 - Never use production databases, storage, or credentials for development or tests.

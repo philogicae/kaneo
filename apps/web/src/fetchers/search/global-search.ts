@@ -7,6 +7,7 @@ type SearchParams = {
   type?:
     | "all"
     | "tasks"
+    | "appointments"
     | "projects"
     | "workspaces"
     | "comments"

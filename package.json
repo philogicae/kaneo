@@ -24,13 +24,13 @@
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
     "husky": "^9.1.7",
-    "turbo": "^2.10.12",
+    "turbo": "^2.10.13",
     "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=26.0.0"
   },
-  "packageManager": "pnpm@12.4.1",
+  "packageManager": "pnpm@12.4.2",
   "version": "2.25.0",
   "dependencies": {
     "dotenv-mono": "^1.5.1"

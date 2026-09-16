@@ -6,6 +6,18 @@ describe("buildTelegramAction", () => {
     expect(buildTelegramAction({ kind: "created" })).toBe("Task created");
   });
 
+  it("describes appointment events", () => {
+    expect(buildTelegramAction({ kind: "appointmentCreated" })).toBe(
+      "Appointment created",
+    );
+    expect(buildTelegramAction({ kind: "appointmentRescheduled" })).toBe(
+      "Appointment rescheduled",
+    );
+    expect(buildTelegramAction({ kind: "appointmentReassigned" })).toBe(
+      "Appointment reassigned",
+    );
+  });
+
   it("describes a status transition", () => {
     expect(
       buildTelegramAction({
