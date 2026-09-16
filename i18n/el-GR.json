@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Αποτυχία συμμετοχής στον χώρο εργασίας",
+				"load": "Αποτυχία φόρτωσης των στοιχείων του συνδέσμου πρόσκλησης."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Σφάλμα συνδέσμου πρόσκλησης",
+			"invalidTitle": "Μη έγκυρος σύνδεσμος πρόσκλησης",
+			"joinPrompt": "Έχετε σύνδεσμο πρόσκλησης για να συμμετάσχετε στο <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Ο σύνδεσμος πρόσκλησης έληξε",
+			"loading": "Φόρτωση συνδέσμου πρόσκλησης...",
+			"pageTitleAccept": "Συμμετοχή στον χώρο εργασίας",
+			"pageTitleError": "Σφάλμα συνδέσμου πρόσκλησης",
+			"pageTitleInvalid": "Μη έγκυρος σύνδεσμος πρόσκλησης",
+			"signedInAs": "Συνδεδεμένος ως <email>{{email}}</email>",
+			"signedOutPrompt": "Δημιουργήστε λογαριασμό ή συνδεθείτε για να συμμετάσχετε στον χώρο εργασίας.",
+			"title": "Συμμετάσχετε στον χώρο εργασίας!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Χώροι εργασίας",
 				"comment": "Σχόλια",
 				"activity": "Δραστηριότητες",
-				"fallback": "Αποτελέσματα"
+				"fallback": "Αποτελέσματα",
+				"appointment": "Συναντήσεις"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Εκπρόθεσμη εργασία",
 				"content": "Η εργασία {{taskTitle}} έχει ξεπεράσει την ημερομηνία λήξης της"
+			},
+			"appointment_created": {
+				"title": "Σας ανατέθηκε ραντεβού",
+				"content": "Σας ανατέθηκε το ραντεβού: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Το ραντεβού ενημερώθηκε",
+				"contentAssignee": "Σας ανατέθηκε το ραντεβού: {{appointmentTitle}}",
+				"contentRescheduled": "Το ραντεβού \"{{appointmentTitle}}\" επαναπρογραμματίστηκε."
 			}
 		},
 		"reminderLeadTime": {
@@ -791,27 +801,27 @@
 			"add": "Προσθήκη"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Προσθήκη",
+			"createError": "Αποτυχία δημιουργίας προσαρμοσμένου πεδίου.",
+			"createSuccess": "Το προσαρμοσμένο πεδίο δημιουργήθηκε.",
+			"defaultLabel": "Προεπιλογή",
+			"defaultValuePlaceholder": "Προεπιλεγμένη τιμή",
+			"deleteButton": "Διαγραφή",
+			"deleteError": "Αποτυχία διαγραφής προσαρμοσμένου πεδίου.",
+			"deleteSuccess": "Το προσαρμοσμένο πεδίο διαγράφηκε.",
+			"empty": "Δεν έχουν ρυθμιστεί προσαρμοσμένα πεδία.",
+			"loading": "Φόρτωση προσαρμοσμένων πεδίων...",
+			"namePlaceholder": "Όνομα πεδίου",
+			"noOptionsPlaceholder": "Χωρίς επιλογές",
+			"optionsPlaceholder": "Επιλογές χωρισμένες με κόμματα",
+			"required": "Υποχρεωτικό",
+			"typePlaceholder": "Επιλέξτε τύπο πεδίου",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"date": "Ημερομηνία",
+				"dropdown": "Αναπτυσσόμενη λίστα",
+				"number": "Αριθμός",
+				"text": "Κείμενο"
 			}
 		},
 		"developer": "Προγραμματιστής",
@@ -1133,22 +1143,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Δημιουργήστε πρώτα ένα κλειδί API και μετά αντικαταστήστε το σύμβολο <YOUR_API_KEY> με αυτό.",
+			"authModeApiKey": "Κλειδί API",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Επιλέξτε τρόπο αυθεντικοποίησης και μετά εκτελέστε την εντολή εγκατάστασης ή επικολλήστε τη διαμόρφωση στον agent σας.",
+			"cardTitle": "Σύνδεση agent",
+			"copied": "Αντιγράφηκε",
+			"copy": "Αντιγραφή",
+			"createApiKey": "Δημιουργία κλειδιού API",
+			"followUpLabel": "Έπειτα αυθεντικοποιήστε",
+			"installCommandLabel": "Εντολή εγκατάστασης",
+			"manualConfigLabel": "Χειροκίνητη διαμόρφωση",
+			"oauthNote": "Το OAuth είναι η προεπιλογή: η πρώτη σύνδεση ανοίγει το Kaneo στον browser για να εξουσιοδοτήσετε τον agent και μετά το token διαχειρίζεται ο ίδιος ο agent.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "ενσωματωμένο HTTP MCP endpoint αυτής της εγκατάστασης",
+			"serverUrlLabel": "URL διακομιστή",
+			"subtitle": "Συνδέστε AI agents όπως Claude, Codex, Gemini ή OpenCode σε αυτή την εγκατάσταση Kaneo μέσω του ενσωματωμένου HTTP MCP server.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Ειδοποιήσεις",
@@ -1368,8 +1378,8 @@
 			"columnsDescription": "Διαχειριστείτε τις στήλες που εμφανίζονται στον πίνακά σας. Σύρετε για αναδιάταξη. Ενεργοποιήστε τη \"Στήλη ολοκλήρωσης\" για στάδια που αντιπροσωπεύουν ολοκληρωμένη εργασία.",
 			"automationTitle": "Κανόνες αυτοματοποίησης",
 			"automationDescription": "Αντιστοιχίστε γεγονότα ενσωμάτωσης σε στήλες. Όταν συμβαίνει ένα γεγονός, η συνδεδεμένη εργασία μετακινείται στην καθορισμένη στήλη.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Διαχειριστείτε τα προσαρμοσμένα πεδία αυτού του έργου. Σύρετε για αναδιάταξη.",
+			"customFieldsTitle": "Προσαρμοσμένα πεδία"
 		},
 		"repositoryBrowser": {
 			"title": "Επιλογή αποθετηρίου",
@@ -1486,7 +1496,9 @@
 				"taskPriorityChanged": "Αλλαγές προτεραιότητας",
 				"taskTitleChanged": "Αλλαγές τίτλου",
 				"taskDescriptionChanged": "Αλλαγές περιγραφής",
-				"taskCommentCreated": "Νέα σχόλια"
+				"taskCommentCreated": "Νέα σχόλια",
+				"appointmentCreated": "Νέα ραντεβού",
+				"appointmentUpdated": "Αλλαγές ραντεβού"
 			},
 			"connect": "Σύνδεση Telegram",
 			"saveChanges": "Αποθήκευση αλλαγών",
@@ -1544,7 +1556,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Εντοπισμένα θέματα",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1775,6 +1787,25 @@
 				"title": "Διαγραφή ρόλου",
 				"description": "Αυτό θα διαγράψει οριστικά τον ρόλο \"{{role}}\". Τα μέλη με αυτόν τον ρόλο θα χάσουν τα δικαιώματά του."
 			}
+		},
+		"skills": "Δεξιότητες",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Εκτελέστε αυτές τις εντολές από τη ρίζα του Kaneo και μετά επανεκκινήστε τον agent σας.",
+			"cardTitle": "Εγκατάσταση του skill Kaneo",
+			"copied": "Αντιγράφηκε",
+			"copy": "Αντιγραφή",
+			"destinationLabel": "Προορισμός",
+			"installCommandLabel": "Εντολή εγκατάστασης",
+			"mcpRequirement": "Το skill βασίζεται στη σύνδεση MCP: ρυθμίστε την πρώτα.",
+			"openMcpSettings": "Άνοιγμα ρυθμίσεων MCP",
+			"pageTitle": "Δεξιότητες",
+			"projectScope": "έργο",
+			"subtitle": "Εγκαταστήστε το skill Kaneo ώστε οι AI agents να ακολουθούν τις συμβάσεις αυτής της εγκατάστασης και να χρησιμοποιούν σωστά τα εργαλεία MCP.",
+			"title": "Δεξιότητες agent",
+			"updateDescription": "Τα skills διαβάζονται από τον δίσκο: αντιγράψτε ξανά τον φάκελο μετά την ενημέρωση του Kaneo για να εφαρμοστούν οι αλλαγές.",
+			"userScope": "χρήστης",
+			"verifyLabel": "Επαλήθευση"
 		}
 	},
 	"tasks": {
@@ -1835,8 +1866,8 @@
 				"isAnyOf": "είναι ένα από",
 				"includeAnyOf": "περιλαμβάνει κάποιο από"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Όλα",
+			"noValuesUsedYet": "Δεν έχουν χρησιμοποιηθεί τιμές"
 		},
 		"boardSearchPlaceholder": "Αναζήτηση αιτημάτων...",
 		"bulk": {
@@ -1889,7 +1920,7 @@
 			"loadingTask": "Φόρτωση εργασίας...",
 			"taskNotFound": "Η εργασία δεν βρέθηκε",
 			"taskNotFoundDescription": "Η εργασία που αναζητάτε δεν υπάρχει ή έχει διαγραφεί.",
-			"customFields": "Custom Fields"
+			"customFields": "Προσαρμοσμένα πεδία"
 		},
 		"contextMenu": {
 			"copyLink": "Αντιγραφή συνδέσμου",
@@ -2007,8 +2038,8 @@
 					"renderFailed": "Δεν ήταν δυνατή η απόδοση του διαγράμματος Mermaid"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Το πεδίο ενημερώθηκε",
+			"selectOption": "Επιλογή επιλογής"
 		},
 		"dueDate": {
 			"label": "Ημερομηνία λήξης",
@@ -2195,7 +2226,7 @@
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "λεπτά",
 			"unitWeek_one": "week",
 			"unitWeek_other": "weeks",
 			"weeksBefore_one": "{{count}} week before",
@@ -2251,7 +2282,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Ετικέτες",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2311,30 +2342,30 @@
 			"roleUpdateError": "Αποτυχία ενημέρωσης ρόλου"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Η αυτόματη αντιγραφή απέτυχε. Επιλέξτε τον σύνδεσμο και πατήστε Ctrl+C.",
+			"copyIconAria": "Αντιγραφή του συνδέσμου πρόσκλησης",
+			"create": "Δημιουργία συνδέσμου",
+			"createError": "Αποτυχία δημιουργίας του συνδέσμου πρόσκλησης",
+			"createSuccess": "Ο σύνδεσμος πρόσκλησης δημιουργήθηκε",
+			"deleteError": "Αποτυχία ανάκλησης του συνδέσμου πρόσκλησης",
+			"deleteSuccess": "Ο σύνδεσμος πρόσκλησης ανακλήθηκε",
+			"description": "Όποιος έχει τον σύνδεσμο μπορεί να συμμετάσχει σε αυτόν τον χώρο εργασίας ως μέλος — δεν απαιτείται email.",
+			"empty": "Δεν υπάρχουν κοινόχρηστοι σύνδεσμοι πρόσκλησης.",
+			"expiry24h": "24 ώρες",
+			"expiry30d": "30 ημέρες",
+			"expiry7d": "7 ημέρες",
+			"expiryLabel": "Λήξη",
+			"expiryNever": "Δεν λήγει ποτέ",
+			"join": "Συμμετοχή στο {{workspaceName}}",
+			"linkCopied": "Ο σύνδεσμος πρόσκλησης αντιγράφηκε",
+			"maxUsesLabel": "Μέγιστες χρήσεις",
+			"maxUsesUnlimited": "Απεριόριστες",
+			"never": "Δεν λήγει ποτέ",
+			"revokeIconAria": "Ανάκληση του συνδέσμου πρόσκλησης",
+			"title": "Κοινόχρηστοι σύνδεσμοι πρόσκλησης",
+			"uses": "{{used}}/{{max}} χρήσεις",
+			"workspace": "Χώρος εργασίας: {{workspaceName}}",
+			"usesUnlimited": "{{used}} χρήσεις"
 		}
 	},
 	"unified": {
@@ -2363,7 +2394,26 @@
 		"charts": {
 			"backlog": "Backlog",
 			"empty": "Καμία δραστηριότητα εργασιών τους τελευταίους 6 μήνες.",
-			"tasks": "Εργασίες"
+			"tasks": "Εργασίες",
+			"byProject": "Ανά έργο",
+			"completed": "Ολοκληρώθηκαν",
+			"created": "Δημιουργήθηκαν",
+			"noTasks": "Δεν υπάρχουν εργασίες για κατανομή.",
+			"other": "Άλλα",
+			"period": "Περίοδος",
+			"periodSummary": "{{created}} δημιουργήθηκαν · {{completed}} ολοκληρώθηκαν",
+			"perWeek": "{{value}}/εβδομάδα",
+			"range_one": "{{count}} μήνας",
+			"range_other": "{{count}} μήνες",
+			"statusDescription": "Πού βρίσκονται τώρα οι εργασίες όλων των έργων.",
+			"statusTitle": "Κατανομή κατάστασης",
+			"unassigned": "Χωρίς ανάθεση",
+			"velocity4w": "Ταχύτητα (4 εβδομάδες)",
+			"velocityDescription": "Εργασίες που δημιουργήθηκαν και ολοκληρώθηκαν ανά εβδομάδα σε όλα τα έργα.",
+			"velocityTitle": "Ταχύτητα",
+			"workloadDescription": "Ανοιχτές εργασίες πίνακα ανά ανατεθέντα, σε όλα τα έργα.",
+			"workloadEmpty": "Δεν έχει ανατεθεί ανοιχτή εργασία.",
+			"workloadTitle": "Φόρτος εργασίας"
 		},
 		"tabs": {
 			"charts": "Γραφήματα",
@@ -2433,5 +2483,45 @@
 			"success": "Ο χώρος εργασίας δημιουργήθηκε με επιτυχία",
 			"error": "Αποτυχία δημιουργίας χώρου εργασίας"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Ανατεθειμένο",
+			"create": "Δημιουργία",
+			"createTitle": "Νέα συνάντηση",
+			"delete": "Διαγραφή",
+			"description": "Οι συναντήσεις προγραμματίζονται όπως οι εργασίες αλλά δεν εμφανίζονται ποτέ στον πίνακα ή στο backlog.",
+			"descriptionLabel": "Περιγραφή",
+			"editTitle": "Επεξεργασία συνάντησης",
+			"endLabel": "Λήξη",
+			"priorityLabel": "Προτεραιότητα",
+			"rangeError": "Η λήξη πρέπει να είναι μετά την έναρξη.",
+			"save": "Αποθήκευση",
+			"startLabel": "Έναρξη",
+			"titleLabel": "Τίτλος",
+			"titlePlaceholder": "π.χ. Ανασκόπηση σχεδίου",
+			"unassigned": "Χωρίς ανάθεση"
+		},
+		"empty": {
+			"description": "Οι συναντήσεις ζουν εδώ, όχι στον πίνακα ή στο backlog.",
+			"title": "Δεν υπάρχουν συναντήσεις ακόμη"
+		},
+		"loadError": "Δεν ήταν δυνατή η φόρτωση των συναντήσεων.",
+		"moveFromBacklog": "Μετακίνηση στις συναντήσεις",
+		"newAppointment": "Νέα συνάντηση",
+		"nextWeek": "Επόμενη εβδομάδα",
+		"pageTitle": "Συναντήσεις · {{name}}",
+		"previousWeek": "Προηγούμενη εβδομάδα",
+		"tab": "Συναντήσεις",
+		"toast": {
+			"created": "Η συνάντηση δημιουργήθηκε",
+			"deleted": "Η συνάντηση διαγράφηκε",
+			"error": "Κάτι πήγε στραβά",
+			"moved": "Μετακινήθηκε στις συναντήσεις",
+			"updated": "Η συνάντηση ενημερώθηκε"
+		},
+		"today": "Σήμερα",
+		"weekHint": "Κάντε κλικ σε ένα κενό διάστημα για να προσθέσετε συνάντηση· κάντε κλικ σε μια συνάντηση για επεξεργασία.",
+		"unscheduled": "Μη προγραμματισμένο"
 	}
 }

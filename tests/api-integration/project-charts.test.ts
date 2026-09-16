@@ -96,6 +96,25 @@ describe("project charts and backlog statistics", () => {
     expect(Math.max(...buckets.map((b) => b.completed))).toBe(1);
     expect(createdThisWeek).toBeDefined();
 
+    const narrowed = await app.request(
+      `/api/project/${project.id}/charts?months=3`,
+    );
+    expect(narrowed.status).toBe(200);
+    const narrowedBuckets = (await narrowed.json()) as Array<{
+      weekStart: string;
+      created: number;
+      completed: number;
+    }>;
+    // The window shrinks to roughly a quarter, keeping the recent activity.
+    expect(narrowedBuckets.length).toBeLessThan(buckets.length);
+    expect(narrowedBuckets.length).toBeGreaterThan(9);
+    expect(narrowedBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
+
+    const invalid = await app.request(
+      `/api/project/${project.id}/charts?months=0`,
+    );
+    expect(invalid.status).toBe(400);
+
     const list = await app.request(`/api/project?workspaceId=${workspace.id}`);
     expect(list.status).toBe(200);
     const [projectItem] = (await list.json()) as Array<{

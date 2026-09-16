@@ -290,4 +290,86 @@ subscribeToEvent<{
   }
 });
 
+function toTimestamp(value: Date | null | undefined): number | null {
+  if (!value) {
+    return null;
+  }
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? null : time;
+}
+
+subscribeToEvent<{
+  appointmentId: string;
+  projectId: string;
+  userId: string;
+  currentUserId?: string;
+  title: string;
+}>("appointment.created", async (data) => {
+  if (data.userId && data.userId !== data.currentUserId) {
+    const [project] = await db
+      .select({ workspaceId: projectTable.workspaceId })
+      .from(projectTable)
+      .where(eq(projectTable.id, data.projectId))
+      .limit(1);
+
+    await createNotification({
+      userId: data.userId,
+      type: "appointment_created",
+      eventData: {
+        appointmentTitle: data.title,
+        projectId: data.projectId,
+        workspaceId: project?.workspaceId ?? null,
+      },
+      resourceId: data.appointmentId,
+      resourceType: "appointment",
+    });
+  }
+});
+
+subscribeToEvent<{
+  appointmentId: string;
+  projectId: string;
+  currentUserId?: string;
+  title: string;
+  oldAssigneeId: string | null;
+  newAssigneeId: string | null;
+  oldStartDate: Date | null;
+  newStartDate: Date | null;
+  oldDueDate: Date | null;
+  newDueDate: Date | null;
+}>("appointment.updated", async (data) => {
+  const assigneeChanged = data.newAssigneeId !== data.oldAssigneeId;
+  const datesChanged =
+    toTimestamp(data.oldStartDate) !== toTimestamp(data.newStartDate) ||
+    toTimestamp(data.oldDueDate) !== toTimestamp(data.newDueDate);
+
+  // Appointments carry no status: only a new assignee or a reschedule is
+  // worth a notification, and never to the member who made the change.
+  if (!assigneeChanged && !datesChanged) {
+    return;
+  }
+  if (!data.newAssigneeId || data.newAssigneeId === data.currentUserId) {
+    return;
+  }
+
+  const [project] = await db
+    .select({ workspaceId: projectTable.workspaceId })
+    .from(projectTable)
+    .where(eq(projectTable.id, data.projectId))
+    .limit(1);
+
+  await createNotification({
+    userId: data.newAssigneeId,
+    type: "appointment_updated",
+    eventData: {
+      appointmentTitle: data.title,
+      projectId: data.projectId,
+      workspaceId: project?.workspaceId ?? null,
+      changeType: assigneeChanged ? "assignee" : "rescheduled",
+    },
+    resourceId: data.appointmentId,
+    resourceType: "appointment",
+  });
+});
+
 export default notification;

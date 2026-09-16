@@ -13,6 +13,7 @@ type WorkspaceIdSource =
       resource:
         | "project"
         | "task"
+        | "appointment"
         | "label"
         | "timeEntry"
         | "activity"
@@ -23,6 +24,7 @@ type WorkspaceIdSource =
         | "telegramRule";
       idKey: string;
     }
+  | { type: "lookupQuery"; resource: "project"; key: string }
   | {
       type: "lookupMany";
       resource: "task";
@@ -77,6 +79,11 @@ export function workspaceAccessMiddleware(
         // caller authorize against one resource (`?taskId=<mine>`) while the
         // handler acted on another (`{"taskId": "<someone else's>"}`).
         const id = c.req.param(source.idKey) || idFromBody;
+        if (id) {
+          workspaceId = await lookupWorkspaceId(source.resource, id);
+        }
+      } else if (source.type === "lookupQuery") {
+        const id = c.req.query(source.key);
         if (id) {
           workspaceId = await lookupWorkspaceId(source.resource, id);
         }
@@ -141,6 +148,7 @@ async function lookupWorkspaceId(
   resource:
     | "project"
     | "task"
+    | "appointment"
     | "label"
     | "timeEntry"
     | "activity"
@@ -175,6 +183,19 @@ async function lookupWorkspaceId(
           .where(eq(schema.taskTable.id, id))
           .limit(1);
         return task?.workspaceId || null;
+      }
+
+      case "appointment": {
+        const [appointment] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.appointmentTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.appointmentTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.appointmentTable.id, id))
+          .limit(1);
+        return appointment?.workspaceId || null;
       }
 
       case "label": {
@@ -327,6 +348,19 @@ export const workspaceAccess = {
 
   fromParam: (key = "workspaceId") =>
     workspaceAccessMiddleware({ sources: [{ type: "param", key }] }),
+
+  fromAppointment: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "appointment", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromProjectQuery: (key = "projectId") =>
+    workspaceAccessMiddleware({
+      sources: [{ type: "lookupQuery", resource: "project", key }],
+    }),
 
   fromProject: (idKey = "id") =>
     workspaceAccessMiddleware({

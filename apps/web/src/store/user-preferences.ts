@@ -35,6 +35,13 @@ export function isWorkspaceSortMode(
   );
 }
 
+export const CHART_MONTH_OPTIONS = [3, 6, 12] as const;
+export type ChartMonths = (typeof CHART_MONTH_OPTIONS)[number];
+
+export function isChartMonths(value: unknown): value is ChartMonths {
+  return CHART_MONTH_OPTIONS.some((months) => months === value);
+}
+
 // Interface density as root font-size multiplier: every rem-based Tailwind
 // size (text, spacing, sidebar width) follows the root font size. The
 // stepper moves in 5% steps within these bounds.
@@ -105,6 +112,9 @@ type UserPreferencesStore = {
   setWorkspaceSort: (mode: WorkspaceSortMode) => void;
   workspaceOrder: string[];
   setWorkspaceOrder: (ids: string[]) => void;
+
+  chartsMonths: ChartMonths;
+  setChartsMonths: (months: ChartMonths) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -192,6 +202,11 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       setWorkspaceSort: (mode) => set({ workspaceSort: mode }),
       workspaceOrder: [],
       setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
+
+      // A wider default window keeps short projects readable; the charts tab
+      // can narrow it to a quarter or widen it to a year.
+      chartsMonths: 6,
+      setChartsMonths: (months) => set({ chartsMonths: months }),
     }),
     {
       name: "user-preferences",
@@ -211,6 +226,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
         }
         if (state && !Array.isArray(state.workspaceOrder)) {
           state.setWorkspaceOrder([]);
+        }
+        if (state && !isChartMonths(state.chartsMonths)) {
+          state.setChartsMonths(6);
         }
       },
     },

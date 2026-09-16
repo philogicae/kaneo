@@ -41,6 +41,10 @@ vi.mock("@/hooks/queries/task/use-get-tasks", () => ({
   useGetTasks: (projectId: string) => useGetTasks(projectId),
 }));
 
+vi.mock("@/hooks/queries/appointment/use-get-appointments", () => ({
+  default: () => ({ data: [] }),
+}));
+
 vi.mock("@/hooks/use-mobile", () => ({
   useIsMobile: () => false,
 }));
@@ -59,6 +63,10 @@ vi.mock("@/components/task/task-details-sheet", () => ({
   default: () => null,
 }));
 
+vi.mock("@/components/appointments/appointment-dialog", () => ({
+  default: () => null,
+}));
+
 vi.mock("@/components/page-title", () => ({
   default: () => null,
 }));
@@ -73,6 +81,7 @@ vi.mock("@/components/gantt/gantt-task-bar", () => ({
 // jumpToToday key (or its interpolated siblings) stops matching what the
 // component actually requests.
 vi.mock("react-i18next", () => ({
+  initReactI18next: { type: "3rdParty", init: () => {} },
   useTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
       const [namespace, path] = key.split(":");

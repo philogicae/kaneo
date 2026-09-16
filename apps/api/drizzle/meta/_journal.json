@@ -8,6 +8,20 @@
 			"when": 1789257334992,
 			"tag": "0000_soft_owl",
 			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "6",
+			"when": 1789456757950,
+			"tag": "0001_regular_silver_sable",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "6",
+			"when": 1789571662286,
+			"tag": "0002_needy_ultimatum",
+			"breakpoints": true
 		}
 	]
 }

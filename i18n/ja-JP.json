@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "ワークスペースに参加できませんでした",
+				"load": "招待リンクの詳細を読み込めませんでした。"
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "招待リンクエラー",
+			"invalidTitle": "無効な招待リンク",
+			"joinPrompt": "<workspaceName>{{workspaceName}}</workspaceName> に参加する招待リンクがあります。",
+			"linkExpired": "招待リンクの有効期限切れ",
+			"loading": "招待リンクを読み込み中...",
+			"pageTitleAccept": "ワークスペースに参加",
+			"pageTitleError": "招待リンクエラー",
+			"pageTitleInvalid": "無効な招待リンク",
+			"signedInAs": "<email>{{email}}</email> としてサインイン中",
+			"signedOutPrompt": "ワークスペースに参加するにはアカウントを作成するかサインインしてください。",
+			"title": "ワークスペースに参加しましょう！"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "ワークスペース",
 				"comment": "コメント",
 				"activity": "アクティビティ",
-				"fallback": "検索結果"
+				"fallback": "検索結果",
+				"appointment": "予定"
 			}
 		},
 		"settingsLayout": {
@@ -666,6 +667,15 @@
 				"title": "時間計測を開始しました",
 				"contentWithTask": "タスク「{{taskTitle}}」の時間計測を開始しました",
 				"contentWithoutTask": "タスクの時間計測を開始しました"
+			},
+			"appointment_created": {
+				"title": "予定があなたに割り当てられました",
+				"content": "予定があなたに割り当てられました: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "予定が更新されました",
+				"contentAssignee": "予定があなたに割り当てられました: {{appointmentTitle}}",
+				"contentRescheduled": "予定「{{appointmentTitle}}」の日時が変更されました。"
 			}
 		}
 	},
@@ -788,27 +798,27 @@
 			"add": "追加"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "追加",
+			"createError": "カスタムフィールドの作成に失敗しました。",
+			"createSuccess": "カスタムフィールドを作成しました。",
+			"defaultLabel": "デフォルト",
+			"defaultValuePlaceholder": "デフォルト値",
+			"deleteButton": "削除",
+			"deleteError": "カスタムフィールドの削除に失敗しました。",
+			"deleteSuccess": "カスタムフィールドを削除しました。",
+			"empty": "まだカスタムフィールドが設定されていません。",
+			"loading": "カスタムフィールドを読み込み中...",
+			"namePlaceholder": "フィールド名",
+			"noOptionsPlaceholder": "オプションなし",
+			"optionsPlaceholder": "オプションはカンマ区切り",
+			"required": "必須",
+			"typePlaceholder": "フィールドタイプを選択",
 			"types": {
-				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"boolean": "ブール値",
+				"date": "日付",
+				"dropdown": "ドロップダウン",
+				"number": "数値",
+				"text": "テキスト"
 			}
 		},
 		"developer": "開発者",
@@ -1130,22 +1140,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "先に API キーを作成し、<YOUR_API_KEY> プレースホルダーをそれに置き換えてください。",
+			"authModeApiKey": "API キー",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "認証方式を選び、インストールコマンドを実行するか設定をエージェントに貼り付けます。",
+			"cardTitle": "エージェントを接続",
+			"copied": "コピーしました",
+			"copy": "コピー",
+			"createApiKey": "API キーを作成",
+			"followUpLabel": "次に認証",
+			"installCommandLabel": "インストールコマンド",
+			"manualConfigLabel": "手動設定",
+			"oauthNote": "OAuth が既定です。初回接続時にブラウザで Kaneo を開いてエージェントを承認し、その後トークンはエージェント自身が管理します。",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "このインスタンスの組み込み HTTP MCP エンドポイント",
+			"serverUrlLabel": "サーバー URL",
+			"subtitle": "Claude、Codex、Gemini、OpenCode などの AI エージェントを、組み込み HTTP MCP サーバー経由でこの Kaneo インスタンスに接続します。",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "通知",
@@ -1365,8 +1375,8 @@
 			"columnsDescription": "ボードに表示されるカラムを管理します。ドラッグして並べ替えます。完了した作業を表すステージには「完了カラム」をオンにしてください。",
 			"automationTitle": "自動化ルール",
 			"automationDescription": "連携イベントをカラムにマッピングします。イベントが発生すると、リンクされたタスクが指定されたカラムに移動します。",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "このプロジェクトのカスタムフィールドを管理します。ドラッグして並べ替えます。",
+			"customFieldsTitle": "カスタムフィールド"
 		},
 		"repositoryBrowser": {
 			"title": "リポジトリの選択",
@@ -1483,7 +1493,9 @@
 				"taskPriorityChanged": "優先度の変更",
 				"taskTitleChanged": "タイトルの変更",
 				"taskDescriptionChanged": "説明の変更",
-				"taskCommentCreated": "新しいコメント"
+				"taskCommentCreated": "新しいコメント",
+				"appointmentCreated": "新しい予定",
+				"appointmentUpdated": "予定の変更"
 			},
 			"connect": "Telegram に接続",
 			"saveChanges": "変更を保存",
@@ -1540,7 +1552,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "検出されたトピック",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1770,6 +1782,25 @@
 				"title": "ロールを削除",
 				"description": "これによりロール「{{role}}」は完全に削除されます。このロールが割り当てられていたメンバーは権限を失います。"
 			}
+		},
+		"skills": "スキル",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Kaneo リポジトリのルートでこれらのコマンドを実行し、エージェントを再起動してください。",
+			"cardTitle": "Kaneo スキルをインストール",
+			"copied": "コピーしました",
+			"copy": "コピー",
+			"destinationLabel": "保存先",
+			"installCommandLabel": "インストールコマンド",
+			"mcpRequirement": "このスキルは MCP 接続を前提としています。先に設定してください。",
+			"openMcpSettings": "MCP 設定を開く",
+			"pageTitle": "スキル",
+			"projectScope": "プロジェクト",
+			"subtitle": "Kaneo スキルをインストールすると、AI エージェントがこのインスタンスの規約に従い、MCP ツールを正しく使用します。",
+			"title": "エージェントスキル",
+			"updateDescription": "スキルはディスクから読み込まれます。Kaneo 更新後はフォルダーを再コピーして変更を反映してください。",
+			"userScope": "ユーザー",
+			"verifyLabel": "検証"
 		}
 	},
 	"tasks": {
@@ -1830,8 +1861,8 @@
 				"isAnyOf": "次のいずれか",
 				"includeAnyOf": "次のいずれかを含む"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "すべて",
+			"noValuesUsedYet": "使用された値はまだありません"
 		},
 		"boardSearchPlaceholder": "チケットを検索...",
 		"bulk": {
@@ -1884,7 +1915,7 @@
 			"loadingTask": "タスクを読み込み中...",
 			"taskNotFound": "タスクが見つかりません",
 			"taskNotFoundDescription": "お探しのタスクは存在しないか、削除されました。",
-			"customFields": "Custom Fields"
+			"customFields": "カスタムフィールド"
 		},
 		"contextMenu": {
 			"copyLink": "リンクをコピー",
@@ -2002,8 +2033,8 @@
 					"renderFailed": "Mermaid ダイアグラムを描画できませんでした"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "フィールドを更新しました",
+			"selectOption": "オプションを選択"
 		},
 		"dueDate": {
 			"label": "期限",
@@ -2180,7 +2211,7 @@
 			"unitDay_other": "days",
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "分",
 			"unitWeek_other": "weeks",
 			"weeksBefore_other": "{{count}} weeks before"
 		},
@@ -2234,7 +2265,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "ラベル",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2294,30 +2325,30 @@
 			"roleUpdateError": "ロールの更新に失敗しました"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "自動コピーに失敗しました。リンクを選択して Ctrl+C を押してください。",
+			"copyIconAria": "招待リンクをコピー",
+			"create": "リンクを作成",
+			"createError": "招待リンクを作成できませんでした",
+			"createSuccess": "招待リンクを作成しました",
+			"deleteError": "招待リンクを無効化できませんでした",
+			"deleteSuccess": "招待リンクを無効化しました",
+			"description": "リンクを知っている人は誰でもメンバーとしてこのワークスペースに参加できます — メールは不要です。",
+			"empty": "共有可能な招待リンクはまだありません。",
+			"expiry24h": "24 時間",
+			"expiry30d": "30 日間",
+			"expiry7d": "7 日間",
+			"expiryLabel": "有効期限",
+			"expiryNever": "無期限",
+			"join": "{{workspaceName}} に参加",
+			"linkCopied": "招待リンクをコピーしました",
+			"maxUsesLabel": "最大使用回数",
+			"maxUsesUnlimited": "無制限",
+			"never": "無期限",
+			"revokeIconAria": "招待リンクを無効化",
+			"title": "共有可能な招待リンク",
+			"uses": "{{used}}/{{max}} 回使用",
+			"workspace": "ワークスペース: {{workspaceName}}",
+			"usesUnlimited": "{{used}} 回使用"
 		}
 	},
 	"unified": {
@@ -2345,7 +2376,26 @@
 		"charts": {
 			"backlog": "バックログ",
 			"empty": "過去6か月間にタスクの活動はありません。",
-			"tasks": "タスク"
+			"tasks": "タスク",
+			"byProject": "プロジェクト別",
+			"completed": "完了",
+			"created": "作成",
+			"noTasks": "配分するタスクがありません。",
+			"other": "その他",
+			"period": "期間",
+			"periodSummary": "{{created}} 作成 · {{completed}} 完了",
+			"perWeek": "{{value}}/週",
+			"range_other": "{{count}} か月",
+			"statusDescription": "全プロジェクトのタスクが現在どこにあるか。",
+			"statusTitle": "ステータス内訳",
+			"unassigned": "未割り当て",
+			"velocity4w": "ベロシティ（4週間）",
+			"velocityDescription": "全プロジェクトで毎週作成・完了されたタスク。",
+			"velocityTitle": "ベロシティ",
+			"workloadDescription": "全プロジェクトの担当者ごとの未完了ボードタスク。",
+			"workloadEmpty": "割り当てられた未完了の作業はありません。",
+			"workloadTitle": "ワークロード",
+			"range_one": "{{count}} か月"
 		},
 		"tabs": {
 			"charts": "グラフ",
@@ -2412,5 +2462,45 @@
 			"success": "ワークスペースを作成しました",
 			"error": "ワークスペースの作成に失敗しました"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "担当者",
+			"create": "作成",
+			"createTitle": "新しい予定",
+			"delete": "削除",
+			"description": "予定はタスクと同じようにスケジュールされますが、ボードやバックログには表示されません。",
+			"descriptionLabel": "説明",
+			"editTitle": "予定を編集",
+			"endLabel": "終了",
+			"priorityLabel": "優先度",
+			"rangeError": "終了は開始より後にしてください。",
+			"save": "保存",
+			"startLabel": "開始",
+			"titleLabel": "タイトル",
+			"titlePlaceholder": "例: デザインレビュー",
+			"unassigned": "未割り当て"
+		},
+		"empty": {
+			"description": "予定はここに表示され、ボードやバックログには表示されません。",
+			"title": "予定はまだありません"
+		},
+		"loadError": "予定を読み込めませんでした。",
+		"moveFromBacklog": "予定に移動",
+		"newAppointment": "新しい予定",
+		"nextWeek": "次の週",
+		"pageTitle": "予定 · {{name}}",
+		"previousWeek": "前の週",
+		"tab": "予定",
+		"toast": {
+			"created": "予定を作成しました",
+			"deleted": "予定を削除しました",
+			"error": "問題が発生しました",
+			"moved": "予定に移動しました",
+			"updated": "予定を更新しました"
+		},
+		"today": "今日",
+		"weekHint": "空きスロットをクリックして予定を追加、予定をクリックして編集します。",
+		"unscheduled": "未スケジュール"
 	}
 }

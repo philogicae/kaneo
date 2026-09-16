@@ -41,12 +41,15 @@ type TaskCardContextMenuContentProps = {
   task: Task;
   taskCardContext: TaskCardContext;
   onDeleteClick: () => void;
+  /** Backlog-only: converts the planned task into an appointment. */
+  onMoveToAppointments?: (task: Task) => void;
 };
 
 export default function TaskCardContextMenuContent({
   task,
   taskCardContext,
   onDeleteClick,
+  onMoveToAppointments,
 }: TaskCardContextMenuContentProps) {
   const { t } = useTranslation();
   const { project } = useProjectStore();
@@ -320,6 +323,22 @@ export default function TaskCardContextMenuContent({
                   <span>{t("tasks:actions.markAsPlanned")}</span>
                 </ContextMenuItem>
               )}
+            </>
+          )}
+
+          {onMoveToAppointments && (
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTimeout(() => {
+                    onMoveToAppointments(task);
+                  }, 0);
+                }}
+              >
+                <span>{t("appointments:moveFromBacklog")}</span>
+              </ContextMenuItem>
             </>
           )}
 

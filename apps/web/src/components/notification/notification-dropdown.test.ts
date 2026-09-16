@@ -18,6 +18,15 @@ const t = (key: string, options?: Record<string, unknown>) => {
   if (key === "notifications:events.task_comment.content") {
     return `New comment on ${options?.taskTitle}: ${options?.commentPreview}`;
   }
+  if (key === "notifications:events.appointment_created.content") {
+    return `You were assigned to the appointment: ${options?.appointmentTitle}`;
+  }
+  if (key === "notifications:events.appointment_updated.contentAssignee") {
+    return `You were assigned to the appointment: ${options?.appointmentTitle}`;
+  }
+  if (key === "notifications:events.appointment_updated.contentRescheduled") {
+    return `The appointment "${options?.appointmentTitle}" was rescheduled.`;
+  }
   return key;
 };
 
@@ -63,6 +72,41 @@ describe("notification display content", () => {
     expect(getNotificationTitle(item, t)).toBe("Mina commented on your task");
     expect(getNotificationContent(item, t)).toBe(
       "New comment on Launch website: Ready for review",
+    );
+  });
+
+  it("renders appointment assignment notifications", () => {
+    const item = notification("appointment_created", {
+      appointmentTitle: "Weekly sync",
+    });
+
+    expect(getNotificationTitle(item, t)).toBe(
+      "notifications:events.appointment_created.title",
+    );
+    expect(getNotificationContent(item, t)).toBe(
+      "You were assigned to the appointment: Weekly sync",
+    );
+  });
+
+  it("distinguishes appointment reschedules from reassignments", () => {
+    const rescheduled = notification("appointment_updated", {
+      appointmentTitle: "Weekly sync",
+      changeType: "rescheduled",
+    });
+
+    expect(getNotificationTitle(rescheduled, t)).toBe(
+      "notifications:events.appointment_updated.title",
+    );
+    expect(getNotificationContent(rescheduled, t)).toBe(
+      'The appointment "Weekly sync" was rescheduled.',
+    );
+
+    const reassigned = notification("appointment_updated", {
+      appointmentTitle: "Weekly sync",
+      changeType: "assignee",
+    });
+    expect(getNotificationContent(reassigned, t)).toBe(
+      "You were assigned to the appointment: Weekly sync",
     );
   });
 });

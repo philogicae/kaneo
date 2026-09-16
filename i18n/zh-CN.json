@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "加入工作区失败",
+				"load": "无法加载邀请链接详情。"
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "邀请链接错误",
+			"invalidTitle": "无效的邀请链接",
+			"joinPrompt": "你有加入 <workspaceName>{{workspaceName}}</workspaceName> 的邀请链接。",
+			"linkExpired": "邀请链接已过期",
+			"loading": "正在加载邀请链接...",
+			"pageTitleAccept": "加入工作区",
+			"pageTitleError": "邀请链接错误",
+			"pageTitleInvalid": "无效的邀请链接",
+			"signedInAs": "已登录为 <email>{{email}}</email>",
+			"signedOutPrompt": "创建账号或登录以加入工作区。",
+			"title": "加入工作区！"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "工作区",
 				"comment": "评论",
 				"activity": "活动",
-				"fallback": "结果"
+				"fallback": "结果",
+				"appointment": "日程"
 			}
 		},
 		"settingsLayout": {
@@ -666,6 +667,15 @@
 				"title": "已开始计时",
 				"contentWithTask": "已开始为任务 {{taskTitle}} 计时",
 				"contentWithoutTask": "已开始为某个任务计时"
+			},
+			"appointment_created": {
+				"title": "已为你分配预约",
+				"content": "已为你分配预约：{{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "预约已更新",
+				"contentAssignee": "已为你分配预约：{{appointmentTitle}}",
+				"contentRescheduled": "预约“{{appointmentTitle}}”已重新安排。"
 			}
 		}
 	},
@@ -788,27 +798,27 @@
 			"add": "添加"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "添加",
+			"createError": "创建自定义字段失败。",
+			"createSuccess": "自定义字段已创建。",
+			"defaultLabel": "默认",
+			"defaultValuePlaceholder": "默认值",
+			"deleteButton": "删除",
+			"deleteError": "删除自定义字段失败。",
+			"deleteSuccess": "自定义字段已删除。",
+			"empty": "尚未配置自定义字段。",
+			"loading": "正在加载自定义字段...",
+			"namePlaceholder": "字段名称",
+			"noOptionsPlaceholder": "无选项",
+			"optionsPlaceholder": "选项用逗号分隔",
+			"required": "必填",
+			"typePlaceholder": "选择字段类型",
 			"types": {
-				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"boolean": "布尔值",
+				"date": "日期",
+				"dropdown": "下拉列表",
+				"number": "数字",
+				"text": "文本"
 			}
 		},
 		"developer": "开发者",
@@ -1130,22 +1140,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "先创建 API 密钥，然后用它替换 <YOUR_API_KEY> 占位符。",
+			"authModeApiKey": "API 密钥",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "选择认证方式，然后运行安装命令或将配置粘贴到你的代理中。",
+			"cardTitle": "连接代理",
+			"copied": "已复制",
+			"copy": "复制",
+			"createApiKey": "创建 API 密钥",
+			"followUpLabel": "然后进行认证",
+			"installCommandLabel": "安装命令",
+			"manualConfigLabel": "手动配置",
+			"oauthNote": "OAuth 是默认方式：首次连接会在浏览器中打开 Kaneo 以授权代理，之后令牌由代理自身管理。",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "此实例内置的 HTTP MCP 端点",
+			"serverUrlLabel": "服务器 URL",
+			"subtitle": "通过内置的 HTTP MCP 服务器，将 Claude、Codex、Gemini 或 OpenCode 等 AI 代理连接到此 Kaneo 实例。",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "通知",
@@ -1365,8 +1375,8 @@
 			"columnsDescription": "管理看板上显示的列，可拖拽排序。打开“完成列”以表示已完成阶段。",
 			"automationTitle": "自动化规则",
 			"automationDescription": "将集成事件映射到列。当事件发生时，关联的任务会移动到指定的列。",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "管理此项目的自定义字段。拖动以重新排序。",
+			"customFieldsTitle": "自定义字段"
 		},
 		"repositoryBrowser": {
 			"title": "选择仓库",
@@ -1483,7 +1493,9 @@
 				"taskPriorityChanged": "优先级变更",
 				"taskTitleChanged": "标题变更",
 				"taskDescriptionChanged": "描述变更",
-				"taskCommentCreated": "新评论"
+				"taskCommentCreated": "新评论",
+				"appointmentCreated": "新预约",
+				"appointmentUpdated": "预约变更"
 			},
 			"connect": "连接 Telegram",
 			"saveChanges": "保存更改",
@@ -1540,7 +1552,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "检测到的主题",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1770,6 +1782,25 @@
 				"title": "删除角色",
 				"description": "这将永久删除角色 \"{{role}}\"，分配给该角色的成员将失去其权限。"
 			}
+		},
+		"skills": "技能",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "在 Kaneo 检出的根目录运行这些命令，然后重启你的代理。",
+			"cardTitle": "安装 Kaneo 技能",
+			"copied": "已复制",
+			"copy": "复制",
+			"destinationLabel": "目标位置",
+			"installCommandLabel": "安装命令",
+			"mcpRequirement": "该技能依赖 MCP 连接：请先完成配置。",
+			"openMcpSettings": "打开 MCP 设置",
+			"pageTitle": "技能",
+			"projectScope": "项目",
+			"subtitle": "安装 Kaneo 技能，让 AI 代理遵循此实例的约定并正确使用 MCP 工具。",
+			"title": "代理技能",
+			"updateDescription": "技能从磁盘读取：更新 Kaneo 后请重新复制文件夹以应用更改。",
+			"userScope": "用户",
+			"verifyLabel": "验证"
 		}
 	},
 	"tasks": {
@@ -1830,8 +1861,8 @@
 				"isAnyOf": "为以下任一",
 				"includeAnyOf": "包含以下任一"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "全部",
+			"noValuesUsedYet": "尚未使用任何值"
 		},
 		"boardSearchPlaceholder": "搜索工单…",
 		"bulk": {
@@ -1884,7 +1915,7 @@
 			"loadingTask": "正在加载任务…",
 			"taskNotFound": "未找到任务",
 			"taskNotFoundDescription": "你查找的任务不存在或已删除。",
-			"customFields": "Custom Fields"
+			"customFields": "自定义字段"
 		},
 		"contextMenu": {
 			"copyLink": "复制链接",
@@ -1900,7 +1931,7 @@
 		"detail": {
 			"activity": "活动",
 			"addDescription": "添加描述…",
-			"customFieldUpdated": "Field updated",
+			"customFieldUpdated": "字段已更新",
 			"editor": {
 				"ariaLabel": "任务描述编辑器",
 				"attachFile": "附加文件",
@@ -2001,7 +2032,7 @@
 			},
 			"noActivity": "暂无活动",
 			"openInFullPage": "在新页面打开",
-			"selectOption": "Select option",
+			"selectOption": "选择选项",
 			"subtaskOf": "子任务属于",
 			"titlePlaceholder": "点击添加标题"
 		},
@@ -2180,7 +2211,7 @@
 			"unitDay_other": "days",
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "分钟",
 			"unitWeek_other": "weeks",
 			"weeksBefore_other": "{{count}} weeks before"
 		},
@@ -2234,7 +2265,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "标签",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2294,30 +2325,30 @@
 			"roleUpdateError": "更新角色失败"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "无法自动复制。请选择链接并按 Ctrl+C。",
+			"copyIconAria": "复制邀请链接",
+			"create": "创建链接",
+			"createError": "创建邀请链接失败",
+			"createSuccess": "邀请链接已创建",
+			"deleteError": "撤销邀请链接失败",
+			"deleteSuccess": "邀请链接已撤销",
+			"description": "任何拥有链接的人都可以作为成员加入此工作区——无需电子邮件。",
+			"empty": "尚无可分享的邀请链接。",
+			"expiry24h": "24 小时",
+			"expiry30d": "30 天",
+			"expiry7d": "7 天",
+			"expiryLabel": "有效期",
+			"expiryNever": "永不过期",
+			"join": "加入 {{workspaceName}}",
+			"linkCopied": "邀请链接已复制",
+			"maxUsesLabel": "最大使用次数",
+			"maxUsesUnlimited": "无限制",
+			"never": "永不过期",
+			"revokeIconAria": "撤销邀请链接",
+			"title": "可分享的邀请链接",
+			"uses": "已使用 {{used}}/{{max}} 次",
+			"workspace": "工作区：{{workspaceName}}",
+			"usesUnlimited": "已使用 {{used}} 次"
 		}
 	},
 	"unified": {
@@ -2343,9 +2374,28 @@
 			"tasks": "任务"
 		},
 		"charts": {
-			"backlog": "待办积压",
+			"backlog": "待办列表",
 			"empty": "最近 6 个月内没有任务动态。",
-			"tasks": "任务"
+			"tasks": "任务",
+			"byProject": "按项目",
+			"completed": "已完成",
+			"created": "已创建",
+			"noTasks": "没有可分配的任务。",
+			"other": "其他",
+			"period": "周期",
+			"periodSummary": "已创建 {{created}} · 已完成 {{completed}}",
+			"perWeek": "{{value}}/周",
+			"range_other": "{{count}} 个月",
+			"statusDescription": "所有项目的任务目前所处的位置。",
+			"statusTitle": "状态分布",
+			"unassigned": "未分配",
+			"velocity4w": "速度（4 周）",
+			"velocityDescription": "所有项目每周创建和完成的任务。",
+			"velocityTitle": "速度",
+			"workloadDescription": "所有项目中每位负责人的未完成看板任务。",
+			"workloadEmpty": "没有已分配的未完成工作。",
+			"workloadTitle": "工作量",
+			"range_one": "{{count}} 个月"
 		},
 		"tabs": {
 			"charts": "图表",
@@ -2412,5 +2462,45 @@
 			"success": "工作区创建成功",
 			"error": "工作区创建失败"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "已分配",
+			"create": "创建",
+			"createTitle": "新建日程",
+			"delete": "删除",
+			"description": "日程像任务一样安排，但绝不会出现在看板或待办列表中。",
+			"descriptionLabel": "描述",
+			"editTitle": "编辑日程",
+			"endLabel": "结束",
+			"priorityLabel": "优先级",
+			"rangeError": "结束时间必须晚于开始时间。",
+			"save": "保存",
+			"startLabel": "开始",
+			"titleLabel": "标题",
+			"titlePlaceholder": "例如：设计评审",
+			"unassigned": "未分配"
+		},
+		"empty": {
+			"description": "日程显示在这里，不在看板或待办列表中。",
+			"title": "暂无日程"
+		},
+		"loadError": "无法加载日程。",
+		"moveFromBacklog": "移至日程",
+		"newAppointment": "新建日程",
+		"nextWeek": "下一周",
+		"pageTitle": "日程 · {{name}}",
+		"previousWeek": "上一周",
+		"tab": "日程",
+		"toast": {
+			"created": "日程已创建",
+			"deleted": "日程已删除",
+			"error": "出错了",
+			"moved": "已移至日程",
+			"updated": "日程已更新"
+		},
+		"today": "今天",
+		"weekHint": "点击空白时段添加日程；点击日程进行编辑。",
+		"unscheduled": "未安排"
 	}
 }

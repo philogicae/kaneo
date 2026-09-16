@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import db from "../../database";
 import {
+  appointmentTable,
   projectTable,
   taskTable,
   userTable,
@@ -33,6 +34,8 @@ type TelegramEventData = {
   actorName: string | null;
   status: string | null;
   priority: string | null;
+  /** Distinguishes appointment messages from task updates in the header. */
+  kind?: "task" | "appointment";
 };
 
 function isEnabled(config: TelegramConfig, key: TelegramEventKey): boolean {
@@ -123,6 +126,26 @@ function getProjectUrl(
   }
 }
 
+function getAppointmentUrl(
+  clientUrl: string | undefined,
+  workspaceId: string,
+  projectId: string,
+): string | null {
+  const normalizedClientUrl = clientUrl?.trim();
+  if (!normalizedClientUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(
+      `/dashboard/workspace/${workspaceId}/project/${projectId}/appointments`,
+      normalizedClientUrl,
+    ).toString();
+  } catch {
+    return null;
+  }
+}
+
 async function getTelegramEventData(
   taskId: string,
   projectId: string,
@@ -179,6 +202,71 @@ async function getTelegramEventData(
   };
 }
 
+// Appointments render with the same compact format as tasks; the link points
+// at the project's Appointments view instead of a task page.
+export async function getAppointmentTelegramEventData(
+  appointmentId: string,
+  projectId: string,
+  userId: string | null,
+): Promise<TelegramEventData | null> {
+  const appointmentPromise = db
+    .select({
+      title: appointmentTable.title,
+      number: appointmentTable.number,
+      priority: appointmentTable.priority,
+      projectName: projectTable.name,
+      projectId: projectTable.id,
+      workspaceId: workspaceTable.id,
+    })
+    .from(appointmentTable)
+    .innerJoin(projectTable, eq(appointmentTable.projectId, projectTable.id))
+    .innerJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
+    .where(
+      and(
+        eq(appointmentTable.id, appointmentId),
+        eq(projectTable.id, projectId),
+      ),
+    )
+    .limit(1);
+
+  const userPromise = userId
+    ? db
+        .select({ name: userTable.name })
+        .from(userTable)
+        .where(eq(userTable.id, userId))
+        .limit(1)
+    : Promise.resolve([]);
+
+  const [[appointmentRow], [user]] = await Promise.all([
+    appointmentPromise,
+    userPromise,
+  ]);
+
+  if (!appointmentRow) {
+    return null;
+  }
+
+  return {
+    taskTitle: appointmentRow.title,
+    taskNumber: appointmentRow.number,
+    projectName: appointmentRow.projectName,
+    taskUrl: getAppointmentUrl(
+      process.env.KANEO_CLIENT_URL,
+      appointmentRow.workspaceId,
+      appointmentRow.projectId,
+    ),
+    projectUrl: getProjectUrl(
+      process.env.KANEO_CLIENT_URL,
+      appointmentRow.workspaceId,
+      appointmentRow.projectId,
+    ),
+    actorName: user?.name ?? null,
+    status: "appointment",
+    priority: appointmentRow.priority,
+    kind: "appointment",
+  };
+}
+
 // Status values are column slugs; custom columns fall back to a generic icon.
 const STATUS_ICONS: Record<string, string> = {
   "to-do": "📋",
@@ -187,6 +275,7 @@ const STATUS_ICONS: Record<string, string> = {
   done: "✅",
   archived: "🗄️",
   planned: "📥",
+  appointment: "📅",
 };
 
 const STATUS_ICON_FALLBACK = "📌";
@@ -221,7 +310,11 @@ async function sendTelegramMessage(
   data: TelegramEventData,
 ): Promise<void> {
   const issueKey =
-    data.taskNumber !== null ? `#${data.taskNumber}` : "Task update";
+    data.taskNumber !== null
+      ? `#${data.taskNumber}`
+      : data.kind === "appointment"
+        ? "Appointment"
+        : "Task update";
   const taskLabel = `${issueKey} ${data.taskTitle}`;
   const escapedTaskLabel = escapeHtml(taskLabel);
   const taskLine = data.taskUrl
@@ -269,7 +362,10 @@ export type TelegramActionInput =
   | { kind: "priorityChanged"; oldPriority: string | null; newPriority: string }
   | { kind: "titleChanged"; oldTitle: string; newTitle: string }
   | { kind: "descriptionChanged"; newDescription: string | null }
-  | { kind: "commentCreated"; comment: string };
+  | { kind: "commentCreated"; comment: string }
+  | { kind: "appointmentCreated" }
+  | { kind: "appointmentRescheduled" }
+  | { kind: "appointmentReassigned" };
 
 export function buildTelegramAction(input: TelegramActionInput): string {
   switch (input.kind) {
@@ -298,6 +394,12 @@ export function buildTelegramAction(input: TelegramActionInput): string {
       );
       return `Comment: ${truncate(content.replace(/\s+/g, " "), 100)}`;
     }
+    case "appointmentCreated":
+      return "Appointment created";
+    case "appointmentRescheduled":
+      return "Appointment rescheduled";
+    case "appointmentReassigned":
+      return "Appointment reassigned";
   }
 }
 

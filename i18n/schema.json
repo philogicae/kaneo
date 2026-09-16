@@ -2146,6 +2146,9 @@
 				"mcp": {
 					"type": "string"
 				},
+				"skills": {
+					"type": "string"
+				},
 				"telegramUnified": {
 					"type": "object",
 					"additionalProperties": false,
@@ -2491,6 +2494,78 @@
 						"followUpLabel",
 						"copy",
 						"copied"
+					]
+				},
+				"skillsPage": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"cardTitle": {
+							"type": "string"
+						},
+						"cardDescription": {
+							"type": "string"
+						},
+						"mcpRequirement": {
+							"type": "string"
+						},
+						"openMcpSettings": {
+							"type": "string"
+						},
+						"destinationLabel": {
+							"type": "string"
+						},
+						"userScope": {
+							"type": "string"
+						},
+						"projectScope": {
+							"type": "string"
+						},
+						"adminScope": {
+							"type": "string"
+						},
+						"installCommandLabel": {
+							"type": "string"
+						},
+						"verifyLabel": {
+							"type": "string"
+						},
+						"copy": {
+							"type": "string"
+						},
+						"copied": {
+							"type": "string"
+						},
+						"updateDescription": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"pageTitle",
+						"title",
+						"subtitle",
+						"cardTitle",
+						"cardDescription",
+						"mcpRequirement",
+						"openMcpSettings",
+						"destinationLabel",
+						"userScope",
+						"projectScope",
+						"adminScope",
+						"installCommandLabel",
+						"verifyLabel",
+						"copy",
+						"copied",
+						"updateDescription"
 					]
 				},
 				"apiKey": {
@@ -5732,8 +5807,10 @@
 				"preferencesPage",
 				"developerPage",
 				"mcp",
+				"skills",
 				"telegramUnified",
 				"mcpPage",
+				"skillsPage",
 				"apiKey",
 				"workspaceGeneral",
 				"workspaceRoles",
@@ -5959,6 +6036,9 @@
 								"task": {
 									"type": "string"
 								},
+								"appointment": {
+									"type": "string"
+								},
 								"project": {
 									"type": "string"
 								},
@@ -5977,6 +6057,7 @@
 							},
 							"required": [
 								"task",
+								"appointment",
 								"project",
 								"workspace",
 								"comment",
@@ -9341,11 +9422,101 @@
 						"backlog": {
 							"type": "string"
 						},
+						"created": {
+							"type": "string"
+						},
+						"completed": {
+							"type": "string"
+						},
 						"empty": {
+							"type": "string"
+						},
+						"noTasks": {
+							"type": "string"
+						},
+						"workloadEmpty": {
+							"type": "string"
+						},
+						"unassigned": {
+							"type": "string"
+						},
+						"other": {
+							"type": "string"
+						},
+						"period": {
+							"type": "string"
+						},
+						"range_one": {
+							"type": "string"
+						},
+						"range_zero": {
+							"type": "string"
+						},
+						"range_two": {
+							"type": "string"
+						},
+						"range_few": {
+							"type": "string"
+						},
+						"range_many": {
+							"type": "string"
+						},
+						"range_other": {
+							"type": "string"
+						},
+						"periodSummary": {
+							"type": "string"
+						},
+						"velocityTitle": {
+							"type": "string"
+						},
+						"velocityDescription": {
+							"type": "string"
+						},
+						"velocity4w": {
+							"type": "string"
+						},
+						"perWeek": {
+							"type": "string"
+						},
+						"workloadTitle": {
+							"type": "string"
+						},
+						"workloadDescription": {
+							"type": "string"
+						},
+						"statusTitle": {
+							"type": "string"
+						},
+						"statusDescription": {
+							"type": "string"
+						},
+						"byProject": {
 							"type": "string"
 						}
 					},
-					"required": ["tasks", "backlog", "empty"]
+					"required": [
+						"tasks",
+						"backlog",
+						"created",
+						"completed",
+						"empty",
+						"noTasks",
+						"workloadEmpty",
+						"unassigned",
+						"other",
+						"period",
+						"periodSummary",
+						"velocityTitle",
+						"velocityDescription",
+						"velocity4w",
+						"perWeek",
+						"workloadTitle",
+						"workloadDescription",
+						"statusTitle",
+						"statusDescription",
+						"byProject"
+					]
 				},
 				"consolidated": {
 					"type": "object",
@@ -10168,6 +10339,160 @@
 				"copyUrl",
 				"branding"
 			]
+		},
+		"appointments": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"tab": {
+					"type": "string"
+				},
+				"pageTitle": {
+					"type": "string"
+				},
+				"previousWeek": {
+					"type": "string"
+				},
+				"nextWeek": {
+					"type": "string"
+				},
+				"today": {
+					"type": "string"
+				},
+				"newAppointment": {
+					"type": "string"
+				},
+				"weekHint": {
+					"type": "string"
+				},
+				"loadError": {
+					"type": "string"
+				},
+				"moveFromBacklog": {
+					"type": "string"
+				},
+				"empty": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						}
+					},
+					"required": ["title", "description"]
+				},
+				"dialog": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"createTitle": {
+							"type": "string"
+						},
+						"editTitle": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"titleLabel": {
+							"type": "string"
+						},
+						"titlePlaceholder": {
+							"type": "string"
+						},
+						"descriptionLabel": {
+							"type": "string"
+						},
+						"startLabel": {
+							"type": "string"
+						},
+						"endLabel": {
+							"type": "string"
+						},
+						"priorityLabel": {
+							"type": "string"
+						},
+						"assigneeLabel": {
+							"type": "string"
+						},
+						"unassigned": {
+							"type": "string"
+						},
+						"rangeError": {
+							"type": "string"
+						},
+						"create": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"delete": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"createTitle",
+						"editTitle",
+						"description",
+						"titleLabel",
+						"titlePlaceholder",
+						"descriptionLabel",
+						"startLabel",
+						"endLabel",
+						"priorityLabel",
+						"assigneeLabel",
+						"unassigned",
+						"rangeError",
+						"create",
+						"save",
+						"delete"
+					]
+				},
+				"toast": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"created": {
+							"type": "string"
+						},
+						"updated": {
+							"type": "string"
+						},
+						"deleted": {
+							"type": "string"
+						},
+						"moved": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						}
+					},
+					"required": ["created", "updated", "deleted", "moved", "error"]
+				},
+				"unscheduled": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"tab",
+				"pageTitle",
+				"previousWeek",
+				"nextWeek",
+				"today",
+				"newAppointment",
+				"weekHint",
+				"loadError",
+				"moveFromBacklog",
+				"empty",
+				"dialog",
+				"toast",
+				"unscheduled"
+			]
 		}
 	},
 	"required": [
@@ -10182,6 +10507,7 @@
 		"unified",
 		"workspace",
 		"team",
-		"publicProject"
+		"publicProject",
+		"appointments"
 	]
 }

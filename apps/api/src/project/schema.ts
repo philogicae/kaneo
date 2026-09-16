@@ -12,6 +12,12 @@ export const getProjectTasksQuery = z.object({
     .openapi({ description: "Number of tasks to skip; use with tasksLimit." }),
 });
 
+export const projectChartsQuery = z.object({
+  months: pagingNumber(1, 24).optional().openapi({
+    description: "Months of weekly buckets to return (default 6, max 24).",
+  }),
+});
+
 export const workspaceIdQuery = z.object({ workspaceId: z.string() });
 
 export const listProjectsQuery = z.object({

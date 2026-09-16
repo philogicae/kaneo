@@ -2,6 +2,7 @@ import { and, desc, eq, inArray, like, or, sql } from "drizzle-orm";
 import db from "../../database";
 import {
   activityTable,
+  appointmentTable,
   projectTable,
   taskTable,
   userTable,
@@ -18,6 +19,7 @@ type SearchParams = {
   type?:
     | "all"
     | "tasks"
+    | "appointments"
     | "projects"
     | "workspaces"
     | "comments"
@@ -29,7 +31,13 @@ type SearchParams = {
 
 type SearchResult = {
   id: string;
-  type: "task" | "project" | "workspace" | "comment" | "activity";
+  type:
+    | "task"
+    | "appointment"
+    | "project"
+    | "workspace"
+    | "comment"
+    | "activity";
   title: string;
   description?: string;
   content?: string;
@@ -296,6 +304,71 @@ async function globalSearch(params: SearchParams): Promise<{
         taskNumber: task.taskNumber || undefined,
         priority: task.priority || undefined,
         status: task.status,
+      });
+    }
+  }
+
+  if (type === "all" || type === "appointments") {
+    const appointmentRelevanceScore = sql<number>`
+      CASE
+        WHEN LOWER(${appointmentTable.title}) LIKE ${searchPattern} THEN 3
+        WHEN LOWER(${appointmentTable.description}) LIKE ${searchPattern} THEN 2
+        ELSE 1
+      END
+    `;
+
+    const appointments = await db
+      .select({
+        id: appointmentTable.id,
+        title: appointmentTable.title,
+        description: appointmentTable.description,
+        projectId: appointmentTable.projectId,
+        projectName: projectTable.name,
+        projectSlug: projectTable.slug,
+        workspaceId: projectTable.workspaceId,
+        workspaceName: workspaceTable.name,
+        userId: appointmentTable.userId,
+        userName: userTable.name,
+        createdAt: appointmentTable.createdAt,
+        priority: appointmentTable.priority,
+        relevanceScore: appointmentRelevanceScore.as("relevanceScore"),
+      })
+      .from(appointmentTable)
+      .leftJoin(projectTable, eq(appointmentTable.projectId, projectTable.id))
+      .leftJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
+      .leftJoin(userTable, eq(appointmentTable.userId, userTable.id))
+      .where(
+        and(
+          workspaceFilter,
+          projectId ? eq(appointmentTable.projectId, projectId) : undefined,
+          or(
+            like(appointmentTable.title, searchPattern),
+            like(appointmentTable.description, searchPattern),
+          ),
+        ),
+      )
+      .orderBy(
+        desc(appointmentRelevanceScore),
+        desc(appointmentTable.createdAt),
+      )
+      .limit(limit);
+
+    for (const appointment of appointments) {
+      results.push({
+        id: appointment.id,
+        type: "appointment",
+        title: appointment.title,
+        description: appointment.description || undefined,
+        projectId: appointment.projectId,
+        projectName: appointment.projectName || undefined,
+        projectSlug: appointment.projectSlug || undefined,
+        workspaceId: appointment.workspaceId || undefined,
+        workspaceName: appointment.workspaceName || undefined,
+        userId: appointment.userId || undefined,
+        userName: appointment.userName || undefined,
+        createdAt: appointment.createdAt,
+        relevanceScore: appointment.relevanceScore,
+        priority: appointment.priority || undefined,
       });
     }
   }

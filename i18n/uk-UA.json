@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Не вдалося приєднатися до робочого простору",
+				"load": "Не вдалося завантажити відомості про посилання-запрошення."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Помилка посилання-запрошення",
+			"invalidTitle": "Недійсне посилання-запрошення",
+			"joinPrompt": "У вас є посилання-запрошення до <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Термін дії посилання-запрошення минув",
+			"loading": "Завантаження посилання-запрошення...",
+			"pageTitleAccept": "Приєднатися до робочого простору",
+			"pageTitleError": "Помилка посилання-запрошення",
+			"pageTitleInvalid": "Недійсне посилання-запрошення",
+			"signedInAs": "Ви увійшли як <email>{{email}}</email>",
+			"signedOutPrompt": "Створіть обліковий запис або увійдіть, щоб приєднатися до робочого простору.",
+			"title": "Приєднуйтеся до робочого простору!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Робочі простори",
 				"comment": "Коментарі",
 				"activity": "Активність",
-				"fallback": "Результати"
+				"fallback": "Результати",
+				"appointment": "Зустрічі"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Завдання прострочено",
 				"content": "Дата завершення {{taskTitle}} вже минула"
+			},
+			"appointment_created": {
+				"title": "Вам призначено зустріч",
+				"content": "Вам призначено зустріч: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Зустріч оновлено",
+				"contentAssignee": "Вам призначено зустріч: {{appointmentTitle}}",
+				"contentRescheduled": "Зустріч \"{{appointmentTitle}}\" перенесено."
 			}
 		},
 		"reminderLeadTime": {
@@ -797,27 +807,27 @@
 			"add": "Додати"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Додати",
+			"createError": "Не вдалося створити користувацьке поле.",
+			"createSuccess": "Користувацьке поле створено.",
+			"defaultLabel": "За замовчуванням",
+			"defaultValuePlaceholder": "Значення за замовчуванням",
+			"deleteButton": "Видалити",
+			"deleteError": "Не вдалося видалити користувацьке поле.",
+			"deleteSuccess": "Користувацьке поле видалено.",
+			"empty": "Користувацькі поля ще не налаштовані.",
+			"loading": "Завантаження користувацьких полів...",
+			"namePlaceholder": "Назва поля",
+			"noOptionsPlaceholder": "Немає варіантів",
+			"optionsPlaceholder": "Варіанти через кому",
+			"required": "Обов'язкове",
+			"typePlaceholder": "Виберіть тип поля",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"date": "Дата",
+				"dropdown": "Випадний список",
+				"number": "Число",
+				"text": "Текст"
 			}
 		},
 		"developer": "Розробник",
@@ -1139,22 +1149,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Спочатку створіть ключ API, потім замініть ним заповнювач <YOUR_API_KEY>.",
+			"authModeApiKey": "Ключ API",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Виберіть спосіб автентифікації, потім виконайте команду встановлення або вставте конфігурацію у вашого агента.",
+			"cardTitle": "Підключити агента",
+			"copied": "Скопійовано",
+			"copy": "Копіювати",
+			"createApiKey": "Створити ключ API",
+			"followUpLabel": "Потім автентифікуйтеся",
+			"installCommandLabel": "Команда встановлення",
+			"manualConfigLabel": "Ручна конфігурація",
+			"oauthNote": "OAuth типово: перше підключення відкриває Kaneo у браузері для авторизації агента, після чого токеном керує сам агент.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "вбудований HTTP MCP-ендпоінт цього екземпляра",
+			"serverUrlLabel": "URL сервера",
+			"subtitle": "Підключіть ШІ-агентів, як-от Claude, Codex, Gemini чи OpenCode, до цього екземпляра Kaneo через вбудований HTTP MCP-сервер.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Сповіщення",
@@ -1374,8 +1384,8 @@
 			"columnsDescription": "Керуйте колонками, які відображаються на вашій дошці. Перетягуйте для зміни порядку. Увімкніть «Колонка готовності» для етапів, які означають завершену роботу.",
 			"automationTitle": "Правила автоматизації",
 			"automationDescription": "Зіставте події інтеґрацій із колонками. Коли подія відбувається, пов'язане завдання переміщується до вказаної колонки.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Керуйте користувацькими полями цього проєкту. Перетягніть для зміни порядку.",
+			"customFieldsTitle": "Користувацькі поля"
 		},
 		"repositoryBrowser": {
 			"title": "Обрати репозиторій",
@@ -1492,7 +1502,9 @@
 				"taskPriorityChanged": "Зміни пріоритету",
 				"taskTitleChanged": "Зміни назви",
 				"taskDescriptionChanged": "Зміни опису",
-				"taskCommentCreated": "Нові коментарі"
+				"taskCommentCreated": "Нові коментарі",
+				"appointmentCreated": "Нові зустрічі",
+				"appointmentUpdated": "Зміни зустрічей"
 			},
 			"connect": "Підключити Telegram",
 			"saveChanges": "Зберегти зміни",
@@ -1552,7 +1564,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Виявлені теми",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1785,6 +1797,25 @@
 				"title": "Видалити роль",
 				"description": "Це назавжди видалить роль «{{role}}». Учасники з цією роллю втратять її дозволи."
 			}
+		},
+		"skills": "Навички",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Виконайте ці команди з кореня репозиторію Kaneo, потім перезапустіть агента.",
+			"cardTitle": "Встановити навичку Kaneo",
+			"copied": "Скопійовано",
+			"copy": "Копіювати",
+			"destinationLabel": "Призначення",
+			"installCommandLabel": "Команда встановлення",
+			"mcpRequirement": "Навичка спирається на підключення MCP: спочатку налаштуйте його.",
+			"openMcpSettings": "Відкрити налаштування MCP",
+			"pageTitle": "Навички",
+			"projectScope": "проєкт",
+			"subtitle": "Встановіть навичку Kaneo, щоб ШІ-агенти дотримувалися конвенцій цього екземпляра та правильно використовували інструменти MCP.",
+			"title": "Навички агентів",
+			"updateDescription": "Навички читаються з диска: після оновлення Kaneo скопіюйте теку знову, щоб застосувати зміни.",
+			"userScope": "користувач",
+			"verifyLabel": "Перевірити"
 		}
 	},
 	"tasks": {
@@ -1845,8 +1876,8 @@
 				"isAnyOf": "є будь-яким з",
 				"includeAnyOf": "включає будь-який з"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Усі",
+			"noValuesUsedYet": "Значення ще не використовувалися"
 		},
 		"boardSearchPlaceholder": "Пошук тікетів...",
 		"bulk": {
@@ -1899,7 +1930,7 @@
 			"loadingTask": "Завантаження завдання...",
 			"taskNotFound": "Завдання не знайдено",
 			"taskNotFoundDescription": "Завдання, яке ви шукаєте, не існує або було видалено.",
-			"customFields": "Custom Fields"
+			"customFields": "Користувацькі поля"
 		},
 		"contextMenu": {
 			"copyLink": "Копіювати посилання",
@@ -2017,8 +2048,8 @@
 					"renderFailed": "Не вдалося відобразити діаграму Mermaid"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Поле оновлено",
+			"selectOption": "Вибрати варіант"
 		},
 		"dueDate": {
 			"label": "Дата завершення",
@@ -2225,7 +2256,7 @@
 			"unitMinute_few": "minutes",
 			"unitMinute_many": "minutes",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "хвилини",
 			"unitWeek_few": "weeks",
 			"unitWeek_many": "weeks",
 			"unitWeek_one": "week",
@@ -2285,7 +2316,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Мітки",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2345,30 +2376,30 @@
 			"roleUpdateError": "Не вдалося оновити роль"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Не вдалося скопіювати автоматично. Виберіть посилання та натисніть Ctrl+C.",
+			"copyIconAria": "Копіювати посилання-запрошення",
+			"create": "Створити посилання",
+			"createError": "Не вдалося створити посилання-запрошення",
+			"createSuccess": "Посилання-запрошення створено",
+			"deleteError": "Не вдалося відкликати посилання-запрошення",
+			"deleteSuccess": "Посилання-запрошення відкликано",
+			"description": "Будь-хто з посиланням може приєднатися до цього робочого простору як учасник — пошта не потрібна.",
+			"empty": "Ще немає спільних посилань-запрошень.",
+			"expiry24h": "24 години",
+			"expiry30d": "30 днів",
+			"expiry7d": "7 днів",
+			"expiryLabel": "Термін дії",
+			"expiryNever": "Ніколи не спливає",
+			"join": "Приєднатися до {{workspaceName}}",
+			"linkCopied": "Посилання-запрошення скопійовано",
+			"maxUsesLabel": "Макс. використань",
+			"maxUsesUnlimited": "Без обмежень",
+			"never": "Ніколи не спливає",
+			"revokeIconAria": "Відкликати посилання-запрошення",
+			"title": "Спільні посилання-запрошення",
+			"uses": "{{used}}/{{max}} використань",
+			"workspace": "Робочий простір: {{workspaceName}}",
+			"usesUnlimited": "{{used}} використань"
 		}
 	},
 	"unified": {
@@ -2399,7 +2430,28 @@
 		"charts": {
 			"backlog": "Беклог",
 			"empty": "Немає активності завдань за останні 6 місяців.",
-			"tasks": "Завдання"
+			"tasks": "Завдання",
+			"byProject": "За проєктом",
+			"completed": "Завершено",
+			"created": "Створено",
+			"noTasks": "Немає завдань для розподілу.",
+			"other": "Інше",
+			"period": "Період",
+			"periodSummary": "{{created}} створено · {{completed}} завершено",
+			"perWeek": "{{value}}/тиждень",
+			"range_few": "{{count}} months",
+			"range_many": "{{count}} months",
+			"range_one": "{{count}} місяць",
+			"range_other": "{{count}} місяців",
+			"statusDescription": "Де зараз перебувають завдання всіх проєктів.",
+			"statusTitle": "Розподіл за статусами",
+			"unassigned": "Не призначено",
+			"velocity4w": "Швидкість (4 тижні)",
+			"velocityDescription": "Завдання, створені та завершені за тиждень, за всіма проєктами.",
+			"velocityTitle": "Швидкість",
+			"workloadDescription": "Відкриті завдання дошки за виконавцями, за всіма проєктами.",
+			"workloadEmpty": "Відкриту роботу не призначено.",
+			"workloadTitle": "Навантаження"
 		},
 		"tabs": {
 			"charts": "Графіки",
@@ -2475,5 +2527,45 @@
 			"success": "Робочий простір успішно створено",
 			"error": "Не вдалося створити робочий простір"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Призначено",
+			"create": "Створити",
+			"createTitle": "Нова зустріч",
+			"delete": "Видалити",
+			"description": "Зустрічі плануються як завдання, але ніколи не з'являються на дошці чи в беклозі.",
+			"descriptionLabel": "Опис",
+			"editTitle": "Редагувати зустріч",
+			"endLabel": "Закінчення",
+			"priorityLabel": "Пріоритет",
+			"rangeError": "Закінчення має бути після початку.",
+			"save": "Зберегти",
+			"startLabel": "Початок",
+			"titleLabel": "Назва",
+			"titlePlaceholder": "напр. Огляд дизайну",
+			"unassigned": "Не призначено"
+		},
+		"empty": {
+			"description": "Зустрічі живуть тут, а не на дошці чи в беклозі.",
+			"title": "Поки немає зустрічей"
+		},
+		"loadError": "Не вдалося завантажити зустрічі.",
+		"moveFromBacklog": "Перемістити в зустрічі",
+		"newAppointment": "Нова зустріч",
+		"nextWeek": "Наступний тиждень",
+		"pageTitle": "Зустрічі · {{name}}",
+		"previousWeek": "Попередній тиждень",
+		"tab": "Зустрічі",
+		"toast": {
+			"created": "Зустріч створено",
+			"deleted": "Зустріч видалено",
+			"error": "Щось пішло не так",
+			"moved": "Переміщено в зустрічі",
+			"updated": "Зустріч оновлено"
+		},
+		"today": "Сьогодні",
+		"weekHint": "Натисніть на порожній слот, щоб додати зустріч; натисніть на зустріч, щоб редагувати її.",
+		"unscheduled": "Не заплановано"
 	}
 }

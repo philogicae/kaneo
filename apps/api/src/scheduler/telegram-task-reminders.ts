@@ -11,7 +11,10 @@ import {
   sendTelegramMessage,
 } from "../plugins/telegram/events";
 import { getUnifiedTelegramTargets } from "../plugins/telegram/unified";
-import { REMINDER_WINDOW_MINUTES } from "./reminder-timing";
+import {
+  formatReminderLeadTime,
+  REMINDER_WINDOW_MINUTES,
+} from "./reminder-timing";
 
 const MINUTE_MS = 60 * 1000;
 
@@ -107,18 +110,6 @@ function parseOffsets(value: unknown): number[] {
   );
 }
 
-function formatLeadTime(minutes: number): string {
-  if (minutes >= 60 * 24 && minutes % (60 * 24) === 0) {
-    const days = minutes / (60 * 24);
-    return days === 1 ? "1 day" : `${days} days`;
-  }
-  if (minutes >= 60 && minutes % 60 === 0) {
-    const hours = minutes / 60;
-    return hours === 1 ? "1 hour" : `${hours} hours`;
-  }
-  return minutes === 1 ? "1 minute" : `${minutes} minutes`;
-}
-
 async function processTelegramReminder(
   task: CandidateTask,
   offset: number,
@@ -158,7 +149,7 @@ async function processTelegramReminder(
     return;
   }
 
-  const action = `Reminder: starts in ${formatLeadTime(offset)}`;
+  const action = `Reminder: starts in ${formatReminderLeadTime(offset)}`;
 
   // sendTelegramMessage logs and swallows send failures by design, matching
   // every other Telegram delivery in this codebase; the sent row stays so the

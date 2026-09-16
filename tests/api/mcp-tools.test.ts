@@ -1,3 +1,4 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   type McpToolRegistrar,
@@ -51,6 +52,74 @@ function lastRequest() {
   };
 }
 
+describe("Kaneo skill contract", () => {
+  const skillRoot = new URL("../../skills/kaneo/", import.meta.url);
+  const documents = [
+    "SKILL.md",
+    ...readdirSync(new URL("references/", skillRoot))
+      .filter((name) => name.endsWith(".md"))
+      .map((name) => `references/${name}`),
+  ].map((path) => ({
+    path,
+    text: readFileSync(new URL(path, skillRoot), "utf8"),
+  }));
+
+  it("ships a discoverable entry point with resolvable local references", () => {
+    expect(documents[0]?.text).toMatch(
+      /^---\nname: kaneo\ndescription: .+\nversion: \d+\.\d+\.\d+\n---/,
+    );
+    for (const { path, text } of documents) {
+      for (const [, target] of text.matchAll(/\]\(([^)]+\.md)(?:#[^)]*)?\)/g)) {
+        expect(
+          existsSync(new URL(target, new URL(path, skillRoot))),
+          target,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("documents every registered tool and no nonexistent tool in the catalog", () => {
+    const guidelines = documents.find(({ path }) =>
+      path.endsWith("mcp-guidelines.md"),
+    );
+    const catalog = guidelines?.text
+      .split("## Tool catalog\n")[1]
+      ?.split("\n## ")[0];
+    expect(catalog).toBeDefined();
+    const names = [...(catalog ?? "").matchAll(/`([a-z]+(?:_[a-z]+)*)`/g)];
+    expect([...new Set(names.map((match) => match[1]))].sort()).toEqual(
+      [...tools.keys()].sort(),
+    );
+  });
+
+  it("validates all documented call examples against the registered schemas", () => {
+    const schemas = new Map<
+      string,
+      Parameters<McpToolRegistrar["registerTool"]>[1]["inputSchema"]
+    >();
+    registerMcpTools(
+      { registerTool: (name, config) => schemas.set(name, config.inputSchema) },
+      "http://api.test",
+      "test-token",
+    );
+    let exampleCount = 0;
+    for (const { path, text } of documents) {
+      for (const [, json] of text.matchAll(/```json\n([\s\S]*?)\n```/g)) {
+        const example = JSON.parse(json ?? "");
+        const schema = schemas.get(example.tool);
+        expect(schema, `${path}: ${example.tool}`).toBeDefined();
+        const result = schema?.strict().safeParse(example.arguments);
+        expect(result?.success, `${path}: ${JSON.stringify(result)}`).toBe(
+          true,
+        );
+        exampleCount++;
+      }
+    }
+    expect(exampleCount).toBeGreaterThan(0);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+});
+
 describe("MCP tool catalog", () => {
   it("resolves workspace members", async () => {
     await call("list_workspace_members", { workspaceId: "ws 1" });
@@ -77,6 +146,11 @@ describe("MCP tool catalog", () => {
       projectId: "p1",
       limit: "5",
     });
+
+    await call("search", { q: "kickoff", type: "appointments" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/search?q=kickoff&type=appointments",
+    );
   });
 
   it("rejects a search limit above the API maximum", async () => {
@@ -647,6 +721,138 @@ describe("MCP instance and workspace invite-link tools", () => {
       url: "https://kaneo.example.com/invitation/link/default",
       token: "default",
       maxUses: null,
+    });
+  });
+});
+
+describe("MCP appointment tools", () => {
+  const existingAppointment = {
+    id: "a1",
+    projectId: "p1",
+    position: 1,
+    number: 1,
+    userId: "u1",
+    title: "Kickoff",
+    description: "Intro call",
+    priority: "high",
+    startDate: "2026-09-20T09:00:00.000Z",
+    dueDate: "2026-09-20T10:00:00.000Z",
+    createdAt: "2026-09-16T08:00:00.000Z",
+    assigneeName: "Dev",
+    assigneeId: "u1",
+  };
+
+  it("lists and reads appointments", async () => {
+    await call("list_appointments", { projectId: "p 1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/appointment?projectId=p%201",
+      method: "GET",
+    });
+
+    await call("get_appointment", { appointmentId: "a1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/appointment/a1",
+      method: "GET",
+    });
+  });
+
+  it("creates an appointment and converts local times with the user timezone", async () => {
+    await call("create_appointment", {
+      projectId: "p1",
+      title: "Kickoff",
+      description: "Intro call",
+      priority: "high",
+      userId: "u1",
+      startDate: "2026-09-14T14:00:00",
+      timezone: "Europe/Bucharest",
+    });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/appointment",
+      method: "POST",
+      body: {
+        projectId: "p1",
+        title: "Kickoff",
+        description: "Intro call",
+        priority: "high",
+        userId: "u1",
+        startDate: "2026-09-14T11:00:00.000Z",
+      },
+    });
+  });
+
+  it("creates an appointment with only the required fields", async () => {
+    await call("create_appointment", { projectId: "p1", title: "Kickoff" });
+
+    expect(lastRequest().body).toEqual({ projectId: "p1", title: "Kickoff" });
+  });
+
+  it("rejects an unknown priority or a local date without timezone", async () => {
+    const badPriority = await call("create_appointment", {
+      projectId: "p1",
+      title: "Kickoff",
+      priority: "critical",
+    });
+    expect(badPriority.isError).toBe(true);
+
+    const noTimezone = await call("create_appointment", {
+      projectId: "p1",
+      title: "Kickoff",
+      startDate: "2026-09-14T14:00:00",
+    });
+    expect(noTimezone.isError).toBe(true);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("merges a partial appointment update into a full body", async () => {
+    apiFetch.mockResolvedValueOnce(Response.json(existingAppointment));
+
+    await call("update_appointment", { appointmentId: "a1", title: "Updated" });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/appointment/a1",
+      method: "PUT",
+      body: {
+        title: "Updated",
+        description: "Intro call",
+        priority: "high",
+        startDate: "2026-09-20T09:00:00.000Z",
+        dueDate: "2026-09-20T10:00:00.000Z",
+        userId: "u1",
+      },
+    });
+  });
+
+  it("clears appointment dates and assignee with null", async () => {
+    apiFetch.mockResolvedValueOnce(Response.json(existingAppointment));
+
+    await call("update_appointment", {
+      appointmentId: "a1",
+      startDate: null,
+      dueDate: null,
+      userId: null,
+    });
+
+    expect(lastRequest().body).toEqual({
+      title: "Kickoff",
+      description: "Intro call",
+      priority: "high",
+      userId: "",
+    });
+  });
+
+  it("deletes an appointment and converts a backlog task", async () => {
+    await call("delete_appointment", { appointmentId: "a1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/appointment/a1",
+      method: "DELETE",
+    });
+
+    await call("move_task_to_appointments", { taskId: "t1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/appointment/from-task",
+      method: "POST",
+      body: { taskId: "t1" },
     });
   });
 });

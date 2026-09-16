@@ -208,6 +208,69 @@ function buildFullTaskUpdateBody(
   return body;
 }
 
+function buildFullAppointmentUpdateBody(
+  existing: Record<string, unknown>,
+  patch: Record<string, unknown>,
+): Record<string, unknown> {
+  const title =
+    (patch.title as string | undefined) ??
+    (typeof existing.title === "string" ? existing.title : undefined);
+  if (!title) throw new Error("Cannot update appointment: missing title.");
+
+  const priorityRaw =
+    (patch.priority as string | undefined) ??
+    (typeof existing.priority === "string" ? existing.priority : undefined);
+  if (!priorityRaw || !isTaskPriority(priorityRaw))
+    throw new Error("Cannot update appointment: invalid or missing priority.");
+
+  const description =
+    patch.description !== undefined
+      ? patch.description === null
+        ? ""
+        : String(patch.description)
+      : existing.description == null
+        ? ""
+        : String(existing.description);
+
+  const body: Record<string, unknown> = {
+    title,
+    description,
+    priority: priorityRaw,
+  };
+
+  // The appointment update endpoint replaces the whole record and clears
+  // dates/assignees that are absent from the body, so a partial patch must
+  // carry the existing values forward; a null patch value clears the field by
+  // leaving the key out (JSON.stringify drops undefined).
+  const startDate = formatOptionalIso(
+    patch.startDate !== undefined ? patch.startDate : existing.startDate,
+  );
+  const dueDate = formatOptionalIso(
+    patch.dueDate !== undefined ? patch.dueDate : existing.dueDate,
+  );
+  if (startDate !== undefined) body.startDate = startDate;
+  if (dueDate !== undefined) body.dueDate = dueDate;
+
+  const userId =
+    patch.userId !== undefined
+      ? patch.userId === null
+        ? ""
+        : (patch.userId as string)
+      : typeof existing.userId === "string"
+        ? existing.userId
+        : undefined;
+  if (userId !== undefined) body.userId = userId;
+
+  if (patch.reminderOffsets !== undefined) {
+    body.reminderOffsets = patch.reminderOffsets as number[] | null;
+  }
+  if (patch.recurrence !== undefined) {
+    body.recurrence = patch.recurrence as RecurrenceInput | null;
+  }
+
+  return body;
+}
+
 const prioritySchema = z.enum([
   "no-priority",
   "low",
@@ -334,7 +397,8 @@ export function registerMcpTools(
   registerTool(
     "whoami",
     {
-      description: "Return the current Kaneo session and user.",
+      description:
+        "Return the current Kaneo session and user. Use user identity fields to confirm the account; do not echo session tokens or the full session into logs or evidence.",
       inputSchema: z.object({}),
     },
     async () =>
@@ -438,7 +502,7 @@ export function registerMcpTools(
     "update_project",
     {
       description:
-        "Update project metadata (PATCH-style: only provided fields are changed).",
+        "Update project metadata by fetching the project, merging supplied fields and sending a full update (not an atomic PATCH). Serialize concurrent edits. Changing isPublic changes visibility and requires explicit authorization.",
       inputSchema: z.object({
         projectId: nonEmptyString.describe("Project id (from list_projects)"),
         name: optionalNonEmptyString,
@@ -550,7 +614,8 @@ export function registerMcpTools(
   registerTool(
     "get_task",
     {
-      description: "Get a task by ID.",
+      description:
+        "Get task fields by opaque task ID. Does not include labels, comments or relations; use list_workspace_labels/list_tasks, list_task_comments or get_task_relations for those.",
       inputSchema: z.object({ taskId: nonEmptyString }),
     },
     async (args) =>
@@ -565,7 +630,7 @@ export function registerMcpTools(
     "create_task",
     {
       description:
-        "Create a task in a project. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
+        "Create a task in a project. `status` is a column slug (from list_project_columns), or `planned` to file the task in the backlog (off the board). Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
         projectId: nonEmptyString,
         title: nonEmptyString,
@@ -666,7 +731,7 @@ export function registerMcpTools(
     "move_task",
     {
       description:
-        "Move a task to another project (and optional column status).",
+        "Move a task to another project in the same workspace, keeping its ID but assigning a new task number. destinationStatus must be a destination column slug, not planned/archived. If omitted, uses a matching column or the first column; backlog/archived tasks therefore move onto the board.",
       inputSchema: z.object({
         taskId: nonEmptyString,
         destinationProjectId: nonEmptyString,
@@ -690,7 +755,8 @@ export function registerMcpTools(
   registerTool(
     "update_task_status",
     {
-      description: "Update only the status (column) of a task.",
+      description:
+        "Update only the status of a task: a column slug (from list_project_columns), `planned` for the backlog, or `archived`.",
       inputSchema: z.object({ taskId: nonEmptyString, status: nonEmptyString }),
     },
     async (args) =>
@@ -748,7 +814,8 @@ export function registerMcpTools(
   registerTool(
     "update_task_comment",
     {
-      description: "Update one of your comments on a task.",
+      description:
+        "Update one of your comments on a task. Requires both authorship and task:update permission; prefer an appended correction for historical evidence.",
       inputSchema: z.object({
         commentId: nonEmptyString,
         content: nonEmptyString,
@@ -766,7 +833,8 @@ export function registerMcpTools(
   registerTool(
     "delete_task_comment",
     {
-      description: "Delete one of your comments from a task.",
+      description:
+        "Delete one of your comments from a task. Requires both authorship and task:update permission, plus explicit user authorization to delete history.",
       inputSchema: z.object({ commentId: nonEmptyString }),
     },
     async (args) =>
@@ -856,7 +924,8 @@ export function registerMcpTools(
   registerTool(
     "detach_label_from_task",
     {
-      description: "Detach a label from its current task.",
+      description:
+        "Remove a label from its current task by deleting the task-scoped copy. Pass that copy's labelId, not the workspace definition ID. This does not preserve the copy as a workspace label.",
       inputSchema: z.object({ labelId: nonEmptyString }),
     },
     async (args) =>
@@ -1221,6 +1290,8 @@ export function registerMcpTools(
             taskTitleChanged: z.boolean().optional(),
             taskDescriptionChanged: z.boolean().optional(),
             taskCommentCreated: z.boolean().optional(),
+            appointmentCreated: z.boolean().optional(),
+            appointmentUpdated: z.boolean().optional(),
           })
           .optional(),
       }),
@@ -1575,7 +1646,7 @@ export function registerMcpTools(
     "list_workspace_members",
     {
       description:
-        "List the members of a workspace. Use this to resolve the user ID an assignee tool expects.",
+        "List workspace members. Each row's id is the user ID to pass as userId to assignee tools (not a membership ID); role is workspace-scoped and does not prove effective permissions.",
       inputSchema: z.object({ workspaceId: nonEmptyString }),
     },
     async (args) =>
@@ -1600,7 +1671,7 @@ export function registerMcpTools(
     "get_workspace_invite_link",
     {
       description:
-        "Return a workspace's shareable invite link URL. Prefers the default link (no expiry, unlimited uses) and falls back to another usable link; errors when every link is expired or exhausted.",
+        "Retrieve an existing shareable workspace invitation; does not create one. Prefers a non-expiring unlimited link, then another usable link. The URL/token grants member access while usable: retrieve/share only for authorized onboarding, never log it. If none is usable, create one in workspace settings.",
       inputSchema: z.object({
         workspaceId: nonEmptyString.describe(
           "Workspace id (from list_workspaces)",
@@ -1651,13 +1722,14 @@ export function registerMcpTools(
     "search",
     {
       description:
-        "Search across tasks, projects, workspaces, comments, and activities.",
+        "Search tasks (all statuses), appointments, projects, workspaces, comments and activities. Results are capped with no pagination; totalCount is not an exhaustive database count. Narrow by type/scope, or use list_tasks pagination before concluding a task is absent. A result id belongs to its returned type.",
       inputSchema: z.object({
         q: nonEmptyString.describe("Search query"),
         type: z
           .enum([
             "all",
             "tasks",
+            "appointments",
             "projects",
             "workspaces",
             "comments",
@@ -1703,7 +1775,7 @@ export function registerMcpTools(
     "create_column",
     {
       description:
-        "Create a board/backlog column in a project. The slug is derived from the name.",
+        "Create a board column; its slug is derived from the name. planned and archived are reserved virtual statuses, not columns. Color must be hex, not a label palette name.",
       inputSchema: z.object({
         projectId: nonEmptyString,
         name: nonEmptyString,
@@ -1732,7 +1804,7 @@ export function registerMcpTools(
     "update_column",
     {
       description:
-        "Rename or restyle a column. Omit icon/color to keep them; pass null to clear.",
+        "Rename or restyle a column by its real ID from list_project_columns. Renaming preserves its slug. Omit icon/color to keep them; null clears them. Color must be hex. Changing isFinal changes completion semantics.",
       inputSchema: z.object({
         columnId: nonEmptyString,
         name: optionalNonEmptyString,
@@ -1803,7 +1875,7 @@ export function registerMcpTools(
     "bulk_update_tasks",
     {
       description:
-        "Apply one operation to many tasks at once (backlog triage, bulk triage of a calendar or Gantt selection). All tasks must belong to the same workspace.",
+        "Apply one operation to tasks in the same workspace. Preflight IDs and status validity in every target project; batches may partially persist and missing IDs may be skipped. Verify updatedCount and read back before retrying. Label operations take a label ID. updateDueDate requires an explicit-offset ISO date-time (no timezone argument), or null to clear. delete requires explicit confirmation.",
       inputSchema: z.object({
         taskIds: z.array(nonEmptyString).min(1),
         operation: z.enum([
@@ -1894,6 +1966,174 @@ export function registerMcpTools(
           },
         );
       }),
+  );
+
+  registerTool(
+    "list_appointments",
+    {
+      description:
+        "List a project's appointments, sorted by start date. Appointments are task-like scheduled items that never appear on the board or in the backlog; they surface in the Appointments view, Calendar, and Gantt.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/appointment?projectId=${encodeURIComponent(args.projectId)}`,
+          { method: "GET" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "get_appointment",
+    {
+      description:
+        "Get a single appointment by its appointmentId (from list_appointments).",
+      inputSchema: z.object({ appointmentId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/appointment/${encodeURIComponent(args.appointmentId)}`,
+          { method: "GET" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "create_appointment",
+    {
+      description:
+        "Create an appointment in a project. An appointment is a task-like scheduled item that never appears on the board or in the backlog. `reminderOffsets` are minutes before the start date (Telegram reminders); `recurrence` spawns the next occurrence when the current one ends. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        title: nonEmptyString,
+        description: z.string().optional(),
+        startDate: optionalIsoDateTimeSchema,
+        dueDate: optionalIsoDateTimeSchema,
+        priority: prioritySchema
+          .optional()
+          .describe("Defaults to `medium` when omitted."),
+        userId: optionalNonEmptyString.describe(
+          "Assignee member ID (from list_workspace_members), if any.",
+        ),
+        reminderOffsets: reminderOffsetsSchema,
+        recurrence: recurrenceSchema,
+        timezone: timezoneSchema,
+      }),
+    },
+    async (args) =>
+      run(() => {
+        const body: Record<string, unknown> = {
+          projectId: args.projectId,
+          title: args.title,
+        };
+        if (args.description !== undefined) body.description = args.description;
+        if (args.startDate !== undefined) {
+          body.startDate = resolveDateTimeInput(
+            args.startDate,
+            args.timezone,
+          ) as string;
+        }
+        if (args.dueDate !== undefined) {
+          body.dueDate = resolveDateTimeInput(
+            args.dueDate,
+            args.timezone,
+          ) as string;
+        }
+        if (args.priority !== undefined) body.priority = args.priority;
+        if (args.userId !== undefined) body.userId = args.userId;
+        if (args.reminderOffsets !== undefined) {
+          body.reminderOffsets = args.reminderOffsets;
+        }
+        if (args.recurrence !== undefined) {
+          body.recurrence = args.recurrence as RecurrenceInput | null;
+        }
+        return client.json("/api/appointment", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      }),
+  );
+
+  registerTool(
+    "update_appointment",
+    {
+      description:
+        "Update an appointment (fetches the current appointment, merges the patch, then full update). Only provided fields change; pass null for startDate, dueDate, userId, reminderOffsets, or recurrence to clear them. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
+      inputSchema: z.object({
+        appointmentId: nonEmptyString,
+        title: optionalNonEmptyString,
+        description: z.string().nullable().optional(),
+        startDate: nullableOptionalIsoDateTimeSchema,
+        dueDate: nullableOptionalIsoDateTimeSchema,
+        priority: prioritySchema.optional(),
+        userId: nullableOptionalNonEmptyString,
+        reminderOffsets: reminderOffsetsSchema,
+        recurrence: recurrenceSchema,
+        timezone: timezoneSchema,
+      }),
+    },
+    async (args) => {
+      const { appointmentId, timezone, ...patch } = args;
+      return run(async () => {
+        if (patch.startDate !== undefined) {
+          patch.startDate = resolveDateTimeInput(patch.startDate, timezone) as
+            | string
+            | null;
+        }
+        if (patch.dueDate !== undefined) {
+          patch.dueDate = resolveDateTimeInput(patch.dueDate, timezone) as
+            | string
+            | null;
+        }
+        const existing = (await client.json(
+          `/api/appointment/${encodeURIComponent(appointmentId)}`,
+          { method: "GET" },
+        )) as Record<string, unknown>;
+        const body = buildFullAppointmentUpdateBody(existing, patch);
+        return client.json(
+          `/api/appointment/${encodeURIComponent(appointmentId)}`,
+          { method: "PUT", body: JSON.stringify(body) },
+        );
+      });
+    },
+  );
+
+  registerTool(
+    "delete_appointment",
+    {
+      description:
+        "Delete an appointment by its appointmentId. The appointment is removed for good; this does not affect tasks.",
+      inputSchema: z.object({ appointmentId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/appointment/${encodeURIComponent(args.appointmentId)}`,
+          { method: "DELETE" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "move_task_to_appointments",
+    {
+      description:
+        "Destructively convert a backlog task (status: planned) to a new appointment ID. Copies core fields only; deletes the task and cascades its linked history/data. Comments, labels, relations, time entries, assets, custom fields, reminders and recurrence are not migrated. Requires explicit confirmation of data loss. Refused for board tasks; prefer setting task dates when history must survive.",
+      inputSchema: z.object({
+        taskId: nonEmptyString.describe("Backlog task id to move"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json("/api/appointment/from-task", {
+          method: "POST",
+          body: JSON.stringify({ taskId: args.taskId }),
+        }),
+      ),
   );
 
   registerTool(

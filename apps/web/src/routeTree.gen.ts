@@ -42,6 +42,7 @@ import { Route as LayoutAuthenticatedDashboardSettingsAccountInformationRouteImp
 import { Route as LayoutAuthenticatedDashboardSettingsAccountMcpRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/mcp'
 import { Route as LayoutAuthenticatedDashboardSettingsAccountNotificationsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/notifications'
 import { Route as LayoutAuthenticatedDashboardSettingsAccountPreferencesRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/preferences'
+import { Route as LayoutAuthenticatedDashboardSettingsAccountSkillsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/skills'
 import { Route as LayoutAuthenticatedDashboardSettingsAccountTelegramRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/telegram'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/general'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/labels'
@@ -54,6 +55,7 @@ import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrati
 import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdVisibilityRouteImport } from './routes/_layout/_authenticated/dashboard/settings/projects/$projectId/visibility'
 import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRouteImport } from './routes/_layout/_authenticated/dashboard/settings/projects/$projectId/workflow'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/index'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/appointments'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar'
@@ -242,6 +244,12 @@ const LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute =
     path: '/preferences',
     getParentRoute: () => LayoutAuthenticatedDashboardSettingsAccountRoute,
   } as any)
+const LayoutAuthenticatedDashboardSettingsAccountSkillsRoute =
+  LayoutAuthenticatedDashboardSettingsAccountSkillsRouteImport.update({
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => LayoutAuthenticatedDashboardSettingsAccountRoute,
+  } as any)
 const LayoutAuthenticatedDashboardSettingsAccountTelegramRoute =
   LayoutAuthenticatedDashboardSettingsAccountTelegramRouteImport.update({
     id: '/telegram',
@@ -325,6 +333,15 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
     } as any,
   )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRouteImport.update(
+    {
+      id: '/project/$projectId/appointments',
+      path: '/project/$projectId/appointments',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute =
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRouteImport.update(
     {
@@ -403,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/account/mcp': typeof LayoutAuthenticatedDashboardSettingsAccountMcpRoute
   '/dashboard/settings/account/notifications': typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   '/dashboard/settings/account/preferences': typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
+  '/dashboard/settings/account/skills': typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
   '/dashboard/settings/account/telegram': typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
   '/dashboard/settings/workspace/general': typeof LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute
   '/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
@@ -414,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/projects/$projectId/integrations': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRoute
   '/dashboard/settings/projects/$projectId/visibility': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdVisibilityRoute
   '/dashboard/settings/projects/$projectId/workflow': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/appointments': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
@@ -450,6 +469,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/account/mcp': typeof LayoutAuthenticatedDashboardSettingsAccountMcpRoute
   '/dashboard/settings/account/notifications': typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   '/dashboard/settings/account/preferences': typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
+  '/dashboard/settings/account/skills': typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
   '/dashboard/settings/account/telegram': typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
   '/dashboard/settings/workspace/general': typeof LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute
   '/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
@@ -461,6 +481,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/projects/$projectId/integrations': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRoute
   '/dashboard/settings/projects/$projectId/visibility': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdVisibilityRoute
   '/dashboard/settings/projects/$projectId/workflow': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/appointments': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
@@ -503,6 +524,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/settings/account/mcp': typeof LayoutAuthenticatedDashboardSettingsAccountMcpRoute
   '/_layout/_authenticated/dashboard/settings/account/notifications': typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   '/_layout/_authenticated/dashboard/settings/account/preferences': typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
+  '/_layout/_authenticated/dashboard/settings/account/skills': typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
   '/_layout/_authenticated/dashboard/settings/account/telegram': typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
   '/_layout/_authenticated/dashboard/settings/workspace/general': typeof LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute
   '/_layout/_authenticated/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
@@ -514,6 +536,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/settings/projects/$projectId/integrations': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRoute
   '/_layout/_authenticated/dashboard/settings/projects/$projectId/visibility': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdVisibilityRoute
   '/_layout/_authenticated/dashboard/settings/projects/$projectId/workflow': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/appointments': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
@@ -555,6 +578,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/account/mcp'
     | '/dashboard/settings/account/notifications'
     | '/dashboard/settings/account/preferences'
+    | '/dashboard/settings/account/skills'
     | '/dashboard/settings/account/telegram'
     | '/dashboard/settings/workspace/general'
     | '/dashboard/settings/workspace/labels'
@@ -566,6 +590,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/projects/$projectId/integrations'
     | '/dashboard/settings/projects/$projectId/visibility'
     | '/dashboard/settings/projects/$projectId/workflow'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/appointments'
     | '/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/dashboard/workspace/$workspaceId/project/$projectId/calendar'
@@ -602,6 +627,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/account/mcp'
     | '/dashboard/settings/account/notifications'
     | '/dashboard/settings/account/preferences'
+    | '/dashboard/settings/account/skills'
     | '/dashboard/settings/account/telegram'
     | '/dashboard/settings/workspace/general'
     | '/dashboard/settings/workspace/labels'
@@ -613,6 +639,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/projects/$projectId/integrations'
     | '/dashboard/settings/projects/$projectId/visibility'
     | '/dashboard/settings/projects/$projectId/workflow'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/appointments'
     | '/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/dashboard/workspace/$workspaceId/project/$projectId/calendar'
@@ -654,6 +681,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/settings/account/mcp'
     | '/_layout/_authenticated/dashboard/settings/account/notifications'
     | '/_layout/_authenticated/dashboard/settings/account/preferences'
+    | '/_layout/_authenticated/dashboard/settings/account/skills'
     | '/_layout/_authenticated/dashboard/settings/account/telegram'
     | '/_layout/_authenticated/dashboard/settings/workspace/general'
     | '/_layout/_authenticated/dashboard/settings/workspace/labels'
@@ -665,6 +693,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/settings/projects/$projectId/integrations'
     | '/_layout/_authenticated/dashboard/settings/projects/$projectId/visibility'
     | '/_layout/_authenticated/dashboard/settings/projects/$projectId/workflow'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/appointments'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar'
@@ -917,6 +946,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardSettingsAccountRoute
     }
+    '/_layout/_authenticated/dashboard/settings/account/skills': {
+      id: '/_layout/_authenticated/dashboard/settings/account/skills'
+      path: '/skills'
+      fullPath: '/dashboard/settings/account/skills'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardSettingsAccountRoute
+    }
     '/_layout/_authenticated/dashboard/settings/account/telegram': {
       id: '/_layout/_authenticated/dashboard/settings/account/telegram'
       path: '/telegram'
@@ -1001,6 +1037,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/appointments': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/appointments'
+      path: '/project/$projectId/appointments'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/appointments'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
       path: '/project/$projectId/backlog'
@@ -1045,6 +1088,7 @@ interface LayoutAuthenticatedDashboardSettingsAccountRouteChildren {
   LayoutAuthenticatedDashboardSettingsAccountMcpRoute: typeof LayoutAuthenticatedDashboardSettingsAccountMcpRoute
   LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute: typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute: typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
+  LayoutAuthenticatedDashboardSettingsAccountSkillsRoute: typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
   LayoutAuthenticatedDashboardSettingsAccountTelegramRoute: typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
 }
 
@@ -1060,6 +1104,8 @@ const LayoutAuthenticatedDashboardSettingsAccountRouteChildren: LayoutAuthentica
       LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute,
     LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute:
       LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute,
+    LayoutAuthenticatedDashboardSettingsAccountSkillsRoute:
+      LayoutAuthenticatedDashboardSettingsAccountSkillsRoute,
     LayoutAuthenticatedDashboardSettingsAccountTelegramRoute:
       LayoutAuthenticatedDashboardSettingsAccountTelegramRoute,
   }
@@ -1139,6 +1185,7 @@ interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren {
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
@@ -1155,6 +1202,8 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren: LayoutAuthe
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdAppointmentsRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute:
