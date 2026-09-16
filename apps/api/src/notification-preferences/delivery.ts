@@ -3,6 +3,7 @@ import { sendNotificationEmail } from "@kaneo/email";
 import { and, eq } from "drizzle-orm";
 import db from "../database";
 import {
+  appointmentTable,
   notificationTable,
   projectTable,
   taskTable,
@@ -39,6 +40,9 @@ type ResolvedNotificationContext = {
   taskId: string | null;
   taskTitle: string | null;
   taskUrl: string | null;
+  appointmentId: string | null;
+  appointmentTitle: string | null;
+  appointmentUrl: string | null;
 };
 
 type DeliveryContent = {
@@ -49,6 +53,11 @@ type DeliveryContent = {
 function buildTaskUrl(workspaceId: string, projectId: string, taskId: string) {
   const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
   return `${clientUrl}/dashboard/workspace/${workspaceId}/project/${projectId}/task/${taskId}`;
+}
+
+function buildAppointmentUrl(workspaceId: string, projectId: string) {
+  const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+  return `${clientUrl}/dashboard/workspace/${workspaceId}/project/${projectId}/appointments`;
 }
 
 function getStringValue(
@@ -196,6 +205,39 @@ function buildDeliveryContent(notification: {
           : "A new comment was added to a Kaneo task.",
       };
     }
+    case "appointment_created": {
+      const appointmentTitle = getStringValue(
+        notification.eventData,
+        "appointmentTitle",
+      );
+      return {
+        title: "Appointment assigned to you",
+        body: appointmentTitle
+          ? `You were assigned to the appointment: ${appointmentTitle}`
+          : "An appointment was assigned to you in Kaneo.",
+      };
+    }
+    case "appointment_updated": {
+      const appointmentTitle = getStringValue(
+        notification.eventData,
+        "appointmentTitle",
+      );
+      const changeType = getStringValue(notification.eventData, "changeType");
+      if (changeType === "assignee") {
+        return {
+          title: "Appointment assigned to you",
+          body: appointmentTitle
+            ? `You were assigned to the appointment: ${appointmentTitle}`
+            : "An appointment was assigned to you in Kaneo.",
+        };
+      }
+      return {
+        title: "Appointment rescheduled",
+        body: appointmentTitle
+          ? `The appointment "${appointmentTitle}" was rescheduled.`
+          : "An appointment was rescheduled in Kaneo.",
+      };
+    }
     default:
       return {
         title: notification.title ?? "New Kaneo notification",
@@ -243,6 +285,9 @@ async function resolveNotificationContext(notification: {
       taskId: task.taskId,
       taskTitle: task.taskTitle,
       taskUrl: buildTaskUrl(task.workspaceId, task.projectId, task.taskId),
+      appointmentId: null,
+      appointmentTitle: null,
+      appointmentUrl: null,
     };
   }
 
@@ -268,6 +313,49 @@ async function resolveNotificationContext(notification: {
       taskId: null,
       taskTitle: null,
       taskUrl: null,
+      appointmentId: null,
+      appointmentTitle: null,
+      appointmentUrl: null,
+    };
+  }
+
+  if (notification.resourceType === "appointment") {
+    const [appointment] = await db
+      .select({
+        appointmentId: appointmentTable.id,
+        appointmentTitle: appointmentTable.title,
+        projectId: projectTable.id,
+        projectName: projectTable.name,
+        workspaceId: workspaceTable.id,
+        workspaceName: workspaceTable.name,
+      })
+      .from(appointmentTable)
+      .innerJoin(projectTable, eq(appointmentTable.projectId, projectTable.id))
+      .innerJoin(
+        workspaceTable,
+        eq(projectTable.workspaceId, workspaceTable.id),
+      )
+      .where(eq(appointmentTable.id, notification.resourceId))
+      .limit(1);
+
+    if (!appointment) {
+      return null;
+    }
+
+    return {
+      workspaceId: appointment.workspaceId,
+      workspaceName: appointment.workspaceName,
+      projectId: appointment.projectId,
+      projectName: appointment.projectName,
+      taskId: null,
+      taskTitle: null,
+      taskUrl: null,
+      appointmentId: appointment.appointmentId,
+      appointmentTitle: appointment.appointmentTitle,
+      appointmentUrl: buildAppointmentUrl(
+        appointment.workspaceId,
+        appointment.projectId,
+      ),
     };
   }
 
@@ -496,6 +584,13 @@ export async function deliverNotification(
           url: context.taskUrl,
         }
       : null,
+    appointment: context.appointmentId
+      ? {
+          id: context.appointmentId,
+          title: context.appointmentTitle,
+          url: context.appointmentUrl,
+        }
+      : null,
     user: {
       id: notification.userId,
       email: user.email,
@@ -503,6 +598,7 @@ export async function deliverNotification(
     },
   };
 
+  const actionUrl = context.appointmentUrl ?? context.taskUrl;
   const deliveries: Array<Promise<void>> = [];
 
   if (decryptedPreference.emailEnabled && rule.emailEnabled && user.email) {
@@ -510,8 +606,8 @@ export async function deliverNotification(
       sendNotificationEmail(user.email, content.title, {
         title: content.title,
         message: content.body,
-        actionUrl: context.taskUrl,
-        actionLabel: context.taskUrl ? "Open in Kaneo" : undefined,
+        actionUrl,
+        actionLabel: actionUrl ? "Open in Kaneo" : undefined,
         locale: user.locale ?? null,
       }).then(() => undefined),
     );
@@ -530,7 +626,7 @@ export async function deliverNotification(
         token: decryptedPreference.ntfyToken,
         title: content.title,
         body: content.body,
-        clickUrl: context.taskUrl,
+        clickUrl: actionUrl,
       }),
     );
   }
@@ -547,7 +643,7 @@ export async function deliverNotification(
         token: decryptedPreference.gotifyToken,
         title: content.title,
         body: content.body,
-        clickUrl: context.taskUrl,
+        clickUrl: actionUrl,
       }),
     );
   }

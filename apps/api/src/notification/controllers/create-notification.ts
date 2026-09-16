@@ -21,8 +21,13 @@ async function createNotification({
   resourceId?: string;
   resourceType?: string;
 }) {
+  // Appointments reuse the assignment preference: they are assigned like
+  // tasks and have no status of their own.
   const preferenceKey =
-    type === "task_assignee_changed" || type === "task_created"
+    type === "task_assignee_changed" ||
+    type === "task_created" ||
+    type === "appointment_created" ||
+    type === "appointment_updated"
       ? "taskAssignmentEnabled"
       : type === "task_comment" || type === "task_mention"
         ? "taskCommentEnabled"

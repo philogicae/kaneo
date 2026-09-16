@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import db from "../database";
 import { integrationTable } from "../database/schema";
 import { subscribeToEvent } from "../events";
+import type { TelegramActionInput } from "./telegram/events";
 import { dispatchUnifiedTelegram } from "./telegram/unified";
 import type {
   IntegrationPlugin,
@@ -228,6 +229,57 @@ export function initializeEventSubscriptions(): void {
     });
   });
 
+  subscribeToEvent<{
+    appointmentId: string;
+    projectId: string;
+    currentUserId?: string;
+  }>("appointment.created", async (data) => {
+    await broadcastAppointmentCreated({
+      appointmentId: data.appointmentId,
+      projectId: data.projectId,
+      userId: data.currentUserId ?? null,
+    });
+  });
+
+  subscribeToEvent<{
+    appointmentId: string;
+    projectId: string;
+    currentUserId?: string;
+    oldAssigneeId: string | null;
+    newAssigneeId: string | null;
+    oldStartDate: Date | null;
+    newStartDate: Date | null;
+    oldDueDate: Date | null;
+    newDueDate: Date | null;
+  }>("appointment.updated", async (data) => {
+    const datesChanged =
+      toTime(data.oldStartDate) !== toTime(data.newStartDate) ||
+      toTime(data.oldDueDate) !== toTime(data.newDueDate);
+
+    if (datesChanged) {
+      await broadcastAppointmentUpdated(
+        {
+          appointmentId: data.appointmentId,
+          projectId: data.projectId,
+          userId: data.currentUserId ?? null,
+        },
+        { kind: "appointmentRescheduled" },
+      );
+      return;
+    }
+
+    if (data.newAssigneeId && data.newAssigneeId !== data.oldAssigneeId) {
+      await broadcastAppointmentUpdated(
+        {
+          appointmentId: data.appointmentId,
+          projectId: data.projectId,
+          userId: data.currentUserId ?? null,
+        },
+        { kind: "appointmentReassigned" },
+      );
+    }
+  });
+
   eventSubscriptionsInitialized = true;
   console.log("✓ Plugin event subscriptions initialized");
 }
@@ -258,6 +310,47 @@ function createContext(integration: {
     projectId: integration.projectId,
     config: JSON.parse(integration.config) as Record<string, unknown>,
   };
+}
+
+function toTime(value: Date | null): number | null {
+  return value ? new Date(value).getTime() : null;
+}
+
+// Appointments have no legacy per-project plugin handlers; they flow straight
+// through the unified Telegram dispatcher (workspace rules).
+export async function broadcastAppointmentCreated(event: {
+  appointmentId: string;
+  projectId: string;
+  userId: string | null;
+}): Promise<void> {
+  await dispatchUnifiedTelegram(
+    {
+      appointmentId: event.appointmentId,
+      projectId: event.projectId,
+      userId: event.userId,
+    },
+    { kind: "appointmentCreated" },
+  );
+}
+
+export async function broadcastAppointmentUpdated(
+  event: {
+    appointmentId: string;
+    projectId: string;
+    userId: string | null;
+  },
+  action:
+    | Extract<TelegramActionInput, { kind: "appointmentRescheduled" }>
+    | Extract<TelegramActionInput, { kind: "appointmentReassigned" }>,
+): Promise<void> {
+  await dispatchUnifiedTelegram(
+    {
+      appointmentId: event.appointmentId,
+      projectId: event.projectId,
+      userId: event.userId,
+    },
+    action,
+  );
 }
 
 export async function broadcastTaskCreated(

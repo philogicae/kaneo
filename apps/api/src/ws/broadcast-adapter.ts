@@ -4,6 +4,7 @@ export type ProjectBroadcastMessage = {
   taskId?: string;
   sourceTaskId?: string;
   targetTaskId?: string;
+  appointmentId?: string;
 };
 
 export type BroadcastMessage = {

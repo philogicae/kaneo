@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "No se pudo unir al espacio de trabajo",
+				"load": "No se pudieron cargar los detalles del enlace de invitación."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Error del enlace de invitación",
+			"invalidTitle": "Enlace de invitación no válido",
+			"joinPrompt": "Tienes un enlace de invitación para unirte a <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Enlace de invitación caducado",
+			"loading": "Cargando el enlace de invitación...",
+			"pageTitleAccept": "Unirse al espacio de trabajo",
+			"pageTitleError": "Error del enlace de invitación",
+			"pageTitleInvalid": "Enlace de invitación no válido",
+			"signedInAs": "Sesión iniciada como <email>{{email}}</email>",
+			"signedOutPrompt": "Crea una cuenta o inicia sesión para unirte al espacio de trabajo.",
+			"title": "¡Únete al espacio de trabajo!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Espacios de trabajo",
 				"comment": "Comentarios",
 				"activity": "Actividad",
-				"fallback": "Resultados"
+				"fallback": "Resultados",
+				"appointment": "Citas"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Tarea vencida",
 				"content": "{{taskTitle}} ha superado su fecha de vencimiento"
+			},
+			"appointment_created": {
+				"title": "Cita asignada a ti",
+				"content": "Se te ha asignado la cita: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Cita actualizada",
+				"contentAssignee": "Se te ha asignado la cita: {{appointmentTitle}}",
+				"contentRescheduled": "La cita \"{{appointmentTitle}}\" se ha reprogramado."
 			}
 		},
 		"reminderLeadTime": {
@@ -794,27 +804,27 @@
 			"add": "Añadir"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Añadir",
+			"createError": "No se pudo crear el campo personalizado.",
+			"createSuccess": "Campo personalizado creado.",
+			"defaultLabel": "Predeterminado",
+			"defaultValuePlaceholder": "Valor predeterminado",
+			"deleteButton": "Eliminar",
+			"deleteError": "No se pudo eliminar el campo personalizado.",
+			"deleteSuccess": "Campo personalizado eliminado.",
+			"empty": "Aún no hay campos personalizados configurados.",
+			"loading": "Cargando campos personalizados...",
+			"namePlaceholder": "Nombre del campo",
+			"noOptionsPlaceholder": "Sin opciones",
+			"optionsPlaceholder": "Opciones separadas por comas",
+			"required": "Obligatorio",
+			"typePlaceholder": "Selecciona el tipo de campo",
 			"types": {
-				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"boolean": "Booleano",
+				"date": "Fecha",
+				"dropdown": "Lista desplegable",
+				"number": "Número",
+				"text": "Texto"
 			}
 		},
 		"developer": "Desarrollador",
@@ -1136,22 +1146,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Crea primero una clave API y luego sustituye el marcador <YOUR_API_KEY> por ella.",
+			"authModeApiKey": "Clave API",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Elige un modo de autenticación y luego ejecuta el comando de instalación o pega la configuración en tu agente.",
+			"cardTitle": "Conectar un agente",
+			"copied": "Copiado",
+			"copy": "Copiar",
+			"createApiKey": "Crear una clave API",
+			"followUpLabel": "Después, autentícate",
+			"installCommandLabel": "Comando de instalación",
+			"manualConfigLabel": "Configuración manual",
+			"oauthNote": "OAuth es el modo predeterminado: la primera conexión abre Kaneo en tu navegador para autorizar al agente y, después, el token lo gestiona el propio agente.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "endpoint MCP HTTP integrado de esta instancia",
+			"serverUrlLabel": "URL del servidor",
+			"subtitle": "Conecta agentes de IA como Claude, Codex, Gemini u OpenCode a esta instancia de Kaneo mediante el servidor MCP HTTP integrado.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Notificaciones",
@@ -1371,8 +1381,8 @@
 			"columnsDescription": "Gestiona las columnas de tu tablero. Arrastra para reordenar. Activa la columna  \"Hecho\" para representar el trabajo completado.",
 			"automationTitle": "Reglas de automatización",
 			"automationDescription": "Mapea eventos de integración y columnas integration. Cuando un evento ocurre, la tarea vinculada se moverá a la columna especificada.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Gestiona los campos personalizados de este proyecto. Arrastra para reordenar.",
+			"customFieldsTitle": "Campos personalizados"
 		},
 		"repositoryBrowser": {
 			"title": "Seleccionar repositorio",
@@ -1489,7 +1499,9 @@
 				"taskPriorityChanged": "Cambios de prioridad",
 				"taskTitleChanged": "Cambios de título",
 				"taskDescriptionChanged": "Cambios de descripción",
-				"taskCommentCreated": "Nuevos comentarios"
+				"taskCommentCreated": "Nuevos comentarios",
+				"appointmentCreated": "Nuevas citas",
+				"appointmentUpdated": "Cambios en citas"
 			},
 			"connect": "Conectar Telegram",
 			"saveChanges": "Guardar cambios",
@@ -1548,7 +1560,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Temas detectados",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1780,6 +1792,25 @@
 				"description": "Esto eliminará permanentemente el rol \"{{role}}\". Los miembros con este rol asignado perderán sus permisos."
 			},
 			"permissionCount_many": "{{count}} permisos"
+		},
+		"skills": "Habilidades",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Ejecuta estos comandos desde la raíz de tu copia de Kaneo y luego reinicia tu agente.",
+			"cardTitle": "Instalar la habilidad de Kaneo",
+			"copied": "Copiado",
+			"copy": "Copiar",
+			"destinationLabel": "Destino",
+			"installCommandLabel": "Comando de instalación",
+			"mcpRequirement": "La habilidad se basa en la conexión MCP: configúrala primero.",
+			"openMcpSettings": "Abrir ajustes de MCP",
+			"pageTitle": "Habilidades",
+			"projectScope": "proyecto",
+			"subtitle": "Instala la habilidad de Kaneo para que los agentes de IA sigan las convenciones de esta instancia y usen correctamente las herramientas MCP.",
+			"title": "Habilidades de agentes",
+			"updateDescription": "Las habilidades se leen del disco: vuelve a copiar la carpeta tras actualizar Kaneo para aplicar los cambios.",
+			"userScope": "usuario",
+			"verifyLabel": "Verificar"
 		}
 	},
 	"tasks": {
@@ -1840,8 +1871,8 @@
 				"isAnyOf": "es alguno de",
 				"includeAnyOf": "incluye alguno de"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Todos",
+			"noValuesUsedYet": "Aún no se han usado valores"
 		},
 		"boardSearchPlaceholder": "Buscar tickets...",
 		"bulk": {
@@ -1894,7 +1925,7 @@
 			"loadingTask": "Cargando tarea...",
 			"taskNotFound": "Tarea no encontrada",
 			"taskNotFoundDescription": "La tarea que buscas no existe o ha sido eliminada.",
-			"customFields": "Custom Fields"
+			"customFields": "Campos personalizados"
 		},
 		"contextMenu": {
 			"copyLink": "Copiar enlace",
@@ -2012,8 +2043,8 @@
 					"renderFailed": "No se pudo renderizar el diagrama de Mermaid"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Campo actualizado",
+			"selectOption": "Seleccionar opción"
 		},
 		"dueDate": {
 			"label": "Fecha de vencimiento",
@@ -2210,7 +2241,7 @@
 			"unitLabel": "Unit",
 			"unitMinute_many": "minutes",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "minutos",
 			"unitWeek_many": "weeks",
 			"unitWeek_one": "week",
 			"unitWeek_other": "weeks",
@@ -2268,7 +2299,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Etiquetas",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2328,30 +2359,30 @@
 			"roleUpdateError": "Error al actualizar el rol"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "No se pudo copiar automáticamente. Selecciona el enlace y pulsa Ctrl+C.",
+			"copyIconAria": "Copiar el enlace de invitación",
+			"create": "Crear enlace",
+			"createError": "No se pudo crear el enlace de invitación",
+			"createSuccess": "Enlace de invitación creado",
+			"deleteError": "No se pudo revocar el enlace de invitación",
+			"deleteSuccess": "Enlace de invitación revocado",
+			"description": "Cualquiera con el enlace puede unirse a este espacio de trabajo como miembro: no se requiere correo.",
+			"empty": "Aún no hay enlaces de invitación compartibles.",
+			"expiry24h": "24 horas",
+			"expiry30d": "30 días",
+			"expiry7d": "7 días",
+			"expiryLabel": "Caducidad",
+			"expiryNever": "Nunca caduca",
+			"join": "Unirse a {{workspaceName}}",
+			"linkCopied": "Enlace de invitación copiado",
+			"maxUsesLabel": "Usos máximos",
+			"maxUsesUnlimited": "Ilimitado",
+			"never": "Nunca caduca",
+			"revokeIconAria": "Revocar el enlace de invitación",
+			"title": "Enlaces de invitación compartibles",
+			"uses": "{{used}}/{{max}} usos",
+			"workspace": "Espacio de trabajo: {{workspaceName}}",
+			"usesUnlimited": "{{used}} usos"
 		}
 	},
 	"unified": {
@@ -2379,9 +2410,29 @@
 			"tasks": "Tareas"
 		},
 		"charts": {
-			"backlog": "Pendientes",
+			"backlog": "Backlog",
 			"empty": "Sin actividad de tareas en los últimos 6 meses.",
-			"tasks": "Tareas"
+			"tasks": "Tareas",
+			"byProject": "Por proyecto",
+			"completed": "Completadas",
+			"created": "Creadas",
+			"noTasks": "No hay tareas que distribuir.",
+			"other": "Otros",
+			"period": "Período",
+			"periodSummary": "{{created}} creadas · {{completed}} completadas",
+			"perWeek": "{{value}}/semana",
+			"range_many": "{{count}} months",
+			"range_one": "{{count}} mes",
+			"range_other": "{{count}} meses",
+			"statusDescription": "Dónde están ahora las tareas de todos los proyectos.",
+			"statusTitle": "Desglose por estado",
+			"unassigned": "Sin asignar",
+			"velocity4w": "Velocidad (4 semanas)",
+			"velocityDescription": "Tareas creadas y completadas por semana en todos los proyectos.",
+			"velocityTitle": "Velocidad",
+			"workloadDescription": "Tareas de tablero abiertas por asignado, en todos los proyectos.",
+			"workloadEmpty": "No hay trabajo abierto asignado.",
+			"workloadTitle": "Carga de trabajo"
 		},
 		"tabs": {
 			"charts": "Gráficos",
@@ -2454,5 +2505,45 @@
 			"success": "Espacio de trabajo creado correctamente",
 			"error": "Error al crear espacio de trabajo"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Asignado",
+			"create": "Crear",
+			"createTitle": "Nueva cita",
+			"delete": "Eliminar",
+			"description": "Las citas se programan como las tareas pero nunca aparecen en el tablero ni en el backlog.",
+			"descriptionLabel": "Descripción",
+			"editTitle": "Editar cita",
+			"endLabel": "Fin",
+			"priorityLabel": "Prioridad",
+			"rangeError": "El fin debe ser posterior al inicio.",
+			"save": "Guardar",
+			"startLabel": "Inicio",
+			"titleLabel": "Título",
+			"titlePlaceholder": "p. ej. Revisión de diseño",
+			"unassigned": "Sin asignar"
+		},
+		"empty": {
+			"description": "Las citas viven aquí, no en el tablero ni en el backlog.",
+			"title": "Aún no hay citas"
+		},
+		"loadError": "No se pudieron cargar las citas.",
+		"moveFromBacklog": "Mover a citas",
+		"newAppointment": "Nueva cita",
+		"nextWeek": "Semana siguiente",
+		"pageTitle": "Citas · {{name}}",
+		"previousWeek": "Semana anterior",
+		"tab": "Citas",
+		"toast": {
+			"created": "Cita creada",
+			"deleted": "Cita eliminada",
+			"error": "Algo salió mal",
+			"moved": "Movida a citas",
+			"updated": "Cita actualizada"
+		},
+		"today": "Hoy",
+		"weekHint": "Haz clic en un hueco vacío para añadir una cita; haz clic en una cita para editarla.",
+		"unscheduled": "Sin programar"
 	}
 }

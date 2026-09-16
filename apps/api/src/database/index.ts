@@ -44,6 +44,8 @@ import {
   accountTable,
   activityTable,
   apikeyTable,
+  appointmentReminderSentTable,
+  appointmentTable,
   assetTable,
   billingEventTable,
   billingReminderSentTable,
@@ -90,6 +92,8 @@ config();
 
 export const schema = {
   accountTable,
+  appointmentTable,
+  appointmentReminderSentTable,
   assetTable,
   activityTable,
   apikeyTable,

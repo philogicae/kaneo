@@ -11,6 +11,7 @@ import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import activity from "./activity";
+import appointment from "./appointment";
 import { auth } from "./auth";
 import { organizationRoutes } from "./auth-openapi";
 import column from "./column";
@@ -43,6 +44,7 @@ import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
+import skills from "./skills";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
@@ -536,6 +538,7 @@ export function createApp() {
     const path = c.req.path;
     if (
       path.startsWith("/api/mcp") ||
+      path.startsWith("/api/skills") ||
       path.startsWith("/api/.well-known/") ||
       // Public invite-link lookups are anonymous by design (the web fetcher
       // sends no credentials for signed-out visitors). The accept route is
@@ -562,10 +565,13 @@ export function createApp() {
 
   const oauthApi = api.route("/oauth", oauth);
 
+  api.route("/skills", skills);
+
   const projectApi = api.route("/project", project);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
+  const appointmentApi = api.route("/appointment", appointment);
   const commentApi = api.route("/comment", comment);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
@@ -746,6 +752,7 @@ export function createApp() {
     api,
     injectWebSocket,
     activityApi,
+    appointmentApi,
     columnApi,
     commentApi,
     configApi,
@@ -852,6 +859,7 @@ const {
   app,
   injectWebSocket,
   activityApi,
+  appointmentApi,
   columnApi,
   commentApi,
   configApi,
@@ -897,6 +905,7 @@ export type AppType =
   | typeof configApi
   | typeof projectApi
   | typeof taskApi
+  | typeof appointmentApi
   | typeof columnApi
   | typeof activityApi
   | typeof commentApi

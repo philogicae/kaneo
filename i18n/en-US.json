@@ -541,6 +541,7 @@
 			"unnamedKey": "Unnamed Key"
 		},
 		"mcp": "MCP",
+		"skills": "Skills",
 		"telegramUnified": {
 			"sidebarLabel": "Telegram",
 			"pageTitle": "Telegram notifications",
@@ -620,6 +621,24 @@
 			"followUpLabel": "Then authenticate",
 			"copy": "Copy",
 			"copied": "Copied"
+		},
+		"skillsPage": {
+			"pageTitle": "Skills",
+			"title": "Agent skills",
+			"subtitle": "Install the Kaneo skill so AI agents follow this instance's conventions and use the MCP tools correctly.",
+			"cardTitle": "Install the Kaneo skill",
+			"cardDescription": "Run these commands from the root of your Kaneo checkout, then restart your agent.",
+			"mcpRequirement": "The skill builds on the MCP connection: configure that first.",
+			"openMcpSettings": "Open MCP settings",
+			"destinationLabel": "Destination",
+			"userScope": "user",
+			"projectScope": "project",
+			"adminScope": "admin",
+			"installCommandLabel": "Install command",
+			"verifyLabel": "Verify",
+			"copy": "Copy",
+			"copied": "Copied",
+			"updateDescription": "Skills are read from disk: re-copy the folder after updating Kaneo to pick up changes."
 		},
 		"apiKey": {
 			"createdModal": {
@@ -1350,7 +1369,9 @@
 				"taskPriorityChanged": "Priority changes",
 				"taskTitleChanged": "Title changes",
 				"taskDescriptionChanged": "Description changes",
-				"taskCommentCreated": "New comments"
+				"taskCommentCreated": "New comments",
+				"appointmentCreated": "New appointments",
+				"appointmentUpdated": "Appointment changes"
 			},
 			"connect": "Connect Telegram",
 			"saveChanges": "Save changes",
@@ -1473,6 +1494,7 @@
 			"minCharsHint": "Type at least 3 characters to search",
 			"groups": {
 				"task": "Tasks",
+				"appointment": "Appointments",
 				"project": "Projects",
 				"workspace": "Workspaces",
 				"comment": "Comments",
@@ -1595,6 +1617,15 @@
 				"title": "Time tracking started",
 				"contentWithTask": "Time tracking started on task: {{taskTitle}}",
 				"contentWithoutTask": "Time tracking started on a task"
+			},
+			"appointment_created": {
+				"title": "Appointment assigned to you",
+				"content": "You were assigned to the appointment: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Appointment updated",
+				"contentAssignee": "You were assigned to the appointment: {{appointmentTitle}}",
+				"contentRescheduled": "The appointment \"{{appointmentTitle}}\" was rescheduled."
 			}
 		}
 	},
@@ -2231,7 +2262,26 @@
 		"charts": {
 			"tasks": "Tasks",
 			"backlog": "Backlog",
-			"empty": "No task activity in the last 6 months."
+			"created": "Created",
+			"completed": "Completed",
+			"empty": "No task activity in this period.",
+			"noTasks": "No tasks to distribute.",
+			"workloadEmpty": "No open work assigned.",
+			"unassigned": "Unassigned",
+			"other": "Other",
+			"period": "Period",
+			"range_one": "{{count}} month",
+			"range_other": "{{count}} months",
+			"periodSummary": "{{created}} created · {{completed}} completed",
+			"velocityTitle": "Velocity",
+			"velocityDescription": "Tasks created and completed per week across all projects.",
+			"velocity4w": "Velocity (4 weeks)",
+			"perWeek": "{{value}}/week",
+			"workloadTitle": "Workload",
+			"workloadDescription": "Open board tasks per assignee, across all projects.",
+			"statusTitle": "Status breakdown",
+			"statusDescription": "Where the tasks of all projects currently sit.",
+			"byProject": "By project"
 		},
 		"consolidated": {
 			"taskNumber": "#{{number}}",
@@ -2433,5 +2483,45 @@
 		"branding": {
 			"poweredBy": "Powered by"
 		}
+	},
+	"appointments": {
+		"tab": "Appointments",
+		"pageTitle": "Appointments · {{name}}",
+		"previousWeek": "Previous week",
+		"nextWeek": "Next week",
+		"today": "Today",
+		"newAppointment": "New appointment",
+		"weekHint": "Click an empty slot to add an appointment; click one to edit it.",
+		"loadError": "Could not load appointments.",
+		"moveFromBacklog": "Move to appointments",
+		"empty": {
+			"title": "No appointments yet",
+			"description": "Appointments live here, not on the board or backlog."
+		},
+		"dialog": {
+			"createTitle": "New appointment",
+			"editTitle": "Edit appointment",
+			"description": "Appointments are scheduled like tasks but never appear on the board or backlog.",
+			"titleLabel": "Title",
+			"titlePlaceholder": "e.g. Design review",
+			"descriptionLabel": "Description",
+			"startLabel": "Starts",
+			"endLabel": "Ends",
+			"priorityLabel": "Priority",
+			"assigneeLabel": "Assignee",
+			"unassigned": "Unassigned",
+			"rangeError": "The end must be after the start.",
+			"create": "Create",
+			"save": "Save",
+			"delete": "Delete"
+		},
+		"toast": {
+			"created": "Appointment created",
+			"updated": "Appointment updated",
+			"deleted": "Appointment deleted",
+			"moved": "Moved to appointments",
+			"error": "Something went wrong"
+		},
+		"unscheduled": "Unscheduled"
 	}
 }

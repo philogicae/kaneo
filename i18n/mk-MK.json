@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Не успеа приклучувањето кон работниот простор",
+				"load": "Не успеа вчитувањето на деталите за линкот за покана."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Грешка со линкот за покана",
+			"invalidTitle": "Неважечки линк за покана",
+			"joinPrompt": "Имате линк за покана да се приклучите кон <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Линкот за покана е истечен",
+			"loading": "Вчитување на линкот за покана...",
+			"pageTitleAccept": "Приклучи се кон работниот простор",
+			"pageTitleError": "Грешка со линкот за покана",
+			"pageTitleInvalid": "Неважечки линк за покана",
+			"signedInAs": "Најавен како <email>{{email}}</email>",
+			"signedOutPrompt": "Создајте сметка или најавете се за да се приклучите кон работниот простор.",
+			"title": "Приклучете се кон работниот простор!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Работни простори",
 				"comment": "Коментари",
 				"activity": "Активности",
-				"fallback": "Резултати"
+				"fallback": "Резултати",
+				"appointment": "Состаноци"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Задачата е задоцнета",
 				"content": "{{taskTitle}} го помина крајниот рок"
+			},
+			"appointment_created": {
+				"title": "Ви е доделен состанок",
+				"content": "Ви е доделен состанокот: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Состанокот е ажуриран",
+				"contentAssignee": "Ви е доделен состанокот: {{appointmentTitle}}",
+				"contentRescheduled": "Состанокот \"{{appointmentTitle}}\" е презакажан."
 			}
 		},
 		"reminderLeadTime": {
@@ -791,27 +801,27 @@
 			"add": "Додади"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Додај",
+			"createError": "Не успеа создавањето на прилагоденото поле.",
+			"createSuccess": "Прилагоденото поле е создадено.",
+			"defaultLabel": "Стандардно",
+			"defaultValuePlaceholder": "Стандардна вредност",
+			"deleteButton": "Избриши",
+			"deleteError": "Не успеа бришењето на прилагоденото поле.",
+			"deleteSuccess": "Прилагоденото поле е избришано.",
+			"empty": "Сè уште нема конфигурирани прилагодени полиња.",
+			"loading": "Вчитување на прилагодените полиња...",
+			"namePlaceholder": "Име на полето",
+			"noOptionsPlaceholder": "Нема опции",
+			"optionsPlaceholder": "Опции одделени со запирки",
+			"required": "Задолжително",
+			"typePlaceholder": "Изберете тип на поле",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"date": "Датум",
+				"dropdown": "Паѓачки список",
+				"number": "Број",
+				"text": "Текст"
 			}
 		},
 		"developer": "Програмер",
@@ -1133,22 +1143,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Прво креирајте API клуч, потоа заменете го placeholder-от <YOUR_API_KEY> со него.",
+			"authModeApiKey": "API клуч",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Изберете режим на автентикација, потоа извршете ја командата за инсталација или залепете ја конфигурацијата во вашиот agent.",
+			"cardTitle": "Поврзи agent",
+			"copied": "Копирано",
+			"copy": "Копирај",
+			"createApiKey": "Креирај API клуч",
+			"followUpLabel": "Потоа автентицирајте се",
+			"installCommandLabel": "Команда за инсталација",
+			"manualConfigLabel": "Рачна конфигурација",
+			"oauthNote": "OAuth е стандарден: првото поврзување го отвора Kaneo во вашиот прелистувач за да го овласти agent-от, потоа токенот го управува самиот agent.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "вграден HTTP MCP endpoint на оваа инстанца",
+			"serverUrlLabel": "URL на серверот",
+			"subtitle": "Поврзете AI agent-и како Claude, Codex, Gemini или OpenCode со оваа Kaneo инстанца преку вградениот HTTP MCP сервер.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Известувања",
@@ -1368,8 +1378,8 @@
 			"columnsDescription": "Управувај со колоните што се прикажуваат на таблата. Повлечи за да ги преуредиш. Вклучи \"Завршна колона\" за фази што претставуваат завршена работа.",
 			"automationTitle": "Правила за автоматизација",
 			"automationDescription": "Поврзи настани од интеграции со колони. Кога ќе се случи настан, поврзаната задача се преместува во одредената колона.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Управувајте со прилагодените полиња на овој проект. Влечете за прередување.",
+			"customFieldsTitle": "Прилагодени полиња"
 		},
 		"repositoryBrowser": {
 			"title": "Избери репозиториум",
@@ -1486,7 +1496,9 @@
 				"taskPriorityChanged": "Промени на приоритет",
 				"taskTitleChanged": "Промени на наслов",
 				"taskDescriptionChanged": "Промени на опис",
-				"taskCommentCreated": "Нови коментари"
+				"taskCommentCreated": "Нови коментари",
+				"appointmentCreated": "Нови состаноци",
+				"appointmentUpdated": "Промени на состаноци"
 			},
 			"connect": "Поврзи Telegram",
 			"saveChanges": "Зачувај промени",
@@ -1544,7 +1556,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Откриени теми",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1775,6 +1787,25 @@
 				"title": "Избриши улога",
 				"description": "Ова трајно ќе ја избрише улогата \"{{role}}\". Членовите со оваа улога ќе ги изгубат нејзините дозволи."
 			}
+		},
+		"skills": "Вештини",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Извршете ги овие команди од коренот на вашиот Kaneo и потоа рестартирајте го agent-от.",
+			"cardTitle": "Инсталирај го Kaneo skill-от",
+			"copied": "Копирано",
+			"copy": "Копирај",
+			"destinationLabel": "Дестинација",
+			"installCommandLabel": "Команда за инсталација",
+			"mcpRequirement": "Skill-от се потпира на MCP конекцијата: прво конфигурирајте ја.",
+			"openMcpSettings": "Отвори MCP поставки",
+			"pageTitle": "Вештини",
+			"projectScope": "проект",
+			"subtitle": "Инсталирајте го Kaneo skill-от за AI agent-ите да ги следат конвенциите на оваа инстанца и правилно да ги користат MCP алатките.",
+			"title": "Agent вештини",
+			"updateDescription": "Skill-овите се читаат од дискот: повторно копирајте ја папката по ажурирање на Kaneo за да ги примените промените.",
+			"userScope": "корисник",
+			"verifyLabel": "Потврди"
 		}
 	},
 	"tasks": {
@@ -1835,8 +1866,8 @@
 				"isAnyOf": "е било кој од",
 				"includeAnyOf": "вклучува било кој од"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Сите",
+			"noValuesUsedYet": "Сè уште нема употребени вредности"
 		},
 		"boardSearchPlaceholder": "Пребарај тикети...",
 		"bulk": {
@@ -1889,7 +1920,7 @@
 			"loadingTask": "Се вчитува задача...",
 			"taskNotFound": "Задачата не е пронајдена",
 			"taskNotFoundDescription": "Задачата што ја барате не постои или е избришана.",
-			"customFields": "Custom Fields"
+			"customFields": "Прилагодени полиња"
 		},
 		"contextMenu": {
 			"copyLink": "Копирај линк",
@@ -2007,8 +2038,8 @@
 					"renderFailed": "Mermaid дијаграмот не можеше да се прикаже"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Полето е ажурирано",
+			"selectOption": "Изберете опција"
 		},
 		"dueDate": {
 			"label": "Краен рок",
@@ -2195,7 +2226,7 @@
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "минути",
 			"unitWeek_one": "week",
 			"unitWeek_other": "weeks",
 			"weeksBefore_one": "{{count}} week before",
@@ -2251,7 +2282,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Ознаки",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2311,30 +2342,30 @@
 			"roleUpdateError": "Неуспешно ажурирање на улогата"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Автоматското копирање не успеа. Изберете го линкот и притиснете Ctrl+C.",
+			"copyIconAria": "Копирај го линкот за покана",
+			"create": "Создај линк",
+			"createError": "Не успеа создавањето на линкот за покана",
+			"createSuccess": "Линкот за покана е создаден",
+			"deleteError": "Не успеа отповикувањето на линкот за покана",
+			"deleteSuccess": "Линкот за покана е отповикан",
+			"description": "Секој со линкот може да се приклучи кон овој работен простор како член — не е потребна е-пошта.",
+			"empty": "Сè уште нема споделливи линкови за покана.",
+			"expiry24h": "24 часа",
+			"expiry30d": "30 дена",
+			"expiry7d": "7 дена",
+			"expiryLabel": "Истек",
+			"expiryNever": "Никогаш не истекува",
+			"join": "Приклучи се кон {{workspaceName}}",
+			"linkCopied": "Линкот за покана е копиран",
+			"maxUsesLabel": "Макс. употреби",
+			"maxUsesUnlimited": "Неограничено",
+			"never": "Никогаш не истекува",
+			"revokeIconAria": "Отповикај го линкот за покана",
+			"title": "Споделливи линкови за покана",
+			"uses": "{{used}}/{{max}} употреби",
+			"workspace": "Работен простор: {{workspaceName}}",
+			"usesUnlimited": "{{used}} употреби"
 		}
 	},
 	"unified": {
@@ -2361,9 +2392,28 @@
 			"tasks": "Задачи"
 		},
 		"charts": {
-			"backlog": "Беклог",
+			"backlog": "Backlog",
 			"empty": "Нема активност на задачи во последните 6 месеци.",
-			"tasks": "Задачи"
+			"tasks": "Задачи",
+			"byProject": "По проект",
+			"completed": "Завршени",
+			"created": "Создадени",
+			"noTasks": "Нема задачи за распоредување.",
+			"other": "Друго",
+			"period": "Период",
+			"periodSummary": "{{created}} создадени · {{completed}} завршени",
+			"perWeek": "{{value}}/недела",
+			"range_one": "{{count}} месец",
+			"range_other": "{{count}} месеци",
+			"statusDescription": "Каде моментално се наоѓаат задачите на сите проекти.",
+			"statusTitle": "Распределба по статус",
+			"unassigned": "Незадолжено",
+			"velocity4w": "Брзина (4 недели)",
+			"velocityDescription": "Задачи создадени и завршени неделно низ сите проекти.",
+			"velocityTitle": "Брзина",
+			"workloadDescription": "Отворени задачи на таблата по задолжен член, низ сите проекти.",
+			"workloadEmpty": "Нема доделена отворена работа.",
+			"workloadTitle": "Обем на работа"
 		},
 		"tabs": {
 			"charts": "Графикони",
@@ -2433,5 +2483,45 @@
 			"success": "Работниот простор е успешно креиран",
 			"error": "Неуспешно креирање на работен простор"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Доделено",
+			"create": "Создај",
+			"createTitle": "Нов состанок",
+			"delete": "Избриши",
+			"description": "Состаноците се закажуваат како задачи, но никогаш не се појавуваат на таблата или во backlog.",
+			"descriptionLabel": "Опис",
+			"editTitle": "Уреди состанок",
+			"endLabel": "Крај",
+			"priorityLabel": "Приоритет",
+			"rangeError": "Крајот мора да биде по почетокот.",
+			"save": "Зачувај",
+			"startLabel": "Почеток",
+			"titleLabel": "Наслов",
+			"titlePlaceholder": "на пр. Преглед на дизајн",
+			"unassigned": "Незадолжено"
+		},
+		"empty": {
+			"description": "Состаноците живеат овде, не на таблата или во backlog.",
+			"title": "Сè уште нема состаноци"
+		},
+		"loadError": "Не можеше да се вчитаат состаноците.",
+		"moveFromBacklog": "Премести во состаноци",
+		"newAppointment": "Нов состанок",
+		"nextWeek": "Следна недела",
+		"pageTitle": "Состаноци · {{name}}",
+		"previousWeek": "Претходна недела",
+		"tab": "Состаноци",
+		"toast": {
+			"created": "Состанокот е создаден",
+			"deleted": "Состанокот е избришан",
+			"error": "Нешто тргна наопаку",
+			"moved": "Преместено во состаноци",
+			"updated": "Состанокот е ажуриран"
+		},
+		"today": "Денес",
+		"weekHint": "Кликнете на празен термин за да додадете состанок; кликнете на состанок за да го уредите.",
+		"unscheduled": "Незакажано"
 	}
 }

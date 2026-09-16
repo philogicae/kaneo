@@ -30,6 +30,8 @@ export const updateTelegramBotBody = z.object({
       taskTitleChanged: z.boolean().optional(),
       taskDescriptionChanged: z.boolean().optional(),
       taskCommentCreated: z.boolean().optional(),
+      appointmentCreated: z.boolean().optional(),
+      appointmentUpdated: z.boolean().optional(),
     })
     .optional()
     .openapi({

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import getLabelsByWorkspace from "@/fetchers/label/get-label-by-workspace";
+import getLabelsByWorkspace from "@/fetchers/label/get-labels-by-workspace";
 
 function useGetLabelsByWorkspace(workspaceId: string) {
   return useQuery({

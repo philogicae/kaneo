@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Không thể tham gia không gian làm việc",
+				"load": "Không thể tải chi tiết liên kết mời."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Lỗi liên kết mời",
+			"invalidTitle": "Liên kết mời không hợp lệ",
+			"joinPrompt": "Bạn có liên kết mời tham gia <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Liên kết mời đã hết hạn",
+			"loading": "Đang tải liên kết mời...",
+			"pageTitleAccept": "Tham gia không gian làm việc",
+			"pageTitleError": "Lỗi liên kết mời",
+			"pageTitleInvalid": "Liên kết mời không hợp lệ",
+			"signedInAs": "Đã đăng nhập với tư cách <email>{{email}}</email>",
+			"signedOutPrompt": "Tạo tài khoản hoặc đăng nhập để tham gia không gian làm việc.",
+			"title": "Tham gia không gian làm việc!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Không gian làm việc",
 				"comment": "Bình luận",
 				"activity": "Hoạt động",
-				"fallback": "Kết quả"
+				"fallback": "Kết quả",
+				"appointment": "Cuộc hẹn"
 			}
 		},
 		"settingsLayout": {
@@ -666,6 +667,15 @@
 				"title": "Đã bắt đầu theo dõi thời gian",
 				"contentWithTask": "Đã bắt đầu theo dõi thời gian trên công việc: {{taskTitle}}",
 				"contentWithoutTask": "Đã bắt đầu theo dõi thời gian trên một công việc"
+			},
+			"appointment_created": {
+				"title": "Cuộc hẹn được giao cho bạn",
+				"content": "Bạn được giao cuộc hẹn: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Cuộc hẹn đã cập nhật",
+				"contentAssignee": "Bạn được giao cuộc hẹn: {{appointmentTitle}}",
+				"contentRescheduled": "Cuộc hẹn \"{{appointmentTitle}}\" đã được dời lịch."
 			}
 		}
 	},
@@ -788,27 +798,27 @@
 			"add": "Thêm"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Thêm",
+			"createError": "Không thể tạo trường tùy chỉnh.",
+			"createSuccess": "Đã tạo trường tùy chỉnh.",
+			"defaultLabel": "Mặc định",
+			"defaultValuePlaceholder": "Giá trị mặc định",
+			"deleteButton": "Xóa",
+			"deleteError": "Không thể xóa trường tùy chỉnh.",
+			"deleteSuccess": "Đã xóa trường tùy chỉnh.",
+			"empty": "Chưa có trường tùy chỉnh nào được cấu hình.",
+			"loading": "Đang tải trường tùy chỉnh...",
+			"namePlaceholder": "Tên trường",
+			"noOptionsPlaceholder": "Không có tùy chọn",
+			"optionsPlaceholder": "Các tùy chọn cách nhau bằng dấu phẩy",
+			"required": "Bắt buộc",
+			"typePlaceholder": "Chọn loại trường",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"date": "Ngày",
+				"dropdown": "Danh sách thả xuống",
+				"number": "Số",
+				"text": "Văn bản"
 			}
 		},
 		"developer": "Nhà phát triển",
@@ -1130,22 +1140,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Tạo khóa API trước, sau đó thay thế placeholder <YOUR_API_KEY> bằng khóa đó.",
+			"authModeApiKey": "Khóa API",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Chọn chế độ xác thực, sau đó chạy lệnh cài đặt hoặc dán cấu hình vào agent của bạn.",
+			"cardTitle": "Kết nối agent",
+			"copied": "Đã sao chép",
+			"copy": "Sao chép",
+			"createApiKey": "Tạo khóa API",
+			"followUpLabel": "Sau đó xác thực",
+			"installCommandLabel": "Lệnh cài đặt",
+			"manualConfigLabel": "Cấu hình thủ công",
+			"oauthNote": "OAuth là mặc định: kết nối đầu tiên mở Kaneo trong trình duyệt để ủy quyền cho agent, sau đó token do chính agent quản lý.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "endpoint MCP HTTP tích hợp của instance này",
+			"serverUrlLabel": "URL máy chủ",
+			"subtitle": "Kết nối các agent AI như Claude, Codex, Gemini hoặc OpenCode với instance Kaneo này qua máy chủ MCP HTTP tích hợp.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Thông báo",
@@ -1365,8 +1375,8 @@
 			"columnsDescription": "Quản lý các cột xuất hiện trên bảng của bạn. Kéo để sắp xếp lại. Bật \"Cột hoàn thành\" cho các giai đoạn thể hiện công việc đã hoàn tất.",
 			"automationTitle": "Quy tắc tự động hóa",
 			"automationDescription": "Ánh xạ sự kiện tích hợp với các cột. Khi một sự kiện xảy ra, công việc liên kết sẽ chuyển sang cột được chỉ định.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Quản lý trường tùy chỉnh của dự án này. Kéo để sắp xếp lại.",
+			"customFieldsTitle": "Trường tùy chỉnh"
 		},
 		"repositoryBrowser": {
 			"title": "Chọn kho lưu trữ",
@@ -1483,7 +1493,9 @@
 				"taskPriorityChanged": "Thay đổi mức ưu tiên",
 				"taskTitleChanged": "Thay đổi tiêu đề",
 				"taskDescriptionChanged": "Thay đổi mô tả",
-				"taskCommentCreated": "Bình luận mới"
+				"taskCommentCreated": "Bình luận mới",
+				"appointmentCreated": "Cuộc hẹn mới",
+				"appointmentUpdated": "Thay đổi cuộc hẹn"
 			},
 			"connect": "Kết nối Telegram",
 			"saveChanges": "Lưu thay đổi",
@@ -1540,7 +1552,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Chủ đề đã phát hiện",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1770,6 +1782,25 @@
 				"title": "Xóa vai trò",
 				"description": "Thao tác này sẽ xóa vĩnh viễn vai trò \"{{role}}\". Các thành viên được gán vai trò này sẽ mất các quyền của nó."
 			}
+		},
+		"skills": "Kỹ năng",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Chạy các lệnh này từ thư mục gốc của bản sao Kaneo, sau đó khởi động lại agent của bạn.",
+			"cardTitle": "Cài đặt kỹ năng Kaneo",
+			"copied": "Đã sao chép",
+			"copy": "Sao chép",
+			"destinationLabel": "Đích",
+			"installCommandLabel": "Lệnh cài đặt",
+			"mcpRequirement": "Kỹ năng dựa trên kết nối MCP: hãy cấu hình trước.",
+			"openMcpSettings": "Mở cài đặt MCP",
+			"pageTitle": "Kỹ năng",
+			"projectScope": "dự án",
+			"subtitle": "Cài đặt kỹ năng Kaneo để các agent AI tuân theo quy ước của instance này và dùng đúng các công cụ MCP.",
+			"title": "Kỹ năng agent",
+			"updateDescription": "Kỹ năng được đọc từ đĩa: sao chép lại thư mục sau khi cập nhật Kaneo để áp dụng thay đổi.",
+			"userScope": "người dùng",
+			"verifyLabel": "Xác minh"
 		}
 	},
 	"tasks": {
@@ -1830,8 +1861,8 @@
 				"isAnyOf": "là một trong",
 				"includeAnyOf": "bao gồm một trong"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Tất cả",
+			"noValuesUsedYet": "Chưa có giá trị nào được dùng"
 		},
 		"boardSearchPlaceholder": "Tìm phiếu...",
 		"bulk": {
@@ -1884,7 +1915,7 @@
 			"loadingTask": "Đang tải công việc...",
 			"taskNotFound": "Không tìm thấy công việc",
 			"taskNotFoundDescription": "Công việc bạn đang tìm không tồn tại hoặc đã bị xóa.",
-			"customFields": "Custom Fields"
+			"customFields": "Trường tùy chỉnh"
 		},
 		"contextMenu": {
 			"copyLink": "Sao chép liên kết",
@@ -1900,7 +1931,7 @@
 		"detail": {
 			"activity": "Hoạt động",
 			"addDescription": "Thêm mô tả...",
-			"customFieldUpdated": "Field updated",
+			"customFieldUpdated": "Đã cập nhật trường",
 			"editor": {
 				"ariaLabel": "Trình soạn thảo mô tả công việc",
 				"placeholder": "Viết mô tả...",
@@ -2001,7 +2032,7 @@
 			},
 			"noActivity": "Không tìm thấy hoạt động nào",
 			"openInFullPage": "Mở ở trang đầy đủ",
-			"selectOption": "Select option",
+			"selectOption": "Chọn tùy chọn",
 			"subtaskOf": "Công việc con của",
 			"titlePlaceholder": "Nhấp để thêm tiêu đề"
 		},
@@ -2180,7 +2211,7 @@
 			"unitDay_other": "days",
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "phút",
 			"unitWeek_other": "weeks",
 			"weeksBefore_other": "{{count}} weeks before"
 		},
@@ -2234,7 +2265,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "Nhãn",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2294,30 +2325,30 @@
 			"roleUpdateError": "Không thể cập nhật vai trò"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Không thể tự động sao chép. Chọn liên kết và nhấn Ctrl+C.",
+			"copyIconAria": "Sao chép liên kết mời",
+			"create": "Tạo liên kết",
+			"createError": "Không thể tạo liên kết mời",
+			"createSuccess": "Đã tạo liên kết mời",
+			"deleteError": "Không thể thu hồi liên kết mời",
+			"deleteSuccess": "Đã thu hồi liên kết mời",
+			"description": "Bất kỳ ai có liên kết đều có thể tham gia không gian làm việc này với tư cách thành viên — không cần email.",
+			"empty": "Chưa có liên kết mời có thể chia sẻ.",
+			"expiry24h": "24 giờ",
+			"expiry30d": "30 ngày",
+			"expiry7d": "7 ngày",
+			"expiryLabel": "Hết hạn",
+			"expiryNever": "Không bao giờ hết hạn",
+			"join": "Tham gia {{workspaceName}}",
+			"linkCopied": "Đã sao chép liên kết mời",
+			"maxUsesLabel": "Số lần dùng tối đa",
+			"maxUsesUnlimited": "Không giới hạn",
+			"never": "Không bao giờ hết hạn",
+			"revokeIconAria": "Thu hồi liên kết mời",
+			"title": "Liên kết mời có thể chia sẻ",
+			"uses": "{{used}}/{{max}} lần dùng",
+			"workspace": "Không gian làm việc: {{workspaceName}}",
+			"usesUnlimited": "{{used}} lần dùng"
 		}
 	},
 	"unified": {
@@ -2345,7 +2376,26 @@
 		"charts": {
 			"backlog": "Backlog",
 			"empty": "Không có hoạt động công việc nào trong 6 tháng qua.",
-			"tasks": "Công việc"
+			"tasks": "Công việc",
+			"byProject": "Theo dự án",
+			"completed": "Đã hoàn thành",
+			"created": "Đã tạo",
+			"noTasks": "Không có công việc để phân phối.",
+			"other": "Khác",
+			"period": "Khoảng thời gian",
+			"periodSummary": "{{created}} đã tạo · {{completed}} đã xong",
+			"perWeek": "{{value}}/tuần",
+			"range_other": "{{count}} tháng",
+			"statusDescription": "Công việc của tất cả dự án hiện đang ở đâu.",
+			"statusTitle": "Phân bổ theo trạng thái",
+			"unassigned": "Chưa giao",
+			"velocity4w": "Tốc độ (4 tuần)",
+			"velocityDescription": "Công việc được tạo và hoàn thành mỗi tuần trên tất cả dự án.",
+			"velocityTitle": "Tốc độ",
+			"workloadDescription": "Công việc trên bảng đang mở theo người được giao, trên tất cả dự án.",
+			"workloadEmpty": "Không có công việc đang mở nào được giao.",
+			"workloadTitle": "Khối lượng công việc",
+			"range_one": "{{count}} tháng"
 		},
 		"tabs": {
 			"charts": "Biểu đồ",
@@ -2412,5 +2462,45 @@
 			"success": "Tạo không gian làm việc thành công",
 			"error": "Không thể tạo không gian làm việc"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Đã giao",
+			"create": "Tạo",
+			"createTitle": "Cuộc hẹn mới",
+			"delete": "Xóa",
+			"description": "Cuộc hẹn được lên lịch như công việc nhưng không bao giờ xuất hiện trên bảng hay backlog.",
+			"descriptionLabel": "Mô tả",
+			"editTitle": "Sửa cuộc hẹn",
+			"endLabel": "Kết thúc",
+			"priorityLabel": "Ưu tiên",
+			"rangeError": "Thời gian kết thúc phải sau thời gian bắt đầu.",
+			"save": "Lưu",
+			"startLabel": "Bắt đầu",
+			"titleLabel": "Tiêu đề",
+			"titlePlaceholder": "ví dụ: Đánh giá thiết kế",
+			"unassigned": "Chưa giao"
+		},
+		"empty": {
+			"description": "Cuộc hẹn ở đây, không phải trên bảng hay backlog.",
+			"title": "Chưa có cuộc hẹn"
+		},
+		"loadError": "Không thể tải cuộc hẹn.",
+		"moveFromBacklog": "Chuyển sang cuộc hẹn",
+		"newAppointment": "Cuộc hẹn mới",
+		"nextWeek": "Tuần sau",
+		"pageTitle": "Cuộc hẹn · {{name}}",
+		"previousWeek": "Tuần trước",
+		"tab": "Cuộc hẹn",
+		"toast": {
+			"created": "Đã tạo cuộc hẹn",
+			"deleted": "Đã xóa cuộc hẹn",
+			"error": "Đã xảy ra lỗi",
+			"moved": "Đã chuyển sang cuộc hẹn",
+			"updated": "Đã cập nhật cuộc hẹn"
+		},
+		"today": "Hôm nay",
+		"weekHint": "Nhấp vào ô trống để thêm cuộc hẹn; nhấp vào cuộc hẹn để sửa.",
+		"unscheduled": "Chưa lên lịch"
 	}
 }

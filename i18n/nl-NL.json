@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "Deelnemen aan de werkruimte mislukt",
+				"load": "Kan de details van de uitnodigingslink niet laden."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "Fout met uitnodigingslink",
+			"invalidTitle": "Ongeldige uitnodigingslink",
+			"joinPrompt": "Je hebt een uitnodigingslink om <workspaceName>{{workspaceName}}</workspaceName> te joinen.",
+			"linkExpired": "Uitnodigingslink verlopen",
+			"loading": "Uitnodigingslink laden...",
+			"pageTitleAccept": "Deelnemen aan werkruimte",
+			"pageTitleError": "Fout met uitnodigingslink",
+			"pageTitleInvalid": "Ongeldige uitnodigingslink",
+			"signedInAs": "Ingelogd als <email>{{email}}</email>",
+			"signedOutPrompt": "Maak een account aan of log in om deel te nemen aan de werkruimte.",
+			"title": "Neem deel aan de werkruimte!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "Werkruimtes",
 				"comment": "Reacties",
 				"activity": "Activiteiten",
-				"fallback": "Resultaten"
+				"fallback": "Resultaten",
+				"appointment": "Afspraken"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "Taak te laat",
 				"content": "{{taskTitle}} is over de einddatum heen"
+			},
+			"appointment_created": {
+				"title": "Afspraak aan jou toegewezen",
+				"content": "Je bent toegewezen aan de afspraak: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "Afspraak bijgewerkt",
+				"contentAssignee": "Je bent toegewezen aan de afspraak: {{appointmentTitle}}",
+				"contentRescheduled": "De afspraak \"{{appointmentTitle}}\" is verplaatst."
 			}
 		},
 		"reminderLeadTime": {
@@ -791,27 +801,27 @@
 			"add": "Toevoegen"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "Toevoegen",
+			"createError": "Aanmaken van aangepast veld mislukt.",
+			"createSuccess": "Aangepast veld aangemaakt.",
+			"defaultLabel": "Standaard",
+			"defaultValuePlaceholder": "Standaardwaarde",
+			"deleteButton": "Verwijderen",
+			"deleteError": "Verwijderen van aangepast veld mislukt.",
+			"deleteSuccess": "Aangepast veld verwijderd.",
+			"empty": "Nog geen aangepaste velden geconfigureerd.",
+			"loading": "Aangepaste velden laden...",
+			"namePlaceholder": "Veldnaam",
+			"noOptionsPlaceholder": "Geen opties",
+			"optionsPlaceholder": "Opties gescheiden door komma's",
+			"required": "Verplicht",
+			"typePlaceholder": "Veldtype selecteren",
 			"types": {
 				"boolean": "Boolean",
-				"date": "Date",
+				"date": "Datum",
 				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"number": "Nummer",
+				"text": "Tekst"
 			}
 		},
 		"developer": "Ontwikkelaar",
@@ -1133,22 +1143,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "Maak eerst een API-sleutel en vervang daarna de tijdelijke aanduiding <YOUR_API_KEY> daarmee.",
+			"authModeApiKey": "API-sleutel",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "Kies een authenticatiemethode en voer daarna de installatieopdracht uit of plak de configuratie in je agent.",
+			"cardTitle": "Een agent verbinden",
+			"copied": "Gekopieerd",
+			"copy": "Kopiëren",
+			"createApiKey": "API-sleutel aanmaken",
+			"followUpLabel": "Daarna authenticeren",
+			"installCommandLabel": "Installatieopdracht",
+			"manualConfigLabel": "Handmatige configuratie",
+			"oauthNote": "OAuth is de standaard: de eerste verbinding opent Kaneo in je browser om de agent te autoriseren; het token wordt daarna door de agent zelf beheerd.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "ingebouwde HTTP MCP-endpoint van deze instantie",
+			"serverUrlLabel": "Server-URL",
+			"subtitle": "Verbind AI-agenten zoals Claude, Codex, Gemini of OpenCode met deze Kaneo-instantie via de ingebouwde HTTP MCP-server.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "Meldingen",
@@ -1368,8 +1378,8 @@
 			"columnsDescription": "Beheer de kolommen op je bord. Sleep om de volgorde te wijzigen. Schakel \"Gereed-kolom\" in voor stadia die voltooid werk vertegenwoordigen.",
 			"automationTitle": "Automatiseringsregels",
 			"automationDescription": "Koppel integratie-gebeurtenissen aan kolommen. Bij een gebeurtenis verplaatst de taak automatisch naar de gekozen kolom.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "Beheer de aangepaste velden van dit project. Sleep om te herordenen.",
+			"customFieldsTitle": "Aangepaste velden"
 		},
 		"repositoryBrowser": {
 			"title": "Selecteer Repository",
@@ -1486,7 +1496,9 @@
 				"taskPriorityChanged": "Prioriteitswijzigingen",
 				"taskTitleChanged": "Titelwijzigingen",
 				"taskDescriptionChanged": "Beschrijvingswijzigingen",
-				"taskCommentCreated": "Nieuwe reacties"
+				"taskCommentCreated": "Nieuwe reacties",
+				"appointmentCreated": "Nieuwe afspraken",
+				"appointmentUpdated": "Afspraakwijzigingen"
 			},
 			"connect": "Verbind Telegram",
 			"saveChanges": "Wijzigingen opslaan",
@@ -1544,7 +1556,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "Gedetecteerde topics",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1775,6 +1787,25 @@
 				"title": "Rol verwijderen",
 				"description": "Dit zal de rol \"{{role}}\" permanent verwijderen. Leden met deze rol verliezen de bijbehorende permissies."
 			}
+		},
+		"skills": "Skills",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Voer deze opdrachten uit vanaf de hoofdmap van je Kaneo-checkout en herstart daarna je agent.",
+			"cardTitle": "De Kaneo-skill installeren",
+			"copied": "Gekopieerd",
+			"copy": "Kopiëren",
+			"destinationLabel": "Bestemming",
+			"installCommandLabel": "Installatieopdracht",
+			"mcpRequirement": "De skill bouwt voort op de MCP-verbinding: configureer die eerst.",
+			"openMcpSettings": "MCP-instellingen openen",
+			"pageTitle": "Skills",
+			"projectScope": "project",
+			"subtitle": "Installeer de Kaneo-skill zodat AI-agenten de conventies van deze instantie volgen en de MCP-tools correct gebruiken.",
+			"title": "Agent-skills",
+			"updateDescription": "Skills worden van schijf gelezen: kopieer de map opnieuw na een Kaneo-update om wijzigingen over te nemen.",
+			"userScope": "gebruiker",
+			"verifyLabel": "Verifiëren"
 		}
 	},
 	"tasks": {
@@ -1835,8 +1866,8 @@
 				"isAnyOf": "is een van",
 				"includeAnyOf": "bevat een van"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "Alle",
+			"noValuesUsedYet": "Nog geen waarden gebruikt"
 		},
 		"boardSearchPlaceholder": "Tickets zoeken...",
 		"bulk": {
@@ -1889,7 +1920,7 @@
 			"loadingTask": "Taak laden...",
 			"taskNotFound": "Taak niet gevonden",
 			"taskNotFoundDescription": "De taak die u zoekt bestaat niet of is verwijderd.",
-			"customFields": "Custom Fields"
+			"customFields": "Aangepaste velden"
 		},
 		"contextMenu": {
 			"copyLink": "Link kopiëren",
@@ -2007,8 +2038,8 @@
 					"renderFailed": "Mermaid-diagram kon niet worden weergegeven"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "Veld bijgewerkt",
+			"selectOption": "Optie selecteren"
 		},
 		"dueDate": {
 			"label": "Einddatum",
@@ -2195,7 +2226,7 @@
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
 			"unitMinute_one": "minute",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "minuten",
 			"unitWeek_one": "week",
 			"unitWeek_other": "weeks",
 			"weeksBefore_one": "{{count}} week before",
@@ -2311,30 +2342,30 @@
 			"roleUpdateError": "Bijwerken rol mislukt"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "Automatisch kopiëren mislukt. Selecteer de link en druk op Ctrl+C.",
+			"copyIconAria": "Uitnodigingslink kopiëren",
+			"create": "Link aanmaken",
+			"createError": "Aanmaken van de uitnodigingslink mislukt",
+			"createSuccess": "Uitnodigingslink aangemaakt",
+			"deleteError": "Intrekken van de uitnodigingslink mislukt",
+			"deleteSuccess": "Uitnodigingslink ingetrokken",
+			"description": "Iedereen met de link kan als lid deelnemen aan deze werkruimte — geen e-mail nodig.",
+			"empty": "Nog geen deelbare uitnodigingslinks.",
+			"expiry24h": "24 uur",
+			"expiry30d": "30 dagen",
+			"expiry7d": "7 dagen",
+			"expiryLabel": "Vervaldatum",
+			"expiryNever": "Verloopt nooit",
+			"join": "Deelnemen aan {{workspaceName}}",
+			"linkCopied": "Uitnodigingslink gekopieerd",
+			"maxUsesLabel": "Max. gebruik",
+			"maxUsesUnlimited": "Onbeperkt",
+			"never": "Verloopt nooit",
+			"revokeIconAria": "Uitnodigingslink intrekken",
+			"title": "Deelbare uitnodigingslinks",
+			"uses": "{{used}}/{{max}} keer gebruikt",
+			"workspace": "Werkruimte: {{workspaceName}}",
+			"usesUnlimited": "{{used}} keer gebruikt"
 		}
 	},
 	"unified": {
@@ -2363,7 +2394,26 @@
 		"charts": {
 			"backlog": "Backlog",
 			"empty": "Geen taakactiviteit in de afgelopen 6 maanden.",
-			"tasks": "Taken"
+			"tasks": "Taken",
+			"byProject": "Per project",
+			"completed": "Afgerond",
+			"created": "Aangemaakt",
+			"noTasks": "Geen taken te verdelen.",
+			"other": "Overig",
+			"period": "Periode",
+			"periodSummary": "{{created}} aangemaakt · {{completed}} afgerond",
+			"perWeek": "{{value}}/week",
+			"range_one": "{{count}} maand",
+			"range_other": "{{count}} maanden",
+			"statusDescription": "Waar de taken van alle projecten nu staan.",
+			"statusTitle": "Statusverdeling",
+			"unassigned": "Niet toegewezen",
+			"velocity4w": "Snelheid (4 weken)",
+			"velocityDescription": "Per week aangemaakte en afgeronde taken over alle projecten.",
+			"velocityTitle": "Snelheid",
+			"workloadDescription": "Open boardtaken per persoon, over alle projecten.",
+			"workloadEmpty": "Geen open werk toegewezen.",
+			"workloadTitle": "Werkbelasting"
 		},
 		"tabs": {
 			"charts": "Grafieken",
@@ -2433,5 +2483,45 @@
 			"success": "Werkruimte succesvol aangemaakt",
 			"error": "Aanmaken werkruimte mislukt"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Toegewezen",
+			"create": "Aanmaken",
+			"createTitle": "Nieuwe afspraak",
+			"delete": "Verwijderen",
+			"description": "Afspraken worden zoals taken gepland, maar verschijnen nooit op het bord of in de backlog.",
+			"descriptionLabel": "Beschrijving",
+			"editTitle": "Afspraak bewerken",
+			"endLabel": "Einde",
+			"priorityLabel": "Prioriteit",
+			"rangeError": "Het einde moet na de start liggen.",
+			"save": "Opslaan",
+			"startLabel": "Start",
+			"titleLabel": "Titel",
+			"titlePlaceholder": "bijv. Designreview",
+			"unassigned": "Niet toegewezen"
+		},
+		"empty": {
+			"description": "Afspraken staan hier, niet op het bord of in de backlog.",
+			"title": "Nog geen afspraken"
+		},
+		"loadError": "Afspraken konden niet worden geladen.",
+		"moveFromBacklog": "Naar afspraken verplaatsen",
+		"newAppointment": "Nieuwe afspraak",
+		"nextWeek": "Volgende week",
+		"pageTitle": "Afspraken · {{name}}",
+		"previousWeek": "Vorige week",
+		"tab": "Afspraken",
+		"toast": {
+			"created": "Afspraak aangemaakt",
+			"deleted": "Afspraak verwijderd",
+			"error": "Er is iets misgegaan",
+			"moved": "Naar afspraken verplaatst",
+			"updated": "Afspraak bijgewerkt"
+		},
+		"today": "Vandaag",
+		"weekHint": "Klik op een leeg tijdslot om een afspraak toe te voegen; klik op een afspraak om deze te bewerken.",
+		"unscheduled": "Niet ingepland"
 	}
 }

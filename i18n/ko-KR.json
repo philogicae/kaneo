@@ -292,20 +292,20 @@
 		},
 		"inviteLink": {
 			"errors": {
-				"accept": "Failed to join the workspace",
-				"load": "Failed to load the invite link details."
+				"accept": "워크스페이스 참여 실패",
+				"load": "초대 링크 세부 정보를 불러오지 못했습니다."
 			},
-			"errorTitle": "Invite Link Error",
-			"invalidTitle": "Invalid Invite Link",
-			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
-			"linkExpired": "Invite Link Expired",
-			"loading": "Loading invite link...",
-			"pageTitleAccept": "Join Workspace",
-			"pageTitleError": "Invite Link Error",
-			"pageTitleInvalid": "Invite Link Invalid",
-			"signedInAs": "Signed in as <email>{{email}}</email>",
-			"signedOutPrompt": "Create an account or sign in to join the workspace.",
-			"title": "Join the workspace!"
+			"errorTitle": "초대 링크 오류",
+			"invalidTitle": "유효하지 않은 초대 링크",
+			"joinPrompt": "<workspaceName>{{workspaceName}}</workspaceName>에 참여할 초대 링크가 있습니다.",
+			"linkExpired": "초대 링크 만료됨",
+			"loading": "초대 링크 불러오는 중...",
+			"pageTitleAccept": "워크스페이스 참여",
+			"pageTitleError": "초대 링크 오류",
+			"pageTitleInvalid": "유효하지 않은 초대 링크",
+			"signedInAs": "<email>{{email}}</email>(으)로 로그인됨",
+			"signedOutPrompt": "워크스페이스에 참여하려면 계정을 만들거나 로그인하세요.",
+			"title": "워크스페이스에 참여하세요!"
 		}
 	},
 	"common": {
@@ -551,7 +551,8 @@
 				"workspace": "워크스페이스",
 				"comment": "댓글",
 				"activity": "활동",
-				"fallback": "결과"
+				"fallback": "결과",
+				"appointment": "일정"
 			}
 		},
 		"settingsLayout": {
@@ -661,6 +662,15 @@
 			"task_overdue": {
 				"title": "작업 기한 초과",
 				"content": "{{taskTitle}}이(가) 마감일을 지났습니다"
+			},
+			"appointment_created": {
+				"title": "일정이 배정되었습니다",
+				"content": "일정이 배정되었습니다: {{appointmentTitle}}"
+			},
+			"appointment_updated": {
+				"title": "일정이 업데이트되었습니다",
+				"contentAssignee": "일정이 배정되었습니다: {{appointmentTitle}}",
+				"contentRescheduled": "\"{{appointmentTitle}}\" 일정이 변경되었습니다."
 			}
 		},
 		"reminderLeadTime": {
@@ -788,27 +798,27 @@
 			"add": "추가"
 		},
 		"customFields": {
-			"addButton": "Add",
-			"createError": "Failed to create custom field.",
-			"createSuccess": "Custom field created.",
-			"defaultLabel": "Default",
-			"defaultValuePlaceholder": "Default value",
-			"deleteButton": "Delete",
-			"deleteError": "Failed to delete custom field.",
-			"deleteSuccess": "Custom field deleted.",
-			"empty": "No custom fields configured yet.",
-			"loading": "Loading custom fields...",
-			"namePlaceholder": "Field name",
-			"noOptionsPlaceholder": "No options",
-			"optionsPlaceholder": "Options separated by commas",
-			"required": "Required",
-			"typePlaceholder": "Select field type",
+			"addButton": "추가",
+			"createError": "사용자 정의 필드를 만들지 못했습니다.",
+			"createSuccess": "사용자 정의 필드가 생성되었습니다.",
+			"defaultLabel": "기본값",
+			"defaultValuePlaceholder": "기본 값",
+			"deleteButton": "삭제",
+			"deleteError": "사용자 정의 필드를 삭제하지 못했습니다.",
+			"deleteSuccess": "사용자 정의 필드가 삭제되었습니다.",
+			"empty": "아직 사용자 정의 필드가 구성되지 않았습니다.",
+			"loading": "사용자 정의 필드를 불러오는 중...",
+			"namePlaceholder": "필드 이름",
+			"noOptionsPlaceholder": "옵션 없음",
+			"optionsPlaceholder": "옵션은 쉼표로 구분",
+			"required": "필수",
+			"typePlaceholder": "필드 유형 선택",
 			"types": {
-				"boolean": "Boolean",
-				"date": "Date",
-				"dropdown": "Dropdown",
-				"number": "Number",
-				"text": "Text"
+				"boolean": "불리언",
+				"date": "날짜",
+				"dropdown": "드롭다운",
+				"number": "숫자",
+				"text": "텍스트"
 			}
 		},
 		"developer": "개발자",
@@ -1130,22 +1140,22 @@
 		},
 		"mcp": "MCP",
 		"mcpPage": {
-			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
-			"authModeApiKey": "API key",
+			"apiKeyNote": "먼저 API 키를 만든 다음 <YOUR_API_KEY> 자리 표시자를 해당 키로 바꾸세요.",
+			"authModeApiKey": "API 키",
 			"authModeOauth": "OAuth",
-			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
-			"cardTitle": "Connect an agent",
-			"copied": "Copied",
-			"copy": "Copy",
-			"createApiKey": "Create an API key",
-			"followUpLabel": "Then authenticate",
-			"installCommandLabel": "Install command",
-			"manualConfigLabel": "Manual configuration",
-			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"cardDescription": "인증 모드를 선택한 다음 설치 명령을 실행하거나 구성을 에이전트에 붙여넣으세요.",
+			"cardTitle": "에이전트 연결",
+			"copied": "복사됨",
+			"copy": "복사",
+			"createApiKey": "API 키 만들기",
+			"followUpLabel": "그런 다음 인증",
+			"installCommandLabel": "설치 명령",
+			"manualConfigLabel": "수동 구성",
+			"oauthNote": "OAuth가 기본입니다. 첫 연결 시 브라우저에서 Kaneo를 열어 에이전트를 승인하고, 이후 토큰은 에이전트가 직접 관리합니다.",
 			"pageTitle": "MCP",
-			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
-			"serverUrlLabel": "Server URL",
-			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"serverUrlDescription": "이 인스턴스의 내장 HTTP MCP 엔드포인트",
+			"serverUrlLabel": "서버 URL",
+			"subtitle": "Claude, Codex, Gemini 또는 OpenCode와 같은 AI 에이전트를 내장 HTTP MCP 서버를 통해 이 Kaneo 인스턴스에 연결하세요.",
 			"title": "MCP (Model Context Protocol)"
 		},
 		"notifications": "알림",
@@ -1365,8 +1375,8 @@
 			"columnsDescription": "보드에 표시되는 컬럼을 관리합니다. 드래그하여 순서를 바꿉니다. 완료된 작업을 나타내는 단계의 경우 \"완료 컬럼\"을 켜세요.",
 			"automationTitle": "자동화 규칙",
 			"automationDescription": "연동 이벤트를 컬럼에 매핑합니다. 이벤트가 발생하면 연결된 작업이 지정된 컬럼으로 이동합니다.",
-			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
-			"customFieldsTitle": "Custom Fields"
+			"customFieldsDescription": "이 프로젝트의 사용자 정의 필드를 관리합니다. 드래그하여 순서를 바꾸세요.",
+			"customFieldsTitle": "사용자 정의 필드"
 		},
 		"repositoryBrowser": {
 			"title": "저장소 선택",
@@ -1483,7 +1493,9 @@
 				"taskPriorityChanged": "우선순위 변경",
 				"taskTitleChanged": "제목 변경",
 				"taskDescriptionChanged": "설명 변경",
-				"taskCommentCreated": "새 댓글"
+				"taskCommentCreated": "새 댓글",
+				"appointmentCreated": "새 일정",
+				"appointmentUpdated": "일정 변경"
 			},
 			"connect": "Telegram 연결",
 			"saveChanges": "변경사항 저장",
@@ -1540,7 +1552,7 @@
 			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
 			"editChat": "Edit chat",
 			"editChatDescription": "Change the chat id or its label.",
-			"detectedTopicsLabel": "Detected topics",
+			"detectedTopicsLabel": "감지된 주제",
 			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
 			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
 			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
@@ -1770,6 +1782,25 @@
 				"title": "역할 삭제",
 				"description": "역할 \"{{role}}\"이(가) 영구적으로 삭제됩니다. 이 역할이 할당된 멤버는 해당 권한을 잃게 됩니다."
 			}
+		},
+		"skills": "스킬",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Kaneo 체크아웃 루트에서 이 명령을 실행한 다음 에이전트를 다시 시작하세요.",
+			"cardTitle": "Kaneo 스킬 설치",
+			"copied": "복사됨",
+			"copy": "복사",
+			"destinationLabel": "대상",
+			"installCommandLabel": "설치 명령",
+			"mcpRequirement": "이 스킬은 MCP 연결을 전제로 합니다. 먼저 구성하세요.",
+			"openMcpSettings": "MCP 설정 열기",
+			"pageTitle": "스킬",
+			"projectScope": "프로젝트",
+			"subtitle": "Kaneo 스킬을 설치하면 AI 에이전트가 이 인스턴스의 규칙을 따르고 MCP 도구를 올바르게 사용합니다.",
+			"title": "에이전트 스킬",
+			"updateDescription": "스킬은 디스크에서 읽습니다. Kaneo 업데이트 후 폴더를 다시 복사해 변경 사항을 반영하세요.",
+			"userScope": "사용자",
+			"verifyLabel": "확인"
 		}
 	},
 	"tasks": {
@@ -1830,8 +1861,8 @@
 				"isAnyOf": "다음 중 하나",
 				"includeAnyOf": "다음 중 하나 포함"
 			},
-			"all": "All",
-			"noValuesUsedYet": "No values used yet"
+			"all": "전체",
+			"noValuesUsedYet": "아직 사용된 값 없음"
 		},
 		"boardSearchPlaceholder": "티켓 검색...",
 		"bulk": {
@@ -1884,7 +1915,7 @@
 			"loadingTask": "작업 로딩 중...",
 			"taskNotFound": "작업을 찾을 수 없음",
 			"taskNotFoundDescription": "찾는 작업이 존재하지 않거나 삭제되었습니다.",
-			"customFields": "Custom Fields"
+			"customFields": "사용자 정의 필드"
 		},
 		"contextMenu": {
 			"copyLink": "링크 복사",
@@ -2002,8 +2033,8 @@
 					"renderFailed": "Mermaid 다이어그램을 렌더링할 수 없습니다"
 				}
 			},
-			"customFieldUpdated": "Field updated",
-			"selectOption": "Select option"
+			"customFieldUpdated": "필드가 업데이트되었습니다",
+			"selectOption": "옵션 선택"
 		},
 		"dueDate": {
 			"label": "마감일",
@@ -2180,7 +2211,7 @@
 			"unitDay_other": "days",
 			"unitHour_other": "hours",
 			"unitLabel": "Unit",
-			"unitMinute_other": "minutes",
+			"unitMinute_other": "분",
 			"unitWeek_other": "weeks",
 			"weeksBefore_other": "{{count}} weeks before"
 		},
@@ -2234,7 +2265,7 @@
 			"dragDisabled": "Drag & drop is disabled while grouping is active",
 			"groupBy": "Group by",
 			"label": "Group",
-			"labels": "Labels",
+			"labels": "라벨",
 			"noLabel": "No label",
 			"none": "No grouping"
 		}
@@ -2294,30 +2325,30 @@
 			"roleUpdateError": "역할 업데이트에 실패했습니다"
 		},
 		"inviteLinks": {
-			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
-			"copyIconAria": "Copy the invite link",
-			"create": "Create link",
-			"createError": "Failed to create the invite link",
-			"createSuccess": "Invite link created",
-			"deleteError": "Failed to revoke the invite link",
-			"deleteSuccess": "Invite link revoked",
-			"description": "Anyone with the link can join this workspace as a member — no email required.",
-			"empty": "No shareable invite links yet.",
-			"expiry24h": "24 hours",
-			"expiry30d": "30 days",
-			"expiry7d": "7 days",
-			"expiryLabel": "Expiry",
-			"expiryNever": "Never expires",
-			"join": "Join {{workspaceName}}",
-			"linkCopied": "Invite link copied",
-			"maxUsesLabel": "Max uses",
-			"maxUsesUnlimited": "Unlimited",
-			"never": "Never expires",
-			"revokeIconAria": "Revoke the invite link",
-			"title": "Shareable invite links",
-			"uses": "{{used}}/{{max}} uses",
-			"workspace": "Workspace: {{workspaceName}}",
-			"usesUnlimited": "{{used}} uses"
+			"copyFailed": "자동 복사에 실패했습니다. 링크를 선택하고 Ctrl+C를 누르세요.",
+			"copyIconAria": "초대 링크 복사",
+			"create": "링크 만들기",
+			"createError": "초대 링크를 만들지 못했습니다",
+			"createSuccess": "초대 링크가 생성되었습니다",
+			"deleteError": "초대 링크를 취소하지 못했습니다",
+			"deleteSuccess": "초대 링크가 취소되었습니다",
+			"description": "링크가 있는 누구나 이 워크스페이스에 멤버로 참여할 수 있습니다 — 이메일이 필요하지 않습니다.",
+			"empty": "아직 공유 가능한 초대 링크가 없습니다.",
+			"expiry24h": "24시간",
+			"expiry30d": "30일",
+			"expiry7d": "7일",
+			"expiryLabel": "만료",
+			"expiryNever": "만료되지 않음",
+			"join": "{{workspaceName}}에 참여",
+			"linkCopied": "초대 링크가 복사되었습니다",
+			"maxUsesLabel": "최대 사용 횟수",
+			"maxUsesUnlimited": "무제한",
+			"never": "만료되지 않음",
+			"revokeIconAria": "초대 링크 취소",
+			"title": "공유 가능한 초대 링크",
+			"uses": "{{used}}/{{max}}회 사용",
+			"workspace": "워크스페이스: {{workspaceName}}",
+			"usesUnlimited": "{{used}}회 사용"
 		}
 	},
 	"unified": {
@@ -2345,7 +2376,26 @@
 		"charts": {
 			"backlog": "백로그",
 			"empty": "최근 6개월간 작업 활동이 없습니다.",
-			"tasks": "작업"
+			"tasks": "작업",
+			"byProject": "프로젝트별",
+			"completed": "완료됨",
+			"created": "생성됨",
+			"noTasks": "배분할 작업이 없습니다.",
+			"other": "기타",
+			"period": "기간",
+			"periodSummary": "{{created}} 생성 · {{completed}} 완료",
+			"perWeek": "{{value}}/주",
+			"range_other": "{{count}}개월",
+			"statusDescription": "모든 프로젝트의 작업이 현재 어디에 있는지.",
+			"statusTitle": "상태 분포",
+			"unassigned": "미배정",
+			"velocity4w": "속도(4주)",
+			"velocityDescription": "모든 프로젝트에서 매주 생성 및 완료된 작업.",
+			"velocityTitle": "속도",
+			"workloadDescription": "모든 프로젝트에서 담당자별 미완료 보드 작업.",
+			"workloadEmpty": "할당된 미완료 작업이 없습니다.",
+			"workloadTitle": "작업량",
+			"range_one": "{{count}}개월"
 		},
 		"tabs": {
 			"charts": "차트",
@@ -2412,5 +2462,45 @@
 			"success": "워크스페이스가 생성되었습니다",
 			"error": "워크스페이스 생성에 실패했습니다"
 		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "담당자",
+			"create": "만들기",
+			"createTitle": "새 일정",
+			"delete": "삭제",
+			"description": "일정은 작업처럼 예약되지만 보드나 백로그에는 절대 표시되지 않습니다.",
+			"descriptionLabel": "설명",
+			"editTitle": "일정 편집",
+			"endLabel": "종료",
+			"priorityLabel": "우선순위",
+			"rangeError": "종료는 시작 이후여야 합니다.",
+			"save": "저장",
+			"startLabel": "시작",
+			"titleLabel": "제목",
+			"titlePlaceholder": "예: 디자인 리뷰",
+			"unassigned": "미배정"
+		},
+		"empty": {
+			"description": "일정은 여기에 표시되며 보드나 백로그에는 표시되지 않습니다.",
+			"title": "아직 일정이 없습니다"
+		},
+		"loadError": "일정을 불러오지 못했습니다.",
+		"moveFromBacklog": "일정으로 이동",
+		"newAppointment": "새 일정",
+		"nextWeek": "다음 주",
+		"pageTitle": "일정 · {{name}}",
+		"previousWeek": "이전 주",
+		"tab": "일정",
+		"toast": {
+			"created": "일정이 생성되었습니다",
+			"deleted": "일정이 삭제되었습니다",
+			"error": "문제가 발생했습니다",
+			"moved": "일정으로 이동했습니다",
+			"updated": "일정이 업데이트되었습니다"
+		},
+		"today": "오늘",
+		"weekHint": "빈 슬롯을 클릭해 일정을 추가하고, 일정을 클릭해 편집하세요.",
+		"unscheduled": "미예약"
 	}
 }

@@ -1,7 +1,5 @@
-import type { client } from "@kaneo/libs";
 import { useQueries } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import type { InferResponseType } from "hono/client";
 import {
   ArrowUpDown,
   ChartLine,
@@ -12,8 +10,8 @@ import {
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Layout from "@/components/common/layout";
+import UnifiedCharts from "@/components/dashboard/charts/unified-charts";
 import ConsolidatedTaskList from "@/components/dashboard/consolidated-task-list";
-import ProgressChart from "@/components/dashboard/progress-chart";
 import PageTitle from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -45,10 +43,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import icons from "@/constants/project-icons";
 import getProjects from "@/fetchers/project/get-projects";
 import getWorkspaces from "@/fetchers/workspace/get-workspaces";
-import useGetProjectCharts from "@/hooks/queries/project/use-get-project-charts";
 import useGetWorkspaces from "@/hooks/queries/workspace/use-get-workspaces";
 import { authClient } from "@/lib/auth-client";
 import { handleUnauthorized, isUnauthorizedError } from "@/lib/http-error";
+import {
+  byNameDesc,
+  type ProjectListItem,
+  sortProjects,
+} from "@/lib/project-sort";
 import {
   isProjectSortMode,
   isWorkspaceSortMode,
@@ -88,11 +90,6 @@ export const Route = createFileRoute("/_layout/_authenticated/")({
   },
   component: RouteComponent,
 });
-
-type ProjectListItem = InferResponseType<
-  (typeof client)["project"]["$get"],
-  200
->[number];
 
 type ProjectWithWorkspace = {
   workspaceId: string;
@@ -227,41 +224,6 @@ function ProjectTileRow({ project }: { project: ProjectWithWorkspace }) {
       <Badge variant={statusVariant()}>{statusText()}</Badge>
     </button>
   );
-}
-
-// Shared sorting for the dashboard and the sidebar: alphabetical by name by
-// default, stored custom order only applies when explicitly picked.
-function byNameDesc(a: string, b: string) {
-  return a.localeCompare(b, undefined, { sensitivity: "base" });
-}
-
-function sortProjects(
-  projects: ProjectListItem[],
-  mode: ReturnType<typeof useUserPreferencesStore.getState>["projectsSort"],
-): ProjectListItem[] {
-  if (mode === "name") {
-    return [...projects].sort((a, b) => byNameDesc(a.name, b.name));
-  }
-  if (mode === "date") {
-    return [...projects].sort(
-      (a, b) =>
-        new Date(b.createdAt ?? 0).getTime() -
-        new Date(a.createdAt ?? 0).getTime(),
-    );
-  }
-  if (mode === "completion") {
-    return [...projects].sort(
-      (a, b) =>
-        (b.statistics?.completionPercentage ?? -1) -
-        (a.statistics?.completionPercentage ?? -1),
-    );
-  }
-  return projects;
-}
-
-function ProjectChartPanel({ projectId }: { projectId: string }) {
-  const { data: buckets, isLoading } = useGetProjectCharts(projectId);
-  return <ProgressChart buckets={buckets} isLoading={isLoading} />;
 }
 
 function RouteComponent() {
@@ -524,55 +486,12 @@ function RouteComponent() {
                     value={`${stats.completion}%`}
                   />
                 </div>
-                {activeTab === "charts"
-                  ? sections.map(({ workspace, projects }) =>
-                      !projects || projects.length === 0 ? null : (
-                        <div className="flex flex-col gap-2" key={workspace.id}>
-                          <div className="flex items-baseline justify-between">
-                            <h3 className="text-sm font-semibold">
-                              {workspace.name}
-                            </h3>
-                            <span className="text-xs text-muted-foreground">
-                              {t("unified:section.projectCount", {
-                                count: projects.length,
-                              })}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-4 items-stretch">
-                            {projects.map((project) => (
-                              <CardFrame
-                                key={project.id}
-                                className="h-full min-w-0"
-                              >
-                                <CardFrameHeader>
-                                  <CardFrameTitle>
-                                    <span className="flex items-center gap-2">
-                                      {(() => {
-                                        const IconComponent =
-                                          icons[
-                                            project.icon as keyof typeof icons
-                                          ] || icons.Layout;
-                                        return (
-                                          <IconComponent
-                                            aria-hidden="true"
-                                            className="h-4 w-4 text-muted-foreground"
-                                          />
-                                        );
-                                      })()}
-                                      {project.name}
-                                    </span>
-                                  </CardFrameTitle>
-                                </CardFrameHeader>
-                                <CardPanel>
-                                  <ProjectChartPanel projectId={project.id} />
-                                </CardPanel>
-                              </CardFrame>
-                            ))}
-                          </div>
-                        </div>
-                      ),
-                    )
-                  : null}
+                {activeTab === "charts" ? (
+                  <UnifiedCharts
+                    sections={sections}
+                    projectsSort={projectsSort}
+                  />
+                ) : null}
                 {(activeTab === "backlog" || activeTab === "tasks") && (
                   <ConsolidatedTaskList
                     projects={allProjects}

@@ -100,6 +100,16 @@ export function getNotificationTitle(
           ...eventData,
           defaultValue: notification.title ?? notification.type,
         });
+      case "appointment_created":
+        return t("notifications:events.appointment_created.title", {
+          ...eventData,
+          defaultValue: notification.title ?? notification.type,
+        });
+      case "appointment_updated":
+        return t("notifications:events.appointment_updated.title", {
+          ...eventData,
+          defaultValue: notification.title ?? notification.type,
+        });
       case "task_mention":
         return t("notifications:events.task_mention.title", {
           ...eventData,
@@ -167,6 +177,21 @@ export function getNotificationContent(
               ...eventData,
               defaultValue: notification.content ?? "",
             });
+      case "appointment_created":
+        return t("notifications:events.appointment_created.content", {
+          ...eventData,
+          defaultValue: notification.content ?? "",
+        });
+      case "appointment_updated":
+        return eventData.changeType === "assignee"
+          ? t("notifications:events.appointment_updated.contentAssignee", {
+              ...eventData,
+              defaultValue: notification.content ?? "",
+            })
+          : t("notifications:events.appointment_updated.contentRescheduled", {
+              ...eventData,
+              defaultValue: notification.content ?? "",
+            });
       case "task_mention":
         return t("notifications:events.task_mention.content", {
           ...eventData,
@@ -230,6 +255,18 @@ const NotificationDropdown = forwardRef<NotificationDropdownRef>(
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
             params: { workspaceId, projectId, taskId },
+          });
+          return;
+        }
+
+        if (
+          notification.resourceType === "appointment" &&
+          workspaceId &&
+          projectId
+        ) {
+          navigate({
+            to: "/dashboard/workspace/$workspaceId/project/$projectId/appointments",
+            params: { workspaceId, projectId },
           });
         }
       },

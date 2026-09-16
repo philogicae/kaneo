@@ -9,6 +9,8 @@ export const telegramBotEventsSchema = z
     taskTitleChanged: z.boolean(),
     taskDescriptionChanged: z.boolean(),
     taskCommentCreated: z.boolean(),
+    appointmentCreated: z.boolean(),
+    appointmentUpdated: z.boolean(),
   })
   .openapi("TelegramBotEvents", {
     description:

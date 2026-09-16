@@ -21,17 +21,20 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
+import AppointmentDialog from "@/components/appointments/appointment-dialog";
 import ProjectLayout from "@/components/common/project-layout";
 import { GanttTaskBar } from "@/components/gantt/gantt-task-bar";
 import PageTitle from "@/components/page-title";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useGetAppointments from "@/hooks/queries/appointment/use-get-appointments";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/cn";
 import { getStatusLabel } from "@/lib/i18n/domain";
 import { useUserPreferencesStore } from "@/store/user-preferences";
+import type Appointment from "@/types/appointment";
 
 type GanttSearchParams = {
   taskId?: string;
@@ -58,6 +61,9 @@ function RouteComponent() {
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
   const { data: project } = useGetTasks(projectId);
+  const { data: appointments } = useGetAppointments(projectId);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
@@ -104,8 +110,33 @@ function RouteComponent() {
     [project],
   );
 
+  const parsedAppointments = useMemo(() => {
+    return (appointments ?? [])
+      .map((appointment) => {
+        const parsedStart =
+          parseTaskDate(appointment.startDate) ??
+          parseTaskDate(appointment.dueDate);
+        const parsedEnd =
+          parseTaskDate(appointment.dueDate) ??
+          parseTaskDate(appointment.startDate);
+
+        if (!parsedStart || !parsedEnd) return null;
+
+        const start = parsedStart <= parsedEnd ? parsedStart : parsedEnd;
+        const end = parsedEnd >= parsedStart ? parsedEnd : parsedStart;
+
+        return {
+          ...appointment,
+          status: "appointment",
+          scheduleStart: start,
+          scheduleEnd: end,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+  }, [appointments]);
+
   const parsedTasks = useMemo(() => {
-    return allTasks
+    return [...allTasks, ...parsedAppointments]
       .map((task) => {
         const parsedStart =
           parseTaskDate(task.startDate) ?? parseTaskDate(task.dueDate);
@@ -128,7 +159,24 @@ function RouteComponent() {
         (left, right) =>
           left.scheduleStart.getTime() - right.scheduleStart.getTime(),
       );
-  }, [allTasks]);
+  }, [allTasks, parsedAppointments]);
+
+  const appointmentById = useMemo(
+    () => new Map((appointments ?? []).map((item) => [item.id, item])),
+    [appointments],
+  );
+
+  const openItem = useCallback(
+    (id: string) => {
+      const appointment = appointmentById.get(id);
+      if (appointment) {
+        setSelectedAppointment(appointment);
+        return;
+      }
+      navigate({ to: ".", search: { taskId: id }, replace: true });
+    },
+    [appointmentById, navigate],
+  );
 
   const scheduledTasks = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -432,13 +480,7 @@ function RouteComponent() {
                             <button
                               type="button"
                               className="flex min-h-[44px] w-full min-w-0 flex-col items-start justify-center gap-0.5 px-2 py-2 text-left transition-colors hover:bg-muted sm:min-h-0 sm:px-3 sm:py-1.5"
-                              onClick={() =>
-                                navigate({
-                                  to: ".",
-                                  search: { taskId: task.id },
-                                  replace: true,
-                                })
-                              }
+                              onClick={() => openItem(task.id)}
                             >
                               <div className="flex w-full items-center gap-1.5">
                                 <span className="max-w-[7rem] truncate rounded-full bg-secondary px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-secondary-foreground sm:max-w-none">
@@ -473,13 +515,7 @@ function RouteComponent() {
                             timeline={timeline}
                             pixelsPerDay={pixelsPerDay}
                             isMobile={isMobile}
-                            onOpenTask={() =>
-                              navigate({
-                                to: ".",
-                                search: { taskId: task.id },
-                                replace: true,
-                              })
-                            }
+                            onOpenTask={() => openItem(task.id)}
                           />
                         </div>
                       </div>
@@ -502,6 +538,14 @@ function RouteComponent() {
               replace: true,
             })
           }
+        />
+
+        <AppointmentDialog
+          open={selectedAppointment !== null}
+          onClose={() => setSelectedAppointment(null)}
+          projectId={projectId}
+          workspaceId={workspaceId}
+          appointment={selectedAppointment}
         />
       </div>
     </ProjectLayout>

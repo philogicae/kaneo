@@ -1,4 +1,6 @@
 import { Cron } from "croner";
+import { checkAppointmentRecurrence } from "./appointment-recurrence";
+import { checkAppointmentReminders } from "./appointment-reminders";
 import { checkDueDateReminders } from "./due-date-reminders";
 import { checkProjectWebhookReminders } from "./project-webhook-reminders";
 import { checkTelegramTaskReminders } from "./telegram-task-reminders";
@@ -44,6 +46,18 @@ export function initializeScheduler(): void {
     new Cron(
       "*/5 * * * *",
       withCheckIn("telegram-task-reminders", checkTelegramTaskReminders),
+    ),
+  );
+  jobs.push(
+    new Cron(
+      "*/5 * * * *",
+      withCheckIn("appointment-reminders", checkAppointmentReminders),
+    ),
+  );
+  jobs.push(
+    new Cron(
+      "*/5 * * * *",
+      withCheckIn("appointment-recurrence", checkAppointmentRecurrence),
     ),
   );
   console.log("⏰ Scheduler started (reminders every 5 minutes)");

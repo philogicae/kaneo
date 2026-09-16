@@ -499,6 +499,94 @@ export const taskTable = sqliteTable(
   ],
 );
 
+// Appointments carry the task scheduling shape (dates, priority, assignee)
+// but stay out of boards and the backlog: they only surface in the
+// calendar-like views.
+export const appointmentTable = sqliteTable(
+  "appointment",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    position: integer("position").default(0),
+    number: integer("number").default(1),
+    userId: text("assignee_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    title: text("title").notNull(),
+    description: text("description"),
+    priority: text("priority").default("medium").notNull(),
+    startDate: integer("start_date", { mode: "timestamp_ms" }),
+    dueDate: integer("due_date", { mode: "timestamp_ms" }),
+    // Minutes before the start date at which Telegram reminders fire; empty or
+    // null means the appointment has no reminder configured.
+    reminderOffsets: text("reminder_offsets", { mode: "json" }).$type<
+      number[]
+    >(),
+    // Recurring appointments spawn their next occurrence when the current one
+    // ends (its due date, or its start date when there is no due date).
+    recurrence: text("recurrence", { mode: "json" }).$type<{
+      frequency: "daily" | "weekly" | "monthly";
+      interval: number;
+    } | null>(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("appointment_projectId_idx").on(table.projectId),
+    index("appointment_startDate_idx").on(table.startDate),
+    index("appointment_assigneeId_idx").on(table.userId),
+    unique("appointment_project_number_unique").on(
+      table.projectId,
+      table.number,
+    ),
+  ],
+);
+
+export const appointmentReminderSentTable = sqliteTable(
+  "appointment_reminder_sent",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    appointmentId: text("appointment_id")
+      .notNull()
+      .references(() => appointmentTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    reminderType: text("reminder_type").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("appointment_reminder_sent_appointmentId_idx").on(
+      table.appointmentId,
+    ),
+    unique("appointment_reminder_sent_appointment_type_unique").on(
+      table.appointmentId,
+      table.reminderType,
+    ),
+  ],
+);
+
 export const billingReminderSentTable = sqliteTable(
   "billing_reminder_sent",
   {

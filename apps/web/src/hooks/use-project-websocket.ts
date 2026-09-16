@@ -13,6 +13,13 @@ export function getWsUrl(projectId: string) {
 const MAX_RETRIES = 5;
 const BASE_DELAY = 1000; // 1 second
 
+/** Appointment events carry an appointmentId instead of a taskId. */
+const APPOINTMENT_MESSAGE_TYPES = new Set([
+  "APPOINTMENT_CREATED",
+  "APPOINTMENT_UPDATED",
+  "APPOINTMENT_DELETED",
+]);
+
 // Cloudflare closes idle WebSocket connections after 100 seconds of no traffic.
 // We send a lightweight ping every 30 seconds to keep the connection alive.
 const WS_PING_INTERVAL_MS = 30_000;
@@ -56,7 +63,11 @@ export function useProjectWebSocket(projectId: string) {
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          if (
+          if (APPOINTMENT_MESSAGE_TYPES.has(message.type)) {
+            queryClient.invalidateQueries({
+              queryKey: ["appointments", message.projectId],
+            });
+          } else if (
             message.type === "TASK_UPDATED" ||
             message.type === "TASK_CREATED" ||
             message.type === "TASK_DELETED" ||

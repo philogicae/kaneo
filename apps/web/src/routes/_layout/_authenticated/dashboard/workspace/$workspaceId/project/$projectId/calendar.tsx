@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { addMonths, startOfMonth, subMonths } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import AppointmentDialog from "@/components/appointments/appointment-dialog";
+import type { CalendarTask } from "@/components/calendar/calendar-task-bar";
 import CalendarToolbar from "@/components/calendar/calendar-toolbar";
 import MonthGrid from "@/components/calendar/month-grid";
 import { buildMonthWeeks } from "@/components/calendar/month-grid-model";
@@ -9,12 +11,14 @@ import ProjectLayout from "@/components/common/project-layout";
 import PageTitle from "@/components/page-title";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { shortcuts } from "@/constants/shortcuts";
+import useGetAppointments from "@/hooks/queries/appointment/use-get-appointments";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { expandRecurringTasks } from "@/lib/recurrence";
-import { toScheduledTasks } from "@/lib/task-schedule";
+import { toScheduledTask, toScheduledTasks } from "@/lib/task-schedule";
 import { useUserPreferencesStore } from "@/store/user-preferences";
+import type Appointment from "@/types/appointment";
 
 type CalendarSearchParams = {
   taskId?: string;
@@ -40,12 +44,15 @@ function RouteComponent() {
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
   const { data: project, isLoading, isError } = useGetTasks(projectId);
+  const { data: appointments } = useGetAppointments(projectId);
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
   const setViewMode = useUserPreferencesStore((state) => state.setViewMode);
   const isMobile = useIsMobile();
   const [visibleMonth, setVisibleMonth] = useState(() =>
     startOfMonth(new Date()),
   );
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
   const weeks = useMemo(
     () => buildMonthWeeks(visibleMonth, weekStartsOn),
@@ -73,6 +80,23 @@ function RouteComponent() {
     );
   }, [project, weeks]);
 
+  const calendarTasks = useMemo<CalendarTask[]>(() => {
+    const appointmentItems = (appointments ?? [])
+      .map((appointment) =>
+        toScheduledTask({ ...appointment, status: "appointment" }),
+      )
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+    return [...scheduledTasks, ...appointmentItems].sort(
+      (left, right) =>
+        left.scheduleStart.getTime() - right.scheduleStart.getTime(),
+    );
+  }, [scheduledTasks, appointments]);
+
+  const appointmentById = useMemo(
+    () => new Map((appointments ?? []).map((item) => [item.id, item])),
+    [appointments],
+  );
+
   const handlePreviousMonth = useCallback(() => {
     setVisibleMonth((current) => subMonths(current, 1));
   }, []);
@@ -87,9 +111,14 @@ function RouteComponent() {
 
   const handleOpenTask = useCallback(
     (nextTaskId: string) => {
+      const appointment = appointmentById.get(nextTaskId);
+      if (appointment) {
+        setSelectedAppointment(appointment);
+        return;
+      }
       navigate({ to: ".", search: { taskId: nextTaskId }, replace: true });
     },
-    [navigate],
+    [navigate, appointmentById],
   );
 
   const handleCloseTaskSheet = useCallback(() => {
@@ -160,7 +189,7 @@ function RouteComponent() {
               {t("tasks:calendar.loadError")}
             </p>
           </div>
-        ) : scheduledTasks.length === 0 ? (
+        ) : calendarTasks.length === 0 ? (
           <div className="border-b border-border/80 px-4 py-3 text-center">
             <p className="text-sm font-semibold text-foreground">
               {t("tasks:calendar.noTasks")}
@@ -173,7 +202,7 @@ function RouteComponent() {
 
         <MonthGrid
           weeks={weeks}
-          tasks={scheduledTasks}
+          tasks={calendarTasks}
           visibleMonth={visibleMonth}
           maxLanes={isMobile ? MAX_LANES_MOBILE : MAX_LANES_DESKTOP}
           projectSlug={project?.slug}
@@ -185,6 +214,14 @@ function RouteComponent() {
           projectId={projectId}
           workspaceId={workspaceId}
           onClose={handleCloseTaskSheet}
+        />
+
+        <AppointmentDialog
+          open={selectedAppointment !== null}
+          onClose={() => setSelectedAppointment(null)}
+          projectId={projectId}
+          workspaceId={workspaceId}
+          appointment={selectedAppointment}
         />
       </div>
     </ProjectLayout>

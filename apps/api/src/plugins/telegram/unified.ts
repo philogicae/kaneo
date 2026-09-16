@@ -10,6 +10,7 @@ import type { TelegramEventKey } from "./config";
 import { defaultTelegramEvents, normalizeTelegramConfig } from "./config";
 import {
   buildTelegramAction,
+  getAppointmentTelegramEventData,
   getTelegramEventData,
   sendTelegramMessage,
   type TelegramActionInput,
@@ -27,13 +28,16 @@ const EVENT_KEY_BY_ACTION: Record<
   titleChanged: "taskTitleChanged",
   descriptionChanged: "taskDescriptionChanged",
   commentCreated: "taskCommentCreated",
+  appointmentCreated: "appointmentCreated",
+  appointmentRescheduled: "appointmentUpdated",
+  appointmentReassigned: "appointmentUpdated",
 };
 
-export type UnifiedTelegramDispatchEvent = {
-  taskId: string;
-  projectId: string;
-  userId: string | null;
-};
+// Both entities flow through the same dispatcher; the id field tells which
+// table backs the message data.
+export type UnifiedTelegramDispatchEvent =
+  | { taskId: string; projectId: string; userId: string | null }
+  | { appointmentId: string; projectId: string; userId: string | null };
 
 // Unified rules supersede the per-project telegram integration: when any
 // active rule matches, the legacy per-project config is skipped so a project
@@ -42,6 +46,8 @@ export async function dispatchUnifiedTelegram(
   event: UnifiedTelegramDispatchEvent,
   action: TelegramActionInput,
 ): Promise<boolean> {
+  const entityId =
+    "appointmentId" in event ? event.appointmentId : event.taskId;
   const matches = await getMatchingRules(event.projectId);
   if (matches.length === 0) {
     // The dispatch is fire-and-forget on the event bus; without this line a
@@ -49,23 +55,26 @@ export async function dispatchUnifiedTelegram(
     // silently swallowed a task.created notification).
     console.log("[telegram] unified dispatch: no matching rule", {
       projectId: event.projectId,
-      taskId: event.taskId,
+      entityId,
       action: action.kind,
     });
     return false;
   }
 
-  const data = await getTelegramEventData(
-    event.taskId,
-    event.projectId,
-    event.userId,
-  );
+  const data =
+    "appointmentId" in event
+      ? await getAppointmentTelegramEventData(
+          event.appointmentId,
+          event.projectId,
+          event.userId,
+        )
+      : await getTelegramEventData(event.taskId, event.projectId, event.userId);
   if (!data) {
-    // Task is gone (e.g. deleted mid-flight): consider it handled so the
+    // Entity is gone (e.g. deleted mid-flight): consider it handled so the
     // legacy path stays silent too.
-    console.warn("[telegram] unified dispatch: task data unavailable", {
+    console.warn("[telegram] unified dispatch: event data unavailable", {
       projectId: event.projectId,
-      taskId: event.taskId,
+      entityId,
     });
     return true;
   }
@@ -84,7 +93,7 @@ export async function dispatchUnifiedTelegram(
         console.log("[telegram] unified dispatch: event disabled for bot", {
           botId: bot.id,
           eventKey,
-          taskId: event.taskId,
+          entityId,
         });
         return;
       }
@@ -101,7 +110,7 @@ export async function dispatchUnifiedTelegram(
         console.log("[telegram] unified dispatch: sent", {
           botId: bot.id,
           eventKey,
-          taskId: event.taskId,
+          entityId,
           threadId: rule.threadId ?? null,
         });
       } catch (error) {
@@ -110,7 +119,7 @@ export async function dispatchUnifiedTelegram(
         console.error("[telegram] unified dispatch: send failed", {
           botId: bot.id,
           eventKey,
-          taskId: event.taskId,
+          entityId,
           error,
         });
       }

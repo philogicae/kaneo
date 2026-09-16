@@ -28,6 +28,8 @@ export type TelegramBotEvents = {
   taskTitleChanged: boolean;
   taskDescriptionChanged: boolean;
   taskCommentCreated: boolean;
+  appointmentCreated: boolean;
+  appointmentUpdated: boolean;
 };
 
 export type TelegramConfigBot = {
