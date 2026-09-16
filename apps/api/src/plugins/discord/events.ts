@@ -12,6 +12,7 @@ import type {
   TaskCommentCreatedEvent,
   TaskCreatedEvent,
   TaskDescriptionChangedEvent,
+  TaskMentionCreatedEvent,
   TaskPriorityChangedEvent,
   TaskStatusChangedEvent,
   TaskTitleChangedEvent,
@@ -280,4 +281,23 @@ export async function handleTaskCommentCreated(
     title: "New task comment",
     body: truncate(event.comment.replace(/\s+/g, " "), 200),
   }));
+}
+
+export async function handleTaskMentionCreated(
+  event: TaskMentionCreatedEvent,
+  context: PluginContext,
+): Promise<void> {
+  await runDiscordHandler(context, event, "taskMentionCreated", () => ({
+    title: "Task mention",
+    body: buildMentionBody(event),
+  }));
+}
+
+function buildMentionBody(event: TaskMentionCreatedEvent): string {
+  const names =
+    event.mentionedUserNames.length > 0
+      ? event.mentionedUserNames.join(", ")
+      : "A member";
+  const where = event.source === "comment" ? "a comment" : "the description";
+  return `**${names}** was mentioned in ${where} on **${event.title}**.`;
 }

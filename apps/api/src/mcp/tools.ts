@@ -1290,6 +1290,7 @@ export function registerMcpTools(
             taskTitleChanged: z.boolean().optional(),
             taskDescriptionChanged: z.boolean().optional(),
             taskCommentCreated: z.boolean().optional(),
+            taskMentionCreated: z.boolean().optional(),
             appointmentCreated: z.boolean().optional(),
             appointmentUpdated: z.boolean().optional(),
           })

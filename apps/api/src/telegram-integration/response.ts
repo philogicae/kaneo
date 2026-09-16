@@ -1,4 +1,4 @@
-import { integrationEventsSchema } from "../integrations/response";
+import { mentionIntegrationEventsSchema } from "../integrations/response";
 import { responseTimestamp, z } from "../openapi";
 
 // The bot token is a bearer credential, so only a masked form is returned.
@@ -17,7 +17,7 @@ export const telegramIntegrationSchema = z
     }),
     botTokenConfigured: z.boolean(),
     maskedBotToken: z.string(),
-    events: integrationEventsSchema,
+    events: mentionIntegrationEventsSchema,
     isActive: z.boolean().nullable(),
     createdAt: responseTimestamp,
     updatedAt: responseTimestamp,

@@ -196,6 +196,7 @@ const BOT_EVENT_KEYS = [
   "taskTitleChanged",
   "taskDescriptionChanged",
   "taskCommentCreated",
+  "taskMentionCreated",
   "appointmentCreated",
   "appointmentUpdated",
 ] as const;

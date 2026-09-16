@@ -97,7 +97,7 @@ describe("project charts and backlog statistics", () => {
     expect(createdThisWeek).toBeDefined();
 
     const narrowed = await app.request(
-      `/api/project/${project.id}/charts?months=3`,
+      `/api/project/${project.id}/charts?range=3m`,
     );
     expect(narrowed.status).toBe(200);
     const narrowedBuckets = (await narrowed.json()) as Array<{
@@ -110,8 +110,36 @@ describe("project charts and backlog statistics", () => {
     expect(narrowedBuckets.length).toBeGreaterThan(9);
     expect(narrowedBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
 
+    // "1w" keeps only the current week's bucket.
+    const weekWindow = await app.request(
+      `/api/project/${project.id}/charts?range=1w`,
+    );
+    expect(weekWindow.status).toBe(200);
+    const weekBuckets = (await weekWindow.json()) as Array<{
+      weekStart: string;
+      created: number;
+      completed: number;
+    }>;
+    expect(weekBuckets).toHaveLength(1);
+    expect(weekBuckets[0]?.created).toBe(1);
+    expect(weekBuckets[0]?.completed).toBe(0);
+
+    // "all" starts at the project's earliest task and keeps every bucket.
+    const all = await app.request(
+      `/api/project/${project.id}/charts?range=all`,
+    );
+    expect(all.status).toBe(200);
+    const allBuckets = (await all.json()) as Array<{
+      weekStart: string;
+      created: number;
+      completed: number;
+    }>;
+    expect(allBuckets.length).toBeGreaterThanOrEqual(5);
+    expect(allBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
+    expect(allBuckets.reduce((sum, b) => sum + b.completed, 0)).toBe(1);
+
     const invalid = await app.request(
-      `/api/project/${project.id}/charts?months=0`,
+      `/api/project/${project.id}/charts?range=0`,
     );
     expect(invalid.status).toBe(400);
 

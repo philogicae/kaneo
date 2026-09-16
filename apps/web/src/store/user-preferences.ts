@@ -35,11 +35,21 @@ export function isWorkspaceSortMode(
   );
 }
 
-export const CHART_MONTH_OPTIONS = [3, 6, 12] as const;
-export type ChartMonths = (typeof CHART_MONTH_OPTIONS)[number];
+export const CHART_RANGE_OPTIONS = [
+  "1w",
+  "1m",
+  "3m",
+  "6m",
+  "12m",
+  "all",
+] as const;
+export type ChartRange = (typeof CHART_RANGE_OPTIONS)[number];
 
-export function isChartMonths(value: unknown): value is ChartMonths {
-  return CHART_MONTH_OPTIONS.some((months) => months === value);
+export function isChartRange(value: unknown): value is ChartRange {
+  return (
+    typeof value === "string" &&
+    (CHART_RANGE_OPTIONS as readonly string[]).includes(value)
+  );
 }
 
 // Interface density as root font-size multiplier: every rem-based Tailwind
@@ -113,8 +123,8 @@ type UserPreferencesStore = {
   workspaceOrder: string[];
   setWorkspaceOrder: (ids: string[]) => void;
 
-  chartsMonths: ChartMonths;
-  setChartsMonths: (months: ChartMonths) => void;
+  chartsRange: ChartRange;
+  setChartsRange: (range: ChartRange) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -204,9 +214,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
 
       // A wider default window keeps short projects readable; the charts tab
-      // can narrow it to a quarter or widen it to a year.
-      chartsMonths: 6,
-      setChartsMonths: (months) => set({ chartsMonths: months }),
+      // can narrow it to a week or a month, or widen it to a year/all history.
+      chartsRange: "6m",
+      setChartsRange: (range) => set({ chartsRange: range }),
     }),
     {
       name: "user-preferences",
@@ -227,8 +237,8 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
         if (state && !Array.isArray(state.workspaceOrder)) {
           state.setWorkspaceOrder([]);
         }
-        if (state && !isChartMonths(state.chartsMonths)) {
-          state.setChartsMonths(6);
+        if (state && !isChartRange(state.chartsRange)) {
+          state.setChartsRange("6m");
         }
       },
     },

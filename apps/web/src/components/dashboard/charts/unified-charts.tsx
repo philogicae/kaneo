@@ -15,8 +15,9 @@ import getProjectCharts from "@/fetchers/project/get-project-charts";
 import getTasks from "@/fetchers/task/get-tasks";
 import { type ProjectListItem, sortProjects } from "@/lib/project-sort";
 import {
-  CHART_MONTH_OPTIONS,
-  isChartMonths,
+  CHART_RANGE_OPTIONS,
+  type ChartRange,
+  isChartRange,
   type ProjectSortMode,
   useUserPreferencesStore,
 } from "@/store/user-preferences";
@@ -86,6 +87,15 @@ function MiniStat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function rangeLabel(
+  range: ChartRange,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  if (range === "1w") return t("unified:charts.rangeWeek");
+  if (range === "all") return t("unified:charts.rangeAll");
+  return t("unified:charts.range", { count: Number.parseInt(range, 10) });
+}
+
 // The charts tab of the unified dashboard: a period filter driving a global
 // velocity chart, a workload reading, a cross-project status breakdown, and
 // the per-project progression and distribution cards.
@@ -94,7 +104,7 @@ export default function UnifiedCharts({
   projectsSort,
 }: UnifiedChartsProps) {
   const { t } = useTranslation();
-  const { chartsMonths, setChartsMonths } = useUserPreferencesStore();
+  const { chartsRange, setChartsRange } = useUserPreferencesStore();
 
   const projectEntries = useMemo(
     () =>
@@ -106,8 +116,8 @@ export default function UnifiedCharts({
 
   const chartQueries = useQueries({
     queries: projectEntries.map(({ project }) => ({
-      queryKey: ["project-charts", project.id, chartsMonths],
-      queryFn: () => getProjectCharts(project.id, chartsMonths),
+      queryKey: ["project-charts", project.id, chartsRange],
+      queryFn: () => getProjectCharts(project.id, chartsRange),
       staleTime: 1000 * 60,
     })),
   });
@@ -204,20 +214,19 @@ export default function UnifiedCharts({
             {t("unified:charts.period")}
           </span>
           <Tabs
-            value={String(chartsMonths)}
+            value={chartsRange}
             onValueChange={(value) => {
-              const months = Number(value);
-              if (isChartMonths(months)) setChartsMonths(months);
+              if (isChartRange(value)) setChartsRange(value);
             }}
           >
             <TabsList className="h-7 bg-card/60">
-              {CHART_MONTH_OPTIONS.map((months) => (
+              {CHART_RANGE_OPTIONS.map((range) => (
                 <TabsTrigger
-                  key={months}
+                  key={range}
                   className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
-                  value={String(months)}
+                  value={range}
                 >
-                  {t("unified:charts.range", { count: months })}
+                  {rangeLabel(range, t)}
                 </TabsTrigger>
               ))}
             </TabsList>

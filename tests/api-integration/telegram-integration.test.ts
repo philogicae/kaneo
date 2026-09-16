@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import db, { schema } from "../../apps/api/src/database";
@@ -27,6 +28,39 @@ async function stubTelegramFetch(
   });
   return new Response(JSON.stringify({ ok: true, result: {} }), {
     status: 200,
+  });
+}
+
+type UnifiedRuleSeed = {
+  userId: string;
+  botToken: string;
+  chatId: string;
+  workspaceId: string;
+  projectId: string;
+  events?: { taskMentionCreated?: boolean };
+};
+
+async function seedUnifiedRule({
+  userId,
+  botToken: token,
+  chatId: targetChatId,
+  workspaceId,
+  projectId,
+  events,
+}: UnifiedRuleSeed) {
+  const [bot] = await db
+    .insert(schema.telegramBotTable)
+    .values({ userId, botToken: token, events: events ?? null })
+    .returning();
+  const [chat] = await db
+    .insert(schema.telegramChatTable)
+    .values({ botId: bot.id, chatId: targetChatId })
+    .returning();
+  await db.insert(schema.telegramRuleTable).values({
+    chatId: chat.id,
+    workspaceId,
+    projectId,
+    isActive: true,
   });
 }
 
@@ -193,5 +227,234 @@ describe("API integration: Telegram notifications", () => {
       where: eq(schema.integrationTable.projectId, project.id),
     });
     expect(stored?.isActive).toBe(false);
+  });
+
+  it("keeps mentions out of the legacy per-project integration", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const { project, columns } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Aurora",
+      slug: "AUR",
+    });
+    const [mentioned] = await db
+      .insert(schema.userTable)
+      .values({
+        id: `user-${randomUUID()}`,
+        email: `legacy-mention-${randomUUID()}@example.com`,
+        emailVerified: true,
+        name: "Legacy Mentioned Member",
+      })
+      .returning();
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: owner.workspace.id,
+      userId: mentioned.id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+
+    mockAuthenticatedSession(owner.user);
+    const { app } = createApp();
+
+    await app.request(`/api/telegram-integration/project/${project.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ botToken, chatId }),
+    });
+
+    const [task] = await db
+      .insert(schema.taskTable)
+      .values({
+        projectId: project.id,
+        title: "Legacy mention probe",
+        status: "to-do",
+        columnId: columns.todo.id,
+        priority: "medium",
+        number: 1,
+        position: 1,
+      })
+      .returning();
+
+    const commentResponse = await app.request(`/api/comment/${task.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: `Heads up <kaneo-mention id="${mentioned.id}">Legacy Mentioned Member</kaneo-mention>`,
+      }),
+    });
+    expect(commentResponse.status).toBe(200);
+
+    // The comment event still fires; the personal mention does not.
+    await vi.waitFor(() => {
+      expect(telegramFetchCalls).toHaveLength(1);
+    });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const texts = telegramFetchCalls.map(
+      (call) => (call.body as { text: string }).text,
+    );
+    expect(texts.some((text) => text.includes("Comment:"))).toBe(true);
+    expect(texts.some((text) => text.includes("Mention:"))).toBe(false);
+    expect(telegramFetchCalls).toHaveLength(1);
+  });
+
+  it("delivers a mention only to the mentioned member's unified rule", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const { project, columns } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Aurora",
+      slug: "AUR",
+    });
+    const [mentioned] = await db
+      .insert(schema.userTable)
+      .values({
+        id: `user-${randomUUID()}`,
+        email: `unified-mention-${randomUUID()}@example.com`,
+        emailVerified: true,
+        name: "Unified Mentioned Member",
+      })
+      .returning();
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: owner.workspace.id,
+      userId: mentioned.id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+
+    mockAuthenticatedSession(owner.user);
+    const { app } = createApp();
+
+    const ownerToken = "1111111111:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi";
+    const memberToken = "2222222222:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi";
+
+    await seedUnifiedRule({
+      userId: owner.user.id,
+      botToken: ownerToken,
+      chatId: "-100111",
+      workspaceId: owner.workspace.id,
+      projectId: project.id,
+    });
+    await seedUnifiedRule({
+      userId: mentioned.id,
+      botToken: memberToken,
+      chatId: "-100222",
+      workspaceId: owner.workspace.id,
+      projectId: project.id,
+    });
+
+    const [task] = await db
+      .insert(schema.taskTable)
+      .values({
+        projectId: project.id,
+        title: "Unified mention probe",
+        status: "to-do",
+        columnId: columns.todo.id,
+        priority: "medium",
+        number: 1,
+        position: 1,
+      })
+      .returning();
+
+    const commentResponse = await app.request(`/api/comment/${task.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: `Please review <kaneo-mention id="${mentioned.id}">Unified Mentioned Member</kaneo-mention>`,
+      }),
+    });
+    expect(commentResponse.status).toBe(200);
+
+    // Owner: comment only. Member: comment + personal mention.
+    await vi.waitFor(() => {
+      expect(telegramFetchCalls.length).toBeGreaterThanOrEqual(3);
+    });
+
+    const textsFor = (token: string) =>
+      telegramFetchCalls
+        .filter((call) => call.url.includes(token))
+        .map((call) => (call.body as { text: string }).text);
+
+    const ownerTexts = textsFor(ownerToken);
+    expect(ownerTexts.some((text) => text.includes("Comment:"))).toBe(true);
+    expect(ownerTexts.some((text) => text.includes("Mention:"))).toBe(false);
+
+    const memberTexts = textsFor(memberToken);
+    expect(memberTexts.some((text) => text.includes("Comment:"))).toBe(true);
+    expect(
+      memberTexts.some(
+        (text) =>
+          text.includes("Mention:") &&
+          text.includes("Unified Mentioned Member"),
+      ),
+    ).toBe(true);
+  });
+
+  it("mutes a unified mention when the bot disables the mention event", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const { project, columns } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Aurora",
+      slug: "AUR",
+    });
+    const [mentioned] = await db
+      .insert(schema.userTable)
+      .values({
+        id: `user-${randomUUID()}`,
+        email: `muted-mention-${randomUUID()}@example.com`,
+        emailVerified: true,
+        name: "Muted Unified Member",
+      })
+      .returning();
+    await db.insert(schema.workspaceUserTable).values({
+      workspaceId: owner.workspace.id,
+      userId: mentioned.id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+
+    mockAuthenticatedSession(owner.user);
+    const { app } = createApp();
+
+    const memberToken = "3333333333:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi";
+    await seedUnifiedRule({
+      userId: mentioned.id,
+      botToken: memberToken,
+      chatId: "-100333",
+      workspaceId: owner.workspace.id,
+      projectId: project.id,
+      events: { taskMentionCreated: false },
+    });
+
+    const [task] = await db
+      .insert(schema.taskTable)
+      .values({
+        projectId: project.id,
+        title: "Muted unified probe",
+        status: "to-do",
+        columnId: columns.todo.id,
+        priority: "medium",
+        number: 1,
+        position: 1,
+      })
+      .returning();
+
+    const commentResponse = await app.request(`/api/comment/${task.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: `FYI <kaneo-mention id="${mentioned.id}">Muted Unified Member</kaneo-mention>`,
+      }),
+    });
+    expect(commentResponse.status).toBe(200);
+
+    await vi.waitFor(() => {
+      expect(telegramFetchCalls.length).toBeGreaterThanOrEqual(1);
+    });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const texts = telegramFetchCalls.map(
+      (call) => (call.body as { text: string }).text,
+    );
+    expect(texts.some((text) => text.includes("Comment:"))).toBe(true);
+    expect(texts.some((text) => text.includes("Mention:"))).toBe(false);
   });
 });

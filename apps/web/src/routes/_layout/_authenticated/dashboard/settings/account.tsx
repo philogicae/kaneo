@@ -4,15 +4,7 @@ import {
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
-import {
-  Bell,
-  Blocks,
-  Code,
-  Send,
-  Settings,
-  Sparkles,
-  User,
-} from "lucide-react";
+import { Bell, Blocks, Code, Settings, Sparkles, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
 import SettingsSidebar from "@/components/SettingsSidebar";
@@ -54,11 +46,6 @@ function RouteComponent() {
       title: t("settings:preferences"),
       url: "/dashboard/settings/account/preferences",
       icon: Settings,
-    },
-    {
-      title: t("settings:telegramUnified.sidebarLabel"),
-      url: "/dashboard/settings/account/telegram",
-      icon: Send,
     },
   ];
 

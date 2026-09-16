@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { taskTable, userTable } from "../../database/schema";
@@ -72,6 +72,24 @@ async function updateTaskDescription({
         resourceType: "task",
       });
     }
+
+    // Same dedicated mention event as comments, sourced from the task body.
+    const mentionedUsers = await db
+      .select({ name: userTable.name })
+      .from(userTable)
+      .where(inArray(userTable.id, newlyMentioned));
+
+    await publishEvent("task.mentioned", {
+      taskId: updatedTask.id,
+      projectId: updatedTask.projectId,
+      userId: currentUserId,
+      title: updatedTask.title,
+      source: "description",
+      mentionedUserIds: newlyMentioned,
+      mentionedUserNames: mentionedUsers
+        .map((mentioned) => mentioned.name)
+        .filter((name): name is string => Boolean(name)),
+    });
   }
 
   return updatedTask;

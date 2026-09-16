@@ -1,6 +1,9 @@
-import { and, eq, gte } from "drizzle-orm";
+import { and, asc, eq, gte } from "drizzle-orm";
 import db from "../../database";
 import { activityTable, taskTable } from "../../database/schema";
+import type { PROJECT_CHART_RANGES } from "../schema";
+
+export type ProjectChartsRange = (typeof PROJECT_CHART_RANGES)[number];
 
 export type ProjectChartsBucket = {
   // ISO date of the week start (Monday, UTC).
@@ -8,6 +11,8 @@ export type ProjectChartsBucket = {
   created: number;
   completed: number;
 };
+
+const DEFAULT_RANGE: ProjectChartsRange = "6m";
 
 function toWeekStart(date: Date): Date {
   const result = new Date(
@@ -22,16 +27,40 @@ function weekKey(date: Date): string {
   return toWeekStart(date).toISOString().slice(0, 10);
 }
 
+// Window start, always snapped to a week so the first bucket is complete.
+// "1w" covers the current week; "all" starts at the project's earliest task.
+async function rangeStartFor(
+  projectId: string,
+  range: ProjectChartsRange,
+): Promise<Date> {
+  const now = new Date();
+  if (range === "1w") return toWeekStart(now);
+
+  if (range !== "all") {
+    const months = Number.parseInt(range, 10);
+    const start = new Date(now);
+    start.setUTCMonth(start.getUTCMonth() - months);
+    start.setUTCDate(1);
+    start.setUTCHours(0, 0, 0, 0);
+    return toWeekStart(start);
+  }
+
+  const [earliest] = await db
+    .select({ createdAt: taskTable.createdAt })
+    .from(taskTable)
+    .where(eq(taskTable.projectId, projectId))
+    .orderBy(asc(taskTable.createdAt))
+    .limit(1);
+
+  return toWeekStart(earliest?.createdAt ?? now);
+}
+
 async function getProjectCharts(
   projectId: string,
-  months = 6,
+  range: ProjectChartsRange = DEFAULT_RANGE,
 ): Promise<ProjectChartsBucket[]> {
   const now = new Date();
-  const start = new Date(now);
-  start.setUTCMonth(start.getUTCMonth() - months);
-  start.setUTCDate(1);
-  start.setUTCHours(0, 0, 0, 0);
-  const rangeStart = toWeekStart(start);
+  const rangeStart = await rangeStartFor(projectId, range);
 
   // Bucket by week in JS: SQLite has no date_trunc, and the rows in range are
   // already bounded by project + window.

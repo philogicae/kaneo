@@ -67,7 +67,10 @@ describe("skill bundle endpoint", () => {
     expect(html).toContain('href="references/mcp-guidelines.md"');
     // Heading anchors match the bundle's #section links.
     expect(html).toContain('id="authority-and-boundaries"');
-    // YAML frontmatter is stripped from the browser view.
+    // Frontmatter is served as a metadata block (name + version visible),
+    // while the raw YAML stays out of the rendered body.
+    expect(html).toContain("<dt>name</dt><dd>kaneo</dd>");
+    expect(html).toMatch(/<dt>version<\/dt><dd>\d+\.\d+\.\d+<\/dd>/);
     expect(html).not.toContain("name: kaneo");
   });
 

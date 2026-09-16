@@ -12,9 +12,19 @@ export const getProjectTasksQuery = z.object({
     .openapi({ description: "Number of tasks to skip; use with tasksLimit." }),
 });
 
+export const PROJECT_CHART_RANGES = [
+  "1w",
+  "1m",
+  "3m",
+  "6m",
+  "12m",
+  "all",
+] as const;
+
 export const projectChartsQuery = z.object({
-  months: pagingNumber(1, 24).optional().openapi({
-    description: "Months of weekly buckets to return (default 6, max 24).",
+  range: z.enum(PROJECT_CHART_RANGES).optional().openapi({
+    description:
+      'Window of weekly buckets: "1w", "1m", "3m", "6m", "12m" or "all" (default "6m").',
   }),
 });
 
