@@ -7,6 +7,7 @@ export const discordEventKeys = [
   "taskTitleChanged",
   "taskDescriptionChanged",
   "taskCommentCreated",
+  "taskMentionCreated",
 ] as const;
 
 export type DiscordEventKey = (typeof discordEventKeys)[number];
@@ -31,6 +32,7 @@ export const discordConfigSchema = v.object({
       taskTitleChanged: v.optional(v.boolean()),
       taskDescriptionChanged: v.optional(v.boolean()),
       taskCommentCreated: v.optional(v.boolean()),
+      taskMentionCreated: v.optional(v.boolean()),
     }),
   ),
 });
@@ -44,6 +46,7 @@ export const defaultDiscordEvents: Record<DiscordEventKey, boolean> = {
   taskTitleChanged: false,
   taskDescriptionChanged: false,
   taskCommentCreated: true,
+  taskMentionCreated: true,
 };
 
 export function normalizeDiscordConfig(config: DiscordConfig): DiscordConfig {

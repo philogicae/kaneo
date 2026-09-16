@@ -363,6 +363,11 @@ export type TelegramActionInput =
   | { kind: "titleChanged"; oldTitle: string; newTitle: string }
   | { kind: "descriptionChanged"; newDescription: string | null }
   | { kind: "commentCreated"; comment: string }
+  | {
+      kind: "mentioned";
+      mentionedUserNames: string[];
+      source: "comment" | "description";
+    }
   | { kind: "appointmentCreated" }
   | { kind: "appointmentRescheduled" }
   | { kind: "appointmentReassigned" };
@@ -393,6 +398,15 @@ export function buildTelegramAction(input: TelegramActionInput): string {
         "",
       );
       return `Comment: ${truncate(content.replace(/\s+/g, " "), 100)}`;
+    }
+    case "mentioned": {
+      const names =
+        input.mentionedUserNames.length > 0
+          ? input.mentionedUserNames.join(", ")
+          : "A member";
+      const where =
+        input.source === "comment" ? "a comment" : "the task description";
+      return `Mention: ${names} in ${where}`;
     }
     case "appointmentCreated":
       return "Appointment created";

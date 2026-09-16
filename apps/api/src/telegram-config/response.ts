@@ -9,6 +9,7 @@ export const telegramBotEventsSchema = z
     taskTitleChanged: z.boolean(),
     taskDescriptionChanged: z.boolean(),
     taskCommentCreated: z.boolean(),
+    taskMentionCreated: z.boolean(),
     appointmentCreated: z.boolean(),
     appointmentUpdated: z.boolean(),
   })

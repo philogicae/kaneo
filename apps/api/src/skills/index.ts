@@ -94,13 +94,49 @@ function firstHeading(markdownContent: string, fallback: string): string {
   return match?.[1]?.trim() || fallback;
 }
 
+type Frontmatter = Record<string, string>;
+
+// The entry file starts with YAML frontmatter for agent hosts. Browsers get it
+// rendered as a metadata block instead of raw YAML, so `name` and especially
+// `version` stay visible on the served page.
+function splitFrontmatter(markdownContent: string): {
+  frontmatter: Frontmatter;
+  body: string;
+} {
+  const match = markdownContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match) return { frontmatter: {}, body: markdownContent };
+
+  const frontmatter: Frontmatter = {};
+  for (const line of (match[1] ?? "").split(/\r?\n/)) {
+    const separator = line.indexOf(":");
+    if (separator <= 0) continue;
+    const key = line.slice(0, separator).trim();
+    const value = line
+      .slice(separator + 1)
+      .trim()
+      .replace(/^"(.*)"$/, "$1");
+    if (key && value) frontmatter[key] = value;
+  }
+
+  return { frontmatter, body: markdownContent.slice(match[0].length) };
+}
+
+function renderFrontmatter(frontmatter: Frontmatter): string {
+  const entries = Object.entries(frontmatter);
+  if (entries.length === 0) return "";
+
+  const rows = entries
+    .map(
+      ([key, value]) =>
+        `<dt>${escapeHtml(key)}</dt><dd>${escapeHtml(value)}</dd>`,
+    )
+    .join("");
+  return `<dl class="frontmatter">${rows}</dl>`;
+}
+
 function renderHtmlPage(title: string, markdownContent: string): string {
-  // The entry file starts with YAML frontmatter for agent hosts; browsers do
-  // not need it in the rendered page.
-  const withoutFrontmatter = markdownContent.replace(
-    /^---\r?\n[\s\S]*?\r?\n---\r?\n?/,
-    "",
-  );
+  const { frontmatter, body: withoutFrontmatter } =
+    splitFrontmatter(markdownContent);
   const rendered = String(
     marked.parse(withoutFrontmatter, { async: false, gfm: true }),
   );
@@ -129,6 +165,9 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 pre { background: rgba(127,127,127,.14); padding: 1rem; border-radius: .5rem; overflow-x: auto; }
 pre code { background: none; padding: 0; }
 blockquote { margin: 1rem 0; padding-left: 1rem; border-left: 3px solid rgba(127,127,127,.45); }
+dl.frontmatter { display: grid; grid-template-columns: max-content 1fr; gap: .3rem .8rem; margin: 0 0 1.75rem; padding: .85rem 1rem; border: 1px solid rgba(127,127,127,.35); border-radius: .5rem; background: rgba(127,127,127,.08); font-size: .875rem; }
+dl.frontmatter dt { font-weight: 600; opacity: .65; }
+dl.frontmatter dd { margin: 0; }
 hr { border: 0; border-top: 1px solid rgba(127,127,127,.35); margin: 2rem 0; }
 table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid rgba(127,127,127,.35); padding: .4rem .6rem; text-align: left; vertical-align: top; }
@@ -136,7 +175,7 @@ th, td { border: 1px solid rgba(127,127,127,.35); padding: .4rem .6rem; text-ali
 </head>
 <body>
 <main>
-${body}
+${renderFrontmatter(frontmatter)}${body}
 </main>
 </body>
 </html>

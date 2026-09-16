@@ -13,6 +13,7 @@ export type UpdateDiscordIntegrationRequest = {
     taskTitleChanged?: boolean;
     taskDescriptionChanged?: boolean;
     taskCommentCreated?: boolean;
+    taskMentionCreated?: boolean;
   };
 };
 

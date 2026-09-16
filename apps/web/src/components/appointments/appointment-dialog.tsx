@@ -35,7 +35,7 @@ type Priority = (typeof PRIORITIES)[number];
 
 // Preset reminder offsets (minutes before the start), matching the task
 // reminder vocabulary. Arbitrary offsets remain available through the API/MCP.
-const REMINDER_PRESETS = [15, 60, 4 * 60, 24 * 60] as const;
+const REMINDER_PRESETS = [15, 60, 2 * 60, 24 * 60, 7 * 24 * 60] as const;
 
 const RECURRENCE_FREQUENCIES: RecurrenceFrequency[] = [
   "daily",
@@ -396,9 +396,13 @@ export default function AppointmentDialog({
                     <Button
                       key={offset}
                       type="button"
-                      variant={active ? "secondary" : "outline"}
+                      // Selected chips switch to the primary fill: readable in
+                      // light, dark and volt, where the subtle secondary tint
+                      // was nearly invisible.
+                      variant={active ? "default" : "outline"}
                       size="sm"
                       className="h-7 px-2 text-xs"
+                      aria-pressed={active}
                       onClick={() =>
                         setReminderOffsets(
                           active

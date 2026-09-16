@@ -9,6 +9,9 @@ export type CalendarTask = PackableTask & {
   title: string;
   number: number | null;
   status: string;
+  // Cross-project views tag each item with its project so the bar can show
+  // the right `<slug>-<number>` key; project views pass `projectSlug` instead.
+  projectSlug?: string;
   // Set on client-projected occurrences of a recurring task; the bar opens
   // the real task behind the projection.
   sourceTaskId?: string;
@@ -52,10 +55,9 @@ export default function CalendarTaskBar({
     continuesAfter,
   } = segment;
 
+  const taskSlug = task.projectSlug ?? projectSlug;
   const taskKey =
-    projectSlug && task.number != null
-      ? `${projectSlug}-${task.number}`
-      : undefined;
+    taskSlug && task.number != null ? `${taskSlug}-${task.number}` : undefined;
 
   const range = `${formatDateShort(task.scheduleStart)} – ${formatDateShort(
     task.scheduleEnd,

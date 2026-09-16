@@ -30,13 +30,14 @@ export const updateTelegramBotBody = z.object({
       taskTitleChanged: z.boolean().optional(),
       taskDescriptionChanged: z.boolean().optional(),
       taskCommentCreated: z.boolean().optional(),
+      taskMentionCreated: z.boolean().optional(),
       appointmentCreated: z.boolean().optional(),
       appointmentUpdated: z.boolean().optional(),
     })
     .optional()
     .openapi({
       description:
-        "Per-bot event filter; omitted keys keep the plugin default (created and comments on).",
+        "Per-bot event filter; omitted keys keep the plugin default (created, comments and mentions on).",
     }),
 });
 

@@ -43,7 +43,6 @@ import { Route as LayoutAuthenticatedDashboardSettingsAccountMcpRouteImport } fr
 import { Route as LayoutAuthenticatedDashboardSettingsAccountNotificationsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/notifications'
 import { Route as LayoutAuthenticatedDashboardSettingsAccountPreferencesRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/preferences'
 import { Route as LayoutAuthenticatedDashboardSettingsAccountSkillsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/skills'
-import { Route as LayoutAuthenticatedDashboardSettingsAccountTelegramRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account/telegram'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/general'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/labels'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceRolesRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/roles'
@@ -250,12 +249,6 @@ const LayoutAuthenticatedDashboardSettingsAccountSkillsRoute =
     path: '/skills',
     getParentRoute: () => LayoutAuthenticatedDashboardSettingsAccountRoute,
   } as any)
-const LayoutAuthenticatedDashboardSettingsAccountTelegramRoute =
-  LayoutAuthenticatedDashboardSettingsAccountTelegramRouteImport.update({
-    id: '/telegram',
-    path: '/telegram',
-    getParentRoute: () => LayoutAuthenticatedDashboardSettingsAccountRoute,
-  } as any)
 const LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute =
   LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRouteImport.update({
     id: '/general',
@@ -421,7 +414,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/account/notifications': typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   '/dashboard/settings/account/preferences': typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
   '/dashboard/settings/account/skills': typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
-  '/dashboard/settings/account/telegram': typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
   '/dashboard/settings/workspace/general': typeof LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute
   '/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   '/dashboard/settings/workspace/roles': typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
@@ -470,7 +462,6 @@ export interface FileRoutesByTo {
   '/dashboard/settings/account/notifications': typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   '/dashboard/settings/account/preferences': typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
   '/dashboard/settings/account/skills': typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
-  '/dashboard/settings/account/telegram': typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
   '/dashboard/settings/workspace/general': typeof LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute
   '/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   '/dashboard/settings/workspace/roles': typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
@@ -525,7 +516,6 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/settings/account/notifications': typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   '/_layout/_authenticated/dashboard/settings/account/preferences': typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
   '/_layout/_authenticated/dashboard/settings/account/skills': typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
-  '/_layout/_authenticated/dashboard/settings/account/telegram': typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
   '/_layout/_authenticated/dashboard/settings/workspace/general': typeof LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRoute
   '/_layout/_authenticated/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   '/_layout/_authenticated/dashboard/settings/workspace/roles': typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
@@ -579,7 +569,6 @@ export interface FileRouteTypes {
     | '/dashboard/settings/account/notifications'
     | '/dashboard/settings/account/preferences'
     | '/dashboard/settings/account/skills'
-    | '/dashboard/settings/account/telegram'
     | '/dashboard/settings/workspace/general'
     | '/dashboard/settings/workspace/labels'
     | '/dashboard/settings/workspace/roles'
@@ -628,7 +617,6 @@ export interface FileRouteTypes {
     | '/dashboard/settings/account/notifications'
     | '/dashboard/settings/account/preferences'
     | '/dashboard/settings/account/skills'
-    | '/dashboard/settings/account/telegram'
     | '/dashboard/settings/workspace/general'
     | '/dashboard/settings/workspace/labels'
     | '/dashboard/settings/workspace/roles'
@@ -682,7 +670,6 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/settings/account/notifications'
     | '/_layout/_authenticated/dashboard/settings/account/preferences'
     | '/_layout/_authenticated/dashboard/settings/account/skills'
-    | '/_layout/_authenticated/dashboard/settings/account/telegram'
     | '/_layout/_authenticated/dashboard/settings/workspace/general'
     | '/_layout/_authenticated/dashboard/settings/workspace/labels'
     | '/_layout/_authenticated/dashboard/settings/workspace/roles'
@@ -953,13 +940,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardSettingsAccountRoute
     }
-    '/_layout/_authenticated/dashboard/settings/account/telegram': {
-      id: '/_layout/_authenticated/dashboard/settings/account/telegram'
-      path: '/telegram'
-      fullPath: '/dashboard/settings/account/telegram'
-      preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRouteImport
-      parentRoute: typeof LayoutAuthenticatedDashboardSettingsAccountRoute
-    }
     '/_layout/_authenticated/dashboard/settings/workspace/general': {
       id: '/_layout/_authenticated/dashboard/settings/workspace/general'
       path: '/general'
@@ -1089,7 +1069,6 @@ interface LayoutAuthenticatedDashboardSettingsAccountRouteChildren {
   LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute: typeof LayoutAuthenticatedDashboardSettingsAccountNotificationsRoute
   LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute: typeof LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute
   LayoutAuthenticatedDashboardSettingsAccountSkillsRoute: typeof LayoutAuthenticatedDashboardSettingsAccountSkillsRoute
-  LayoutAuthenticatedDashboardSettingsAccountTelegramRoute: typeof LayoutAuthenticatedDashboardSettingsAccountTelegramRoute
 }
 
 const LayoutAuthenticatedDashboardSettingsAccountRouteChildren: LayoutAuthenticatedDashboardSettingsAccountRouteChildren =
@@ -1106,8 +1085,6 @@ const LayoutAuthenticatedDashboardSettingsAccountRouteChildren: LayoutAuthentica
       LayoutAuthenticatedDashboardSettingsAccountPreferencesRoute,
     LayoutAuthenticatedDashboardSettingsAccountSkillsRoute:
       LayoutAuthenticatedDashboardSettingsAccountSkillsRoute,
-    LayoutAuthenticatedDashboardSettingsAccountTelegramRoute:
-      LayoutAuthenticatedDashboardSettingsAccountTelegramRoute,
   }
 
 const LayoutAuthenticatedDashboardSettingsAccountRouteWithChildren =

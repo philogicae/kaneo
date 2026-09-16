@@ -14,6 +14,7 @@ export type CreateTelegramIntegrationRequest = {
     taskTitleChanged?: boolean;
     taskDescriptionChanged?: boolean;
     taskCommentCreated?: boolean;
+    taskMentionCreated?: boolean;
   };
 };
 

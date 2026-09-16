@@ -32,6 +32,7 @@ type DiscordIntegrationFormValues = {
   taskTitleChanged: boolean;
   taskDescriptionChanged: boolean;
   taskCommentCreated: boolean;
+  taskMentionCreated: boolean;
 };
 
 function EventToggle({
@@ -48,6 +49,7 @@ function EventToggle({
     | "taskTitleChanged"
     | "taskDescriptionChanged"
     | "taskCommentCreated"
+    | "taskMentionCreated"
   >;
   label: string;
 }) {
@@ -96,6 +98,7 @@ export function DiscordIntegrationSettings({
         taskTitleChanged: z.boolean(),
         taskDescriptionChanged: z.boolean(),
         taskCommentCreated: z.boolean(),
+        taskMentionCreated: z.boolean(),
       }),
     [],
   );
@@ -118,6 +121,7 @@ export function DiscordIntegrationSettings({
       taskDescriptionChanged:
         integration?.events?.taskDescriptionChanged ?? false,
       taskCommentCreated: integration?.events?.taskCommentCreated ?? true,
+      taskMentionCreated: integration?.events?.taskMentionCreated ?? true,
     }),
     [integration],
   );
@@ -133,6 +137,7 @@ export function DiscordIntegrationSettings({
       taskTitleChanged: false,
       taskDescriptionChanged: false,
       taskCommentCreated: true,
+      taskMentionCreated: true,
     },
   });
   const { reset } = form;
@@ -161,6 +166,7 @@ export function DiscordIntegrationSettings({
         taskTitleChanged: values.taskTitleChanged,
         taskDescriptionChanged: values.taskDescriptionChanged,
         taskCommentCreated: values.taskCommentCreated,
+        taskMentionCreated: values.taskMentionCreated,
       };
 
       if (!isConnected) {
@@ -246,6 +252,7 @@ export function DiscordIntegrationSettings({
         taskTitleChanged: false,
         taskDescriptionChanged: false,
         taskCommentCreated: true,
+        taskMentionCreated: true,
       });
       toast.success(t("settings:discordIntegration.toast.removed"));
     } catch (error) {
@@ -404,6 +411,11 @@ export function DiscordIntegrationSettings({
               control={form.control}
               label={t("settings:discordIntegration.events.taskCommentCreated")}
               name="taskCommentCreated"
+            />
+            <EventToggle
+              control={form.control}
+              label={t("settings:discordIntegration.events.taskMentionCreated")}
+              name="taskMentionCreated"
             />
           </div>
 

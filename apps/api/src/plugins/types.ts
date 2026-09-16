@@ -56,6 +56,19 @@ export type TaskCommentCreatedEvent = {
   comment: string;
 };
 
+// A comment or a description edit @mentioned one or more workspace members.
+// Kept separate from the comment/description events so a channel can
+// subscribe to mentions without receiving every comment.
+export type TaskMentionCreatedEvent = {
+  taskId: string;
+  projectId: string;
+  userId: string | null;
+  title: string;
+  source: "comment" | "description";
+  mentionedUserIds: string[];
+  mentionedUserNames: string[];
+};
+
 export type TaskDeletedEvent = {
   taskId: string;
   projectId: string;
@@ -108,6 +121,7 @@ export type TaskEvent =
   | TaskTitleChangedEvent
   | TaskDescriptionChangedEvent
   | TaskCommentCreatedEvent
+  | TaskMentionCreatedEvent
   | TaskDeletedEvent
   | TaskMovedEvent
   | TaskDueDateChangedEvent
@@ -153,6 +167,7 @@ export type IntegrationPlugin = {
   onTaskTitleChanged?: TaskEventHandler<TaskTitleChangedEvent>;
   onTaskDescriptionChanged?: TaskEventHandler<TaskDescriptionChangedEvent>;
   onTaskCommentCreated?: TaskEventHandler<TaskCommentCreatedEvent>;
+  onTaskMentionCreated?: TaskEventHandler<TaskMentionCreatedEvent>;
   onTaskDeleted?: TaskEventHandler<TaskDeletedEvent>;
   onTaskMoved?: TaskEventHandler<TaskMovedEvent>;
   onTaskDueDateChanged?: TaskEventHandler<TaskDueDateChangedEvent>;
