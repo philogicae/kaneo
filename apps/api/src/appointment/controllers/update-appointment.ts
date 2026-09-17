@@ -7,10 +7,7 @@ import {
   userTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
-import {
-  assertAssignableUser,
-  getProjectWorkspaceId,
-} from "../../utils/assert-assignable-user";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
 
 type UpdateAppointmentInput = {
   title: string;
@@ -54,10 +51,7 @@ async function updateAppointment(id: string, input: UpdateAppointmentInput) {
   let assigneeName: string | null = null;
 
   if (normalizedUserId) {
-    await assertAssignableUser(
-      normalizedUserId,
-      await getProjectWorkspaceId(existing.projectId),
-    );
+    await assertAssignableUser(normalizedUserId, existing.projectId);
 
     const [assignee] = await db
       .select({ name: userTable.name })

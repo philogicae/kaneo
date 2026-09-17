@@ -2419,6 +2419,16 @@
 			"teamsLabel": "Teams",
 			"title": "邀请团队成员"
 		},
+		"memberAccess": {
+			"description": "{{name}} 在此工作区的直接项目访问权限。",
+			"fullAccess": "该成员已拥有整个工作区的访问权限。",
+			"hint": "取消勾选所有项可移除直接授权。如果没有团队或其他授权，该成员将离开工作区。",
+			"menuItem": "管理访问权限",
+			"save": "保存访问权限",
+			"saveError": "更新成员访问权限失败",
+			"saveSuccess": "成员访问权限已更新",
+			"title": "管理访问权限"
+		},
 		"members": {
 			"inviteMember": "邀请成员",
 			"pageTitle": "成员",
@@ -2426,6 +2436,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "邀请操作",
+			"ariaMemberActions": "成员操作",
 			"ariaRemoveMember": "移除成员",
 			"cancelDialogDescription": "确定要取消 {{email}} 的邀请吗？此操作不可撤销。",
 			"cancelDialogTitle": "取消邀请？",

@@ -81,7 +81,10 @@ export default function AppointmentDialog({
   defaultStart,
 }: AppointmentDialogProps) {
   const { t } = useTranslation();
-  const { data: workspaceUsers } = useGetActiveWorkspaceUsers(workspaceId);
+  const { data: workspaceUsers } = useGetActiveWorkspaceUsers(
+    workspaceId,
+    projectId,
+  );
   const { mutateAsync: createAppointment, isPending: isCreating } =
     useCreateAppointment();
   const { mutateAsync: updateAppointment, isPending: isUpdating } =

@@ -86,9 +86,9 @@ describe("project charts and backlog statistics", () => {
       created: number;
       completed: number;
     }>;
-    // Defaults: the last three months bucketed by day.
-    expect(buckets.length).toBeGreaterThan(80);
-    expect(buckets.length).toBeLessThan(130);
+    // Defaults: the last month bucketed by day.
+    expect(buckets.length).toBeGreaterThan(25);
+    expect(buckets.length).toBeLessThan(65);
     expect(
       buckets.every((bucket) => bucket.bucketStart.endsWith("T00:00:00.000Z")),
     ).toBe(true);

@@ -55,6 +55,7 @@ import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
 import user from "./user";
 import getAvatar from "./user/controllers/get-avatar";
+import { canAccessProject } from "./utils/access-scope";
 import { authenticateApiRequest } from "./utils/authenticate-api-request";
 import { authorizeAssetAccess } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
@@ -706,6 +707,14 @@ export function createApp() {
         }
 
         await validateWorkspaceAccess(userId, project.workspaceId);
+
+        // A scoped member without a grant for this project must not hear its
+        // broadcasts, even though the workspace itself is reachable.
+        if (!(await canAccessProject(userId, projectId))) {
+          throw new HTTPException(403, {
+            message: "No access to this project",
+          });
+        }
       }
 
       const windowId = c.req.query("windowId");

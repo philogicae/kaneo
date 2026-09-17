@@ -10188,6 +10188,46 @@
 						"title"
 					]
 				},
+				"memberAccess": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"description": {
+							"type": "string"
+						},
+						"fullAccess": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"menuItem": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"saveError": {
+							"type": "string"
+						},
+						"saveSuccess": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"description",
+						"fullAccess",
+						"hint",
+						"menuItem",
+						"save",
+						"saveError",
+						"saveSuccess",
+						"title"
+					]
+				},
 				"members": {
 					"type": "object",
 					"additionalProperties": false,
@@ -10209,6 +10249,9 @@
 					"additionalProperties": false,
 					"properties": {
 						"ariaInvitationActions": {
+							"type": "string"
+						},
+						"ariaMemberActions": {
 							"type": "string"
 						},
 						"ariaRemoveMember": {
@@ -10275,6 +10318,7 @@
 					},
 					"required": [
 						"ariaInvitationActions",
+						"ariaMemberActions",
 						"ariaRemoveMember",
 						"cancelDialogDescription",
 						"cancelDialogTitle",
@@ -10319,6 +10363,7 @@
 				"invitations",
 				"inviteLinks",
 				"inviteModal",
+				"memberAccess",
 				"members",
 				"membersTable",
 				"roles"

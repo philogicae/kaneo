@@ -3,10 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { appointmentTable, userTable } from "../../database/schema";
 import { publishEvent } from "../../events";
-import {
-  assertAssignableUser,
-  getProjectWorkspaceId,
-} from "../../utils/assert-assignable-user";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
 
 type CreateAppointmentInput = {
   projectId: string;
@@ -40,10 +37,7 @@ async function createAppointment({
   let assigneeName: string | null = null;
 
   if (normalizedUserId) {
-    await assertAssignableUser(
-      normalizedUserId,
-      await getProjectWorkspaceId(projectId),
-    );
+    await assertAssignableUser(normalizedUserId, projectId);
 
     const [assignee] = await db
       .select({ name: userTable.name })

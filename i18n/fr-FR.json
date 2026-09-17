@@ -2459,6 +2459,16 @@
 			"teamsLabel": "Teams",
 			"title": "Inviter un membre de l'équipe"
 		},
+		"memberAccess": {
+			"description": "Accès direct aux projets de {{name}} dans cet espace de travail.",
+			"fullAccess": "Ce membre a déjà accès à tout l'espace de travail.",
+			"hint": "Décochez tout pour retirer les accès directs. Le membre quitte l'espace de travail si aucune équipe ni autre accès ne subsiste.",
+			"menuItem": "Gérer l'accès",
+			"save": "Enregistrer l'accès",
+			"saveError": "Échec de la mise à jour de l'accès du membre",
+			"saveSuccess": "Accès du membre mis à jour",
+			"title": "Gérer l'accès"
+		},
 		"members": {
 			"inviteMember": "Inviter un membre",
 			"pageTitle": "Membres",
@@ -2466,6 +2476,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Actions de l'invitation",
+			"ariaMemberActions": "Actions du membre",
 			"ariaRemoveMember": "Supprimer le membre",
 			"cancelDialogDescription": "Êtes-vous sûr de vouloir annuler l'invitation pour {{email}} ? Cette action ne peut pas être annulée.",
 			"cancelDialogTitle": "Annuler l'invitation ?",

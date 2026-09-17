@@ -2439,6 +2439,16 @@
 			"teamsLabel": "Teams",
 			"title": "Komanda üzvü dəvət et"
 		},
+		"memberAccess": {
+			"description": "Bu iş sahəsində {{name}} üçün birbaşa layihə girişi.",
+			"fullAccess": "Bu üzv artıq bütün iş sahəsinə girişə malikdir.",
+			"hint": "Birbaşa girişləri silmək üçün hər şeyin işarəsini götürün. Komanda və ya başqa giriş qalmazsa, üzv iş sahəsindən çıxarılır.",
+			"menuItem": "Girişi idarə et",
+			"save": "Girişi yadda saxla",
+			"saveError": "Üzvün girişini yeniləmək alınmadı",
+			"saveSuccess": "Üzvün girişi yeniləndi",
+			"title": "Girişi idarə et"
+		},
 		"members": {
 			"inviteMember": "Üzv dəvət et",
 			"pageTitle": "Üzvlər",
@@ -2446,6 +2456,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Dəvət əməliyyatları",
+			"ariaMemberActions": "Üzv əməliyyatları",
 			"ariaRemoveMember": "Üzvü çıxar",
 			"cancelDialogDescription": "{{email}} üçün dəvəti ləğv etmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.",
 			"cancelDialogTitle": "Dəvət ləğv edilsin?",

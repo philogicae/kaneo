@@ -14,7 +14,7 @@ export type ProjectChartsBucket = {
   completed: number;
 };
 
-const DEFAULT_RANGE: ProjectChartsRange = "3m";
+const DEFAULT_RANGE: ProjectChartsRange = "1m";
 const DEFAULT_UNIT: ProjectChartsUnit = "day";
 
 // Bucket sizes a window can carry; finer sizes are rejected so a chart cannot

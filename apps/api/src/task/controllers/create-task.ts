@@ -9,10 +9,7 @@ import {
   userTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
-import {
-  assertAssignableUser,
-  getProjectWorkspaceId,
-} from "../../utils/assert-assignable-user";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
 import type { RecurrenceRule } from "../recurrence";
 import {
   assertRequiredCustomFields,
@@ -103,10 +100,7 @@ async function createTask({
   let assignee: { name: string } | undefined;
 
   if (normalizedUserId) {
-    await assertAssignableUser(
-      normalizedUserId,
-      await getProjectWorkspaceId(projectId),
-    );
+    await assertAssignableUser(normalizedUserId, projectId);
 
     [assignee] = await db
       .select({ name: userTable.name })

@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, notInArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db, { schema } from "../database";
 
@@ -365,6 +365,153 @@ async function upsertProjectGrant(
     projectId,
     grantedBy: context.grantedBy ?? null,
   });
+}
+
+export type DirectWorkspaceGrants = {
+  allProjects: boolean;
+  projectIds: string[];
+};
+
+// Direct grants recorded for a member in one workspace, outside teams.
+export async function getDirectWorkspaceGrants(
+  userId: string,
+  workspaceId: string,
+): Promise<DirectWorkspaceGrants> {
+  const [workspaceGrant] = await db
+    .select({ allProjects: schema.userWorkspaceAccessTable.allProjects })
+    .from(schema.userWorkspaceAccessTable)
+    .where(
+      and(
+        eq(schema.userWorkspaceAccessTable.userId, userId),
+        eq(schema.userWorkspaceAccessTable.workspaceId, workspaceId),
+      ),
+    )
+    .limit(1);
+
+  const projectRows = await db
+    .select({ projectId: schema.userProjectAccessTable.projectId })
+    .from(schema.userProjectAccessTable)
+    .innerJoin(
+      schema.projectTable,
+      eq(schema.projectTable.id, schema.userProjectAccessTable.projectId),
+    )
+    .where(
+      and(
+        eq(schema.userProjectAccessTable.userId, userId),
+        eq(schema.projectTable.workspaceId, workspaceId),
+      ),
+    );
+
+  return {
+    allProjects: Boolean(workspaceGrant?.allProjects),
+    projectIds: projectRows.map((row) => row.projectId),
+  };
+}
+
+// Replaces a member's direct grants for one workspace. "All projects" lifts a
+// scoped membership back to full (same rule as an accepted invitation);
+// clearing everything drops the grants and removes the membership when no
+// team or other grant still justifies it.
+export async function replaceDirectWorkspaceGrants(
+  userId: string,
+  workspaceId: string,
+  input: DirectWorkspaceGrants,
+  context: GrantContext = {},
+): Promise<void> {
+  const projectIds = [...new Set(input.projectIds)];
+  const workspaceProjects = db
+    .select({ id: schema.projectTable.id })
+    .from(schema.projectTable)
+    .where(eq(schema.projectTable.workspaceId, workspaceId));
+
+  if (input.allProjects) {
+    await upsertWorkspaceGrant(userId, workspaceId, true, context);
+    // Explicit rows are redundant once the whole workspace is granted.
+    await db
+      .delete(schema.userProjectAccessTable)
+      .where(
+        and(
+          eq(schema.userProjectAccessTable.userId, userId),
+          inArray(schema.userProjectAccessTable.projectId, workspaceProjects),
+        ),
+      );
+    await db
+      .update(schema.workspaceUserTable)
+      .set({ accessScope: "full" })
+      .where(
+        and(
+          eq(schema.workspaceUserTable.userId, userId),
+          eq(schema.workspaceUserTable.workspaceId, workspaceId),
+          eq(schema.workspaceUserTable.role, "member"),
+        ),
+      );
+    return;
+  }
+
+  if (projectIds.length > 0) {
+    const [existing] = await db
+      .select({
+        id: schema.userWorkspaceAccessTable.id,
+        allProjects: schema.userWorkspaceAccessTable.allProjects,
+      })
+      .from(schema.userWorkspaceAccessTable)
+      .where(
+        and(
+          eq(schema.userWorkspaceAccessTable.userId, userId),
+          eq(schema.userWorkspaceAccessTable.workspaceId, workspaceId),
+        ),
+      )
+      .limit(1);
+
+    if (!existing) {
+      await db.insert(schema.userWorkspaceAccessTable).values({
+        userId,
+        workspaceId,
+        allProjects: false,
+        grantedBy: context.grantedBy ?? null,
+      });
+    } else if (existing.allProjects) {
+      await db
+        .update(schema.userWorkspaceAccessTable)
+        .set({ allProjects: false })
+        .where(eq(schema.userWorkspaceAccessTable.id, existing.id));
+    }
+
+    await db
+      .delete(schema.userProjectAccessTable)
+      .where(
+        and(
+          eq(schema.userProjectAccessTable.userId, userId),
+          inArray(schema.userProjectAccessTable.projectId, workspaceProjects),
+          notInArray(schema.userProjectAccessTable.projectId, projectIds),
+        ),
+      );
+
+    for (const projectId of projectIds) {
+      await upsertProjectGrant(userId, projectId, context);
+    }
+
+    await markWorkspaceMembershipScoped(userId, workspaceId);
+    return;
+  }
+
+  await db
+    .delete(schema.userWorkspaceAccessTable)
+    .where(
+      and(
+        eq(schema.userWorkspaceAccessTable.userId, userId),
+        eq(schema.userWorkspaceAccessTable.workspaceId, workspaceId),
+      ),
+    );
+  await db
+    .delete(schema.userProjectAccessTable)
+    .where(
+      and(
+        eq(schema.userProjectAccessTable.userId, userId),
+        inArray(schema.userProjectAccessTable.projectId, workspaceProjects),
+      ),
+    );
+  await cleanupOrphanedScopedMembership(userId, workspaceId);
 }
 
 // Workspaces where the user can administer every project, used for team and

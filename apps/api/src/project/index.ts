@@ -13,6 +13,7 @@ import createProjectCtrl from "./controllers/create-project";
 import deleteProjectCtrl from "./controllers/delete-project";
 import getProjectCtrl from "./controllers/get-project";
 import getProjectCharts from "./controllers/get-project-charts";
+import getProjectMembers from "./controllers/get-project-members";
 import getProjectsCtrl from "./controllers/get-projects";
 import reorderProjectsCtrl from "./controllers/reorder-projects";
 import unarchiveProjectCtrl from "./controllers/unarchive-project";
@@ -20,6 +21,7 @@ import updateProjectCtrl from "./controllers/update-project";
 import {
   projectChartsSchema,
   projectListSchema,
+  projectMemberListSchema,
   projectSchema,
 } from "./response";
 import {
@@ -102,13 +104,32 @@ const getProjectChartsRoute = createRoute({
   tags: ["Projects"],
   summary: "Get project charts",
   description:
-    'Task-creation and completion counts for the selected window (default "3m"), bucketed at the requested unit. `created` counts tasks created in the bucket; `completed` counts status changes into a final status. Ranges: "1w", "1m", "3m", "6m", "12m" or "all"; units: "hour", "day", "week" or "month" (hour only for "1w", day up to "12m", week/month for every range). The unit defaults to "day", or "week" for ranges without a daily reading ("all").',
+    'Task-creation and completion counts for the selected window (default "1m"), bucketed at the requested unit. `created` counts tasks created in the bucket; `completed` counts status changes into a final status. Ranges: "1w", "1m", "3m", "6m", "12m" or "all"; units: "hour", "day", "week" or "month" (hour only for "1w", day up to "12m", week/month for every range). The unit defaults to "day", or "week" for ranges without a daily reading ("all").',
   middleware: [workspaceAccess.fromProject()] as const,
   request: { params: projectParam, query: projectChartsQuery },
   responses: {
     200: jsonResponse("Progression buckets", z.array(projectChartsSchema)),
     400: errorResponse(
       "Unknown project, or its workspace could not be determined",
+    ),
+    403: errorResponse("No access to the project's workspace"),
+  },
+});
+
+const getProjectMembersRoute = createRoute({
+  method: "get",
+  operationId: "getProjectMembers",
+  path: "/{id}/members",
+  tags: ["Projects"],
+  summary: "Get project members",
+  description:
+    "Workspace members who can access this project: full workspace access, or a scoped membership with an explicit grant; instance admins are included. Feeds the assignee and mention pickers so nobody is offered work in a project they cannot open.",
+  middleware: [workspaceAccess.fromProject()] as const,
+  request: { params: projectParam },
+  responses: {
+    200: jsonResponse(
+      "Members with access to the project",
+      projectMemberListSchema,
     ),
     403: errorResponse("No access to the project's workspace"),
   },
@@ -263,6 +284,7 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
       icon,
       slug,
       description ?? null,
+      c.get("userId"),
     );
     return c.json(newProject, 200);
   })
@@ -281,6 +303,10 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const { range, unit } = c.req.valid("query");
     const buckets = await getProjectCharts(id, range, unit);
     return c.json(buckets, 200);
+  })
+  .openapi(getProjectMembersRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    return c.json(await getProjectMembers(id), 200);
   })
   .openapi(reorderProjectsRoute, async (c) => {
     const workspaceId = c.get("workspaceId");

@@ -2419,6 +2419,16 @@
 			"teamsLabel": "Teams",
 			"title": "Mời thành viên nhóm"
 		},
+		"memberAccess": {
+			"description": "Quyền truy cập dự án trực tiếp cho {{name}} trong không gian làm việc này.",
+			"fullAccess": "Thành viên này đã có toàn quyền truy cập không gian làm việc.",
+			"hint": "Bỏ chọn tất cả để xóa quyền truy cập trực tiếp. Thành viên sẽ rời không gian làm việc nếu không còn nhóm hoặc quyền truy cập nào khác.",
+			"menuItem": "Quản lý quyền truy cập",
+			"save": "Lưu quyền truy cập",
+			"saveError": "Không thể cập nhật quyền truy cập của thành viên",
+			"saveSuccess": "Đã cập nhật quyền truy cập của thành viên",
+			"title": "Quản lý quyền truy cập"
+		},
 		"members": {
 			"inviteMember": "Mời thành viên",
 			"pageTitle": "Thành viên",
@@ -2426,6 +2436,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Hành động lời mời",
+			"ariaMemberActions": "Hành động của thành viên",
 			"ariaRemoveMember": "Gỡ thành viên",
 			"cancelDialogDescription": "Bạn có chắc muốn hủy lời mời cho {{email}}? Hành động này không thể hoàn tác.",
 			"cancelDialogTitle": "Hủy lời mời?",

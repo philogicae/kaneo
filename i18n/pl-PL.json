@@ -2479,6 +2479,16 @@
 			"teamsLabel": "Teams",
 			"title": "Zaproś członka zespołu"
 		},
+		"memberAccess": {
+			"description": "Bezpośredni dostęp do projektów dla {{name}} w tej przestrzeni roboczej.",
+			"fullAccess": "Ten członek ma już pełny dostęp do przestrzeni roboczej.",
+			"hint": "Odznacz wszystko, aby usunąć bezpośrednie dostępy. Członek opuści przestrzeń roboczą, jeśli nie pozostanie żaden zespół ani inny dostęp.",
+			"menuItem": "Zarządzaj dostępem",
+			"save": "Zapisz dostęp",
+			"saveError": "Nie udało się zaktualizować dostępu członka",
+			"saveSuccess": "Zaktualizowano dostęp członka",
+			"title": "Zarządzaj dostępem"
+		},
 		"members": {
 			"inviteMember": "Zaproś członka",
 			"pageTitle": "Członkowie",
@@ -2486,6 +2496,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Działania związane z zaproszeniem",
+			"ariaMemberActions": "Działania członka",
 			"ariaRemoveMember": "Usuń członka",
 			"cancelDialogDescription": "Czy na pewno chcesz anulować zaproszenie dla {{email}}? Nie można tego cofnąć.",
 			"cancelDialogTitle": "Anulować zaproszenie?",

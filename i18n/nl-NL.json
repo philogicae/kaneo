@@ -2439,6 +2439,16 @@
 			"teamsLabel": "Teams",
 			"title": "Teamlid uitnodigen"
 		},
+		"memberAccess": {
+			"description": "Directe projecttoegang voor {{name}} in deze werkruimte.",
+			"fullAccess": "Dit lid heeft al volledige toegang tot de werkruimte.",
+			"hint": "Vink alles uit om de directe toegangen te verwijderen. Het lid verlaat de werkruimte als er geen team of andere toegang overblijft.",
+			"menuItem": "Toegang beheren",
+			"save": "Toegang opslaan",
+			"saveError": "Bijwerken van lidtoegang mislukt",
+			"saveSuccess": "Lidtoegang bijgewerkt",
+			"title": "Toegang beheren"
+		},
 		"members": {
 			"inviteMember": "Lid uitnodigen",
 			"pageTitle": "Leden",
@@ -2446,6 +2456,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Uitnodigingsacties",
+			"ariaMemberActions": "Lidacties",
 			"ariaRemoveMember": "Lid verwijderen",
 			"cancelDialogDescription": "Weet je zeker dat je de uitnodiging voor {{email}} wilt annuleren?",
 			"cancelDialogTitle": "Uitnodiging annuleren?",

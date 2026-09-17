@@ -77,6 +77,7 @@ async function createComment(
       },
       resourceId: taskId,
       resourceType: "task",
+      projectId: task?.projectId ?? null,
     });
   }
 
@@ -118,6 +119,7 @@ async function createComment(
       },
       resourceId: taskId,
       resourceType: "task",
+      projectId: task.projectId,
     });
   }
 

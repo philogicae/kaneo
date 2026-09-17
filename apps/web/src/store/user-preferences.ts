@@ -242,9 +242,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       workspaceOrder: [],
       setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
 
-      // Default reading: the last quarter, bucketed by day. The window can be
+      // Default reading: the last month, bucketed by day. The window can be
       // narrowed to a week or widened to all history.
-      chartsRange: "3m",
+      chartsRange: "1m",
       setChartsRange: (range) => set({ chartsRange: range }),
       // Daily buckets by default (weekly for "all"); the unit selector refines
       // them down to the hour or coarsens them up to the month.
@@ -254,6 +254,21 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     {
       name: "user-preferences",
       storage: createJSONStorage(() => localStorage),
+      // The current default window is 1 month; sessions persisted while 6
+      // months, then 3 months, were the defaults still hold one of those. Move
+      // them once so the new default shows, while a window deliberately picked
+      // after the migration is never overridden.
+      version: 1,
+      migrate: (persistedState, version) => {
+        const state = (persistedState ?? {}) as Partial<UserPreferencesStore>;
+        if (
+          version < 1 &&
+          (state.chartsRange === "3m" || state.chartsRange === "6m")
+        ) {
+          state.chartsRange = "1m";
+        }
+        return state as UserPreferencesStore;
+      },
       onRehydrateStorage: () => (state) => {
         if (state && !isWeekStartDay(state.weekStartsOn)) {
           state.setWeekStartsOn(0);
@@ -273,7 +288,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
         if (state) {
           const range = isChartRange(state.chartsRange)
             ? state.chartsRange
-            : "3m";
+            : "1m";
           if (range !== state.chartsRange) {
             state.setChartsRange(range);
           }

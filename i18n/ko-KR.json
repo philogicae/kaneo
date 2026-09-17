@@ -2419,6 +2419,16 @@
 			"teamsLabel": "Teams",
 			"title": "팀 멤버 초대"
 		},
+		"memberAccess": {
+			"description": "이 워크스페이스에서 {{name}} 님의 직접 프로젝트 액세스입니다.",
+			"fullAccess": "이 멤버는 이미 워크스페이스 전체 액세스 권한이 있습니다.",
+			"hint": "모두 선택 해제하면 직접 액세스가 제거됩니다. 팀이나 다른 액세스가 남아 있지 않으면 멤버는 워크스페이스에서 나갑니다.",
+			"menuItem": "액세스 관리",
+			"save": "액세스 저장",
+			"saveError": "멤버 액세스를 업데이트하지 못했습니다",
+			"saveSuccess": "멤버 액세스가 업데이트되었습니다",
+			"title": "액세스 관리"
+		},
 		"members": {
 			"inviteMember": "멤버 초대",
 			"pageTitle": "멤버",
@@ -2426,6 +2436,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "초대 작업",
+			"ariaMemberActions": "멤버 작업",
 			"ariaRemoveMember": "멤버 제거",
 			"cancelDialogDescription": "{{email}}에 대한 초대를 취소하시겠습니까? 이 작업은 취소할 수 없습니다.",
 			"cancelDialogTitle": "초대를 취소하시겠습니까?",

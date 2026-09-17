@@ -1,6 +1,11 @@
 import { eq, max } from "drizzle-orm";
 import db from "../../database";
-import { columnTable, projectTable } from "../../database/schema";
+import {
+  columnTable,
+  projectTable,
+  userProjectAccessTable,
+} from "../../database/schema";
+import { getWorkspaceAccessLevel } from "../../utils/access-scope";
 
 export const DEFAULT_PROJECT_COLUMNS = [
   { name: "To Do", slug: "to-do", position: 0, isFinal: false },
@@ -15,7 +20,15 @@ async function createProject(
   icon: string,
   slug: string,
   description: string | null,
+  userId?: string,
 ) {
+  // A scoped member may create a project (the member role carries
+  // project:create), but a fresh project has no grant and would fall outside
+  // their own scope, hidden from its creator. Grant it to them directly.
+  const creatorNeedsGrant =
+    userId !== undefined &&
+    (await getWorkspaceAccessLevel(userId, workspaceId)) === "scoped";
+
   return db.transaction(
     async (tx) => {
       // Serialize ordering writes per workspace: SQLite has a single writer,
@@ -48,6 +61,12 @@ async function createProject(
             position: col.position,
             isFinal: col.isFinal,
           });
+        }
+
+        if (creatorNeedsGrant && userId) {
+          await tx
+            .insert(userProjectAccessTable)
+            .values({ projectId: createdProject.id, userId });
         }
       }
 
