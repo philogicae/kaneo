@@ -1,18 +1,22 @@
 import { client } from "@kaneo/libs";
-import type { ChartRange } from "@/store/user-preferences";
+import type { ChartRange, ChartUnit } from "@/store/user-preferences";
 
 type ProjectChartsBucket = {
-  weekStart: string;
+  bucketStart: string;
   created: number;
   completed: number;
 };
 
 export type { ProjectChartsBucket };
 
-async function getProjectCharts(projectId: string, range: ChartRange) {
+async function getProjectCharts(
+  projectId: string,
+  range: ChartRange,
+  unit: ChartUnit,
+) {
   const response = await client.project[":id"].charts.$get({
     param: { id: projectId },
-    query: { range },
+    query: { range, unit },
   });
 
   if (!response.ok) {

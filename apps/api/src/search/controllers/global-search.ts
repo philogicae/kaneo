@@ -9,6 +9,10 @@ import {
   workspaceTable,
   workspaceUserTable,
 } from "../../database/schema";
+import {
+  getExplicitProjectGrantIds,
+  getFullAccessWorkspaceIds,
+} from "../../utils/access-scope";
 import { escapeLikePattern } from "../like-pattern";
 import { TASK_SHORT_ID_PATTERN } from "../task-short-id";
 
@@ -152,15 +156,40 @@ async function globalSearch(params: SearchParams): Promise<{
   const results: SearchResult[] = [];
   const searchPattern = `%${query.toLowerCase()}%`;
 
-  // An explicit workspace id is always intersected with the user's own
-  // memberships so a foreign id can never widen the search; the middleware's
-  // optional mode no longer guarantees that check upstream.
+  // Project-level scope: the user sees every project of their full-access
+  // workspaces, plus the projects explicitly granted through access teams or
+  // direct grants. Scoped members therefore never match the rest of a shared
+  // workspace.
+  const [fullWorkspaceIds, explicitProjectIds] = await Promise.all([
+    getFullAccessWorkspaceIds(resolvedUserId),
+    getExplicitProjectGrantIds(resolvedUserId),
+  ]);
+
+  const accessConditions = [];
+  if (fullWorkspaceIds.length > 0) {
+    accessConditions.push(inArray(projectTable.workspaceId, fullWorkspaceIds));
+  }
+  if (explicitProjectIds.length > 0) {
+    accessConditions.push(inArray(projectTable.id, explicitProjectIds));
+  }
+  if (accessConditions.length === 0) {
+    return { results: [], totalCount: 0, searchQuery: query };
+  }
+  const projectAccessFilter = or(...accessConditions);
+
+  // An explicit workspace id is always intersected with that project scope so
+  // a foreign id can never widen the search; the middleware's optional mode no
+  // longer guarantees that check upstream.
   const workspaceFilter = workspaceId
     ? and(
+        projectAccessFilter,
         eq(projectTable.workspaceId, workspaceId),
         inArray(projectTable.workspaceId, accessibleWorkspaceIds),
       )
-    : inArray(projectTable.workspaceId, accessibleWorkspaceIds);
+    : and(
+        projectAccessFilter,
+        inArray(projectTable.workspaceId, accessibleWorkspaceIds),
+      );
 
   // Check if query matches short-id pattern (e.g. "DEP-23"). `generateProjectSlug`
   // normalizes to NFKC before it stores a key, so the query is normalized too,

@@ -43,14 +43,15 @@ export const projectStatisticsSchema = z
 
 export const projectChartsSchema = z
   .object({
-    weekStart: z.string().openapi({
-      description: "ISO date of the week start (Monday, UTC).",
+    bucketStart: z.string().openapi({
+      description:
+        "ISO 8601 start of the bucket (UTC), truncated to the requested unit.",
     }),
     created: z.number().openapi({
-      description: "Tasks created during that week.",
+      description: "Tasks created during that bucket.",
     }),
     completed: z.number().openapi({
-      description: "Tasks moved into a final status during that week.",
+      description: "Tasks moved into a final status during that bucket.",
     }),
   })
   .openapi("ProjectChartsBucket");

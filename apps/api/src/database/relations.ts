@@ -1,5 +1,9 @@
 import { relations } from "drizzle-orm";
 import {
+  accessTeamMemberTable,
+  accessTeamProjectTable,
+  accessTeamTable,
+  accessTeamWorkspaceTable,
   accountTable,
   activityTable,
   apikeyTable,
@@ -12,7 +16,10 @@ import {
   externalLinkTable,
   githubIntegrationTable,
   integrationTable,
+  invitationProjectGrantTable,
   invitationTable,
+  invitationTeamTable,
+  invitationWorkspaceGrantTable,
   labelTable,
   notificationTable,
   projectTable,
@@ -29,7 +36,9 @@ import {
   userNotificationPreferenceTable,
   userNotificationWorkspaceProjectTable,
   userNotificationWorkspaceRuleTable,
+  userProjectAccessTable,
   userTable,
+  userWorkspaceAccessTable,
   verificationTable,
   workflowRuleTable,
   workspaceRoleTable,
@@ -318,6 +327,128 @@ export const teamMemberTableRelations = relations(
     user: one(userTable, {
       fields: [teamMemberTable.userId],
       references: [userTable.id],
+    }),
+  }),
+);
+
+export const accessTeamTableRelations = relations(
+  accessTeamTable,
+  ({ many }) => ({
+    members: many(accessTeamMemberTable),
+    workspaces: many(accessTeamWorkspaceTable),
+    projects: many(accessTeamProjectTable),
+    invitations: many(invitationTeamTable),
+  }),
+);
+
+export const accessTeamMemberTableRelations = relations(
+  accessTeamMemberTable,
+  ({ one }) => ({
+    team: one(accessTeamTable, {
+      fields: [accessTeamMemberTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+    user: one(userTable, {
+      fields: [accessTeamMemberTable.userId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
+export const accessTeamWorkspaceTableRelations = relations(
+  accessTeamWorkspaceTable,
+  ({ one }) => ({
+    team: one(accessTeamTable, {
+      fields: [accessTeamWorkspaceTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [accessTeamWorkspaceTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+  }),
+);
+
+export const accessTeamProjectTableRelations = relations(
+  accessTeamProjectTable,
+  ({ one }) => ({
+    team: one(accessTeamTable, {
+      fields: [accessTeamProjectTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [accessTeamProjectTable.projectId],
+      references: [projectTable.id],
+    }),
+  }),
+);
+
+export const userWorkspaceAccessTableRelations = relations(
+  userWorkspaceAccessTable,
+  ({ one }) => ({
+    user: one(userTable, {
+      fields: [userWorkspaceAccessTable.userId],
+      references: [userTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [userWorkspaceAccessTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+  }),
+);
+
+export const userProjectAccessTableRelations = relations(
+  userProjectAccessTable,
+  ({ one }) => ({
+    user: one(userTable, {
+      fields: [userProjectAccessTable.userId],
+      references: [userTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [userProjectAccessTable.projectId],
+      references: [projectTable.id],
+    }),
+  }),
+);
+
+export const invitationTeamTableRelations = relations(
+  invitationTeamTable,
+  ({ one }) => ({
+    invitation: one(invitationTable, {
+      fields: [invitationTeamTable.invitationId],
+      references: [invitationTable.id],
+    }),
+    team: one(accessTeamTable, {
+      fields: [invitationTeamTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+  }),
+);
+
+export const invitationWorkspaceGrantTableRelations = relations(
+  invitationWorkspaceGrantTable,
+  ({ one }) => ({
+    invitation: one(invitationTable, {
+      fields: [invitationWorkspaceGrantTable.invitationId],
+      references: [invitationTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [invitationWorkspaceGrantTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+  }),
+);
+
+export const invitationProjectGrantTableRelations = relations(
+  invitationProjectGrantTable,
+  ({ one }) => ({
+    invitation: one(invitationTable, {
+      fields: [invitationProjectGrantTable.invitationId],
+      references: [invitationTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [invitationProjectGrantTable.projectId],
+      references: [projectTable.id],
     }),
   }),
 );

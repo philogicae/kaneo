@@ -2,25 +2,28 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
+import type { ChartUnit } from "@/store/user-preferences";
 import {
   cumulativeBuckets,
-  formatMonth,
-  formatWeekStart,
-  monthTickIndexes,
+  formatBucket,
+  formatBucketTick,
   niceMax,
+  tickIndexes,
 } from "./charts/chart-utils";
 
 type ProgressChartProps = {
   buckets: ProjectChartsBucket[] | undefined;
+  unit: ChartUnit;
   isLoading?: boolean;
   height?: number;
 };
 
 // Lightweight dependency-free SVG line chart: two cumulative lines (total
-// tasks and remaining backlog) over the covered weeks, with adaptive tick
-// density based on the render width and a per-week hover cursor.
+// tasks and remaining backlog) over the covered buckets, with adaptive tick
+// density based on the render width and a per-bucket hover cursor.
 export default function ProgressChart({
   buckets,
+  unit,
   isLoading,
   height = 120,
 }: ProgressChartProps) {
@@ -60,7 +63,7 @@ export default function ProgressChart({
   const toPoints = (key: "tasks" | "backlog") =>
     data.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
 
-  const ticks = monthTickIndexes(buckets);
+  const ticks = tickIndexes(buckets, unit);
   const hoveredPoint = hovered !== null ? data[hovered] : undefined;
   const tooltipLeft =
     hovered !== null
@@ -126,12 +129,12 @@ export default function ProgressChart({
               vectorEffect="non-scaling-stroke"
             />
           </svg>
-          {/* Hover columns sit above the SVG so every week is a hit target. */}
+          {/* Hover columns sit above the SVG so every bucket is a hit target. */}
           <div className="absolute inset-0 flex">
             {data.map((point, index) => (
               // biome-ignore lint/a11y/noStaticElementInteractions: hover-only tooltip cursor over the plot
               <div
-                key={point.weekStart}
+                key={point.bucketStart}
                 className="h-full flex-1"
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
@@ -145,7 +148,7 @@ export default function ProgressChart({
             >
               <div className="space-y-0.5 rounded-md border border-border bg-popover px-2 py-1 text-[10px] whitespace-nowrap text-popover-foreground shadow-md">
                 <p className="font-medium">
-                  {formatWeekStart(hoveredPoint.weekStart)}
+                  {formatBucket(hoveredPoint.bucketStart, unit)}
                 </p>
                 <p className="flex items-center gap-1.5">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-info" />
@@ -168,11 +171,11 @@ export default function ProgressChart({
           <div className="relative mt-1 h-3 text-[10px] text-muted-foreground">
             {ticks.map(({ bucket, index }) => (
               <span
-                key={bucket.weekStart}
+                key={bucket.bucketStart}
                 className="absolute -translate-x-1/2 whitespace-nowrap"
                 style={{ left: `${((index + 0.5) / data.length) * 100}%` }}
               >
-                {formatMonth(bucket.weekStart)}
+                {formatBucketTick(bucket.bucketStart, unit)}
               </span>
             ))}
           </div>

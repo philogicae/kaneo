@@ -5,7 +5,7 @@ import {
   redirect,
   useLocation,
 } from "@tanstack/react-router";
-import { Settings, Shield, Tag } from "lucide-react";
+import { Settings, Shield, Tag, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SettingsSidebar from "@/components/SettingsSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -65,7 +65,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { t } = useTranslation();
-  const { workspace, role } = useWorkspacePermission();
+  const { workspace, role, canInviteUsers } = useWorkspacePermission();
   const location = useLocation();
   const menuItems = [
     {
@@ -83,6 +83,15 @@ function RouteComponent() {
       url: "/dashboard/settings/workspace/labels",
       icon: Tag,
     },
+    ...(canInviteUsers()
+      ? [
+          {
+            title: t("team:accessTeams.pageTitle"),
+            url: "/dashboard/settings/workspace/teams",
+            icon: Users,
+          },
+        ]
+      : []),
   ];
   const isActivePath = (path: string) => location.pathname === path;
   const workspaceInitials = getInitials(workspace?.name, "WS");

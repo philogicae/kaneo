@@ -1,6 +1,7 @@
 import { and, eq, or } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db, { schema } from "../database";
+import { getWorkspaceAccessLevel } from "./access-scope";
 
 export async function validateWorkspaceAccess(
   userId: string,
@@ -30,28 +31,10 @@ export async function validateWorkspaceAccess(
     }
   }
 
-  const [user] = await db
-    .select({ role: schema.userTable.role })
-    .from(schema.userTable)
-    .where(eq(schema.userTable.id, userId))
-    .limit(1);
-
-  if (user?.role === "admin") {
-    return;
-  }
-
-  const membership = await db
-    .select()
-    .from(schema.workspaceUserTable)
-    .where(
-      and(
-        eq(schema.workspaceUserTable.userId, userId),
-        eq(schema.workspaceUserTable.workspaceId, workspaceId),
-      ),
-    )
-    .limit(1);
-
-  if (membership.length === 0) {
+  // Instance admins bypass, full members reach everything, scoped members and
+  // team/grant-only users still open the workspace for their granted projects.
+  const level = await getWorkspaceAccessLevel(userId, workspaceId);
+  if (level === "none") {
     throw new HTTPException(403, {
       message: "You don't have access to this workspace",
     });

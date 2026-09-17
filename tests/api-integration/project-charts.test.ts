@@ -82,11 +82,16 @@ describe("project charts and backlog statistics", () => {
     const charts = await app.request(`/api/project/${project.id}/charts`);
     expect(charts.status).toBe(200);
     const buckets = (await charts.json()) as Array<{
-      weekStart: string;
+      bucketStart: string;
       created: number;
       completed: number;
     }>;
-    expect(buckets.length).toBeGreaterThan(20);
+    // Defaults: the last three months bucketed by day.
+    expect(buckets.length).toBeGreaterThan(80);
+    expect(buckets.length).toBeLessThan(130);
+    expect(
+      buckets.every((bucket) => bucket.bucketStart.endsWith("T00:00:00.000Z")),
+    ).toBe(true);
 
     const totalCreated = buckets.reduce((sum, b) => sum + b.created, 0);
     const totalCompleted = buckets.reduce((sum, b) => sum + b.completed, 0);
@@ -96,27 +101,39 @@ describe("project charts and backlog statistics", () => {
     expect(Math.max(...buckets.map((b) => b.completed))).toBe(1);
     expect(createdThisWeek).toBeDefined();
 
+    // Weekly buckets still narrow with the window.
+    const weekly = await app.request(
+      `/api/project/${project.id}/charts?range=6m&unit=week`,
+    );
+    expect(weekly.status).toBe(200);
+    const weeklyBuckets = (await weekly.json()) as Array<{
+      bucketStart: string;
+      created: number;
+      completed: number;
+    }>;
+    expect(weeklyBuckets.length).toBeGreaterThan(20);
+
     const narrowed = await app.request(
-      `/api/project/${project.id}/charts?range=3m`,
+      `/api/project/${project.id}/charts?range=3m&unit=week`,
     );
     expect(narrowed.status).toBe(200);
     const narrowedBuckets = (await narrowed.json()) as Array<{
-      weekStart: string;
+      bucketStart: string;
       created: number;
       completed: number;
     }>;
     // The window shrinks to roughly a quarter, keeping the recent activity.
-    expect(narrowedBuckets.length).toBeLessThan(buckets.length);
+    expect(narrowedBuckets.length).toBeLessThan(weeklyBuckets.length);
     expect(narrowedBuckets.length).toBeGreaterThan(9);
     expect(narrowedBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
 
-    // "1w" keeps only the current week's bucket.
+    // "1w" keeps only the current week's bucket at the weekly unit.
     const weekWindow = await app.request(
-      `/api/project/${project.id}/charts?range=1w`,
+      `/api/project/${project.id}/charts?range=1w&unit=week`,
     );
     expect(weekWindow.status).toBe(200);
     const weekBuckets = (await weekWindow.json()) as Array<{
-      weekStart: string;
+      bucketStart: string;
       created: number;
       completed: number;
     }>;
@@ -124,19 +141,82 @@ describe("project charts and backlog statistics", () => {
     expect(weekBuckets[0]?.created).toBe(1);
     expect(weekBuckets[0]?.completed).toBe(0);
 
-    // "all" starts at the project's earliest task and keeps every bucket.
+    // "all" starts at the project's earliest task and keeps every bucket; it
+    // has no daily reading, so the omitted unit falls back to weekly buckets.
     const all = await app.request(
       `/api/project/${project.id}/charts?range=all`,
     );
     expect(all.status).toBe(200);
     const allBuckets = (await all.json()) as Array<{
-      weekStart: string;
+      bucketStart: string;
       created: number;
       completed: number;
     }>;
     expect(allBuckets.length).toBeGreaterThanOrEqual(5);
     expect(allBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
     expect(allBuckets.reduce((sum, b) => sum + b.completed, 0)).toBe(1);
+
+    // Unit is independent from the window: daily buckets over 3 months.
+    const daily = await app.request(
+      `/api/project/${project.id}/charts?range=3m&unit=day`,
+    );
+    expect(daily.status).toBe(200);
+    const dailyBuckets = (await daily.json()) as Array<{
+      bucketStart: string;
+      created: number;
+      completed: number;
+    }>;
+    expect(dailyBuckets.length).toBeGreaterThan(80);
+    expect(dailyBuckets.length).toBeLessThan(130);
+    expect(dailyBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
+    expect(dailyBuckets.reduce((sum, b) => sum + b.completed, 0)).toBe(1);
+    // Daily buckets carry the time truncated to midnight UTC.
+    expect(
+      dailyBuckets.every((b) => b.bucketStart.endsWith("T00:00:00.000Z")),
+    ).toBe(true);
+
+    // Hourly buckets over the current week.
+    const hourly = await app.request(
+      `/api/project/${project.id}/charts?range=1w&unit=hour`,
+    );
+    expect(hourly.status).toBe(200);
+    const hourlyBuckets = (await hourly.json()) as Array<{
+      bucketStart: string;
+      created: number;
+      completed: number;
+    }>;
+    expect(hourlyBuckets.length).toBeGreaterThan(0);
+    expect(hourlyBuckets.length).toBeLessThanOrEqual(168);
+    expect(hourlyBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(1);
+
+    // Monthly buckets over a year.
+    const monthly = await app.request(
+      `/api/project/${project.id}/charts?range=12m&unit=month`,
+    );
+    expect(monthly.status).toBe(200);
+    const monthlyBuckets = (await monthly.json()) as Array<{
+      bucketStart: string;
+      created: number;
+      completed: number;
+    }>;
+    expect(monthlyBuckets.length).toBeGreaterThanOrEqual(12);
+    expect(monthlyBuckets.length).toBeLessThanOrEqual(13);
+    expect(monthlyBuckets.reduce((sum, b) => sum + b.created, 0)).toBe(3);
+    expect(monthlyBuckets.reduce((sum, b) => sum + b.completed, 0)).toBe(1);
+
+    // Combinations the dashboard does not offer are rejected server-side.
+    const tooFine = await app.request(
+      `/api/project/${project.id}/charts?range=1w&unit=month`,
+    );
+    expect(tooFine.status).toBe(400);
+    const hourlyQuarter = await app.request(
+      `/api/project/${project.id}/charts?range=3m&unit=hour`,
+    );
+    expect(hourlyQuarter.status).toBe(400);
+    const unknownUnit = await app.request(
+      `/api/project/${project.id}/charts?unit=minute`,
+    );
+    expect(unknownUnit.status).toBe(400);
 
     const invalid = await app.request(
       `/api/project/${project.id}/charts?range=0`,

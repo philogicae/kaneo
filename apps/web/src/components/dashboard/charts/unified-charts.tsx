@@ -9,19 +9,30 @@ import {
   CardFrameTitle,
   CardPanel,
 } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import icons from "@/constants/project-icons";
 import getProjectCharts from "@/fetchers/project/get-project-charts";
 import getTasks from "@/fetchers/task/get-tasks";
 import { type ProjectListItem, sortProjects } from "@/lib/project-sort";
 import {
   CHART_RANGE_OPTIONS,
+  CHART_UNIT_OPTIONS,
+  CHART_UNITS_BY_RANGE,
   type ChartRange,
+  type ChartUnit,
+  defaultChartUnit,
   isChartRange,
+  isChartUnit,
   type ProjectSortMode,
   useUserPreferencesStore,
 } from "@/store/user-preferences";
-import { aggregateBuckets, recentVelocity } from "./chart-utils";
+import { aggregateBuckets, averageCompleted } from "./chart-utils";
 import StatusDistribution, { type StatusSegment } from "./status-distribution";
 import VelocityChart from "./velocity-chart";
 import WorkloadChart, { type WorkloadItem } from "./workload-chart";
@@ -96,6 +107,21 @@ function rangeLabel(
   return t("unified:charts.range", { count: Number.parseInt(range, 10) });
 }
 
+const UNIT_LABEL_KEYS: Record<ChartUnit, string> = {
+  hour: "unified:charts.unitLabelHour",
+  day: "unified:charts.unitLabelDay",
+  week: "unified:charts.unitLabelWeek",
+  month: "unified:charts.unitLabelMonth",
+};
+
+// Lowercase unit words interpolated into the per-unit average label.
+const UNIT_WORD_KEYS: Record<ChartUnit, string> = {
+  hour: "unified:charts.unitHour",
+  day: "unified:charts.unitDay",
+  week: "unified:charts.unitWeek",
+  month: "unified:charts.unitMonth",
+};
+
 // The charts tab of the unified dashboard: a period filter driving a global
 // velocity chart, a workload reading, a cross-project status breakdown, and
 // the per-project progression and distribution cards.
@@ -104,7 +130,21 @@ export default function UnifiedCharts({
   projectsSort,
 }: UnifiedChartsProps) {
   const { t } = useTranslation();
-  const { chartsRange, setChartsRange } = useUserPreferencesStore();
+  const { chartsRange, chartsUnit, setChartsRange, setChartsUnit } =
+    useUserPreferencesStore();
+
+  const unitOptions = CHART_UNITS_BY_RANGE[chartsRange];
+
+  // Base UI renders the selected item's label from this map, since the
+  // dropdown items are portaled and not mounted until the popup opens.
+  const rangeItems = CHART_RANGE_OPTIONS.map((range) => ({
+    label: rangeLabel(range, t),
+    value: range,
+  }));
+  const unitItems = CHART_UNIT_OPTIONS.map((unit) => ({
+    label: t(UNIT_LABEL_KEYS[unit]),
+    value: unit,
+  }));
 
   const projectEntries = useMemo(
     () =>
@@ -116,8 +156,8 @@ export default function UnifiedCharts({
 
   const chartQueries = useQueries({
     queries: projectEntries.map(({ project }) => ({
-      queryKey: ["project-charts", project.id, chartsRange],
-      queryFn: () => getProjectCharts(project.id, chartsRange),
+      queryKey: ["project-charts", project.id, chartsRange, chartsUnit],
+      queryFn: () => getProjectCharts(project.id, chartsRange, chartsUnit),
       staleTime: 1000 * 60,
     })),
   });
@@ -187,7 +227,8 @@ export default function UnifiedCharts({
     (sum, bucket) => sum + bucket.completed,
     0,
   );
-  const velocity = recentVelocity(allBuckets);
+  const velocity = averageCompleted(allBuckets);
+  const velocityUnit = t(UNIT_WORD_KEYS[chartsUnit]);
 
   const workspaceSections = useMemo(
     () =>
@@ -206,31 +247,78 @@ export default function UnifiedCharts({
     [projectEntries],
   );
 
+  // Keep the bucket size valid when the window changes: fall back to the
+  // default unit of the new range (daily, or weekly for "all").
+  const handleRangeChange = (value: string | null) => {
+    if (!isChartRange(value)) return;
+    setChartsRange(value);
+    if (!CHART_UNITS_BY_RANGE[value].includes(chartsUnit)) {
+      setChartsUnit(defaultChartUnit(value));
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">
-            {t("unified:charts.period")}
-          </span>
-          <Tabs
-            value={chartsRange}
-            onValueChange={(value) => {
-              if (isChartRange(value)) setChartsRange(value);
-            }}
-          >
-            <TabsList className="h-7 bg-card/60">
-              {CHART_RANGE_OPTIONS.map((range) => (
-                <TabsTrigger
-                  key={range}
-                  className="h-full rounded-md px-2.5 text-xs [&[data-state=active]]:bg-accent [&[data-state=active]]:text-foreground"
-                  value={range}
-                >
-                  {rangeLabel(range, t)}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {t("unified:charts.period")}
+            </span>
+            <Select
+              items={rangeItems}
+              value={chartsRange}
+              onValueChange={handleRangeChange}
+            >
+              <SelectTrigger
+                aria-label={t("unified:charts.period")}
+                className="min-w-32"
+                size="sm"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CHART_RANGE_OPTIONS.map((range) => (
+                  <SelectItem key={range} value={range}>
+                    {rangeLabel(range, t)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {t("unified:charts.unit")}
+            </span>
+            <Select
+              items={unitItems}
+              value={chartsUnit}
+              onValueChange={(value) => {
+                if (isChartUnit(value) && unitOptions.includes(value)) {
+                  setChartsUnit(value);
+                }
+              }}
+            >
+              <SelectTrigger
+                aria-label={t("unified:charts.unit")}
+                className="min-w-24"
+                size="sm"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CHART_UNIT_OPTIONS.map((unit) => (
+                  <SelectItem
+                    key={unit}
+                    disabled={!unitOptions.includes(unit)}
+                    value={unit}
+                  >
+                    {t(UNIT_LABEL_KEYS[unit])}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <p className="text-xs text-muted-foreground tabular-nums">
           {isLoadingCharts
@@ -247,11 +335,17 @@ export default function UnifiedCharts({
           <CardFrameHeader>
             <CardFrameTitle>{t("unified:charts.velocityTitle")}</CardFrameTitle>
             <CardFrameDescription>
-              {t("unified:charts.velocityDescription")}
+              {t("unified:charts.velocityDescription", {
+                unit: velocityUnit,
+              })}
             </CardFrameDescription>
           </CardFrameHeader>
           <CardPanel className="space-y-3">
-            <VelocityChart buckets={allBuckets} isLoading={isLoadingCharts} />
+            <VelocityChart
+              buckets={allBuckets}
+              unit={chartsUnit}
+              isLoading={isLoadingCharts}
+            />
             <div className="flex flex-wrap gap-6 border-t border-border/60 pt-3">
               <MiniStat
                 label={t("unified:charts.created")}
@@ -262,9 +356,10 @@ export default function UnifiedCharts({
                 value={String(periodCompleted)}
               />
               <MiniStat
-                label={t("unified:charts.velocity4w")}
-                value={t("unified:charts.perWeek", {
+                label={t("unified:charts.average")}
+                value={t("unified:charts.perUnit", {
                   value: velocity.toFixed(1),
+                  unit: velocityUnit,
                 })}
               />
             </div>
@@ -353,14 +448,16 @@ export default function UnifiedCharts({
                         value={String(projectCompleted)}
                       />
                       <MiniStat
-                        label={t("unified:charts.velocity4w")}
-                        value={t("unified:charts.perWeek", {
-                          value: recentVelocity(buckets ?? []).toFixed(1),
+                        label={t("unified:charts.average")}
+                        value={t("unified:charts.perUnit", {
+                          value: averageCompleted(buckets ?? []).toFixed(1),
+                          unit: velocityUnit,
                         })}
                       />
                     </div>
                     <ProgressChart
                       buckets={buckets}
+                      unit={chartsUnit}
                       isLoading={
                         index >= 0 ? chartQueries[index]?.isLoading : true
                       }
