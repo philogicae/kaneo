@@ -2419,6 +2419,16 @@
 			"teamsLabel": "Teams",
 			"title": "チームメンバーを招待"
 		},
+		"memberAccess": {
+			"description": "このワークスペースでの {{name}} の直接プロジェクトアクセス。",
+			"fullAccess": "このメンバーはすでにワークスペース全体へのアクセス権を持っています。",
+			"hint": "すべてのチェックを外すと直接アクセスが削除されます。チームや他のアクセスが残っていない場合、メンバーはワークスペースから外れます。",
+			"menuItem": "アクセスを管理",
+			"save": "アクセスを保存",
+			"saveError": "メンバーのアクセスを更新できませんでした",
+			"saveSuccess": "メンバーのアクセスを更新しました",
+			"title": "アクセスを管理"
+		},
 		"members": {
 			"inviteMember": "メンバーを招待",
 			"pageTitle": "メンバー",
@@ -2426,6 +2436,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "招待の操作",
+			"ariaMemberActions": "メンバーの操作",
 			"ariaRemoveMember": "メンバーを削除",
 			"cancelDialogDescription": "本当に {{email}} への招待をキャンセルしますか？この操作は取り消せません。",
 			"cancelDialogTitle": "招待をキャンセルしますか？",

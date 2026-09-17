@@ -7,10 +7,7 @@ import {
   taskTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
-import {
-  assertAssignableUser,
-  getProjectWorkspaceId,
-} from "../../utils/assert-assignable-user";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
 import type { RecurrenceRule } from "../recurrence";
 import { assertValidTaskStatus } from "../validate-task-fields";
 
@@ -60,10 +57,7 @@ async function updateTask(
   const normalizedUserId = userId?.trim() || undefined;
 
   if (normalizedUserId) {
-    await assertAssignableUser(
-      normalizedUserId,
-      await getProjectWorkspaceId(projectId),
-    );
+    await assertAssignableUser(normalizedUserId, projectId);
   }
 
   const column = await db.query.columnTable.findFirst({

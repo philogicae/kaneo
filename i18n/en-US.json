@@ -2439,6 +2439,16 @@
 			"teamsLabel": "Teams",
 			"title": "Invite Team Member"
 		},
+		"memberAccess": {
+			"description": "Direct project access for {{name}} in this workspace.",
+			"fullAccess": "This member already has full workspace access.",
+			"hint": "Untick everything to remove the direct grants. The member leaves the workspace when no team or other grant remains.",
+			"menuItem": "Manage access",
+			"save": "Save access",
+			"saveError": "Failed to update member access",
+			"saveSuccess": "Member access updated",
+			"title": "Manage access"
+		},
 		"members": {
 			"inviteMember": "Invite member",
 			"pageTitle": "Members",
@@ -2446,6 +2456,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Invitation actions",
+			"ariaMemberActions": "Member actions",
 			"ariaRemoveMember": "Remove member",
 			"cancelDialogDescription": "Are you sure you want to cancel the invitation for {{email}}? This action cannot be undone.",
 			"cancelDialogTitle": "Cancel Invitation?",

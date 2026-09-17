@@ -2439,6 +2439,16 @@
 			"teamsLabel": "Teams",
 			"title": "Ekip Üyesi Davet Et"
 		},
+		"memberAccess": {
+			"description": "Bu çalışma alanında {{name}} için doğrudan proje erişimi.",
+			"fullAccess": "Bu üye zaten tüm çalışma alanına erişime sahip.",
+			"hint": "Doğrudan erişimleri kaldırmak için her şeyin işaretini kaldırın. Ekip veya başka bir erişim kalmazsa üye çalışma alanından ayrılır.",
+			"menuItem": "Erişimi yönet",
+			"save": "Erişimi kaydet",
+			"saveError": "Üye erişimi güncellenemedi",
+			"saveSuccess": "Üye erişimi güncellendi",
+			"title": "Erişimi yönet"
+		},
 		"members": {
 			"inviteMember": "Üye davet et",
 			"pageTitle": "Üyeler",
@@ -2446,6 +2456,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Davet işlemleri",
+			"ariaMemberActions": "Üye işlemleri",
 			"ariaRemoveMember": "Üyeyi kaldır",
 			"cancelDialogDescription": "{{email}} için daveti iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
 			"cancelDialogTitle": "Davet İptal Edilsin mi?",

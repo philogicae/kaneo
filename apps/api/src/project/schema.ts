@@ -26,7 +26,7 @@ export const PROJECT_CHART_UNITS = ["hour", "day", "week", "month"] as const;
 export const projectChartsQuery = z.object({
   range: z.enum(PROJECT_CHART_RANGES).optional().openapi({
     description:
-      'Window of the chart: "1w", "1m", "3m", "6m", "12m" or "all" (default "6m").',
+      'Window of the chart: "1w", "1m", "3m", "6m", "12m" or "all" (default "1m").',
   }),
   unit: z.enum(PROJECT_CHART_UNITS).optional().openapi({
     description:

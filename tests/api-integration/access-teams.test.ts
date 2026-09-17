@@ -14,9 +14,9 @@ import {
 
 type App = ReturnType<typeof createApp>["app"];
 
-function jsonRequest(body: unknown) {
+function jsonRequest(body: unknown, method = "POST") {
   return {
-    method: "POST",
+    method,
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   };
@@ -359,5 +359,337 @@ describe("API integration: access teams and scoped access", () => {
       `/api/project?workspaceId=${owner.workspace.id}`,
     );
     expect(list.status).toBe(200);
+  });
+
+  it("keeps a project created by a scoped member inside their scope", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const target = await createWorkspaceMember({ role: "member" });
+    const { project: alpha } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Alpha",
+    });
+    const { app } = createApp();
+
+    mockAuthenticatedSession(owner.user);
+    const created = await createTeam(app, {
+      name: "Alpha only",
+      workspaces: [
+        {
+          workspaceId: owner.workspace.id,
+          allProjects: false,
+          projectIds: [alpha.id],
+        },
+      ],
+    });
+    expect(created.status).toBe(200);
+    const team = (await created.json()) as { id: string };
+    await addTeamMember(app, team.id, target.user.id);
+
+    vi.restoreAllMocks();
+    mockAuthenticatedSession(target.user);
+
+    // The member role allows project:create; the new project has no grant yet.
+    const response = await app.request(
+      "/api/project",
+      jsonRequest({
+        workspaceId: owner.workspace.id,
+        name: "Created by scoped member",
+        icon: "Layout",
+        slug: "SCOPE",
+      }),
+    );
+    expect(response.status).toBe(200);
+    const project = (await response.json()) as { id: string };
+    expect(project.id).toBeDefined();
+
+    // The creator keeps access to it: a direct grant is recorded and the
+    // project stays in their filtered list.
+    const [grant] = await db
+      .select({ id: schema.userProjectAccessTable.id })
+      .from(schema.userProjectAccessTable)
+      .where(
+        and(
+          eq(schema.userProjectAccessTable.userId, target.user.id),
+          eq(schema.userProjectAccessTable.projectId, project.id),
+        ),
+      );
+    expect(grant).toBeDefined();
+
+    const list = await app.request(
+      `/api/project?workspaceId=${owner.workspace.id}`,
+    );
+    expect(list.status).toBe(200);
+    const projects = (await list.json()) as Array<{ id: string }>;
+    expect(projects.map((entry) => entry.id).sort()).toEqual(
+      [alpha.id, project.id].sort(),
+    );
+
+    const board = await app.request(`/api/task/tasks/${project.id}`);
+    expect(board.status).toBe(200);
+  });
+
+  it("grants and revokes direct projects for an existing member", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const target = await createWorkspaceMember({ role: "member" });
+    const { project: alpha } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Alpha",
+    });
+    const { project: beta } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Beta",
+    });
+    const { app } = createApp();
+
+    mockAuthenticatedSession(owner.user);
+    const created = await createTeam(app, {
+      name: "Alpha only",
+      workspaces: [
+        {
+          workspaceId: owner.workspace.id,
+          allProjects: false,
+          projectIds: [alpha.id],
+        },
+      ],
+    });
+    expect(created.status).toBe(200);
+    const team = (await created.json()) as { id: string };
+    await addTeamMember(app, team.id, target.user.id);
+
+    const accessUrl = `/api/workspace/${owner.workspace.id}/members/${target.user.id}/access`;
+
+    // Read: the member only holds the team grant so far.
+    const before = await app.request(accessUrl);
+    expect(before.status).toBe(200);
+    expect(await before.json()).toEqual({
+      accessScope: "scoped",
+      allProjects: false,
+      projectIds: [],
+    });
+
+    // A project outside the workspace is rejected.
+    const foreign = await app.request(
+      accessUrl,
+      jsonRequest(
+        { allProjects: false, projectIds: ["missing-project"] },
+        "PUT",
+      ),
+    );
+    expect(foreign.status).toBe(400);
+
+    // Grant Beta directly, without a team.
+    const granted = await app.request(
+      accessUrl,
+      jsonRequest({ allProjects: false, projectIds: [beta.id] }, "PUT"),
+    );
+    expect(granted.status).toBe(200);
+    expect(await granted.json()).toEqual({
+      accessScope: "scoped",
+      allProjects: false,
+      projectIds: [beta.id],
+    });
+
+    // The member reaches both projects now; a scoped member cannot edit.
+    vi.restoreAllMocks();
+    mockAuthenticatedSession(target.user);
+    const list = await app.request(
+      `/api/project?workspaceId=${owner.workspace.id}`,
+    );
+    const ids = ((await list.json()) as Array<{ id: string }>)
+      .map((entry) => entry.id)
+      .sort();
+    expect(ids).toEqual([alpha.id, beta.id].sort());
+    expect((await app.request(`/api/task/tasks/${beta.id}`)).status).toBe(200);
+    const refused = await app.request(
+      accessUrl,
+      jsonRequest({ allProjects: true }, "PUT"),
+    );
+    expect(refused.status).toBe(403);
+
+    // Clearing the direct grants keeps the team-granted project only.
+    vi.restoreAllMocks();
+    mockAuthenticatedSession(owner.user);
+    const cleared = await app.request(
+      accessUrl,
+      jsonRequest({ allProjects: false, projectIds: [] }, "PUT"),
+    );
+    expect(cleared.status).toBe(200);
+    expect(await cleared.json()).toEqual({
+      accessScope: "scoped",
+      allProjects: false,
+      projectIds: [],
+    });
+
+    vi.restoreAllMocks();
+    mockAuthenticatedSession(target.user);
+    const after = await app.request(
+      `/api/project?workspaceId=${owner.workspace.id}`,
+    );
+    expect(
+      ((await after.json()) as Array<{ id: string }>).map((entry) => entry.id),
+    ).toEqual([alpha.id]);
+    expect((await app.request(`/api/task/tasks/${beta.id}`)).status).toBe(403);
+  });
+
+  it("scopes assignees, member lists and mentions to project access", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const target = await createWorkspaceMember({ role: "member" });
+    const { project: alpha } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Alpha",
+    });
+    const { project: beta } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Beta",
+    });
+    const { app } = createApp();
+
+    // The member is scoped to Alpha only, through a team.
+    mockAuthenticatedSession(owner.user);
+    const created = await createTeam(app, {
+      name: "Alpha only",
+      workspaces: [
+        {
+          workspaceId: owner.workspace.id,
+          allProjects: false,
+          projectIds: [alpha.id],
+        },
+      ],
+    });
+    expect(created.status).toBe(200);
+    const team = (await created.json()) as { id: string };
+    await addTeamMember(app, team.id, target.user.id);
+
+    // The picker endpoint offers the member on Alpha, not on Beta.
+    const alphaMembers = await app.request(`/api/project/${alpha.id}/members`);
+    expect(alphaMembers.status).toBe(200);
+    const alphaIds = ((await alphaMembers.json()) as Array<{ id: string }>).map(
+      (member) => member.id,
+    );
+    expect(alphaIds).toContain(target.user.id);
+
+    const betaMembers = await app.request(`/api/project/${beta.id}/members`);
+    expect(betaMembers.status).toBe(200);
+    const betaIds = ((await betaMembers.json()) as Array<{ id: string }>).map(
+      (member) => member.id,
+    );
+    expect(betaIds).not.toContain(target.user.id);
+
+    // Assigning the member on Beta is refused, and allowed on Alpha.
+    const refused = await app.request(
+      `/api/task/${beta.id}`,
+      jsonRequest({
+        title: "Outside the scope",
+        description: "",
+        priority: "low",
+        status: "to-do",
+        userId: target.user.id,
+      }),
+    );
+    expect(refused.status).toBe(403);
+
+    const allowed = await app.request(
+      `/api/task/${alpha.id}`,
+      jsonRequest({
+        title: "Inside the scope",
+        description: "",
+        priority: "low",
+        status: "to-do",
+        userId: target.user.id,
+      }),
+    );
+    expect(allowed.status).toBe(200);
+    const alphaTask = (await allowed.json()) as { id: string };
+
+    // Mentions only notify members who can open the project.
+    const betaTask = await seedTask(beta.id, "Beta task");
+    const mention = `<kaneo-mention id="${target.user.id}">Target</kaneo-mention>`;
+
+    const betaComment = await app.request(
+      "/api/activity/comment",
+      jsonRequest({ taskId: betaTask.id, comment: `Hello ${mention}` }),
+    );
+    expect(betaComment.status).toBe(200);
+    const afterBeta = await db
+      .select({ id: schema.notificationTable.id })
+      .from(schema.notificationTable)
+      .where(
+        and(
+          eq(schema.notificationTable.userId, target.user.id),
+          eq(schema.notificationTable.type, "task_mention"),
+        ),
+      );
+    expect(afterBeta).toHaveLength(0);
+
+    const alphaComment = await app.request(
+      "/api/activity/comment",
+      jsonRequest({ taskId: alphaTask.id, comment: `Hello ${mention}` }),
+    );
+    expect(alphaComment.status).toBe(200);
+    const afterAlpha = await db
+      .select({ id: schema.notificationTable.id })
+      .from(schema.notificationTable)
+      .where(
+        and(
+          eq(schema.notificationTable.userId, target.user.id),
+          eq(schema.notificationTable.type, "task_mention"),
+        ),
+      );
+    expect(afterAlpha).toHaveLength(1);
+  });
+
+  it("lifts a scoped member to full access with an all-projects grant", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    const target = await createWorkspaceMember({ role: "member" });
+    const { project: alpha } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Alpha",
+    });
+    const { app } = createApp();
+
+    mockAuthenticatedSession(owner.user);
+    const created = await createTeam(app, {
+      name: "Alpha only",
+      workspaces: [
+        {
+          workspaceId: owner.workspace.id,
+          allProjects: false,
+          projectIds: [alpha.id],
+        },
+      ],
+    });
+    expect(created.status).toBe(200);
+    const team = (await created.json()) as { id: string };
+    await addTeamMember(app, team.id, target.user.id);
+
+    const response = await app.request(
+      `/api/workspace/${owner.workspace.id}/members/${target.user.id}/access`,
+      jsonRequest({ allProjects: true }, "PUT"),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      accessScope: "full",
+      allProjects: true,
+      projectIds: [],
+    });
+
+    // The grant covers projects created after it.
+    const { project: future } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+      name: "Future",
+    });
+
+    vi.restoreAllMocks();
+    mockAuthenticatedSession(target.user);
+    const list = await app.request(
+      `/api/project?workspaceId=${owner.workspace.id}`,
+    );
+    const ids = ((await list.json()) as Array<{ id: string }>)
+      .map((entry) => entry.id)
+      .sort();
+    expect(ids).toEqual([alpha.id, future.id].sort());
+    expect((await app.request(`/api/task/tasks/${future.id}`)).status).toBe(
+      200,
+    );
   });
 });

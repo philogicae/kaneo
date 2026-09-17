@@ -2439,6 +2439,16 @@
 			"teamsLabel": "Teams",
 			"title": "Teammitglied einladen"
 		},
+		"memberAccess": {
+			"description": "Direkter Projektzugriff für {{name}} in diesem Arbeitsbereich.",
+			"fullAccess": "Dieses Mitglied hat bereits vollen Zugriff auf den Arbeitsbereich.",
+			"hint": "Alles abwählen, um die direkten Zugriffe zu entfernen. Das Mitglied verlässt den Arbeitsbereich, wenn kein Team oder anderer Zugriff bleibt.",
+			"menuItem": "Zugriff verwalten",
+			"save": "Zugriff speichern",
+			"saveError": "Mitgliedszugriff konnte nicht aktualisiert werden",
+			"saveSuccess": "Mitgliedszugriff aktualisiert",
+			"title": "Zugriff verwalten"
+		},
 		"members": {
 			"inviteMember": "Mitglied einladen",
 			"pageTitle": "Mitglieder",
@@ -2446,6 +2456,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Einladungsaktionen",
+			"ariaMemberActions": "Mitgliedsaktionen",
 			"ariaRemoveMember": "Mitglied entfernen",
 			"cancelDialogDescription": "Bist du sicher, dass du die Einladung für {{email}} abbrechen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
 			"cancelDialogTitle": "Einladung abbrechen?",

@@ -2419,6 +2419,16 @@
 			"teamsLabel": "Teams",
 			"title": "Undang Anggota Tim"
 		},
+		"memberAccess": {
+			"description": "Akses proyek langsung untuk {{name}} di ruang kerja ini.",
+			"fullAccess": "Anggota ini sudah memiliki akses penuh ke ruang kerja.",
+			"hint": "Hapus centang semua untuk menghapus akses langsung. Anggota keluar dari ruang kerja jika tidak ada tim atau akses lain yang tersisa.",
+			"menuItem": "Kelola akses",
+			"save": "Simpan akses",
+			"saveError": "Gagal memperbarui akses anggota",
+			"saveSuccess": "Akses anggota diperbarui",
+			"title": "Kelola akses"
+		},
 		"members": {
 			"inviteMember": "Undang anggota",
 			"pageTitle": "Anggota",
@@ -2426,6 +2436,7 @@
 		},
 		"membersTable": {
 			"ariaInvitationActions": "Tindakan undangan",
+			"ariaMemberActions": "Tindakan anggota",
 			"ariaRemoveMember": "Hapus anggota",
 			"cancelDialogDescription": "Apakah Anda yakin ingin membatalkan undangan untuk {{email}}? Tindakan ini tidak dapat dibatalkan.",
 			"cancelDialogTitle": "Batalkan Undangan?",

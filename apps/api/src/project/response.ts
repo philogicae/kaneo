@@ -73,3 +73,17 @@ export const projectListItemSchema = projectSchema
   .openapi("ProjectListItem");
 
 export const projectListSchema = z.array(projectListItemSchema);
+
+export const projectMemberSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    image: z.string().nullable(),
+    role: z.string().openapi({
+      description: "The member's workspace role.",
+    }),
+  })
+  .openapi("ProjectMember");
+
+export const projectMemberListSchema = z.array(projectMemberSchema);

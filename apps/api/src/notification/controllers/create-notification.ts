@@ -3,6 +3,7 @@ import db from "../../database";
 import { notificationTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { deliverNotification } from "../../notification-preferences/delivery";
+import { canAccessProject } from "../../utils/access-scope";
 
 async function createNotification({
   userId,
@@ -12,6 +13,7 @@ async function createNotification({
   eventData,
   resourceId,
   resourceType,
+  projectId,
 }: {
   userId: string;
   title?: string | null;
@@ -20,7 +22,14 @@ async function createNotification({
   eventData?: Record<string, unknown> | null;
   resourceId?: string;
   resourceType?: string;
+  projectId?: string | null;
 }) {
+  // A project-scoped notification would deep-link to a surface the recipient
+  // is refused on: drop it instead of storing a dead link.
+  if (projectId && !(await canAccessProject(userId, projectId))) {
+    return null;
+  }
+
   // Appointments reuse the assignment preference: they are assigned like
   // tasks and have no status of their own.
   const preferenceKey =

@@ -155,6 +155,7 @@ subscribeToEvent<{
       },
       resourceId: data.taskId,
       resourceType: "task",
+      projectId: data.projectId,
     });
   }
 });
@@ -213,6 +214,7 @@ subscribeToEvent<{
       },
       resourceId: data.taskId,
       resourceType: "task",
+      projectId: task?.projectId ?? null,
     });
   }
 });
@@ -250,6 +252,7 @@ subscribeToEvent<{
       },
       resourceId: data.taskId,
       resourceType: "task",
+      projectId: task?.projectId ?? null,
     });
   }
 });
@@ -286,6 +289,7 @@ subscribeToEvent<{
       },
       resourceId: data.taskId,
       resourceType: "task",
+      projectId: task?.projectId ?? null,
     });
   }
 });
@@ -322,6 +326,7 @@ subscribeToEvent<{
       },
       resourceId: data.appointmentId,
       resourceType: "appointment",
+      projectId: data.projectId,
     });
   }
 });
@@ -369,6 +374,7 @@ subscribeToEvent<{
     },
     resourceId: data.appointmentId,
     resourceType: "appointment",
+    projectId: data.projectId,
   });
 });
 
