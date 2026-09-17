@@ -620,21 +620,21 @@
       "ProjectChartsBucket": {
         "type": "object",
         "properties": {
-          "weekStart": {
+          "bucketStart": {
             "type": "string",
-            "description": "ISO date of the week start (Monday, UTC)."
+            "description": "ISO 8601 start of the bucket (UTC), truncated to the requested unit."
           },
           "created": {
             "type": "number",
-            "description": "Tasks created during that week."
+            "description": "Tasks created during that bucket."
           },
           "completed": {
             "type": "number",
-            "description": "Tasks moved into a final status during that week."
+            "description": "Tasks moved into a final status during that bucket."
           }
         },
         "required": [
-          "weekStart",
+          "bucketStart",
           "created",
           "completed"
         ]
@@ -3624,6 +3624,39 @@
           "updatedAt"
         ]
       },
+      "CreatedInvitation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "workspaceCount": {
+            "type": "number",
+            "description": "Distinct workspaces the invitation opens (manual grants plus the workspace scope of the selected teams)."
+          },
+          "teamCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "status",
+          "expiresAt",
+          "workspaceCount",
+          "teamCount"
+        ]
+      },
       "PendingInvitation": {
         "type": "object",
         "properties": {
@@ -3717,6 +3750,155 @@
         },
         "required": [
           "valid"
+        ]
+      },
+      "ManageableWorkspace": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "slug"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "projects"
+        ]
+      },
+      "AccessTeam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "canManage": {
+            "type": "boolean",
+            "description": "True when the caller administers every workspace in the team scope (or is an instance admin)."
+          },
+          "workspaces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "workspaceId": {
+                  "type": "string"
+                },
+                "workspaceName": {
+                  "type": "string"
+                },
+                "allProjects": {
+                  "type": "boolean"
+                },
+                "projects": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "slug"
+                    ]
+                  },
+                  "description": "Explicitly covered projects; empty when allProjects is true."
+                }
+              },
+              "required": [
+                "workspaceId",
+                "workspaceName",
+                "allProjects",
+                "projects"
+              ]
+            }
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "userId",
+                "name",
+                "email"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "createdAt",
+          "updatedAt",
+          "canManage",
+          "workspaces",
+          "members"
         ]
       },
       "WorkspaceMember": {
@@ -6808,7 +6990,7 @@
           "Projects"
         ],
         "summary": "Get project charts",
-        "description": "Weekly task-creation and completion counts for the selected range (default \"6m\"), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Ranges: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\".",
+        "description": "Task-creation and completion counts for the selected window (default \"3m\"), bucketed at the requested unit. `created` counts tasks created in the bucket; `completed` counts status changes into a final status. Ranges: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\"; units: \"hour\", \"day\", \"week\" or \"month\" (hour only for \"1w\", day up to \"12m\", week/month for every range). The unit defaults to \"day\", or \"week\" for ranges without a daily reading (\"all\").",
         "parameters": [
           {
             "schema": {
@@ -6829,17 +7011,33 @@
                 "12m",
                 "all"
               ],
-              "description": "Window of weekly buckets: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\" (default \"6m\")."
+              "description": "Window of the chart: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\" (default \"6m\")."
             },
             "required": false,
-            "description": "Window of weekly buckets: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\" (default \"6m\").",
+            "description": "Window of the chart: \"1w\", \"1m\", \"3m\", \"6m\", \"12m\" or \"all\" (default \"6m\").",
             "name": "range",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hour",
+                "day",
+                "week",
+                "month"
+              ],
+              "description": "Time unit of the series, independent from the window: \"hour\", \"day\", \"week\" or \"month\". Defaults to \"day\", or \"week\" for ranges without a daily reading (\"all\"). Fine units are only supported on narrow windows: hour for \"1w\"; day for \"1w\" through \"12m\"; week and month for every window."
+            },
+            "required": false,
+            "description": "Time unit of the series, independent from the window: \"hour\", \"day\", \"week\" or \"month\". Defaults to \"day\", or \"week\" for ranges without a daily reading (\"all\"). Fine units are only supported on narrow windows: hour for \"1w\"; day for \"1w\" through \"12m\"; week and month for every window.",
+            "name": "unit",
             "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "description": "Weekly progression buckets",
+            "description": "Progression buckets",
             "content": {
               "application/json": {
                 "schema": {
@@ -15978,6 +16176,108 @@
         }
       }
     },
+    "/invitation": {
+      "post": {
+        "operationId": "createInvitation",
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "Invite a member with a scoped access bundle",
+        "description": "Invites an email with a scope: manual workspace/project grants and/or access teams. The caller must administer every workspace in the resulting scope. Acceptance materialises the scoped memberships and direct grants; teams stay live.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Invitee email address."
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "Workspace role granted in the primary workspace (default \"member\"). Custom workspace roles are accepted."
+                  },
+                  "workspaces": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "workspaceId": {
+                          "type": "string"
+                        },
+                        "allProjects": {
+                          "type": "boolean",
+                          "description": "When true the team covers every project of the workspace, including future ones."
+                        },
+                        "projectIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Projects covered by the team when allProjects is false; at least one is required."
+                        }
+                      },
+                      "required": [
+                        "workspaceId",
+                        "allProjects"
+                      ]
+                    },
+                    "description": "Manual workspace/project grants, used when no team is selected."
+                  },
+                  "teamIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Access teams whose scope the invitee joins; teams stay live after acceptance."
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created invitation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedInvitation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email, scope or teams",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Not allowed to manage one of the workspaces",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/invitation/pending": {
       "get": {
         "operationId": "getUserPendingInvitations",
@@ -16037,6 +16337,542 @@
           },
           "401": {
             "description": "Missing or invalid credentials"
+          }
+        }
+      }
+    },
+    "/access-team/manageable-workspaces": {
+      "get": {
+        "operationId": "listManageableWorkspaces",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "List workspaces the caller can grant access to",
+        "description": "Workspaces the caller administers (every workspace for instance admins), with their projects, for the access-scope editors.",
+        "responses": {
+          "200": {
+            "description": "Manageable workspaces with their projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ManageableWorkspace"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          }
+        }
+      }
+    },
+    "/access-team": {
+      "get": {
+        "operationId": "listAccessTeams",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "List access teams",
+        "description": "Reusable scope bundles (workspaces and projects) assignable to members. Instance admins see every team; workspace admins see the teams whose scope intersects the workspaces they administer; members see the teams they belong to.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Only return teams whose scope covers this workspace, the teams the caller belongs to, and (for workspace admins) teams scoped to workspaces they administer."
+            },
+            "required": false,
+            "description": "Only return teams whose scope covers this workspace, the teams the caller belongs to, and (for workspace admins) teams scoped to workspaces they administer.",
+            "name": "workspaceId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Visible access teams",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccessTeam"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createAccessTeam",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "Create an access team",
+        "description": "Creates a scope bundle. The caller must administer every workspace in the scope (instance admins bypass).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "workspaces": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "workspaceId": {
+                          "type": "string"
+                        },
+                        "allProjects": {
+                          "type": "boolean",
+                          "description": "When true the team covers every project of the workspace, including future ones."
+                        },
+                        "projectIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Projects covered by the team when allProjects is false; at least one is required."
+                        }
+                      },
+                      "required": [
+                        "workspaceId",
+                        "allProjects"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "name",
+                  "workspaces"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created access team",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessTeam"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid scope",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Not allowed to manage one of the workspaces",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A team with this name already exists",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access-team/{id}": {
+      "get": {
+        "operationId": "getAccessTeam",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "Get an access team",
+        "description": "Team detail with its workspace/project scope and members. Teams outside the caller's visibility return 404.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access team detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessTeam"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "404": {
+            "description": "Unknown team, or not visible to the caller",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateAccessTeam",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "Update an access team",
+        "description": "Replaces the name, description and scope. Memberships materialised from removed workspaces are cleaned up when no other grant remains.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "workspaces": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "workspaceId": {
+                          "type": "string"
+                        },
+                        "allProjects": {
+                          "type": "boolean",
+                          "description": "When true the team covers every project of the workspace, including future ones."
+                        },
+                        "projectIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Projects covered by the team when allProjects is false; at least one is required."
+                        }
+                      },
+                      "required": [
+                        "workspaceId",
+                        "allProjects"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "name",
+                  "workspaces"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated access team",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessTeam"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid scope",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Not allowed to manage one of the workspaces",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A team with this name already exists",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteAccessTeam",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "Delete an access team",
+        "description": "Deletes the team and revokes the scoped memberships it was the only source of.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted team id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Not allowed to manage one of the workspaces",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access-team/{id}/members": {
+      "post": {
+        "operationId": "addAccessTeamMember",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "Add a member to an access team",
+        "description": "Adds the user to the team and materialises a scoped workspace membership for every workspace the team covers.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "userId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Team after adding the member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessTeam"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Not allowed to manage the team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown team or user",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access-team/{id}/members/{userId}": {
+      "delete": {
+        "operationId": "removeAccessTeamMember",
+        "tags": [
+          "Access teams"
+        ],
+        "summary": "Remove a member from an access team",
+        "description": "Removes the user from the team and revokes the scoped membership when no other grant justifies it.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team after removing the member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessTeam"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Not allowed to manage the team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }

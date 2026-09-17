@@ -1,4 +1,5 @@
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
+import type { ChartUnit } from "@/store/user-preferences";
 
 // Scale ceilings with integer halves so the 50% tick label stays clean.
 const SCALE_STEPS = [
@@ -11,43 +12,96 @@ export function niceMax(value: number) {
   );
 }
 
-export function formatWeekStart(weekStart: string) {
-  return new Date(`${weekStart}T00:00:00Z`).toLocaleDateString(undefined, {
+const UTC = { timeZone: "UTC" } as const;
+
+// Tooltip header: the full instant of the bucket, precise enough for its size.
+export function formatBucket(bucketStart: string, unit: ChartUnit) {
+  const date = new Date(bucketStart);
+  if (unit === "hour") {
+    return date.toLocaleString(undefined, {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      ...UTC,
+    });
+  }
+  if (unit === "month") {
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      year: "numeric",
+      ...UTC,
+    });
+  }
+  return date.toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
-    timeZone: "UTC",
+    ...UTC,
   });
 }
 
-export function formatMonth(weekStart: string) {
-  return new Date(`${weekStart}T00:00:00Z`).toLocaleDateString(undefined, {
-    month: "short",
-    timeZone: "UTC",
-  });
-}
-
-// One label per month change, thinned out when labels would collide. The
-// thinning runs on the tick positions (not the bucket indexes) so the kept
-// labels stay evenly spaced.
-export function monthTickIndexes(buckets: ProjectChartsBucket[]) {
-  const ticks = buckets
-    .map((bucket, index) => ({ bucket, index }))
-    .filter(
-      ({ bucket, index }, _, all) =>
-        index === 0 ||
-        bucket.weekStart.slice(5, 7) !==
-          all[index - 1]?.bucket.weekStart.slice(5, 7),
-    );
-  if (ticks.length <= 7) {
-    return ticks;
+// Axis label for a bucket, kept short so ticks do not collide.
+export function formatBucketTick(bucketStart: string, unit: ChartUnit) {
+  const date = new Date(bucketStart);
+  if (unit === "hour") {
+    return date.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      ...UTC,
+    });
   }
-  const step = Math.ceil(ticks.length / 6);
-  return ticks.filter(
-    (_, position) => position % step === 0 || position === ticks.length - 1,
+  if (unit === "month") {
+    return date.toLocaleDateString(undefined, { month: "short", ...UTC });
+  }
+  return date.toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    ...UTC,
+  });
+}
+
+// One label per calendar boundary (day changes for hourly buckets, month
+// changes for daily and weekly ones, every month for monthly buckets),
+// thinned out when labels would collide. Sparse boundaries fall back to evenly
+// spaced ticks so short windows still get a readable axis.
+export function tickIndexes(buckets: ProjectChartsBucket[], unit: ChartUnit) {
+  if (buckets.length === 0) {
+    return [];
+  }
+
+  const indexed = buckets.map((bucket, index) => ({ bucket, index }));
+  const isBoundary = ({ bucket, index }: (typeof indexed)[number]) => {
+    if (index === 0) {
+      return true;
+    }
+    const current = new Date(bucket.bucketStart);
+    const previous = new Date(
+      buckets[index - 1]?.bucketStart ?? bucket.bucketStart,
+    );
+    if (unit === "hour") {
+      return current.getUTCHours() === 0;
+    }
+    if (unit === "day") {
+      return current.getUTCDate() === 1;
+    }
+    if (unit === "month") {
+      return true;
+    }
+    return current.getUTCMonth() !== previous.getUTCMonth();
+  };
+
+  const boundaries = indexed.filter(isBoundary);
+  if (boundaries.length > 1 && boundaries.length <= 7) {
+    return boundaries;
+  }
+
+  const step = Math.ceil(buckets.length / 6);
+  return indexed.filter(
+    ({ index }) => index % step === 0 || index === buckets.length - 1,
   );
 }
 
-// Shared progression shape: cumulative tasks and remaining backlog per week.
+// Shared progression shape: cumulative tasks and remaining backlog per bucket.
 export function cumulativeBuckets(buckets: ProjectChartsBucket[]) {
   let created = 0;
   let completed = 0;
@@ -55,7 +109,7 @@ export function cumulativeBuckets(buckets: ProjectChartsBucket[]) {
     created += bucket.created;
     completed += bucket.completed;
     return {
-      weekStart: bucket.weekStart,
+      bucketStart: bucket.bucketStart,
       created: bucket.created,
       completed: bucket.completed,
       tasks: created,
@@ -66,34 +120,33 @@ export function cumulativeBuckets(buckets: ProjectChartsBucket[]) {
   });
 }
 
-// Weekly buckets from several projects share the same window; sum them per
-// week (and keep the window sorted) to read the whole board at once.
+// Buckets from several projects share the same window; sum them per bucket
+// (and keep the window sorted) to read the whole board at once.
 export function aggregateBuckets(
   snapshots: Array<ProjectChartsBucket[] | undefined>,
 ) {
-  const byWeek = new Map<string, ProjectChartsBucket>();
+  const byBucket = new Map<string, ProjectChartsBucket>();
   for (const buckets of snapshots) {
     for (const bucket of buckets ?? []) {
-      const current = byWeek.get(bucket.weekStart) ?? {
-        weekStart: bucket.weekStart,
+      const current = byBucket.get(bucket.bucketStart) ?? {
+        bucketStart: bucket.bucketStart,
         created: 0,
         completed: 0,
       };
       current.created += bucket.created;
       current.completed += bucket.completed;
-      byWeek.set(bucket.weekStart, current);
+      byBucket.set(bucket.bucketStart, current);
     }
   }
-  return [...byWeek.values()].sort((a, b) =>
-    a.weekStart.localeCompare(b.weekStart),
+  return [...byBucket.values()].sort((a, b) =>
+    a.bucketStart.localeCompare(b.bucketStart),
   );
 }
 
-// Average completions per week over the trailing window, the usual velocity
-// reading; falls back to the whole window when there are fewer weeks.
-export function recentVelocity(buckets: ProjectChartsBucket[], weeks = 4) {
-  const window = buckets.slice(-weeks);
-  if (window.length === 0) return 0;
-  const completed = window.reduce((sum, bucket) => sum + bucket.completed, 0);
-  return completed / window.length;
+// Average completions per bucket over the selected window; the unit
+// decides whether that reads as per hour, per day, per week or per month.
+export function averageCompleted(buckets: ProjectChartsBucket[]) {
+  if (buckets.length === 0) return 0;
+  const completed = buckets.reduce((sum, bucket) => sum + bucket.completed, 0);
+  return completed / buckets.length;
 }

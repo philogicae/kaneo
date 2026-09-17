@@ -10,6 +10,7 @@ import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import accessTeam from "./access-team";
 import activity from "./activity";
 import appointment from "./appointment";
 import { auth } from "./auth";
@@ -286,6 +287,7 @@ export function createApp() {
           mimeType: schema.assetTable.mimeType,
           filename: schema.assetTable.filename,
           workspaceId: schema.assetTable.workspaceId,
+          projectId: schema.assetTable.projectId,
           isPublic: schema.projectTable.isPublic,
         })
         .from(schema.assetTable)
@@ -608,6 +610,7 @@ export function createApp() {
   const externalLinkApi = api.route("/external-link", externalLink);
   const workflowRuleApi = api.route("/workflow-rule", workflowRule);
   const invitationApi = api.route("/invitation", invitation);
+  const accessTeamApi = api.route("/access-team", accessTeam);
   const workspaceApi = api.route("/workspace", workspace);
   const workspaceSharingApi = api.route("/workspace-sharing", workspaceSharing);
   const customFieldApi = api.route("/custom-field", customField);
@@ -751,6 +754,7 @@ export function createApp() {
     app,
     api,
     injectWebSocket,
+    accessTeamApi,
     activityApi,
     appointmentApi,
     columnApi,
@@ -858,6 +862,7 @@ const createdApp = createApp();
 const {
   app,
   injectWebSocket,
+  accessTeamApi,
   activityApi,
   appointmentApi,
   columnApi,
@@ -902,6 +907,7 @@ if (isMainModule) {
 }
 
 export type AppType =
+  | typeof accessTeamApi
   | typeof configApi
   | typeof projectApi
   | typeof taskApi

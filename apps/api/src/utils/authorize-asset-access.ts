@@ -1,9 +1,12 @@
 import type { Context } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { canAccessProject } from "./access-scope";
 import { resolveAssetBearerOrCookie } from "./authenticate-api-request";
 import { validateWorkspaceAccess } from "./validate-workspace-access";
 
 type AssetAccessTarget = {
   workspaceId: string;
+  projectId: string;
   isPublic: boolean | null;
 };
 
@@ -26,4 +29,8 @@ export async function authorizeAssetAccess(
 
   const { userId, apiKeyId } = await resolveAssetBearerOrCookie(c);
   await validateWorkspaceAccess(userId, asset.workspaceId, apiKeyId);
+
+  if (!(await canAccessProject(userId, asset.projectId))) {
+    throw new HTTPException(403, { message: "No access to this asset" });
+  }
 }

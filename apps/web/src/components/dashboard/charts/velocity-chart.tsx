@@ -2,23 +2,26 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
+import type { ChartUnit } from "@/store/user-preferences";
 import {
-  formatMonth,
-  formatWeekStart,
-  monthTickIndexes,
+  formatBucket,
+  formatBucketTick,
   niceMax,
+  tickIndexes,
 } from "./chart-utils";
 
 type VelocityChartProps = {
   buckets: ProjectChartsBucket[] | undefined;
+  unit: ChartUnit;
   isLoading?: boolean;
   height?: number;
 };
 
-// Dependency-free weekly bars: tasks created vs completed per week, with a
-// hover cursor per week and a tooltip carrying the raw counts.
+// Dependency-free bars: tasks created vs completed per bucket, with a hover
+// cursor per bucket and a tooltip carrying the raw counts.
 export default function VelocityChart({
   buckets,
+  unit,
   isLoading,
   height = 150,
 }: VelocityChartProps) {
@@ -74,7 +77,7 @@ export default function VelocityChart({
             {buckets.map((bucket, index) => (
               // biome-ignore lint/a11y/noStaticElementInteractions: hover-only tooltip cursor over the bars
               <div
-                key={bucket.weekStart}
+                key={bucket.bucketStart}
                 className="flex h-full flex-1 items-end justify-center gap-px"
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
@@ -93,13 +96,13 @@ export default function VelocityChart({
         </div>
       </div>
       <div className="relative mt-1 h-3 text-[10px] text-muted-foreground">
-        {monthTickIndexes(buckets).map(({ bucket, index }) => (
+        {tickIndexes(buckets, unit).map(({ bucket, index }) => (
           <span
-            key={bucket.weekStart}
+            key={bucket.bucketStart}
             className="absolute -translate-x-1/2 whitespace-nowrap"
             style={{ left: `${((index + 0.5) / buckets.length) * 100}%` }}
           >
-            {formatMonth(bucket.weekStart)}
+            {formatBucketTick(bucket.bucketStart, unit)}
           </span>
         ))}
       </div>
@@ -111,7 +114,7 @@ export default function VelocityChart({
         >
           <div className="space-y-0.5 rounded-md border border-border bg-popover px-2 py-1 text-[10px] whitespace-nowrap text-popover-foreground shadow-md">
             <p className="font-medium">
-              {formatWeekStart(hoveredBucket.weekStart)}
+              {formatBucket(hoveredBucket.bucketStart, unit)}
             </p>
             <p className="flex items-center gap-1.5">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-info" />

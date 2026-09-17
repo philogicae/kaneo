@@ -33,10 +33,14 @@ import {
 import type { AccessControl } from "better-auth/plugins/access";
 import type { UserWithAnonymous } from "better-auth/plugins/anonymous";
 import { config } from "dotenv-mono";
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import db, { schema } from "./database";
 import { publishEvent } from "./events";
 import deleteAccountData from "./user/controllers/delete-account-data";
+import {
+  markWorkspaceMembershipScoped,
+  materializeInvitationGrants,
+} from "./utils/access-grants";
 import { checkRegistrationAllowed } from "./utils/check-registration-allowed";
 import { checkWorkspaceName } from "./utils/check-workspace-name";
 import { mapCustomOAuthProfileToUser } from "./utils/custom-oauth-profile";
@@ -471,6 +475,50 @@ export const auth = betterAuth({
             ownerEmail: user.name,
             ownerId: user.id,
           });
+        },
+        // Scope-bundle invitations carry their workspace/project/team intent in
+        // first-party child tables; acceptance turns that intent into live
+        // memberships and direct grants. Best-effort: a failure here must not
+        // block the membership created by better-auth, and the admin can fix
+        // the scope from the team/member views.
+        afterAcceptInvitation: async ({ invitation, user }) => {
+          try {
+            await materializeInvitationGrants(user.id, invitation.id, {
+              grantedBy: invitation.inviterId,
+            });
+            // The primary workspace's membership is created by better-auth with
+            // the full-access default; narrow it unless the invitation granted
+            // the whole workspace manually.
+            const [fullGrant] = await db
+              .select({ id: schema.invitationWorkspaceGrantTable.id })
+              .from(schema.invitationWorkspaceGrantTable)
+              .where(
+                and(
+                  eq(
+                    schema.invitationWorkspaceGrantTable.invitationId,
+                    invitation.id,
+                  ),
+                  eq(
+                    schema.invitationWorkspaceGrantTable.workspaceId,
+                    invitation.organizationId,
+                  ),
+                  eq(schema.invitationWorkspaceGrantTable.allProjects, true),
+                ),
+              )
+              .limit(1);
+            if (!fullGrant) {
+              await markWorkspaceMembershipScoped(
+                user.id,
+                invitation.organizationId,
+              );
+            }
+          } catch (error) {
+            console.error(
+              "Failed to materialise invitation grants for invitation",
+              invitation.id,
+              error,
+            );
+          }
         },
       },
       async sendInvitationEmail(data) {

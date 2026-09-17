@@ -21,10 +21,16 @@ export const PROJECT_CHART_RANGES = [
   "all",
 ] as const;
 
+export const PROJECT_CHART_UNITS = ["hour", "day", "week", "month"] as const;
+
 export const projectChartsQuery = z.object({
   range: z.enum(PROJECT_CHART_RANGES).optional().openapi({
     description:
-      'Window of weekly buckets: "1w", "1m", "3m", "6m", "12m" or "all" (default "6m").',
+      'Window of the chart: "1w", "1m", "3m", "6m", "12m" or "all" (default "6m").',
+  }),
+  unit: z.enum(PROJECT_CHART_UNITS).optional().openapi({
+    description:
+      'Time unit of the series, independent from the window: "hour", "day", "week" or "month". Defaults to "day", or "week" for ranges without a daily reading ("all"). Fine units are only supported on narrow windows: hour for "1w"; day for "1w" through "12m"; week and month for every window.',
   }),
 });
 

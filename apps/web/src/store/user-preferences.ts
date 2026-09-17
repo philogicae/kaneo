@@ -52,6 +52,33 @@ export function isChartRange(value: unknown): value is ChartRange {
   );
 }
 
+export const CHART_UNIT_OPTIONS = ["hour", "day", "week", "month"] as const;
+export type ChartUnit = (typeof CHART_UNIT_OPTIONS)[number];
+
+export function isChartUnit(value: unknown): value is ChartUnit {
+  return (
+    typeof value === "string" &&
+    (CHART_UNIT_OPTIONS as readonly string[]).includes(value)
+  );
+}
+
+// Mirror of the API's ALLOWED_UNITS: the dashboard disables units the server
+// rejects, and falls back to the daily default when the window changes.
+export const CHART_UNITS_BY_RANGE: Record<ChartRange, readonly ChartUnit[]> = {
+  "1w": ["hour", "day", "week"],
+  "1m": ["day", "week"],
+  "3m": ["day", "week", "month"],
+  "6m": ["day", "week", "month"],
+  "12m": ["day", "week", "month"],
+  all: ["week", "month"],
+};
+
+// The product default is daily buckets; "all" has no daily reading, so it
+// falls back to weekly ones.
+export function defaultChartUnit(range: ChartRange): ChartUnit {
+  return CHART_UNITS_BY_RANGE[range].includes("day") ? "day" : "week";
+}
+
 // Interface density as root font-size multiplier: every rem-based Tailwind
 // size (text, spacing, sidebar width) follows the root font size. The
 // stepper moves in 5% steps within these bounds.
@@ -125,6 +152,8 @@ type UserPreferencesStore = {
 
   chartsRange: ChartRange;
   setChartsRange: (range: ChartRange) => void;
+  chartsUnit: ChartUnit;
+  setChartsUnit: (unit: ChartUnit) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -213,10 +242,14 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       workspaceOrder: [],
       setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
 
-      // A wider default window keeps short projects readable; the charts tab
-      // can narrow it to a week or a month, or widen it to a year/all history.
-      chartsRange: "6m",
+      // Default reading: the last quarter, bucketed by day. The window can be
+      // narrowed to a week or widened to all history.
+      chartsRange: "3m",
       setChartsRange: (range) => set({ chartsRange: range }),
+      // Daily buckets by default (weekly for "all"); the unit selector refines
+      // them down to the hour or coarsens them up to the month.
+      chartsUnit: "day",
+      setChartsUnit: (unit) => set({ chartsUnit: unit }),
     }),
     {
       name: "user-preferences",
@@ -237,8 +270,19 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
         if (state && !Array.isArray(state.workspaceOrder)) {
           state.setWorkspaceOrder([]);
         }
-        if (state && !isChartRange(state.chartsRange)) {
-          state.setChartsRange("6m");
+        if (state) {
+          const range = isChartRange(state.chartsRange)
+            ? state.chartsRange
+            : "3m";
+          if (range !== state.chartsRange) {
+            state.setChartsRange(range);
+          }
+          if (
+            !isChartUnit(state.chartsUnit) ||
+            !CHART_UNITS_BY_RANGE[range].includes(state.chartsUnit)
+          ) {
+            state.setChartsUnit(defaultChartUnit(range));
+          }
         }
       },
     },

@@ -169,6 +169,10 @@ export const workspaceUserTable = sqliteTable(
         onDelete: "cascade",
       }),
     role: text("role").default("member").notNull(),
+    // "full" members reach every project of the workspace (historical
+    // behaviour); "scoped" members only reach the projects granted through
+    // access teams or direct user grants.
+    accessScope: text("access_scope").default("full").notNull(),
     joinedAt: integer("joined_at", { mode: "timestamp_ms" }).notNull(),
   },
   (table) => [
@@ -261,6 +265,285 @@ export const teamMemberTable = sqliteTable(
   (table) => [
     index("teamMember_teamId_idx").on(table.teamId),
     index("teamMember_userId_idx").on(table.userId),
+  ],
+);
+
+export const accessTeamTable = sqliteTable(
+  "access_team",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    name: text("name").notNull(),
+    description: text("description"),
+    createdBy: text("created_by").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [uniqueIndex("access_team_name_idx").on(table.name)],
+);
+
+export const accessTeamMemberTable = sqliteTable(
+  "access_team_member",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => accessTeamTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("access_team_member_teamId_idx").on(table.teamId),
+    index("access_team_member_userId_idx").on(table.userId),
+    unique("access_team_member_unique").on(table.teamId, table.userId),
+  ],
+);
+
+export const accessTeamWorkspaceTable = sqliteTable(
+  "access_team_workspace",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => accessTeamTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    allProjects: integer("all_projects", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("access_team_workspace_teamId_idx").on(table.teamId),
+    index("access_team_workspace_workspaceId_idx").on(table.workspaceId),
+    unique("access_team_workspace_unique").on(table.teamId, table.workspaceId),
+  ],
+);
+
+export const accessTeamProjectTable = sqliteTable(
+  "access_team_project",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => accessTeamTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("access_team_project_teamId_idx").on(table.teamId),
+    index("access_team_project_projectId_idx").on(table.projectId),
+    unique("access_team_project_unique").on(table.teamId, table.projectId),
+  ],
+);
+
+// Direct per-user grants, used by invitations that do not go through a team
+// (manual workspace/project selection).
+export const userWorkspaceAccessTable = sqliteTable(
+  "user_workspace_access",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    allProjects: integer("all_projects", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+    grantedBy: text("granted_by").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("user_workspace_access_userId_idx").on(table.userId),
+    index("user_workspace_access_workspaceId_idx").on(table.workspaceId),
+    unique("user_workspace_access_unique").on(table.userId, table.workspaceId),
+  ],
+);
+
+export const userProjectAccessTable = sqliteTable(
+  "user_project_access",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    grantedBy: text("granted_by").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("user_project_access_userId_idx").on(table.userId),
+    index("user_project_access_projectId_idx").on(table.projectId),
+    unique("user_project_access_unique").on(table.userId, table.projectId),
+  ],
+);
+
+// Intent recorded on an invitation; acceptance materialises memberships and
+// direct grants so later edits to the invitation cannot change live access.
+export const invitationTeamTable = sqliteTable(
+  "invitation_team",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    invitationId: text("invitation_id")
+      .notNull()
+      .references(() => invitationTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => accessTeamTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("invitation_team_invitationId_idx").on(table.invitationId),
+    unique("invitation_team_unique").on(table.invitationId, table.teamId),
+  ],
+);
+
+export const invitationWorkspaceGrantTable = sqliteTable(
+  "invitation_workspace_grant",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    invitationId: text("invitation_id")
+      .notNull()
+      .references(() => invitationTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    allProjects: integer("all_projects", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("invitation_workspace_grant_invitationId_idx").on(table.invitationId),
+    unique("invitation_workspace_grant_unique").on(
+      table.invitationId,
+      table.workspaceId,
+    ),
+  ],
+);
+
+export const invitationProjectGrantTable = sqliteTable(
+  "invitation_project_grant",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    invitationId: text("invitation_id")
+      .notNull()
+      .references(() => invitationTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("invitation_project_grant_invitationId_idx").on(table.invitationId),
+    unique("invitation_project_grant_unique").on(
+      table.invitationId,
+      table.projectId,
+    ),
   ],
 );
 

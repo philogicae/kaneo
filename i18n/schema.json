@@ -1440,6 +1440,9 @@
 						},
 						"reset": {
 							"type": "string"
+						},
+						"save": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -1452,7 +1455,8 @@
 						"filter",
 						"markAllRead",
 						"remove",
-						"reset"
+						"reset",
+						"save"
 					]
 				},
 				"appName": {
@@ -9792,6 +9796,194 @@
 			"type": "object",
 			"additionalProperties": false,
 			"properties": {
+				"accessScope": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"allProjects": {
+							"type": "string"
+						},
+						"noProjects": {
+							"type": "string"
+						},
+						"noWorkspaces": {
+							"type": "string"
+						}
+					},
+					"required": ["allProjects", "noProjects", "noWorkspaces"]
+				},
+				"accessTeams": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"addMember": {
+							"type": "string"
+						},
+						"addMemberPlaceholder": {
+							"type": "string"
+						},
+						"allProjects": {
+							"type": "string"
+						},
+						"createTitle": {
+							"type": "string"
+						},
+						"created": {
+							"type": "string"
+						},
+						"delete": {
+							"type": "string"
+						},
+						"deleteDialogDescription": {
+							"type": "string"
+						},
+						"deleteDialogTitle": {
+							"type": "string"
+						},
+						"deleteError": {
+							"type": "string"
+						},
+						"deleted": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"descriptionLabel": {
+							"type": "string"
+						},
+						"descriptionPlaceholder": {
+							"type": "string"
+						},
+						"edit": {
+							"type": "string"
+						},
+						"editTitle": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"emptyDescription": {
+							"type": "string"
+						},
+						"memberAdded": {
+							"type": "string"
+						},
+						"memberCount_one": {
+							"type": "string"
+						},
+						"memberCount_zero": {
+							"type": "string"
+						},
+						"memberCount_two": {
+							"type": "string"
+						},
+						"memberCount_few": {
+							"type": "string"
+						},
+						"memberCount_many": {
+							"type": "string"
+						},
+						"memberCount_other": {
+							"type": "string"
+						},
+						"memberError": {
+							"type": "string"
+						},
+						"memberRemoved": {
+							"type": "string"
+						},
+						"membersLabel": {
+							"type": "string"
+						},
+						"nameLabel": {
+							"type": "string"
+						},
+						"namePlaceholder": {
+							"type": "string"
+						},
+						"newTeam": {
+							"type": "string"
+						},
+						"noMembers": {
+							"type": "string"
+						},
+						"pageTitle": {
+							"type": "string"
+						},
+						"projectCount_one": {
+							"type": "string"
+						},
+						"projectCount_zero": {
+							"type": "string"
+						},
+						"projectCount_two": {
+							"type": "string"
+						},
+						"projectCount_few": {
+							"type": "string"
+						},
+						"projectCount_many": {
+							"type": "string"
+						},
+						"projectCount_other": {
+							"type": "string"
+						},
+						"removeMember": {
+							"type": "string"
+						},
+						"saveError": {
+							"type": "string"
+						},
+						"scopeHint": {
+							"type": "string"
+						},
+						"scopeLabel": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"updated": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"addMember",
+						"addMemberPlaceholder",
+						"allProjects",
+						"createTitle",
+						"created",
+						"delete",
+						"deleteDialogDescription",
+						"deleteDialogTitle",
+						"deleteError",
+						"deleted",
+						"description",
+						"descriptionLabel",
+						"descriptionPlaceholder",
+						"edit",
+						"editTitle",
+						"empty",
+						"emptyDescription",
+						"memberAdded",
+						"memberError",
+						"memberRemoved",
+						"membersLabel",
+						"nameLabel",
+						"namePlaceholder",
+						"newTeam",
+						"noMembers",
+						"pageTitle",
+						"removeMember",
+						"saveError",
+						"scopeHint",
+						"scopeLabel",
+						"title",
+						"updated"
+					]
+				},
 				"invitations": {
 					"type": "object",
 					"additionalProperties": false,
@@ -9947,6 +10139,18 @@
 						"error": {
 							"type": "string"
 						},
+						"noTeams": {
+							"type": "string"
+						},
+						"scopeHint": {
+							"type": "string"
+						},
+						"scopeLabel": {
+							"type": "string"
+						},
+						"scopeRequired": {
+							"type": "string"
+						},
 						"sendInvitation": {
 							"type": "string"
 						},
@@ -9954,6 +10158,12 @@
 							"type": "string"
 						},
 						"success": {
+							"type": "string"
+						},
+						"teamsHint": {
+							"type": "string"
+						},
+						"teamsLabel": {
 							"type": "string"
 						},
 						"title": {
@@ -9966,9 +10176,15 @@
 						"emailLabel",
 						"emailPlaceholder",
 						"error",
+						"noTeams",
+						"scopeHint",
+						"scopeLabel",
+						"scopeRequired",
 						"sendInvitation",
 						"shareLinkDescription",
 						"success",
+						"teamsHint",
+						"teamsLabel",
 						"title"
 					]
 				},
@@ -10098,6 +10314,8 @@
 				}
 			},
 			"required": [
+				"accessScope",
+				"accessTeams",
 				"invitations",
 				"inviteLinks",
 				"inviteModal",
@@ -10148,6 +10366,9 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
+						"average": {
+							"type": "string"
+						},
 						"backlog": {
 							"type": "string"
 						},
@@ -10169,7 +10390,7 @@
 						"other": {
 							"type": "string"
 						},
-						"perWeek": {
+						"perUnit": {
 							"type": "string"
 						},
 						"period": {
@@ -10214,7 +10435,31 @@
 						"unassigned": {
 							"type": "string"
 						},
-						"velocity4w": {
+						"unit": {
+							"type": "string"
+						},
+						"unitDay": {
+							"type": "string"
+						},
+						"unitHour": {
+							"type": "string"
+						},
+						"unitLabelDay": {
+							"type": "string"
+						},
+						"unitLabelHour": {
+							"type": "string"
+						},
+						"unitLabelMonth": {
+							"type": "string"
+						},
+						"unitLabelWeek": {
+							"type": "string"
+						},
+						"unitMonth": {
+							"type": "string"
+						},
+						"unitWeek": {
 							"type": "string"
 						},
 						"velocityDescription": {
@@ -10234,6 +10479,7 @@
 						}
 					},
 					"required": [
+						"average",
 						"backlog",
 						"byProject",
 						"completed",
@@ -10241,7 +10487,7 @@
 						"empty",
 						"noTasks",
 						"other",
-						"perWeek",
+						"perUnit",
 						"period",
 						"periodSummary",
 						"rangeAll",
@@ -10250,7 +10496,15 @@
 						"statusTitle",
 						"tasks",
 						"unassigned",
-						"velocity4w",
+						"unit",
+						"unitDay",
+						"unitHour",
+						"unitLabelDay",
+						"unitLabelHour",
+						"unitLabelMonth",
+						"unitLabelWeek",
+						"unitMonth",
+						"unitWeek",
 						"velocityDescription",
 						"velocityTitle",
 						"workloadDescription",

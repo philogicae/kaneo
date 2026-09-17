@@ -1,6 +1,7 @@
-import { and, count, eq, isNull, min, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, min, sql } from "drizzle-orm";
 import db from "../../database";
 import { projectTable, taskTable } from "../../database/schema";
+import { getScopedProjectIds } from "../../utils/access-scope";
 
 type ProjectStatistics = {
   completionPercentage: number;
@@ -68,14 +69,31 @@ async function getProjectStatistics(
   return statisticsByProject;
 }
 
-async function getProjects(workspaceId: string, includeArchived = false) {
+async function getProjects(
+  workspaceId: string,
+  includeArchived = false,
+  userId?: string,
+) {
+  // Scoped members only see the projects granted to them (directly or through
+  // an access team); a null result means the workspace is fully reachable.
+  const scopedProjectIds = userId
+    ? await getScopedProjectIds(userId, workspaceId)
+    : null;
+
+  if (scopedProjectIds?.length === 0) {
+    return [];
+  }
+
   const projects = await db.query.projectTable.findMany({
-    where: includeArchived
-      ? eq(projectTable.workspaceId, workspaceId)
-      : and(
-          eq(projectTable.workspaceId, workspaceId),
-          isNull(projectTable.archivedAt),
-        ),
+    where: and(
+      includeArchived
+        ? eq(projectTable.workspaceId, workspaceId)
+        : and(
+            eq(projectTable.workspaceId, workspaceId),
+            isNull(projectTable.archivedAt),
+          ),
+      scopedProjectIds ? inArray(projectTable.id, scopedProjectIds) : undefined,
+    ),
     // `id` is the deterministic tie-breaker: without it, rows sharing both a
     // position and a createdAt come back in an unspecified order.
     orderBy: (project, { asc }) => [

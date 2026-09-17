@@ -102,14 +102,11 @@ const getProjectChartsRoute = createRoute({
   tags: ["Projects"],
   summary: "Get project charts",
   description:
-    'Weekly task-creation and completion counts for the selected range (default "6m"), for progression charts. `created` counts tasks created in the week; `completed` counts status changes into a final status. Ranges: "1w", "1m", "3m", "6m", "12m" or "all".',
+    'Task-creation and completion counts for the selected window (default "3m"), bucketed at the requested unit. `created` counts tasks created in the bucket; `completed` counts status changes into a final status. Ranges: "1w", "1m", "3m", "6m", "12m" or "all"; units: "hour", "day", "week" or "month" (hour only for "1w", day up to "12m", week/month for every range). The unit defaults to "day", or "week" for ranges without a daily reading ("all").',
   middleware: [workspaceAccess.fromProject()] as const,
   request: { params: projectParam, query: projectChartsQuery },
   responses: {
-    200: jsonResponse(
-      "Weekly progression buckets",
-      z.array(projectChartsSchema),
-    ),
+    200: jsonResponse("Progression buckets", z.array(projectChartsSchema)),
     400: errorResponse(
       "Unknown project, or its workspace could not be determined",
     ),
@@ -253,6 +250,7 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const projects = await getProjectsCtrl(
       workspaceId,
       includeArchived === "true",
+      c.get("userId"),
     );
     return c.json(projects, 200);
   })
@@ -280,8 +278,8 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
   })
   .openapi(getProjectChartsRoute, async (c) => {
     const { id } = c.req.valid("param");
-    const { range } = c.req.valid("query");
-    const buckets = await getProjectCharts(id, range ?? "6m");
+    const { range, unit } = c.req.valid("query");
+    const buckets = await getProjectCharts(id, range, unit);
     return c.json(buckets, 200);
   })
   .openapi(reorderProjectsRoute, async (c) => {
