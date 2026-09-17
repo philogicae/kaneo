@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ${KANEO_DATA_PATH:-./data/kaneo.db}:/app/data
+      - ${KANEO_DATA_PATH:-./data}:/app/data
     healthcheck:
       test:
         [

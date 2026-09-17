@@ -28,7 +28,7 @@ For development, you'll need at minimum:
 - `AUTH_SECRET` - Secret key for JWT token generation (**must be at least 32 characters long**; use a long, random value in production)
 - `DEVICE_AUTH_CLIENT_IDS` - **Optional.** Comma-separated list of allowed device-flow OAuth client IDs. When unset, Kaneo implicitly allows `kaneo-cli` and `kaneo-mcp` by default (no extra configuration for the CLI or MCP). Override only when you need additional trusted clients, for example `kaneo-cli,kaneo-mcp,my-desktop-app`.
 - `DATABASE_PATH` - Path to the local libSQL/SQLite database file (`:memory:` supported). Defaults to `./data/kaneo.db` (resolved from the repository root).
-- `KANEO_DATA_PATH` - Docker Compose only: host data directory bind-mounted to `/app/data` (default `./data/kaneo.db`).
+- `KANEO_DATA_PATH` - Docker Compose only: host data directory bind-mounted to `/app/data` (default `./data`).
 
 If your app uses a device client ID that is not included in the defaults, set `DEVICE_AUTH_CLIENT_IDS` to the full comma-separated list of allowed IDs (including any defaults you still need), so it includes the client ID your app sends to `/api/auth/device/code`.
 
