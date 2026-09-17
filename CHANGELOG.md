@@ -1,26 +1,33 @@
-## [1.0.5] - 2026-09-16
+## [1.0.6] - 2026-09-17
 
 ### 🚀 Features
 
-- Unified Notifications page (General/Telegram/Discord/Slack tabs, per-project Discord/Slack management, legacy Telegram route dropped); personal mention events for Telegram/Discord/Slack (separate from comments, both on by default, mentions target the mentioned member's Telegram rules); unified Appointments/Calendar/Gantt dashboard tabs + MCP and Skill links; charts ranges 1w/1m/3m/6m/12m/all; copyable skill URL block and served-page frontmatter (name/description/version); fix: week calendar header/column alignment, appointment reminder chips 15m/1h/2h/1d/1w with theme-aware selected state; chore: translate 28 new keys across 19 locales + alphabetize all i18n files, mcp-install skill reference, docs/openapi refresh
-
-## [1.0.4] - 2026-09-15
-
-### 🚀 Features
-
+- _(ci)_ Add maintainer-triggered Peekareq screenshots
+- Add focused Peekareq previews and accessibility findings
 - Expand MCP tooling, project analytics and workspace UX
 - Unified telegram bots, per-task reminders and task recurrence
 - Shareable workspace invite links with default-link backfill
 - Reminder rescheduling discipline, MCP datetime args and bounded pagination
+- Unified Notifications page (General/Telegram/Discord/Slack tabs, per-project Discord/Slack management, legacy Telegram route dropped); personal mention events for Telegram/Discord/Slack (separate from comments, both on by default, mentions target the mentioned member's Telegram rules); unified Appointments/Calendar/Gantt dashboard tabs + MCP and Skill links; charts ranges 1w/1m/3m/6m/12m/all; copyable skill URL block and served-page frontmatter (name/description/version); fix: week calendar header/column alignment, appointment reminder chips 15m/1h/2h/1d/1w with theme-aware selected state; chore: translate 28 new keys across 19 locales + alphabetize all i18n files, mcp-install skill reference, docs/openapi refresh
+- Board charts period/unit dropdowns with independent window and unit (3 months/day defaults, hourly→monthly buckets, dynamic averages); global access teams and scoped invitations (workspace×project scope bundles, manual grants or teams, materialised at acceptance, dynamic on team edits) enforced across project routes, project lists, global search and private assets; Teams settings page and invitation scope tree; additive migration 0003; openapi + i18n refreshed
+- Scope assignee lists, notifications and project WebSockets to project access (GET /api/project/{id}/members; assignability moved from workspace membership to canAccessProject across task/appointment create/update/assignee/bulk/import; notifications dropped at creation when the recipient cannot open the project, all emitters pass projectId; /ws/:projectId upgrade enforces project access); editable direct project grants for existing members (GET/PUT /api/workspace/{workspaceId}/members/{userId}/access — all-projects lifts the scope to full, clearing removes the orphaned scoped membership, invitation:create guard — plus Manage access dialog on the Members page); a scoped member keeps the project they create via a direct grant; fix: dashboard charts default to the last month by day with a one-time persisted-preference migration 6m/3m→1m; openapi + i18n (9 keys × 20 locales) + integration tests refreshed
 
 ### 🐛 Bug Fixes
 
+- _(ci)_ Filter Peekareq commands with a Cloudflare webhook
+- _(ci)_ Use Cloudflare-compatible GitHub requests
+- Ground Peekareq custom-field screenshots in fixtures
+- Fall back when Peekareq's model provider is throttled
+- _(billing)_ Keep cancelled subscriptions entitled until the paid period ends
 - Harden MCP auth and label flows, rework self-hosted compose
 - _(web)_ Keep drag & drop active while a board or backlog sort is applied
 - Telegram verify loop, board sort/filter hydration, per-workspace label identity
+- Default the Compose host data mount to the ./data directory instead of ./data/kaneo.db so the WAL/SHM sidecars are persisted; chore: dependency lockfile refresh, biome 2.5.13→2.5.14 and docs alignment
 
 ### 📚 Documentation
 
+- Update contributors and sponsors
+- Update contributors and sponsors
 - Update contributors and sponsors
 - Update contributors and sponsors
 
@@ -29,11 +36,18 @@
 - Migrate PostgreSQL to local libSQL (Turso) storage
 - Drop SaaS dependencies for local-disk asset storage
 
+### 🧪 Testing
+
+- _(ci)_ Isolate screenshot publisher test identities
+- _(billing)_ Separate act from assert in entitlement tests
+
 ### ⚙️ Miscellaneous Tasks
 
+- _(release)_ V2.25.0 [skip ci]
 - _(infra)_ Modernize runtime and deploy stack
 - Fork cleanup — drop upstream release, site, helm and stdio-mcp machinery
 - _(ci)_ Per-workspace coverage reporting and test-infra hardening
+- Add changelog
 
 ## [2.24.0] - 2026-09-11
 
