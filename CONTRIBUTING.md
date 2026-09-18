@@ -76,7 +76,7 @@ git checkout -b fix/whatever-youre-fixing
 git checkout -b feat/cool-new-feature
 ```
 
-2. **Make your changes** and test them locally (`pnpm test` for unit tests; `pnpm test:integration` for API integration tests with PostgreSQL)
+2. **Make your changes** and test them locally (`pnpm test` for unit tests; `pnpm test:integration` for API integration tests against the local libSQL/SQLite test file)
 
 3. **Commit using conventional commits**:
 ```bash
@@ -185,18 +185,16 @@ t("projects:greeting", { name: userName });
 ```
 kaneo/
 ├── apps/
-│   ├── api/          # Backend API (Node.js/Hono)
-│   ├── docs/         # Product and API documentation content
-│   ├── site/         # Public website and documentation host (Next.js)
+│   ├── api/          # Backend API authority (Hono, libSQL, HTTP MCP, WebSockets)
+│   ├── docs/         # Product and API documentation content (Mintlify)
 │   └── web/          # Frontend app (React/Vite)
 ├── packages/
 │   ├── email/        # Shared email utilities and templates
 │   ├── libs/         # Typed API client and shared runtime helpers
-│   ├── mcp/          # Published stdio MCP package
 │   ├── permissions/  # Shared permission vocabulary and built-in roles
-│   └── ...            # Import tooling and shared TypeScript configuration
-├── tests/            # API unit and integration tests
-└── charts/           # Kubernetes Helm chart
+│   └── planka-import # PLANKA import CLI
+├── skills/kaneo/     # Distributed agent skill bundle (also served over HTTP)
+└── tests/            # API unit and integration tests
 ```
 
 ## Using AI

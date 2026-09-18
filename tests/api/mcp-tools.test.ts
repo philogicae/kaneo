@@ -369,6 +369,36 @@ describe("MCP tool catalog", () => {
     });
   });
 
+  it("previews the Jev qualification of a task", async () => {
+    await call("qualify_task", {
+      projectId: "p1",
+      title: "Fix login redirect loop",
+      description: "Users bounce between the callback and the sign-in page.",
+    });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/task/qualify/p1",
+      method: "POST",
+      body: {
+        title: "Fix login redirect loop",
+        description: "Users bounce between the callback and the sign-in page.",
+      },
+    });
+  });
+
+  it("passes an optional priority hint to qualify_task", async () => {
+    await call("qualify_task", {
+      projectId: "p1",
+      title: "Fix login redirect loop",
+      priority: "high",
+    });
+
+    expect(lastRequest().body).toEqual({
+      title: "Fix login redirect loop",
+      priority: "high",
+    });
+  });
+
   it("passes recurrence through create_task and update_task, including a clear", async () => {
     await call("create_task", {
       projectId: "p1",

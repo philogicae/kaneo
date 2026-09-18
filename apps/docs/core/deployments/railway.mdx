@@ -1,73 +1,41 @@
 ---
 title: Railway
-description: Deploy Kaneo to Railway using the official template.
+description: Deploy this fork to Railway from the repository, with a persistent volume for the libSQL database.
 ---
-## Railway Template
 
-Kaneo provides an official Railway template for easy deployment with a single click.
+This fork runs as a **single container** with a local libSQL database, so a Railway deployment is one service plus a volume. There is no PostgreSQL plugin and no separate web service.
 
-[Deploy on Railway](https://railway.com/deploy/kaneo)
+## Deploy from the repository
 
-## What the Template Includes
+1. Create a Railway project and choose **Deploy from GitHub repo**, selecting this fork.
+2. Railway detects `Dockerfile.kaneo` as the build file.
+3. Add a **volume** mounted at `/app/data` — it holds `kaneo.db` and its WAL/SHM sidecars.
+4. Set the service's public port to **5173** and generate a domain.
+5. Set the environment variables:
 
-The Railway template automatically configures:
-
-- **PostgreSQL Database**: Managed PostgreSQL instance
-- **API Service**: Pre-configured Hono API server
-- **Web Service**: Pre-configured React web application
-- **Environment Variables**: All required variables with sensible defaults
-- **Networking**: Proper service discovery and internal communication
-- **Build Configuration**: Optimized Docker builds for both services
-
-## Deployment Steps
-
-1. **Click the Deploy Button** above to open the Railway template
-2. **Connect to Railway** (sign up or log in if needed)
-3. **Configure Environment Variables**:
-   - Set your `AUTH_SECRET` (minimum 32 characters)
-   - Review other environment variables as needed
-4. **Deploy** - Railway will build and deploy all services automatically
-
-## Post-Deployment Setup
-
-After deployment completes:
-
-1. **Access Your Application**: Railway will provide URLs for both services
-2. **Create Admin Account**: Visit the web application to create your first user
-3. **Configure Domain** (optional): Add custom domains in Railway dashboard
-4. **Set Up SSO** (optional): Configure GitHub, Google, or other providers
-
-## Environment Variables
-
-The template includes these pre-configured variables:
-
-```
-# Railway automatically sets these
-DATABASE_URL=postgresql://postgres:password@host:port/database
-KANEO_API_URL=https://your-api.railway.app
-KANEO_CLIENT_URL=https://your-web.railway.app
-
-# You may want to customize these
-AUTH_SECRET=your-32-character-secret-here
-CORS_ORIGINS=https://your-web.railway.app
+```env
+KANEO_CLIENT_URL=https://your-domain.example
+AUTH_SECRET=                             # openssl rand -hex 32
 ```
 
-## Monitoring and Scaling
+`KANEO_API_URL` defaults to `KANEO_CLIENT_URL/api`, so one public domain is enough: the container proxies `/api` requests to the internal API process.
 
-Railway provides built-in:
+6. Deploy. The health check is `GET /api/health` on port 5173.
 
-- **Health Checks**: Automatic service monitoring
-- **Logs**: Centralized logging for all services
-- **Metrics**: Performance and usage analytics
-- **Scaling**: Easy horizontal scaling when needed
+## Post-deployment setup
 
-## Troubleshooting
+1. Open the public URL and create the first account.
+2. Configure a custom domain if you want one.
+3. Optionally set up SSO, object storage, or the MCP endpoint — see the [environment variables](/core/installation/environment-variables).
 
-If you encounter issues:
+## Notes
 
-1. **Check Logs**: Use Railway's log viewer to debug
-2. **Verify Environment**: Ensure all required variables are set
-3. **Redeploy**: Sometimes a fresh deployment resolves issues
-4. **Check Resource Usage**: Free tier has limitations
+- The volume is required: without it, the database is recreated on every deploy.
+- Railway's usual `PORT` variable is not used; the container always listens on 5173 (nginx front, bundled API behind it).
+- For backups, read or copy `kaneo.db` (plus its `-wal`/`-shm` sidecars) from the mounted volume.
 
-For more detailed troubleshooting, see the [troubleshooting section](/core/installation/start-services).
+## Related
+
+- [The compose file](/core/installation/docker-compose)
+- [Environment variables](/core/installation/environment-variables)
+- [Reverse proxy with nginx](/core/reverse-proxy/nginx)

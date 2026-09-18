@@ -33,7 +33,7 @@ Unclear work stays in `planned`, with what is known and the exact open question.
 
 1. Search the relevant workspace/project for the same outcome, including all statuses. `search` has no status parameter; omit status filters in paginated `list_tasks` when checking the full project. Include archived projects if the scope may live there. See [complete lookup](mcp-guidelines.md#search-and-pagination).
 2. Read plausible matches and their comments/relations. Update the canonical task when it is genuinely the same issue; do not reopen a rejected or completed task automatically. A new occurrence with distinct scope/evidence may warrant a linked follow-up rather than rewriting an accepted history.
-3. For new work, pass `projectId`, `title`, `description`, `priority`, **and an explicit `status`** to `create_task`. Use `planned` unless qualified. Labels are separate calls, not a `labels` argument on task creation.
+3. For new work, pass `projectId`, `title`, `description`, `priority`, **and an explicit `status`** to `create_task`. Use `planned` unless qualified. The response is authoritative: keep the final `priority` and `labels` it reports. Labels it did not apply (especially `branch:<name>`) are separate calls, not a `labels` argument on task creation.
 4. Attach the required labels and dependencies, then read back the task and attachments with the appropriate tools. If setup stops halfway, keep scope truthful and report the missing parts before promoting it.
 
 Example envelope; replace placeholders with verified IDs, and do not execute merely because this example is loaded:

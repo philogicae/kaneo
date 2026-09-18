@@ -9,10 +9,13 @@ import {
   workspaceTable,
   workspaceUserTable,
 } from "../../database/schema";
+import { isJevEnabled } from "../../jev/client";
+import { CANDIDATE_CAP } from "../../jev/rerank";
 import {
   getExplicitProjectGrantIds,
   getFullAccessWorkspaceIds,
 } from "../../utils/access-scope";
+import { rerankSearchResults } from "../jev-search";
 import { escapeLikePattern } from "../like-pattern";
 import { TASK_SHORT_ID_PATTERN } from "../task-short-id";
 
@@ -155,6 +158,9 @@ async function globalSearch(params: SearchParams): Promise<{
 
   const results: SearchResult[] = [];
   const searchPattern = `%${query.toLowerCase()}%`;
+  // With Jev enabled the SQL pass over-fetches candidates that the reranker
+  // then filters down to the requested limit.
+  const fetchLimit = isJevEnabled() ? CANDIDATE_CAP : limit;
 
   // Project-level scope: the user sees every project of their full-access
   // workspaces, plus the projects explicitly granted through access teams or
@@ -310,7 +316,7 @@ async function globalSearch(params: SearchParams): Promise<{
         ),
       )
       .orderBy(desc(taskRelevanceScore), desc(taskTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const tasks = await taskQuery;
 
@@ -380,7 +386,7 @@ async function globalSearch(params: SearchParams): Promise<{
         desc(appointmentRelevanceScore),
         desc(appointmentTable.createdAt),
       )
-      .limit(limit);
+      .limit(fetchLimit);
 
     for (const appointment of appointments) {
       results.push({
@@ -434,7 +440,7 @@ async function globalSearch(params: SearchParams): Promise<{
         ),
       )
       .orderBy(desc(projectRelevanceScore), desc(projectTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const projects = await projectQuery;
 
@@ -486,7 +492,7 @@ async function globalSearch(params: SearchParams): Promise<{
         ),
       )
       .orderBy(desc(workspaceRelevanceScore), desc(workspaceTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const workspaces = await workspaceQuery;
 
@@ -550,7 +556,7 @@ async function globalSearch(params: SearchParams): Promise<{
         ),
       )
       .orderBy(desc(activityRelevanceScore), desc(activityTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const activities = await activityQuery;
 
@@ -589,11 +595,15 @@ async function globalSearch(params: SearchParams): Promise<{
     return b.createdAt.getTime() - a.createdAt.getTime();
   });
 
-  const finalResults = results.slice(0, limit);
+  const { results: finalResults, totalCount } = await rerankSearchResults(
+    results,
+    query,
+    limit,
+  );
 
   return {
     results: finalResults,
-    totalCount: results.length,
+    totalCount,
     searchQuery: query,
   };
 }

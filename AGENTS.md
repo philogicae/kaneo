@@ -6,13 +6,14 @@
 >
 > **Notes:**
 >
-> - This is a **fork** of [usekaneo/kaneo](https://github.com/usekaneo/kaneo) that tracks upstream. `upstream/main` is a local ref — never fetch; deleting upstream-owned paths is accepted and will surface as conflicts on upstream syncs. Fork context: self-hosted single instance, compose-based deploy, no release/GHCR/Helm machinery (removed 2026-09-11), MCP used **HTTP-only** (`/api/mcp`; `packages/mcp` stdio package deleted).
+> - This is a **fork** of [usekaneo/kaneo](https://github.com/usekaneo/kaneo) that tracks upstream. `upstream/main` is a local ref — never fetch; deleting upstream-owned paths is accepted and will surface as conflicts on upstream syncs. Fork context: self-hosted single instance, compose-based deploy, no Helm or release automation — the only image workflow is the tag/dispatch GHCR publish of `Dockerfile.kaneo` (`.github/workflows/publish.yml`, consumed by `compose.remote.yml`), MCP used **HTTP-only** (`/api/mcp`; `packages/mcp` stdio package deleted).
 > - Route middleware declared via `createRoute({ middleware })` runs **before** request validators — middleware must read the raw request, not `c.req.valid()` (validators haven't run yet).
 > - `dotenv-mono` is declared in the **root** `package.json` and consumed via pnpm hoisting by `apps/api`, `packages/email`, and `tests/` (which has no `package.json`). Do not "re-home" it to per-package deps without handling `tests/api-integration` resolution.
 > - Root `.env` carries server env vars; Vite-only overrides go in `apps/web/.env.local`. Never print secret values.
 > - `lint` scripts run Biome with `--write` and can rewrite unrelated files — prefer `pnpm exec biome check <paths>` while iterating.
 > - `apps/docs/openapi.json` is a committed artifact checked by CI (`pnpm openapi:check`); regenerate with `pnpm openapi:check:fix` after any route/schema change.
 > - `i18n/en-US.json` is the source of truth; `pnpm i18n:schema` regenerates `i18n/schema.json` after key changes. `scripts/i18n/check.mjs --fix` only adds missing keys — it never prunes extras, so removing a key means removing it from **every** locale file.
+- **Jev (TypeSafe System One).** Optional via `TYPESAFE_API_KEY` in root `.env` (`KANEO_JEV_*` knobs documented in `.env.sample`): `apps/api/src/jev/` reranks/filters global search candidates and auto-qualifies task creation (priority + semantic labels; `branch:*`/`machine:*` are never picked automatically). Every integration is fail-open — without a key or on any error, previous behavior is unchanged. Requests stay under the Jev context budget: oversized items are truncated and the questions split into parallel batches (`KANEO_JEV_MAX_REQUEST_TOKENS`).
 > - `pnpm-workspace.yaml` pins security-relevant overrides (`better-auth`, `hono`, `esbuild`…). Don't bypass them in package manifests.
 > - User-visible web copy must use static i18n keys — no hardcoded UI copy.
 
@@ -20,7 +21,7 @@
 
 - **Stack**: TypeScript monorepo (pnpm 12 workspaces + turbo) — Hono API (`@hono/zod-openapi`, Better Auth, Drizzle/Turso-libSQL), React/Vite web (TanStack Router/Query, Tailwind 4, Biome), React Email templates.
 - **Workspaces**: `apps/api` (API authority: controllers, events, integrations, HTTP MCP, WebSockets) · `apps/web` (UI, fetchers, hooks, realtime cache updates) · `apps/docs` (docs content + committed `openapi.json`) · `packages/libs` (typed Hono client) · `packages/permissions` (permission vocabulary, built-in roles) · `packages/email` · `packages/planka-import` (published CLI).
-- **Deploy**: `compose.yml` builds locally via `Dockerfile.kaneo` (bundled API + web + Turso/libSQL, one Kaneo container) — Dokploy-friendly. No GHCR publishing, no Helm, no release automation.
+- **Deploy**: `compose.yml` builds locally via `Dockerfile.kaneo` (bundled API + web + Turso/libSQL, one Kaneo container; uploaded assets live on local disk under the mounted data directory — `STORAGE_PATH` overrides) — Dokploy-friendly. `compose.remote.yml` runs the GHCR image published by `.github/workflows/publish.yml` (tags + dispatch); no Helm, no release automation.
 - **Tests**: `tests/api` (unit) and `tests/api-integration` (local libSQL/SQLite file; run under `apps/api`'s vitest config).
 
 ## Setup commands

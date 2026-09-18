@@ -7,6 +7,7 @@ import {
   taskTable,
   workspaceTable,
 } from "../database/schema";
+import { isJevEnabled } from "../jev/client";
 import {
   apiRouter,
   type BaseVariables,
@@ -37,6 +38,7 @@ import getTask from "./controllers/get-task";
 import getTasks from "./controllers/get-tasks";
 import importTasks from "./controllers/import-tasks";
 import moveTask from "./controllers/move-task";
+import qualifyTask from "./controllers/qualify-task";
 import {
   requireBulkTaskPermission,
   requireTaskAssigneePermission,
@@ -51,11 +53,13 @@ import updateTaskTitle from "./controllers/update-task-title";
 import {
   boardSchema,
   bulkResultSchema,
+  createdTaskSchema,
   finalizedAssetSchema,
   imageUploadSchema,
   moveTaskResultSchema,
   taskExportSchema,
   taskImportResultSchema,
+  taskQualificationSchema,
   taskSchema,
   taskWithAssigneeSchema,
 } from "./response";
@@ -68,6 +72,7 @@ import {
   listTasksQuery,
   moveTaskBody,
   projectIdParam,
+  qualifyTaskBody,
   taskParam,
   updateAssigneeBody,
   updateDescriptionBody,
@@ -131,7 +136,7 @@ const createTaskRoute = createRoute({
   tags: ["Tasks"],
   summary: "Create task",
   description:
-    "Add a task to a project. It is placed in the column named by `status`.",
+    "Add a task to a project. It is placed in the column named by `status`. The response is the created task with the final `priority` and its `labels`.",
   middleware: [
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["create"] }),
@@ -144,7 +149,38 @@ const createTaskRoute = createRoute({
     },
   },
   responses: {
-    200: jsonResponse("The created task", taskSchema),
+    200: jsonResponse("The created task", createdTaskSchema),
+    400: errorResponse("Invalid body, or unknown project"),
+    403: errorResponse(
+      "No workspace access, or missing task:create permission",
+    ),
+  },
+});
+
+const qualifyTaskRoute = createRoute({
+  method: "post",
+  operationId: "qualifyTask",
+  path: "/qualify/{projectId}",
+  tags: ["Tasks"],
+  summary: "Suggest task priority and labels",
+  description:
+    "Suggest the priority and labels for a new task from its title and description, without creating it. Suggestions only: creating a task still applies the instance's own qualification. `enabled` is false when this instance has no suggestion service configured.",
+  middleware: [
+    workspaceAccess.fromProject("projectId"),
+    requireWorkspacePermission({ task: ["create"] }),
+  ] as const,
+  request: {
+    params: projectIdParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: qualifyTaskBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse(
+      "The suggested priority and labels",
+      taskQualificationSchema,
+    ),
     400: errorResponse("Invalid body, or unknown project"),
     403: errorResponse(
       "No workspace access, or missing task:create permission",
@@ -633,9 +669,33 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       // would make an explicit null indistinguishable from "not provided".
       reminderOffsets,
       recurrence,
+      // Every task created through the API/MCP is qualified by Jev when a
+      // TypeSafe key is configured.
+      qualify: true,
     });
 
     return c.json(task, 200);
+  })
+  .openapi(qualifyTaskRoute, async (c) => {
+    const { projectId } = c.req.valid("param");
+    const { title, description, priority } = c.req.valid("json");
+
+    const suggestion = await qualifyTask({
+      projectId,
+      title,
+      description,
+      priority,
+    });
+
+    return c.json(
+      {
+        enabled: isJevEnabled(),
+        priority: suggestion?.priority ?? null,
+        priorityConfidence: suggestion?.priorityConfidence ?? null,
+        labels: suggestion?.labels ?? [],
+      },
+      200,
+    );
   })
   .openapi(getTaskRoute, async (c) => {
     const { id } = c.req.valid("param");

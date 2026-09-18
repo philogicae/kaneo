@@ -1,51 +1,37 @@
 ---
 title: Installation Overview
-description: Choose how to install Kaneo - quick setup with drim or manual Docker Compose
+description: Install this fork with Docker Compose, either building the image locally or pulling the prebuilt one.
 ---
 
-## Choose Your Installation Method
+This fork ships as a **single container**: the bundled API and web app plus the libSQL (Turso) database stored on a local file. There is no PostgreSQL sidecar, no external database, and no separate web service.
 
-Kaneo offers two installation methods depending on your needs:
+## Choose your installation method
 
-### Quick Setup with drim (Recommended)
+### Build locally (recommended)
 
-[drim](/core/installation/drim) is a CLI tool designed for straightforward Kaneo deployments. It's perfect for:
+Uses `compose.yml`, which builds the image from `Dockerfile.kaneo`:
 
-- Getting started quickly with minimal configuration
-- Local development environments
-- Simple production deployments with a single domain
-- Automatic HTTPS setup
-
-```bash
-curl -fsSL https://assets.kaneo.app/install.sh | sh
-drim setup
-```
-
-### Manual Setup with Docker Compose
-
-For more control over your deployment or complex setups, use the manual installation process:
-
-1. [Create the Docker Compose file](/core/installation/docker-compose)
-2. [Configure environment variables](/core/installation/environment-variables)
+1. [Review the compose file](/core/installation/docker-compose)
+2. [Configure environment variables](/core/installation/environment-variables) (`cp .env.sample .env`)
 3. [Start the services](/core/installation/start-services)
 
-This method is ideal for:
-- Custom networking configurations
-- Multiple domains or complex reverse proxy setups
-- Integration with existing infrastructure
-- Advanced customization needs
+### Prebuilt image
+
+`compose.remote.yml` pulls the image published by `.github/workflows/publish.yml` from GHCR instead of building locally. Same steps, with `docker compose -f compose.remote.yml up -d`.
 
 ## Requirements
 
-Both methods require:
-
-- Docker 20.10+
-- Docker Compose V2
+- Docker 20.10+ and Docker Compose V2
 - 2GB RAM minimum
 - 10GB disk space
+- A directory writable by the container user (uid 1001) for the database
 
-**Supported Platforms:** Linux, macOS, Windows (WSL)
+**Supported platforms:** Linux, macOS, Windows (WSL)
 
-## Next Steps
+## Guides
 
-Choose your preferred method and follow the corresponding guide to get Kaneo up and running.
+- [The compose file](/core/installation/docker-compose)
+- [Environment variables](/core/installation/environment-variables)
+- [Start the services](/core/installation/start-services)
+- [Image uploads and asset storage](/core/installation/object-storage-and-image-uploads)
+- [Reverse proxy with nginx](/core/reverse-proxy/nginx)

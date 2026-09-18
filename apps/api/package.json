@@ -40,6 +40,7 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@modelcontextprotocol/server": "2.0.0",
     "@paralleldrive/cuid2": "^3.3.0",
+    "@scalar/hono-api-reference": "0.12.1",
     "bcryptjs": "^3.0.2",
     "better-auth": "~1.6.30",
     "croner": "^10.0.1",

@@ -50,7 +50,7 @@ The HTTP endpoint exposes these tools:
 - Search: `search`
 - Projects: `list_projects`, `get_project`, `create_project`, `update_project`, `list_project_columns`
 - Columns: `create_column`, `update_column`, `reorder_columns`, `delete_column`
-- Tasks: `list_tasks`, `get_task`, `create_task`, `update_task`, `delete_task`, `move_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `list_task_activity`
+- Tasks: `list_tasks`, `get_task`, `qualify_task`, `create_task`, `update_task`, `delete_task`, `move_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `list_task_activity`
 - Bulk tasks: `bulk_update_tasks`
 - Appointments: `list_appointments`, `get_appointment`, `create_appointment`, `update_appointment`, `delete_appointment`, `move_task_to_appointments`
 - Time entries: `list_task_time_entries`, `get_time_entry`, `create_time_entry`, `update_time_entry`, `delete_time_entry`
@@ -91,6 +91,9 @@ with clickable links (`Accept: text/html`), while API clients and agents keep
 the raw `text/markdown` response. Set `KANEO_SKILLS_DIR` to serve bundles
 from a different directory. Unknown skills, non-`.md` files and path traversal
 attempts return `404`.
+
+For what the skill contains, how to install it in each agent host, and how to
+update it, see [Agent skill](/core/integrations/agent-skill).
 
 ## Debugging
 

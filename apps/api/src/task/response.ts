@@ -52,9 +52,36 @@ export const taskWithAssigneeSchema = taskSchema
   })
   .openapi("TaskWithAssignee");
 
-const taskLabelSchema = z
+export const taskLabelSchema = z
   .object({ id: z.string(), name: z.string(), color: z.string() })
   .openapi("TaskLabel");
+
+// Creation returns the labels too: when Jev qualifies the task, the caller
+// sees the priority and tags that were actually applied.
+export const createdTaskSchema = taskSchema
+  .extend({ labels: z.array(taskLabelSchema) })
+  .openapi("CreatedTask");
+
+const suggestedLabelSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    color: z.string(),
+    probability: z.number(),
+  })
+  .openapi("SuggestedTaskLabel");
+
+export const taskQualificationSchema = z
+  .object({
+    enabled: z.boolean().openapi({
+      description:
+        "False when this instance has no suggestion service configured.",
+    }),
+    priority: z.string().nullable(),
+    priorityConfidence: z.number().nullable(),
+    labels: z.array(suggestedLabelSchema),
+  })
+  .openapi("TaskQualification");
 
 const taskExternalLinkSchema = z
   .object({

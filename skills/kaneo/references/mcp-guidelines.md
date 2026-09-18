@@ -42,7 +42,7 @@ This catalog must match the source registry. At runtime, intersect it with the c
 
 **Columns:** `list_project_columns`, `create_column`, `update_column`, `reorder_columns`, `delete_column`
 
-**Tasks:** `list_tasks`, `get_task`, `create_task`, `update_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `move_task`, `bulk_update_tasks`, `delete_task`
+**Tasks:** `list_tasks`, `get_task`, `qualify_task`, `create_task`, `update_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `move_task`, `bulk_update_tasks`, `delete_task`
 
 **Appointments (if available on the connected instance):** `list_appointments`, `get_appointment`, `create_appointment`, `update_appointment`, `delete_appointment`, `move_task_to_appointments`
 
@@ -68,7 +68,7 @@ Internal REST requests time out after 10 seconds. An error can occur **after** a
 
 - `search` takes `q`, optional `type`, `workspaceId`, `projectId`, `limit` (default 20, max 50). Types are `all`, `tasks`, `appointments` where supported, `projects`, `workspaces`, `comments`, `activities`. It has **no status, page or offset argument**. Search tasks without a status filter covers backlog, archived and completed tasks.
 - Search results have singular types; inspect `type` before using `id`. Prefer `type: "tasks"` for task lookup. Search by meaningful title/outcome terms or a known short identifier; verify candidates with `get_task` and project metadata. A prefix may collide across projects/workspaces.
-- `search.totalCount` counts collected candidates, themselves bounded per category; it is **not an exhaustive database count**. Narrow the query/type/scope. If absence matters or results are capped, fall back to paginated project task lists; report any incomplete coverage.
+- `search.totalCount` counts the results kept after relevance ranking, each category bounded; it is **not an exhaustive database count**. A keyword match that does not answer the query can be dropped, so a short or empty result set is not proof of absence. Narrow the query/type/scope; if absence matters, fall back to paginated project task lists and report any incomplete coverage.
 - `list_tasks`: `page` starts at 1; `limit` defaults to 50, max 100. Flatten `data.columns[].tasks`, `data.plannedTasks`, `data.archivedTasks` for each page. Increment through `pagination.totalPages`; do not stop because one column is empty. Pagination/sorting apply before grouping. For full scans prefer `sortBy: "number", sortOrder: "asc"`, deduplicate IDs, and recheck likely matches before creating if the board changed during the scan.
 - Available task filters are status, priority, assignee and due-date bounds. There is no label filter or unassigned sentinel: filter collected tasks locally for those needs. Priority descending orders urgent before high/medium/low/no-priority.
 - `get_project` embeds tasks with `tasksLimit`/`tasksOffset` (default 50, max 200); it is not the whole board. Prefer `list_tasks` for exhaustive scans.
@@ -89,15 +89,28 @@ Example MCP envelope; replace placeholders with verified values:
 }
 ```
 
+Preview the priority and labels a new task would get before creating it:
+
+```json
+{
+  "tool": "qualify_task",
+  "arguments": {
+    "projectId": "<project-id>",
+    "title": "Fix the login redirect loop after SSO",
+    "description": "Users bounce between the callback and the sign-in page until the session expires."
+  }
+}
+```
+
 ## Mutation arguments and side effects
 
-- **Create task:** supply `projectId`, `title`, `description`, `priority`, `status` explicitly for compatibility with the local schema. Do not assume a default backlog status. Priorities: `no-priority`, `low`, `medium`, `high`, `urgent`.
+- **Create task:** supply `projectId`, `title`, `description`, `priority`, `status` explicitly for compatibility with the local schema. Do not assume a default backlog status. Priorities: `no-priority`, `low`, `medium`, `high`, `urgent`. The response is authoritative: read the final `priority` and `labels` it reports before adding your own. Attach the `branch:<name>` and `machine:*` labels yourself; they are never added for you. `qualify_task` previews the priority and labels the instance would apply.
 - **Status:** a verified column slug or `planned`/`archived`, never a display name. `move_task.destinationStatus` is an exception: only a destination column slug, same workspace, with a new display number. See [move safeguards](lifecycle.md#wrong-project-or-wrong-collection).
 - **Narrow updates:** use `update_task_status`, `update_task_assignee`, `update_task_due_date` when applicable. `update_task`, `update_project` and `update_appointment` fetch existing state, merge supplied fields, then send a full PUT. They are patch-like conveniences, **not atomic PATCH or concurrency-safe merges**. Serialize changes and re-read shared records. Do not use `update_task.projectId` to bypass `move_task`.
 - **Comments:** `create_task_comment` uses `taskId` and `content`; `update_task_comment` uses `commentId` and `content`. Update/delete require **both authorship and `task:update` permission**, not one or the other. Prefer adding a correction/evidence comment rather than rewriting history.
 - **Columns:** create derives a slug from the name; update can rename without changing the slug. Column `color` requires hex (`#RGB`/`#RRGGBB`), not label palette names. Reorder must include every real column ID once with its new position. Deletion requires an empty column and explicit confirmation; don't delete its tasks just to make it empty.
 - **Relations:** same-workspace tasks only, no self-links. `subtask`: source parent → target child; `blocks`: source blocker → target blocked; `related`: bidirectional. Read relations before creating; a duplicate pair/type (including a reversed pair) returns conflict. Model dependencies without cycles rather than assuming server cycle detection. Delete by relation ID only with authorization.
-- **Appointments:** own IDs/collection, no task status, labels, comments, relations, reminders or recurrence arguments. A scheduled task can remain a task. Conversion deletes task history and must be explicitly confirmed; verify availability and read [conversion safeguards](lifecycle.md#wrong-project-or-wrong-collection) first.
+- **Appointments:** own IDs/collection, no task status, labels, comments or relations. They do carry `priority`, `startDate`/`dueDate`, `reminderOffsets` (minutes before the start) and `recurrence` — the next occurrence spawns when the current one ends (its due date, or its start date when there is no due date). A scheduled task can remain a task. Conversion deletes task history and must be explicitly confirmed; verify availability and read [conversion safeguards](lifecycle.md#wrong-project-or-wrong-collection) first.
 
 ## Dates, reminders and time entries
 

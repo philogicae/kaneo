@@ -630,7 +630,7 @@ export function registerMcpTools(
     "create_task",
     {
       description:
-        "Create a task in a project. `status` is a column slug (from list_project_columns), or `planned` to file the task in the backlog (off the board). Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
+        "Create a task in a project. `status` is a column slug (from list_project_columns), or `planned` to file the task in the backlog (off the board). The response carries the task's final `priority` and `labels`: read them before making further edits. Attach context labels such as `branch:<name>` or `machine:*` yourself; they are never added for you. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
         projectId: nonEmptyString,
         title: nonEmptyString,
@@ -678,6 +678,33 @@ export function registerMcpTools(
         });
       });
     },
+  );
+
+  registerTool(
+    "qualify_task",
+    {
+      description:
+        "Suggest a priority and labels for a task from its title and description, before creating it. Use it when the user leaves the priority or tags open, or to double-check a categorization. Returns `priority` (with `priorityConfidence`) and the `labels` to attach. If `enabled` is false, no suggestion is available: choose the priority and labels yourself.",
+      inputSchema: z.object({
+        projectId: nonEmptyString,
+        title: nonEmptyString,
+        description: z.string().optional(),
+        priority: prioritySchema.optional(),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/task/qualify/${encodeURIComponent(args.projectId)}`, {
+          method: "POST",
+          body: JSON.stringify({
+            title: args.title,
+            ...(args.description !== undefined
+              ? { description: args.description }
+              : {}),
+            ...(args.priority !== undefined ? { priority: args.priority } : {}),
+          }),
+        }),
+      ),
   );
 
   registerTool(
