@@ -9,6 +9,12 @@ import {
   userTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
+import { isJevEnabled } from "../../jev/client";
+import {
+  suggestTaskQualification,
+  type TaskQualification,
+} from "../../jev/qualify";
+import createLabel from "../../label/controllers/create-label";
 import { assertAssignableUser } from "../../utils/assert-assignable-user";
 import type { RecurrenceRule } from "../recurrence";
 import {
@@ -16,6 +22,7 @@ import {
   assertValidTaskStatus,
 } from "../validate-task-fields";
 import { claimTaskNumber } from "./claim-task-numbers";
+import { loadQualificationContext } from "./qualify-task";
 
 type CustomFieldInput = {
   fieldId: string;
@@ -38,6 +45,40 @@ function deduplicateCustomFields(
   return Array.from(fieldsById.values());
 }
 
+// Suggested labels are attached as task-scoped copies through the regular
+// label controller, so events and GitHub/Gitea syncs stay the same. A failed
+// label must not fail the creation.
+async function attachQualificationLabels(
+  qualification: TaskQualification | null,
+  taskId: string,
+  workspaceId: string | undefined,
+  userId: string,
+): Promise<Array<{ id: string; name: string; color: string }>> {
+  if (!qualification || !workspaceId) {
+    return [];
+  }
+
+  const labels: Array<{ id: string; name: string; color: string }> = [];
+  for (const suggestion of qualification.labels) {
+    try {
+      const label = await createLabel(
+        suggestion.name,
+        suggestion.color,
+        taskId,
+        workspaceId,
+        userId,
+      );
+      labels.push({ id: label.id, name: label.name, color: label.color });
+    } catch (error) {
+      console.error(
+        `Failed to attach suggested label "${suggestion.name}":`,
+        error,
+      );
+    }
+  }
+  return labels;
+}
+
 async function createTask({
   projectId,
   currentUserId,
@@ -51,6 +92,7 @@ async function createTask({
   customFields,
   reminderOffsets,
   recurrence,
+  qualify = false,
 }: {
   projectId: string;
   currentUserId: string;
@@ -64,12 +106,32 @@ async function createTask({
   customFields?: CustomFieldInput[];
   reminderOffsets?: number[] | null;
   recurrence?: RecurrenceRule | null;
+  qualify?: boolean;
 }) {
   const resolvedStatus = status || "to-do";
-  const resolvedPriority = priority || "no-priority";
   const normalizedCustomFields = deduplicateCustomFields(customFields);
 
   const normalizedUserId = userId?.trim() || undefined;
+
+  // Auto-qualification (opt-in per caller, so internal clones such as
+  // recurrence occurrences keep their source values): Jev reads the task and
+  // picks the priority and semantic labels when a TypeSafe key is configured.
+  let qualification: TaskQualification | null = null;
+  let workspaceId: string | undefined;
+  if (qualify && isJevEnabled()) {
+    const context = await loadQualificationContext(projectId);
+    workspaceId = context.workspaceId;
+    qualification = await suggestTaskQualification({
+      title,
+      description,
+      projectName: context.projectName,
+      workspaceName: context.workspaceName,
+      labels: context.labels,
+      providedPriority: priority,
+    });
+  }
+
+  const resolvedPriority = qualification?.priority ?? priority ?? "no-priority";
 
   await assertValidTaskStatus(resolvedStatus, projectId);
 
@@ -179,9 +241,19 @@ async function createTask({
     content: null,
   });
 
+  // The qualification labels are attached after the task exists; the returned
+  // task carries them so callers see what was applied.
+  const labels = await attachQualificationLabels(
+    qualification,
+    createdTask.id,
+    workspaceId,
+    currentUserId,
+  );
+
   return {
     ...createdTask,
     assigneeName: assignee?.name,
+    labels,
   };
 }
 

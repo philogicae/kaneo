@@ -14,14 +14,16 @@ The variables are split up into the following sections:
 - [Database](#database)
 - [Authentication](#authentication)
 - [MCP](#mcp)
-- [Object Storage](#object-storage)
+- [Asset storage](#asset-storage)
 - [Access Control](#access-control)
+- [Proxies](#proxies)
+- [Notifications](#notifications)
+- [Task suggestions and relevance ranking](#task-suggestions-and-relevance-ranking)
 - [GitHub SSO](#github-sso)
 - [GitHub integration](#github-integration)
 - [Google SSO](#google-sso)
 - [Discord SSO](#discord-sso)
 - [Custom OAuth/OIDC](#custom-oauth-oidc)
-- [Redis](#redis)
 - [SMTP Configuration](#smtp-configuration)
 
 ## Required variables
@@ -37,14 +39,12 @@ Name | Description |
 
 ### Database
 
-This section will cover all the variables related to the database.
+Kaneo stores everything in a local libSQL (Turso) file; there is no external database service.
 
-Name | Description |
---- | --- |
-| `DATABASE_URL` | The full PostgreSQL connection string, in the format `postgresql://[user]:[password]@[host]:[port]/[database]`. Example: `postgresql://kaneo:kaneo@localhost:5432/kaneo`. The user/password/database must match the `POSTGRES_*` values below.
-| `POSTGRES_DB` | The name of the PostgreSQL database. Example: `kaneo`.
-| `POSTGRES_USER` | The username for the PostgreSQL database. Example: `kaneo`.
-| `POSTGRES_PASSWORD` | The password for the PostgreSQL database. Use a strong value in production.
+Name | Description | Default |
+--- | --- | --- |
+| `DATABASE_PATH` | Path to the libSQL/SQLite database file, relative to the repository root or absolute. `:memory:` is supported for throwaway runs. | `./data/kaneo.db` |
+| `KANEO_DATA_PATH` | Docker Compose only: host directory bind-mounted to `/app/data` (database file, WAL/SHM sidecars, and uploaded assets). | `./data` |
 
 ### Authentication
 
@@ -64,24 +64,17 @@ Name | Description | Default |
 --- | --- | --- |
 | `KANEO_INTERNAL_API_URL` | API origin used only for server-side requests from the built-in HTTP MCP endpoint. Override it only if the API is not reachable at the default loopback address from its own process. | `http://127.0.0.1:1337` |
 
-### Object Storage
+### Asset storage
 
-Kaneo uses S3-compatible object storage for private uploads in task descriptions and task comments.
+Uploads in task descriptions and comments are stored on the **local disk**, next to the database file, and served back through the API (`/api/asset/{id}`). No object-storage service is required.
 
-MinIO is the easiest local option and the primary tested target. You can also use other S3-compatible storage backends such as AWS S3, Cloudflare R2, or [`fs`](https://github.com/ferdzo/fs).
+By default the files live in `assets/` beside the database: with the Compose setup that is `/app/data/assets` inside the container, on the `${KANEO_DATA_PATH:-./data}` bind mount — the same volume as the database.
 
 Name | Description | Default |
 --- | --- | --- |
-| `S3_ENDPOINT` | The S3-compatible API endpoint used by the Kaneo API for presigned uploads. Example: `http://minio:9000`. |  |
-| `S3_BUCKET` | The bucket Kaneo will use for uploaded files. |  |
-| `S3_ACCESS_KEY_ID` | Access key used by the Kaneo API to create presigned upload URLs. Optional: leave unset (together with `S3_SECRET_ACCESS_KEY`) to use the default AWS credential provider chain (IAM role / IRSA / instance profile). |  |
-| `S3_SECRET_ACCESS_KEY` | Secret key used by the Kaneo API to create presigned upload URLs. Must be set together with `S3_ACCESS_KEY_ID`, or left unset for IAM-role-based access. |  |
-| `S3_REGION` | The storage region used for request signing. | `us-east-1` |
-| `S3_PUBLIC_BASE_URL` | Optional public base URL for uploaded assets. Kaneo does not require this for the current private asset flow. |  |
-| `S3_FORCE_PATH_STYLE` | Use path-style S3 URLs. This should usually be `true` for MinIO and `fs`. | `true` |
-| `S3_MAX_IMAGE_UPLOAD_BYTES` | Maximum allowed upload size in bytes for images and other uploaded files. | `10485760` |
-| `S3_KEY_PREFIX` | Optional prefix prepended to all S3 object keys. Useful for sharing a single bucket across multiple environments (e.g. `staging/`, `prod/kaneo/`). Trailing slashes are trimmed automatically. |  |
-| `S3_PRESIGN_TTL_SECONDS` | How long presigned upload URLs remain valid. | `300` |
+| `STORAGE_PATH` | Directory for uploaded assets. Point it inside the data volume (or add a volume for it) to keep uploads across container recreation. | `assets/` next to the database file |
+| `STORAGE_KEY_PREFIX` | Optional prefix prepended to every stored object key, useful for separating environments that share a data directory (e.g. `staging/`, `prod/kaneo/`). Trailing slashes are trimmed automatically. |  |
+| `STORAGE_MAX_IMAGE_UPLOAD_BYTES` | Maximum allowed upload size in bytes for images and other uploaded files. | `10485760` (10 MB) |
 
 ### Access Control
 
@@ -113,6 +106,21 @@ Name | Description | Default |
 Name | Description | Default |
 --- | --- | --- |
 | `KANEO_ALLOW_PRIVATE_WEBHOOK_DESTINATIONS` | Allow outbound notification destinations (ntfy, Gotify, generic webhooks) that resolve to private or non-routable addresses. Off by default to prevent SSRF; the `http`/`https` requirement still applies. Only enable on a trusted, isolated deployment. | `false` |
+
+### Task suggestions and relevance ranking
+
+When `TYPESAFE_API_KEY` is set, Kaneo calls TypeSafe System One (Jev) to rank and filter global search results by relevance and to suggest the priority and semantic labels of newly created tasks. Labels that describe the working context (`branch:*`, `machine:*`) are never suggested. Every call is fail-open: without a key, or on any error, search and task creation behave exactly as before.
+
+Name | Description | Default |
+--- | --- | --- |
+| `TYPESAFE_API_KEY` | TypeSafe API key. When set, enables relevance ranking for search and task suggestions. |  |
+| `KANEO_JEV_MODEL` | Model to call. Pin a version such as `jev-1.13.0` for stable thresholds; the alias `jev-latest` moves with new releases. | `jev-latest` |
+| `KANEO_JEV_BASE_URL` | Jev endpoint. `TYPESAFE_BASE_URL` (API root) is honored as a fallback. | `https://api.typesafe.ai/v1/systemone` |
+| `KANEO_JEV_MIN_RATIO` | Minimum relevance (0-1) a search result must reach to be kept. Higher is stricter; `1` keeps only the best matches. | `0.5` |
+| `KANEO_JEV_LABEL_THRESHOLD` | Minimum probability (0-1) for a suggested task label to be applied. | `0.5` |
+| `KANEO_JEV_MAX_REQUEST_TOKENS` | Token budget per request. Oversized items are truncated and the questions are split into batches. | `30000` |
+| `KANEO_JEV_TIMEOUT_MS` | Timeout per attempt, in milliseconds. | `10000` |
+| `KANEO_JEV_MAX_RETRIES` | Retries after the first attempt, on network errors, timeouts, and retryable HTTP statuses. | `2` |
 
 ### GitHub SSO
 
@@ -165,39 +173,6 @@ Name | Description |
 | `CUSTOM_OAUTH_RESPONSE_TYPE` | (Optional) OAuth response type. Default: `code`.
 | `CUSTOM_AUTH_PKCE` | (Optional) Enable/disable PKCE. Default: `true`.
 | `CUSTOM_OAUTH_LOGOUT_URL` | (Optional) Logout endpoint URL for your identity provider.
-
-### Redis
-
-Kaneo supports Redis for horizontal scaling of WebSocket broadcasts. When any Redis mode is configured, multiple API instances can relay real-time updates via Redis Pub/Sub. When none are set, an in-memory adapter is used (single-instance only).
-
-Three deployment modes are supported: **Standalone**, **Sentinel**, and **Cluster**. Only one mode should be configured at a time. If multiple are set, the priority is: Cluster > Sentinel > Standalone.
-
-#### Standalone (single server)
-
-Name | Description |
---- | --- |
-| `REDIS_URL` | Redis connection string (e.g., `redis://localhost:6379`).
-
-#### Sentinel (high-availability with automatic failover)
-
-Name | Description | Default |
---- | --- | --- |
-| `REDIS_SENTINELS` | Comma-separated list of Sentinel nodes (e.g., `sentinel-1:26379,sentinel-2:26379,sentinel-3:26379`). | |
-| `REDIS_SENTINEL_MASTER_NAME` | Name of the Sentinel master group. | `mymaster` |
-| `REDIS_SENTINEL_PASSWORD` | Password for Sentinel instances, if different from the Redis password. | |
-| `REDIS_SENTINEL_TLS` | Set to `true` to enable TLS for Sentinel connections. | `false` |
-
-#### Cluster (horizontal sharding)
-
-Name | Description |
---- | --- |
-| `REDIS_CLUSTER_NODES` | Comma-separated list of cluster seed nodes (e.g., `node-1:6379,node-2:6379,node-3:6379`).
-
-#### Shared (used by Sentinel and Cluster modes)
-
-Name | Description |
---- | --- |
-| `REDIS_PASSWORD` | Password for the Redis data nodes (used by both Sentinel and Cluster modes, not for Sentinel auth itself; use `REDIS_SENTINEL_PASSWORD` for that).
 
 ### SMTP Configuration
 

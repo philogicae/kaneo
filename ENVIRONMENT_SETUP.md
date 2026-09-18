@@ -48,6 +48,7 @@ Kaneo supports many optional configuration options including:
 - Access control settings
 - CORS configuration
 - Private-network notification receivers (`KANEO_ALLOW_PRIVATE_WEBHOOK_DESTINATIONS=true` lets ntfy/Gotify/webhook destinations resolve to private addresses; off by default to prevent SSRF)
+- Optional TypeSafe/Jev suggestions (`TYPESAFE_API_KEY` enables relevance-ranked search results and priority/label suggestions when creating tasks; see `.env.sample` for the `KANEO_JEV_*` tuning variables)
 
 #### SMTP Configuration
 
@@ -173,7 +174,7 @@ If you're still experiencing issues:
 1. Check the browser console for detailed error messages
 2. Review the API server logs
 3. Verify all environment variables are set correctly
-4. Ensure all services (PostgreSQL, API, Frontend) are running
+4. Ensure all services (the Kaneo container and your reverse proxy) are running
 5. Consult the [official documentation](https://kaneo.app/docs) for detailed guides and troubleshooting
 
 For the most up-to-date information on environment variables and configuration, always refer to the [official documentation](https://kaneo.app/docs/core/installation/environment-variables).

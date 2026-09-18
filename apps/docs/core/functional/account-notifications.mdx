@@ -110,15 +110,20 @@ This lets a user receive notifications from one workspace in ntfy, another by em
 
 ## Supported notification sources
 
-V1 forwards the same notification types that currently create inbox notifications in Kaneo.
-
-That includes:
+Delivery covers the notification types that also create an entry in the in-app inbox:
 
 - `task_created`
 - `workspace_created`
 - `task_status_changed`
 - `task_assignee_changed`
 - `time_entry_created`
+- `task_comment` — someone comments on a task
+- `task_mention` — someone @mentions you in a task description or comment
+- `due_date_reminder` — a task is due soon (the per-channel lead time)
+- `task_overdue` — a task is past its due date
+- `appointment_created` and `appointment_updated`
+
+Mentions are a distinct event from comments: the channel integrations (Telegram, Discord, Slack) expose separate toggles for the two, so you can subscribe to mentions without receiving every comment.
 
 If Kaneo cannot resolve a notification to a workspace or project context, that notification stays inbox-only.
 

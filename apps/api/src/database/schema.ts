@@ -754,7 +754,7 @@ export const taskTable = sqliteTable(
     priority: text("priority").default("low").notNull(),
     startDate: integer("start_date", { mode: "timestamp_ms" }),
     dueDate: integer("due_date", { mode: "timestamp_ms" }),
-    // Minutes before the due date at which Telegram reminders fire; empty or
+    // Minutes before the start date at which Telegram reminders fire; empty or
     // null means the task has no reminder configured.
     reminderOffsets: text("reminder_offsets", { mode: "json" }).$type<
       number[]

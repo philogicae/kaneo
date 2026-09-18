@@ -53,7 +53,13 @@
 							"core/functional/create-workspace-and-project",
 							"core/functional/plan-and-execute-tasks",
 							"core/functional/backlog-planning",
+							"core/functional/dashboard-and-analytics",
+							"core/functional/appointments-calendar-gantt",
+							"core/functional/recurrence-and-reminders",
+							"core/functional/custom-fields",
+							"core/functional/search-and-command-palette",
 							"core/functional/collaborate-with-team",
+							"core/functional/teams-and-scoped-access",
 							"core/functional/configure-workflows",
 							"core/functional/account-notifications",
 							"core/functional/manage-your-account",
@@ -65,13 +71,10 @@
 						"group": "Installation",
 						"pages": [
 							"core/installation/index",
-							"core/installation/drim",
-							"core/installation/drim-migration",
 							"core/installation/docker-compose",
-							"core/installation/object-storage-and-image-uploads",
-							"core/installation/storage-backends",
 							"core/installation/environment-variables",
-							"core/installation/start-services"
+							"core/installation/start-services",
+							"core/installation/object-storage-and-image-uploads"
 						]
 					},
 					{
@@ -91,9 +94,11 @@
 						"pages": [
 							"core/integrations/mcp",
 							"core/integrations/mcp-stateless",
+							"core/integrations/agent-skill",
 							"core/integrations/discord",
 							"core/integrations/slack",
 							"core/integrations/telegram",
+							"core/integrations/mattermost",
 							"core/integrations/outgoing-webhooks"
 						]
 					},

@@ -3,6 +3,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { Scalar } from "@scalar/hono-api-reference";
 import type { Session, User } from "better-auth/types";
 import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/libsql/migrator";
@@ -454,6 +455,16 @@ export function createApp() {
 
     return c.json(document);
   });
+
+  // Interactive API reference reading the public /openapi document above.
+  // Kept a plain route so it does not appear inside the spec it renders.
+  api.get(
+    "/docs",
+    Scalar({
+      url: "/api/openapi",
+      pageTitle: "Kaneo API Reference",
+    }),
+  );
 
   // Better Auth serves GET /auth/device as JSON. Browsers that open the API URL
   // directly expect a page, so redirect full document navigations to the web app.

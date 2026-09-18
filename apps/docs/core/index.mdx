@@ -13,25 +13,14 @@ Kaneo is composed of several components:
 
 - API: The backend API that powers the application, it is built with Hono and TypeScript.
 - Web: The frontend web application that is built with React and Tailwind CSS.
-- Database: The database that is built with PostgreSQL.
+- Database: A local libSQL (Turso) file (`./data/kaneo.db`), with no external database service.
 
 ### Installation
 
-We offer two ways to install Kaneo:
+This fork is deployed with Docker Compose, building the single container locally:
 
-**Quick Setup with drim (Recommended)**
+1. [Review the compose file](/core/installation/docker-compose) (`compose.yml`)
+2. [Configure the environment variables](/core/installation/environment-variables) (`cp .env.sample .env`)
+3. [Start the services](/core/installation/start-services)
 
-For straightforward deployments, use [drim](/core/installation/drim) - a CLI tool that handles everything automatically:
-
-```bash
-curl -fsSL https://assets.kaneo.app/install.sh | sh
-drim setup
-```
-
-**Manual Setup with Docker Compose**
-
-For more control or complex setups, follow the manual installation process:
-
-- [Setting up the Docker compose file](/core/installation/docker-compose)
-- [Setting up the environment variables](/core/installation/environment-variables)
-- [Starting the services](/core/installation/start-services)
+A prebuilt image is also published to GHCR (`compose.remote.yml`). See the [installation overview](/core/installation) for both paths.

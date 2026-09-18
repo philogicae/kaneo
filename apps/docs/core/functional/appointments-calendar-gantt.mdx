@@ -1,0 +1,33 @@
+---
+title: Appointments, Calendar and Gantt
+description: Schedule task-like appointments, and read scheduled work on the calendar and timeline.
+---
+
+Kaneo separates *work* (board tasks) from *scheduled items* (appointments). Both appear in the Calendar and Gantt views; only tasks appear on the board and in the backlog.
+
+## Appointments
+
+Appointments are scheduled items with their own dialog and lifecycle. They carry a title, description, start and end time, priority, assignee, reminders, and recurrence — but no status, labels, comments, relations, or board presence.
+
+- Open the **Appointments** tab in a project, or the consolidated tab on the [dashboard](/core/functional/dashboard-and-analytics).
+- The week view navigates with **previous / next / today**; appointments without a date land in **Unscheduled**.
+- Reminders use the same vocabulary as tasks (minutes/hours/days/weeks before the start). The dialog offers presets; the API and MCP accept arbitrary offsets.
+- Recurrence is daily, weekly, or monthly with an interval. Unlike tasks, an appointment spawns its next occurrence when the current one **ends** — its due date, or its start date when there is no due date.
+
+## Moving a backlog task to an appointment
+
+`move_task_to_appointments` (and the corresponding action) converts a **planned** task into an appointment. The conversion is **destructive**: the task row is deleted and only core fields are copied. Comments, activity, labels, relations, time entries, assets, custom fields, reminders, and recurrence are not migrated. Prefer keeping the task and setting dates when that history matters.
+
+## Calendar
+
+The Calendar places dated tasks and appointments on a per-project or workspace view. Use it to spot collisions, check a week before committing to a date, or drag work that has slipped.
+
+## Gantt
+
+The Gantt view lays dated tasks and appointments on a timeline. It is best for sequencing: seeing which work is in flight, what overlaps, and where a start date has not been set yet (undated items stay out of the timeline).
+
+## Related
+
+- [Plan and execute tasks](/core/functional/plan-and-execute-tasks)
+- [Recurrence and reminders](/core/functional/recurrence-and-reminders)
+- [MCP integration](/core/integrations/mcp) — appointment tools for agents

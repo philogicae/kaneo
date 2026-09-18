@@ -86,6 +86,12 @@ export const createTaskBody = z.object({
   recurrence: recurrenceRule,
 });
 
+export const qualifyTaskBody = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  priority: priority.optional(),
+});
+
 export const updateTaskBody = z.object({
   title: z.string(),
   description: z.string(),
