@@ -150,3 +150,19 @@ export function averageCompleted(buckets: ProjectChartsBucket[]) {
   const completed = buckets.reduce((sum, bucket) => sum + bucket.completed, 0);
   return completed / buckets.length;
 }
+
+// Below this share of the plot a bucket pair (two bars plus their inner gap)
+// collapses under a pixel and the series looks empty even though the DOM has
+// bars (12 months at day granularity packs ~385 buckets into one card).
+const DENSE_BUCKET_PX = 3;
+// Width a bucket gets when the plot switches to horizontal scrolling: enough
+// for two visible bars plus the gap.
+const DENSE_BUCKET_TARGET_PX = 6;
+
+// Plot floor for dense series: undefined means "fill the card as before".
+export function plotMinWidth(bucketCount: number, containerWidth: number) {
+  if (bucketCount <= 0 || containerWidth <= 0) return undefined;
+  const natural = containerWidth / bucketCount;
+  if (natural >= DENSE_BUCKET_PX) return undefined;
+  return Math.round(bucketCount * DENSE_BUCKET_TARGET_PX);
+}

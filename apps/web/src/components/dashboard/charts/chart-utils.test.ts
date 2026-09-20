@@ -4,6 +4,7 @@ import {
   aggregateBuckets,
   averageCompleted,
   cumulativeBuckets,
+  plotMinWidth,
   tickIndexes,
 } from "./chart-utils";
 
@@ -114,5 +115,26 @@ describe("averageCompleted", () => {
         bucket("2026-09-14T00:00:00.000Z", 0, 0),
       ]),
     ).toBe(1);
+  });
+});
+
+describe("plotMinWidth", () => {
+  it("keeps the fill-the-card layout while buckets stay readable", () => {
+    // 53 weekly buckets in a 735px card: ~14px each, no scrolling needed.
+    expect(plotMinWidth(53, 735)).toBeUndefined();
+    // Exactly at the threshold the natural width still wins.
+    expect(plotMinWidth(100, 300)).toBeUndefined();
+  });
+
+  it("falls back to a per-bucket floor when the series is dense", () => {
+    // 12 months at day granularity: 385 buckets would get ~1.9px each.
+    expect(plotMinWidth(385, 735)).toBe(385 * 6);
+    // 1 week at hour granularity on a narrow phone card.
+    expect(plotMinWidth(168, 340)).toBe(168 * 6);
+  });
+
+  it("does nothing before it can measure a plot", () => {
+    expect(plotMinWidth(0, 735)).toBeUndefined();
+    expect(plotMinWidth(385, 0)).toBeUndefined();
   });
 });

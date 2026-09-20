@@ -170,4 +170,24 @@ describe("list pagination", () => {
     ).json();
     expect(full.tasks).toHaveLength(3);
   });
+
+  it("honours the documented 200-task page size on the per-project board", async () => {
+    const scene = await seedScene();
+
+    mockAuthenticatedSession(scene.member.user);
+    const { app } = createApp();
+
+    const response = await app.request(
+      `/api/task/tasks/${scene.project.id}?limit=200`,
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    // The controller used to cap every request at 100 while the schema and the
+    // MCP tool advertised 200, so an agent asking for 200 silently lost tasks.
+    expect(body.pagination.pageSize).toBe(200);
+    expect(body.pagination.total).toBe(1);
+    expect(
+      body.data.columns.flatMap((column: { tasks: unknown[] }) => column.tasks),
+    ).toHaveLength(1);
+  });
 });

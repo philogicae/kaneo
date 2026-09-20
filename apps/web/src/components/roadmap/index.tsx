@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import RoadmapGraph, {
   type RoadmapFilter,
 } from "@/components/roadmap/roadmap-graph";
+import RoadmapMobileList from "@/components/roadmap/roadmap-mobile-list";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import {
   AlertDialog,
@@ -483,11 +484,20 @@ export default function RoadmapView({
         </div>
       ) : (
         <div className="min-h-0 flex-1">
-          <RoadmapGraph
-            graph={graph}
-            filter={filter}
-            onOpenTask={(taskId) => setOpenTaskId(taskId)}
-          />
+          <div className="hidden h-full md:block">
+            <RoadmapGraph
+              graph={graph}
+              filter={filter}
+              onOpenTask={(taskId) => setOpenTaskId(taskId)}
+            />
+          </div>
+          <div className="h-full md:hidden">
+            <RoadmapMobileList
+              graph={graph}
+              filter={filter}
+              onOpenTask={(taskId) => setOpenTaskId(taskId)}
+            />
+          </div>
         </div>
       )}
 

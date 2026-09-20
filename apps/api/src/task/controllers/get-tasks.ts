@@ -60,7 +60,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
   const usePagination = options.page != null || options.limit != null;
   const page = options.page && options.page > 0 ? options.page : 1;
   const pageSize =
-    options.limit && options.limit > 0 ? Math.min(options.limit, 100) : 50;
+    options.limit && options.limit > 0 ? Math.min(options.limit, 200) : 50;
   const offset = (page - 1) * pageSize;
 
   const orderByClause = buildTaskOrderBy(
