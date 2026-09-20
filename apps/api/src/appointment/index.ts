@@ -182,8 +182,8 @@ const deleteAppointmentRoute = createRoute({
 
 const appointment = apiRouter()
   .openapi(listAppointmentsRoute, async (c) => {
-    const { projectId } = c.req.valid("query");
-    return c.json(await listAppointments(projectId), 200);
+    const { projectId, limit, offset } = c.req.valid("query");
+    return c.json(await listAppointments(projectId, { limit, offset }), 200);
   })
   .openapi(createAppointmentRoute, async (c) => {
     const { projectId, ...body } = c.req.valid("json");

@@ -1,6 +1,9 @@
 import { z } from "../openapi";
+import { listPagingQuery } from "../utils/paging";
 
 export const notificationParam = z.object({ id: z.string() });
+
+export const notificationListQuery = listPagingQuery;
 
 export const createNotificationBody = z.object({
   title: z.string().nullable().optional(),

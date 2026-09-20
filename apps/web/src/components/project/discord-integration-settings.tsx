@@ -301,7 +301,7 @@ export function DiscordIntegrationSettings({
               <div className="flex items-center gap-3">
                 {isConnected && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="size-4 text-green-600" />
+                    <CheckCircle className="size-4 text-success-foreground" />
                     <span>
                       {integration?.isActive
                         ? t("settings:discordIntegration.connected")

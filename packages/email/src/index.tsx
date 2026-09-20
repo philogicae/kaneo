@@ -1,4 +1,6 @@
+export { isResendConfigured } from "./resend";
 export {
+  isEmailConfigured,
   sendMagicLinkEmail,
   sendNotificationEmail,
   sendOtpEmail,

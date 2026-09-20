@@ -1,4 +1,4 @@
-import { isSmtpConfigured } from "@kaneo/email";
+import { isEmailConfigured, isSmtpConfigured } from "@kaneo/email";
 import { config } from "dotenv-mono";
 import { isGithubSsoConfigured } from "./github-sso-env";
 
@@ -13,6 +13,7 @@ function getSettings() {
     disableWorkspaceCreation: process.env.DISABLE_WORKSPACE_CREATION === "true",
     isDemoMode: process.env.DEMO_MODE === "true",
     hasSmtp: isSmtpConfigured(),
+    hasEmail: isEmailConfigured(),
     hasGithubSignIn: isGithubSsoConfigured(),
     hasGoogleSignIn:
       Boolean(process.env.GOOGLE_CLIENT_ID) &&

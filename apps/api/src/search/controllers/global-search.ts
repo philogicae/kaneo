@@ -71,6 +71,10 @@ function toDisplayCase(value: string) {
     .join(" ");
 }
 
+// A multi-word query matches every token across the searched column.
+const MAX_SEARCH_TOKENS = 6;
+type LikeTarget = Parameters<typeof like>[0];
+
 function getActivitySearchContent(
   type: string,
   content: string | null,
@@ -161,6 +165,23 @@ async function globalSearch(params: SearchParams): Promise<{
   // With Jev enabled the SQL pass over-fetches candidates that the reranker
   // then filters down to the requested limit.
   const fetchLimit = isJevEnabled() ? CANDIDATE_CAP : limit;
+  // Multi-word queries match token-by-token (AND): a phrase-only LIKE misses
+  // "redirect loop in login" for the query "login redirect". Tokens shorter
+  // than 2 characters are dropped when longer ones exist, and the full query
+  // still drives relevance ordering.
+  const tokens = (() => {
+    const parts = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, MAX_SEARCH_TOKENS);
+    const meaningful = parts.filter((token) => token.length >= 2);
+    return meaningful.length > 0 ? meaningful : parts;
+  })();
+  const allTokensLike = (column: LikeTarget) =>
+    tokens.length === 0
+      ? like(column, searchPattern)
+      : and(...tokens.map((token) => like(column, `%${token}%`)));
 
   // Project-level scope: the user sees every project of their full-access
   // workspaces, plus the projects explicitly granted through access teams or
@@ -310,8 +331,8 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(taskTable.projectId, projectId) : undefined,
           or(
-            like(taskTable.title, searchPattern),
-            like(taskTable.description, searchPattern),
+            allTokensLike(taskTable.title),
+            allTokensLike(taskTable.description),
           ),
         ),
       )
@@ -377,8 +398,8 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(appointmentTable.projectId, projectId) : undefined,
           or(
-            like(appointmentTable.title, searchPattern),
-            like(appointmentTable.description, searchPattern),
+            allTokensLike(appointmentTable.title),
+            allTokensLike(appointmentTable.description),
           ),
         ),
       )
@@ -434,8 +455,8 @@ async function globalSearch(params: SearchParams): Promise<{
         and(
           workspaceFilter,
           or(
-            like(projectTable.name, searchPattern),
-            like(projectTable.description, searchPattern),
+            allTokensLike(projectTable.name),
+            allTokensLike(projectTable.description),
           ),
         ),
       )
@@ -486,8 +507,8 @@ async function globalSearch(params: SearchParams): Promise<{
         and(
           inArray(workspaceTable.id, accessibleWorkspaceIds),
           or(
-            like(workspaceTable.name, searchPattern),
-            like(workspaceTable.description, searchPattern),
+            allTokensLike(workspaceTable.name),
+            allTokensLike(workspaceTable.description),
           ),
         ),
       )
@@ -549,8 +570,8 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(taskTable.projectId, projectId) : undefined,
           or(
-            like(searchableActivityText, searchPattern),
-            like(taskTable.title, searchPattern),
+            allTokensLike(searchableActivityText),
+            allTokensLike(taskTable.title),
           ),
           type === "comments" ? eq(activityTable.type, "comment") : undefined,
         ),

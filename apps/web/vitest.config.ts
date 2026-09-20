@@ -12,6 +12,10 @@ export default defineConfig({
     // the 5s vitest default (observed 6.5s+); give them headroom without masking hangs.
     testTimeout: 10_000,
     fsModuleCache: true,
+    // Six vitest processes run at once under turbo; a shared root cache races
+    // on cleanup right after a lockfile change (all clear it simultaneously,
+    // ENOTEMPTY). Keep one cache directory per workspace.
+    fsModuleCachePath: "node_modules/.vitest-cache",
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     coverage: {

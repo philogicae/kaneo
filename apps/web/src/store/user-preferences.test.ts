@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { useUserPreferencesStore } from "@/store/user-preferences";
+import {
+  CHART_RANGE_OPTIONS,
+  CHART_UNITS_BY_RANGE,
+  rangeSupportingUnit,
+  useUserPreferencesStore,
+} from "@/store/user-preferences";
 
 const STORAGE_KEY = "user-preferences";
 
@@ -32,5 +37,42 @@ describe("chart preferences", () => {
     await useUserPreferencesStore.persist.rehydrate();
 
     expect(useUserPreferencesStore.getState().chartsRange).toBe("3m");
+  });
+
+  it("keeps a legacy finer unit by widening the window to carry it", async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        state: { chartsRange: "all", chartsUnit: "day" },
+        version: 1,
+      }),
+    );
+    await useUserPreferencesStore.persist.rehydrate();
+
+    expect(useUserPreferencesStore.getState().chartsRange).toBe("12m");
+    expect(useUserPreferencesStore.getState().chartsUnit).toBe("day");
+  });
+});
+
+describe("rangeSupportingUnit", () => {
+  it("leaves a window that already carries the unit untouched", () => {
+    expect(rangeSupportingUnit("1m", "day")).toBe("1m");
+    expect(rangeSupportingUnit("12m", "month")).toBe("12m");
+    expect(rangeSupportingUnit("all", "week")).toBe("all");
+  });
+
+  it("moves finer units to the longest window that supports them", () => {
+    expect(rangeSupportingUnit("all", "day")).toBe("12m");
+    expect(rangeSupportingUnit("all", "hour")).toBe("1w");
+    expect(rangeSupportingUnit("1w", "month")).toBe("all");
+  });
+
+  it("returns a window from the allowed list for every unit", () => {
+    for (const range of CHART_RANGE_OPTIONS) {
+      for (const unit of ["hour", "day", "week", "month"] as const) {
+        const supported = rangeSupportingUnit(range, unit);
+        expect(CHART_UNITS_BY_RANGE[supported]).toContain(unit);
+      }
+    }
   });
 });

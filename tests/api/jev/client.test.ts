@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   askJev,
   isJevEnabled,
+  JevError,
   jevApiKey,
 } from "../../../apps/api/src/jev/client";
 
@@ -14,12 +15,17 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+function okResponse(answers: Record<string, unknown>) {
+  return jsonResponse({ model: "jev-latest", answers });
+}
+
 beforeEach(() => {
   fetchMock.mockReset();
   vi.stubGlobal("fetch", fetchMock);
   vi.stubEnv("TYPESAFE_API_KEY", "test-key");
   vi.stubEnv("KANEO_JEV_MODEL", "");
   vi.stubEnv("KANEO_JEV_BASE_URL", "");
+  vi.stubEnv("KANEO_JEV_MAX_RETRIES", "");
 });
 
 afterEach(() => {
@@ -44,9 +50,7 @@ describe("Jev client configuration", () => {
 
 describe("askJev", () => {
   it("posts the model, state and questions with the bearer key", async () => {
-    fetchMock.mockResolvedValue(
-      jsonResponse({ answers: { q: { noul: 0.9 } } }),
-    );
+    fetchMock.mockResolvedValue(okResponse({ q: { noul: 0.9 } }));
 
     const answers = await askJev(
       { note: "x" },
@@ -70,7 +74,7 @@ describe("askJev", () => {
   it("honors model and base URL overrides", async () => {
     vi.stubEnv("KANEO_JEV_MODEL", "jev-1.13.0");
     vi.stubEnv("KANEO_JEV_BASE_URL", "https://jev.internal/v1/systemone");
-    fetchMock.mockResolvedValue(jsonResponse({ answers: {} }));
+    fetchMock.mockResolvedValue(okResponse({ q: { noul: 0.9 } }));
 
     await askJev({}, { q: { type: "noul", instructions: "x" } });
 
@@ -97,10 +101,29 @@ describe("askJev", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it("exposes the API's error_type on the thrown error", async () => {
+    vi.stubEnv("KANEO_JEV_MAX_RETRIES", "0");
+    fetchMock.mockResolvedValue(
+      jsonResponse(
+        { error_type: "max_tokens_exceeded", detail: "too big" },
+        400,
+      ),
+    );
+
+    const error = await askJev(
+      {},
+      { q: { type: "noul", instructions: "x" } },
+    ).catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(JevError);
+    expect((error as JevError).status).toBe(400);
+    expect((error as JevError).errorType).toBe("max_tokens_exceeded");
+  });
+
   it("retries a transient status once and returns the success", async () => {
     fetchMock
       .mockResolvedValueOnce(new Response("overloaded", { status: 529 }))
-      .mockResolvedValueOnce(jsonResponse({ answers: { q: { noul: 1 } } }));
+      .mockResolvedValueOnce(okResponse({ q: { noul: 1 } }));
 
     const answers = await askJev(
       {},
@@ -112,6 +135,7 @@ describe("askJev", () => {
   });
 
   it("throws on malformed JSON and on missing answers", async () => {
+    vi.stubEnv("KANEO_JEV_MAX_RETRIES", "0");
     fetchMock.mockResolvedValueOnce(new Response("not json", { status: 200 }));
     await expect(
       askJev({}, { q: { type: "noul", instructions: "x" } }),
@@ -121,5 +145,73 @@ describe("askJev", () => {
     await expect(
       askJev({}, { q: { type: "noul", instructions: "x" } }),
     ).rejects.toThrow("Jev response is missing answers");
+  });
+
+  it("requires the response model so a silent model swap is auditable", async () => {
+    vi.stubEnv("KANEO_JEV_MAX_RETRIES", "0");
+    fetchMock.mockResolvedValue(jsonResponse({ answers: { q: { noul: 1 } } }));
+
+    await expect(
+      askJev({}, { q: { type: "noul", instructions: "x" } }),
+    ).rejects.toThrow("Jev response is missing model");
+  });
+
+  it("rejects an out-of-range probability", async () => {
+    vi.stubEnv("KANEO_JEV_MAX_RETRIES", "0");
+    fetchMock.mockResolvedValue(okResponse({ q: { noul: 1.4 } }));
+
+    await expect(
+      askJev({}, { q: { type: "noul", instructions: "x" } }),
+    ).rejects.toThrow("Jev answer q is not a probability");
+  });
+
+  it("rejects a choice answer that misses a criterion probability", async () => {
+    vi.stubEnv("KANEO_JEV_MAX_RETRIES", "0");
+    fetchMock.mockResolvedValue(
+      okResponse({
+        q: {
+          choice: "a",
+          probabilities: { a: 0.6, b: 0.4 },
+        },
+      }),
+    );
+
+    await expect(
+      askJev(
+        {},
+        {
+          q: {
+            type: "choice",
+            instructions: "pick",
+            criteria: { a: "one", b: "two", c: "three" },
+          },
+        },
+      ),
+    ).rejects.toThrow("Jev answer q misses criteria probabilities");
+  });
+
+  it("rejects a choice answer outside the criteria", async () => {
+    vi.stubEnv("KANEO_JEV_MAX_RETRIES", "0");
+    fetchMock.mockResolvedValue(
+      okResponse({
+        q: {
+          choice: "z",
+          probabilities: { a: 0.6, b: 0.4 },
+        },
+      }),
+    );
+
+    await expect(
+      askJev(
+        {},
+        {
+          q: {
+            type: "choice",
+            instructions: "pick",
+            criteria: { a: "one", b: "two" },
+          },
+        },
+      ),
+    ).rejects.toThrow("Jev answer q chose an unknown option");
   });
 });

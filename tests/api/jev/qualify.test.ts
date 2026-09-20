@@ -198,7 +198,7 @@ describe("suggestTaskQualification", () => {
 
     const result = await suggestTaskQualification({
       title: "Fix the login redirect loop",
-      description: "x".repeat(300_000),
+      description: "lorem ipsum dolor sit amet ".repeat(12_000),
       labels: LABELS,
       ask: fakeAsker({
         onAsk: (askedState, askedQuestions) => {

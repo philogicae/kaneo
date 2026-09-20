@@ -27,3 +27,13 @@ export async function sendWorkspaceInvitationEmail(
 export function isSmtpConfigured(): boolean {
   return false;
 }
+
+// The integration suite runs with no transport configured; the mock keeps
+// that contract without touching turbo.json's env declarations.
+export function isResendConfigured(): boolean {
+  return false;
+}
+
+export function isEmailConfigured(): boolean {
+  return isSmtpConfigured() || isResendConfigured();
+}

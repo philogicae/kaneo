@@ -1,14 +1,4 @@
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  gte,
-  inArray,
-  lte,
-  type SQL,
-  sql,
-} from "drizzle-orm";
+import { and, asc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -19,6 +9,7 @@ import {
   taskTable,
   userTable,
 } from "../../database/schema";
+import { buildTaskOrderBy, type TaskSortField } from "../task-order";
 
 type GetTasksOptions = {
   assigneeId?: string;
@@ -27,46 +18,10 @@ type GetTasksOptions = {
   limit?: number;
   page?: number;
   priority?: string;
-  sortBy?:
-    | "createdAt"
-    | "priority"
-    | "dueDate"
-    | "position"
-    | "title"
-    | "number";
+  sortBy?: TaskSortField;
   sortOrder?: "asc" | "desc";
   status?: string;
 };
-
-const priorityCaseExpr = sql<number>`CASE
-  WHEN ${taskTable.priority} = 'urgent' THEN 4
-  WHEN ${taskTable.priority} = 'high' THEN 3
-  WHEN ${taskTable.priority} = 'medium' THEN 2
-  WHEN ${taskTable.priority} = 'low' THEN 1
-  ELSE 0
-END`;
-
-function buildOrderBy(
-  sortBy: GetTasksOptions["sortBy"],
-  sortOrder: GetTasksOptions["sortOrder"],
-): SQL {
-  const direction = sortOrder === "desc" ? desc : asc;
-
-  switch (sortBy) {
-    case "createdAt":
-      return direction(taskTable.createdAt);
-    case "priority":
-      return direction(priorityCaseExpr);
-    case "dueDate":
-      return direction(taskTable.dueDate);
-    case "title":
-      return direction(taskTable.title);
-    case "number":
-      return direction(taskTable.number);
-    default:
-      return direction(taskTable.position);
-  }
-}
 
 async function getTasks(projectId: string, options: GetTasksOptions = {}) {
   const project = await db.query.projectTable.findFirst({
@@ -108,7 +63,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     options.limit && options.limit > 0 ? Math.min(options.limit, 100) : 50;
   const offset = (page - 1) * pageSize;
 
-  const orderByClause = buildOrderBy(
+  const orderByClause = buildTaskOrderBy(
     options.sortBy ?? "position",
     options.sortOrder ?? "asc",
   );
@@ -126,6 +81,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     number: taskTable.number,
     description: taskTable.description,
     status: taskTable.status,
+    milestoneId: taskTable.milestoneId,
     priority: taskTable.priority,
     startDate: taskTable.startDate,
     dueDate: taskTable.dueDate,

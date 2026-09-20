@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  inferToolAnnotations,
   type McpToolRegistrar,
   registerMcpTools,
 } from "../../apps/api/src/mcp/tools";
@@ -117,6 +118,36 @@ describe("Kaneo skill contract", () => {
     }
     expect(exampleCount).toBeGreaterThan(0);
     expect(apiFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("MCP tool annotations", () => {
+  it("marks reads read-only and deletes destructive", () => {
+    expect(inferToolAnnotations("list_tasks")).toMatchObject({
+      title: "List tasks",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    });
+    expect(inferToolAnnotations("search")).toMatchObject({
+      readOnlyHint: true,
+    });
+    expect(inferToolAnnotations("delete_task")).toMatchObject({
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+    });
+    expect(inferToolAnnotations("move_task_to_appointments")).toMatchObject({
+      destructiveHint: true,
+    });
+    expect(inferToolAnnotations("telegram_delete_bot")).toMatchObject({
+      destructiveHint: true,
+    });
+    expect(inferToolAnnotations("update_task")).toMatchObject({
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+    });
   });
 });
 
@@ -607,7 +638,45 @@ describe("MCP tool catalog", () => {
     );
 
     await call("list_notifications");
-    expect(lastRequest().url).toBe("http://api.test/api/notification");
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/notification?limit=50&offset=0",
+    );
+
+    await call("list_notifications", { limit: 10, offset: 20 });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/notification?limit=10&offset=20",
+    );
+  });
+
+  it("lists a task's labels directly", async () => {
+    await call("list_task_labels", { taskId: "t 1" });
+    expect(lastRequest().url).toBe("http://api.test/api/label/task/t%201");
+  });
+
+  it("returns workspace label definitions only unless copies are requested", async () => {
+    apiFetch.mockResolvedValueOnce(
+      Response.json([
+        { id: "def", name: "bug", color: "red", taskId: null },
+        { id: "copy", name: "bug", color: "red", taskId: "t1" },
+      ]),
+    );
+
+    const filtered = await call("list_workspace_labels", { workspaceId: "w1" });
+    expect(JSON.parse(filtered.content[0].text)).toEqual([
+      { id: "def", name: "bug", color: "red", taskId: null },
+    ]);
+
+    apiFetch.mockResolvedValueOnce(
+      Response.json([
+        { id: "def", name: "bug", color: "red", taskId: null },
+        { id: "copy", name: "bug", color: "red", taskId: "t1" },
+      ]),
+    );
+    const all = await call("list_workspace_labels", {
+      workspaceId: "w1",
+      includeCopies: true,
+    });
+    expect(JSON.parse(all.content[0].text)).toHaveLength(2);
   });
 
   it("surfaces an API failure as a tool error", async () => {
@@ -775,7 +844,7 @@ describe("MCP appointment tools", () => {
   it("lists and reads appointments", async () => {
     await call("list_appointments", { projectId: "p 1" });
     expect(lastRequest()).toMatchObject({
-      url: "http://api.test/api/appointment?projectId=p%201",
+      url: "http://api.test/api/appointment?projectId=p+1&limit=50&offset=0",
       method: "GET",
     });
 
@@ -853,6 +922,44 @@ describe("MCP appointment tools", () => {
     });
   });
 
+  it("preserves reminders and recurrence on a partial appointment update", async () => {
+    apiFetch.mockResolvedValueOnce(
+      Response.json({
+        ...existingAppointment,
+        reminderOffsets: [120, 15],
+        recurrence: { frequency: "weekly", interval: 2 },
+      }),
+    );
+
+    await call("update_appointment", { appointmentId: "a1", title: "Updated" });
+
+    expect(lastRequest().body).toMatchObject({
+      title: "Updated",
+      reminderOffsets: [120, 15],
+      recurrence: { frequency: "weekly", interval: 2 },
+    });
+  });
+
+  it("clears appointment reminders with an explicit null", async () => {
+    apiFetch.mockResolvedValueOnce(
+      Response.json({
+        ...existingAppointment,
+        reminderOffsets: [120],
+        recurrence: { frequency: "weekly", interval: 1 },
+      }),
+    );
+
+    await call("update_appointment", {
+      appointmentId: "a1",
+      reminderOffsets: null,
+    });
+
+    expect(lastRequest().body).toMatchObject({
+      reminderOffsets: null,
+      recurrence: { frequency: "weekly", interval: 1 },
+    });
+  });
+
   it("clears appointment dates and assignee with null", async () => {
     apiFetch.mockResolvedValueOnce(Response.json(existingAppointment));
 
@@ -883,6 +990,218 @@ describe("MCP appointment tools", () => {
       url: "http://api.test/api/appointment/from-task",
       method: "POST",
       body: { taskId: "t1" },
+    });
+  });
+
+  it("pages the appointment list with bounded defaults", async () => {
+    await call("list_appointments", { projectId: "p 1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/appointment?projectId=p+1&limit=50&offset=0",
+    );
+
+    await call("list_appointments", {
+      projectId: "p1",
+      limit: 10,
+      offset: 20,
+    });
+    const url = new URL(lastRequest().url);
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      projectId: "p1",
+      limit: "10",
+      offset: "20",
+    });
+  });
+});
+
+describe("MCP workspace task tools", () => {
+  it("lists workspace tasks with filters and bounded defaults", async () => {
+    await call("list_workspace_tasks", { workspaceId: "ws 1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/task/workspace/ws%201?page=1&limit=50",
+    );
+
+    await call("list_workspace_tasks", {
+      workspaceId: "ws1",
+      status: "to-do",
+      priority: "urgent",
+      assigneeId: "unassigned",
+      label: "bug",
+      q: "login",
+      sortBy: "dueDate",
+      sortOrder: "asc",
+      page: 2,
+      limit: 10,
+    });
+    const url = new URL(lastRequest().url);
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      page: "2",
+      limit: "10",
+      status: "to-do",
+      priority: "urgent",
+      assigneeId: "unassigned",
+      label: "bug",
+      q: "login",
+      sortBy: "dueDate",
+      sortOrder: "asc",
+    });
+  });
+
+  it("resolves a short id exactly and returns the full task", async () => {
+    apiFetch
+      .mockResolvedValueOnce(
+        Response.json({
+          results: [
+            {
+              id: "t1",
+              type: "task",
+              title: "Fix login",
+              projectSlug: "KAN",
+              taskNumber: 12,
+            },
+            { id: "c1", type: "comment", title: "Comment on other" },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ id: "t1", title: "Fix login", status: "to-do" }),
+      );
+
+    const result = await call("get_task_by_short_id", { shortId: "kan-12" });
+
+    expect(JSON.parse(result.content[0].text)).toMatchObject({
+      match: "exact",
+      shortId: "kan-12",
+      task: { id: "t1" },
+    });
+    const calls = apiFetch.mock.calls.map(([input]) => String(input));
+    expect(calls[0]).toBe(
+      "http://api.test/api/search?q=kan-12&type=tasks&limit=20",
+    );
+    expect(calls[1]).toBe("http://api.test/api/task/t1");
+  });
+
+  it("reports close candidates when no short id matches", async () => {
+    apiFetch.mockResolvedValueOnce(
+      Response.json({
+        results: [
+          {
+            id: "t2",
+            type: "task",
+            title: "Other",
+            projectSlug: "KAN",
+            taskNumber: 13,
+          },
+        ],
+      }),
+    );
+
+    const result = await call("get_task_by_short_id", { shortId: "KAN-12" });
+    const payload = JSON.parse(result.content[0].text);
+
+    expect(payload).toMatchObject({ match: "none", shortId: "KAN-12" });
+    expect(payload.candidates).toEqual([
+      { id: "t2", title: "Other", projectSlug: "KAN", taskNumber: 13 },
+    ]);
+  });
+
+  it("rejects a malformed short id before calling the API", async () => {
+    const result = await call("get_task_by_short_id", {
+      shortId: "not-a-task",
+    });
+
+    expect(result.isError).toBe(true);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("accepts a non-ASCII project key", async () => {
+    apiFetch.mockResolvedValueOnce(Response.json({ results: [] }));
+
+    const result = await call("get_task_by_short_id", { shortId: "ПА-3" });
+
+    expect(result.isError).toBeFalsy();
+    expect(JSON.parse(result.content[0].text)).toMatchObject({
+      match: "none",
+      shortId: "ПА-3",
+    });
+  });
+});
+
+describe("MCP milestone tools", () => {
+  it("lists, creates, updates, deletes and assigns milestones", async () => {
+    await call("list_milestones", { projectId: "p 1" });
+    expect(lastRequest().url).toBe(
+      "http://api.test/api/milestone?projectId=p%201",
+    );
+
+    await call("create_milestone", {
+      projectId: "p1",
+      name: "Sprint 1",
+      color: "teal",
+    });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/milestone",
+      method: "POST",
+      body: { projectId: "p1", name: "Sprint 1", color: "teal" },
+    });
+
+    apiFetch.mockResolvedValueOnce(
+      Response.json({ id: "m1", name: "Sprint 1", color: "teal" }),
+    );
+    await call("update_milestone", { milestoneId: "m1", name: "Sprint 2" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/milestone/m1",
+      method: "PUT",
+      body: { name: "Sprint 2", color: "teal" },
+    });
+
+    await call("delete_milestone", { milestoneId: "m1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/milestone/m1",
+      method: "DELETE",
+    });
+
+    await call("assign_task_milestone", { taskId: "t1", milestoneId: "m1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/task/milestone/t1",
+      method: "PUT",
+      body: { milestoneId: "m1" },
+    });
+
+    await call("assign_task_milestone", { taskId: "t1", milestoneId: null });
+    expect(lastRequest().body).toEqual({ milestoneId: null });
+  });
+});
+
+describe("MCP label and project lifecycle tools", () => {
+  it("merges a label update with the existing fields", async () => {
+    apiFetch
+      .mockResolvedValueOnce(
+        Response.json({ id: "l1", name: "bug", color: "red" }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ id: "l1", name: "defect", color: "red" }),
+      );
+
+    await call("update_label", { labelId: "l1", name: "defect" });
+
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/label/l1",
+      method: "PUT",
+      body: { name: "defect", color: "red" },
+    });
+  });
+
+  it("archives and unarchives a project", async () => {
+    await call("archive_project", { projectId: "p1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/project/p1/archive",
+      method: "PUT",
+    });
+
+    await call("unarchive_project", { projectId: "p1" });
+    expect(lastRequest()).toMatchObject({
+      url: "http://api.test/api/project/p1/unarchive",
+      method: "PUT",
     });
   });
 });

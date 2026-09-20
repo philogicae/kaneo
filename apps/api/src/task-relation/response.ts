@@ -38,3 +38,8 @@ export const taskRelationWithTasksSchema = taskRelationSchema
 export const taskRelationWithTasksListSchema = z.array(
   taskRelationWithTasksSchema,
 );
+
+// Endpoints of a project's relations; the roadmap consumes this one call.
+export const projectRelationsSchema = z
+  .array(taskRelationSchema)
+  .openapi("ProjectRelations");

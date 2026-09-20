@@ -144,4 +144,36 @@ describe("rerankSearchResults", () => {
     expect(outcome.results).toEqual([]);
     expect(outcome.totalCount).toBe(0);
   });
+
+  it("keeps unsure rejects from Jev as lower-ranked results", async () => {
+    const results = [result("a", "alpha"), result("b", "beta")];
+    const ask: JevAsker = async (_state, questions) =>
+      Object.fromEntries(
+        Object.keys(questions).map((name) => [
+          name,
+          { score: name.endsWith("c0") ? 4 : 0, confidence: 0.2 },
+        ]),
+      );
+
+    const outcome = await rerankSearchResults(results, "q", 5, ask);
+
+    expect(outcome.results.map((item) => item.id)).toEqual(["a", "b"]);
+    expect(outcome.totalCount).toBe(2);
+  });
+
+  it("restores the hard floor when KANEO_JEV_KEEP_UNSURE=0", async () => {
+    vi.stubEnv("KANEO_JEV_KEEP_UNSURE", "0");
+    const results = [result("a", "alpha"), result("b", "beta")];
+    const ask: JevAsker = async (_state, questions) =>
+      Object.fromEntries(
+        Object.keys(questions).map((name) => [
+          name,
+          { score: name.endsWith("c0") ? 4 : 0, confidence: 0.2 },
+        ]),
+      );
+
+    const outcome = await rerankSearchResults(results, "q", 5, ask);
+
+    expect(outcome.results.map((item) => item.id)).toEqual(["a"]);
+  });
 });

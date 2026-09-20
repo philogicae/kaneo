@@ -79,6 +79,26 @@ export function defaultChartUnit(range: ChartRange): ChartUnit {
   return CHART_UNITS_BY_RANGE[range].includes("day") ? "day" : "week";
 }
 
+// The window a unit needs when the current one cannot carry it. Finer units
+// need a narrower window (hour -> 1 week, day -> 12 months); picking one
+// adjusts the period instead of leaving the option dead, which is what the
+// unit selector used to do. Week fits every window, so it never moves.
+export function rangeSupportingUnit(
+  current: ChartRange,
+  unit: ChartUnit,
+): ChartRange {
+  if (CHART_UNITS_BY_RANGE[current].includes(unit)) {
+    return current;
+  }
+  if (unit === "hour") {
+    return "1w";
+  }
+  if (unit === "day") {
+    return "12m";
+  }
+  return "all";
+}
+
 // Interface density as root font-size multiplier: every rem-based Tailwind
 // size (text, spacing, sidebar width) follows the root font size. The
 // stepper moves in 5% steps within these bounds.
@@ -292,11 +312,12 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
           if (range !== state.chartsRange) {
             state.setChartsRange(range);
           }
-          if (
-            !isChartUnit(state.chartsUnit) ||
-            !CHART_UNITS_BY_RANGE[range].includes(state.chartsUnit)
-          ) {
+          if (!isChartUnit(state.chartsUnit)) {
             state.setChartsUnit(defaultChartUnit(range));
+          } else if (!CHART_UNITS_BY_RANGE[range].includes(state.chartsUnit)) {
+            // A legacy pair the current tables reject: keep the finer unit the
+            // user picked and widen/narrow the window to one that carries it.
+            state.setChartsRange(rangeSupportingUnit(range, state.chartsUnit));
           }
         }
       },

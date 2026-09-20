@@ -30,6 +30,7 @@ import {
   isChartRange,
   isChartUnit,
   type ProjectSortMode,
+  rangeSupportingUnit,
   useUserPreferencesStore,
 } from "@/store/user-preferences";
 import { aggregateBuckets, averageCompleted } from "./chart-utils";
@@ -132,8 +133,6 @@ export default function UnifiedCharts({
   const { t } = useTranslation();
   const { chartsRange, chartsUnit, setChartsRange, setChartsUnit } =
     useUserPreferencesStore();
-
-  const unitOptions = CHART_UNITS_BY_RANGE[chartsRange];
 
   // Base UI renders the selected item's label from this map, since the
   // dropdown items are portaled and not mounted until the popup opens.
@@ -257,6 +256,18 @@ export default function UnifiedCharts({
     }
   };
 
+  // Every unit stays selectable: a finer one than the current window carries
+  // (hour on "all", day on "all") moves the period to the longest window that
+  // supports it instead of leaving the option dead.
+  const handleUnitChange = (value: string | null) => {
+    if (!isChartUnit(value)) return;
+    const nextRange = rangeSupportingUnit(chartsRange, value);
+    if (nextRange !== chartsRange) {
+      setChartsRange(nextRange);
+    }
+    setChartsUnit(value);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -293,26 +304,19 @@ export default function UnifiedCharts({
             <Select
               items={unitItems}
               value={chartsUnit}
-              onValueChange={(value) => {
-                if (isChartUnit(value) && unitOptions.includes(value)) {
-                  setChartsUnit(value);
-                }
-              }}
+              onValueChange={handleUnitChange}
             >
               <SelectTrigger
                 aria-label={t("unified:charts.unit")}
                 className="min-w-24"
                 size="sm"
+                title={t("unified:charts.unitHint")}
               >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {CHART_UNIT_OPTIONS.map((unit) => (
-                  <SelectItem
-                    key={unit}
-                    disabled={!unitOptions.includes(unit)}
-                    value={unit}
-                  >
+                  <SelectItem key={unit} value={unit}>
                     {t(UNIT_LABEL_KEYS[unit])}
                   </SelectItem>
                 ))}

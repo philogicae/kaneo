@@ -18,7 +18,11 @@ import {
   notificationListSchema,
   notificationSchema,
 } from "./response";
-import { createNotificationBody, notificationParam } from "./schema";
+import {
+  createNotificationBody,
+  notificationListQuery,
+  notificationParam,
+} from "./schema";
 
 const listNotificationsRoute = createRoute({
   method: "get",
@@ -26,7 +30,9 @@ const listNotificationsRoute = createRoute({
   path: "/",
   tags: ["Notifications"],
   summary: "List notifications",
-  description: "Get every notification for the current user, read and unread.",
+  description:
+    "Get the current user's notifications, newest first. Paginated: limit (default 50, max 200) and offset.",
+  request: { query: notificationListQuery },
   responses: {
     200: jsonResponse("List of notifications", notificationListSchema),
   },
@@ -96,9 +102,13 @@ const clearAllRoute = createRoute({
 });
 
 const notification = apiRouter()
-  .openapi(listNotificationsRoute, async (c) =>
-    c.json(await getNotifications(c.get("userId")), 200),
-  )
+  .openapi(listNotificationsRoute, async (c) => {
+    const { limit, offset } = c.req.valid("query");
+    return c.json(
+      await getNotifications(c.get("userId"), { limit, offset }),
+      200,
+    );
+  })
   .openapi(createNotificationRoute, async (c) => {
     const {
       title,

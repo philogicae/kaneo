@@ -38,11 +38,11 @@ This catalog must match the source registry. At runtime, intersect it with the c
 
 **Workspaces:** `list_workspace_members`, `list_workspace_labels`, `get_workspace_invite_link`
 
-**Projects:** `list_projects`, `get_project`, `create_project`, `update_project`
+**Projects:** `list_projects`, `get_project`, `create_project`, `update_project`, `archive_project`, `unarchive_project`
 
 **Columns:** `list_project_columns`, `create_column`, `update_column`, `reorder_columns`, `delete_column`
 
-**Tasks:** `list_tasks`, `get_task`, `qualify_task`, `create_task`, `update_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `move_task`, `bulk_update_tasks`, `delete_task`
+**Tasks:** `list_tasks`, `list_workspace_tasks`, `get_task`, `get_task_by_short_id`, `qualify_task`, `create_task`, `update_task`, `update_task_status`, `update_task_assignee`, `update_task_due_date`, `move_task`, `bulk_update_tasks`, `delete_task`
 
 **Appointments (if available on the connected instance):** `list_appointments`, `get_appointment`, `create_appointment`, `update_appointment`, `delete_appointment`, `move_task_to_appointments`
 
@@ -50,7 +50,9 @@ This catalog must match the source registry. At runtime, intersect it with the c
 
 **Relations:** `create_task_relation`, `get_task_relations`, `delete_task_relation`
 
-**Labels:** `create_label`, `attach_label_to_task`, `detach_label_from_task`, `delete_label`
+**Labels:** `list_workspace_labels`, `list_task_labels`, `create_label`, `update_label`, `attach_label_to_task`, `detach_label_from_task`, `delete_label`
+
+**Milestones (roadmap sprints/phases):** `list_milestones`, `create_milestone`, `update_milestone`, `delete_milestone`, `assign_task_milestone`
 
 **Time entries:** `create_time_entry`, `get_time_entry`, `list_task_time_entries`, `update_time_entry`, `delete_time_entry`
 
@@ -66,13 +68,16 @@ Internal REST requests time out after 10 seconds. An error can occur **after** a
 
 ## Search and pagination
 
-- `search` takes `q`, optional `type`, `workspaceId`, `projectId`, `limit` (default 20, max 50). Types are `all`, `tasks`, `appointments` where supported, `projects`, `workspaces`, `comments`, `activities`. It has **no status, page or offset argument**. Search tasks without a status filter covers backlog, archived and completed tasks.
+- `search` takes `q`, optional `type`, `workspaceId`, `projectId`, `limit` (default 20, max 50). Types are `all`, `tasks`, `appointments` where supported, `projects`, `workspaces`, `comments`, `activities`. It has **no status, page or offset argument**. Multi-word queries match every word anywhere in the text (order-independent), and a `PROJ-12`-shaped query pins that exact short ID on top. Search tasks without a status filter covers backlog, archived and completed tasks.
 - Search results have singular types; inspect `type` before using `id`. Prefer `type: "tasks"` for task lookup. Search by meaningful title/outcome terms or a known short identifier; verify candidates with `get_task` and project metadata. A prefix may collide across projects/workspaces.
 - `search.totalCount` counts the results kept after relevance ranking, each category bounded; it is **not an exhaustive database count**. A keyword match that does not answer the query can be dropped, so a short or empty result set is not proof of absence. Narrow the query/type/scope; if absence matters, fall back to paginated project task lists and report any incomplete coverage.
-- `list_tasks`: `page` starts at 1; `limit` defaults to 50, max 100. Flatten `data.columns[].tasks`, `data.plannedTasks`, `data.archivedTasks` for each page. Increment through `pagination.totalPages`; do not stop because one column is empty. Pagination/sorting apply before grouping. For full scans prefer `sortBy: "number", sortOrder: "asc"`, deduplicate IDs, and recheck likely matches before creating if the board changed during the scan.
-- Available task filters are status, priority, assignee and due-date bounds. There is no label filter or unassigned sentinel: filter collected tasks locally for those needs. Priority descending orders urgent before high/medium/low/no-priority.
+- `list_tasks`: `page` starts at 1; `limit` defaults to 50, max 200. Flatten `data.columns[].tasks`, `data.plannedTasks`, `data.archivedTasks` for each page. Increment through `pagination.totalPages`; do not stop because one column is empty. Pagination/sorting apply before grouping. For full scans prefer `sortBy: "number", sortOrder: "asc"`, deduplicate IDs, and recheck likely matches before creating if the board changed during the scan.
+- Available task filters are status, priority, assignee and due-date bounds. There is no label filter or unassigned sentinel on `list_tasks`; filter collected tasks locally for those needs, or use `list_workspace_tasks` (label name and `unassigned` supported). Priority descending orders urgent before high/medium/low/no-priority.
 - `get_project` embeds tasks with `tasksLimit`/`tasksOffset` (default 50, max 200); it is not the whole board. Prefer `list_tasks` for exhaustive scans.
-- Comments, activity and time entries accept `limit`/`offset` (default 50, max 200); continue until a short page, including an extra empty page if the last was full. Comments are oldest-first, activity newest-first. `list_notifications` returns only the latest 50, not a paginated history. `list_appointments` currently returns the project's appointments without pagination.
+- Comments, activity, notifications, appointments and time entries accept `limit`/`offset` (default 50, max 200); continue until a short page, including an extra empty page if the last was full. Comments are oldest-first; activity, notifications and appointments are newest/most-recent-first by their own keys (`createdAt` for activity and notifications, `startDate` for appointments).
+- `list_workspace_tasks` is the cross-project read: one flat, filtered, paginated list for a whole workspace. Use it for "my open tasks" (`assigneeId` + statuses), "everything urgent" (`priority`), "due this week" (`dueAfter`/`dueBefore`), "tasks with label X" (`label`, exact name) and "unassigned work" (`assigneeId: "unassigned"`). It supports the same `page`/`limit` (max 200) and `sortBy`/`sortOrder` as `list_tasks`, and every row carries `projectId`, `projectName`, `projectSlug` and `number`.
+- `get_task_by_short_id` resolves a `KEY-12` id to the full task across every workspace the user can access, returning `match: "exact"` or `match: "none"` with close candidates. Prefer it over guessing a task id or scanning boards.
+- Milestones are the roadmap's left-to-right sprints/phases: `list_milestones` reads them, `create_milestone` appends, `update_milestone` renames/recolors/re-dates, `assign_task_milestone` moves a task (or clears it with null), and `delete_milestone` keeps the tasks (they fall back to the no-sprint lane). A task belongs to at most one milestone.
 
 Example MCP envelope; replace placeholders with verified values:
 
@@ -161,7 +166,7 @@ Preflight the target IDs, memberships, per-project status validity and label ide
 
 ## Labels and identity
 
-- `list_workspace_labels` mixes definitions (`taskId: null`) and copies (`taskId` populated). Identity is workspace + name for a definition and task + name for a copy, not global uniqueness. Match names exactly, including branch slashes.
+- `list_workspace_labels` returns the workspace **definitions** (`taskId: null`) by default; pass `includeCopies: true` to also get task-scoped copies. Use `list_task_labels` for the labels attached to one task. Identity is workspace + name for a definition and task + name for a copy, not global uniqueness. Match names exactly, including branch slashes.
 - Attach using the definition ID: the API copies it onto the task. A copy belonging to another task is refused by MCP to avoid moving it. If only a copy exists, `create_label` with the verified workspace/name/color and target `taskId` creates/returns a target copy; a same-name definition supplies its color.
 - `create_label` is idempotent by same-scope name; it does **not** recolor an existing label. Palette: `gray`, `dark-gray`, `purple`, `teal`, `green`, `yellow`, `orange`, `pink`, `red`, `sky`, `blue`, `cyan`, `indigo`, `fuchsia`, `lime`, `emerald`, or hex. Prefer palette names for palette colors; no normalization is applied. See [label setup](setup.md#idempotent-label-setup).
 - Detach uses the **task copy's** `labelId`, not the definition ID, and deletes that copy. A workspace-definition delete cascades to same-name task copies. **Detaching is not a preservation strategy.** Use the web editor for rename/recolor; never delete/recreate to bypass the missing update tool.
@@ -181,7 +186,7 @@ Read `telegram_list_config` before changes. Bots are account-owned and hold even
 | Changed state                     | Verification                                                                                            |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Task fields/status/assignee/dates | `get_task`                                                                                              |
-| Labels on a task                  | Filter `list_workspace_labels` by `taskId`, or inspect paginated `list_tasks`; `get_task` has no labels |
+| Labels on a task                  | `list_task_labels` (copies with detach IDs); `get_task` has no labels                                   |
 | Comment/evidence                  | `list_task_comments`, with pagination; `get_task` has no comments                                       |
 | Relations / time entry            | `get_task_relations` / `get_time_entry`                                                                 |
 | Project / columns                 | `get_project` / `list_project_columns`                                                                  |

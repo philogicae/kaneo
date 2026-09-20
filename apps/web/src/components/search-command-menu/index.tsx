@@ -4,6 +4,7 @@ import {
   FileText,
   FolderKanban,
   Hash,
+  Loader2,
   MessageSquare,
   Search,
   Users,
@@ -64,17 +65,44 @@ type SearchCommandMenuProps = {
 function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
+  // Requests are debounced and only start at the same 3-character threshold
+  // the result list uses: one Jev-reranked search per keystroke is slow and
+  // bills a request for text the menu would not show yet.
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const { data: workspace } = useActiveWorkspace();
   const navigate = useNavigate();
 
   const searchEnabled = query.trim().length >= 3;
 
-  const { data: searchResults } = useGlobalSearch({
-    q: query,
+  useEffect(() => {
+    const value = query.trim();
+    if (value.length < 3) {
+      setDebouncedQuery("");
+      return;
+    }
+    const timer = setTimeout(() => setDebouncedQuery(value), 250);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const {
+    data: searchResults,
+    isLoading,
+    isFetching,
+  } = useGlobalSearch({
+    q: debouncedQuery,
     type: "all",
     // No workspaceId: search every workspace the user belongs to.
     limit: 20,
   });
+
+  // The Jev pass takes seconds on a cold query; without this the menu shows
+  // "No results found" for the whole wait (and for the debounce window before
+  // the request even starts), which reads as a broken search.
+  const isDebouncing = searchEnabled && debouncedQuery !== query.trim();
+  const isSearching =
+    searchEnabled &&
+    (isDebouncing || isLoading || isFetching) &&
+    !searchResults;
 
   useRegisterShortcuts({
     shortcuts: {
@@ -87,6 +115,7 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   useEffect(() => {
     if (!open) {
       setQuery("");
+      setDebouncedQuery("");
     }
   }, [open]);
 
@@ -231,12 +260,23 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
           <CommandPanel>
             <CommandEmpty>
               <div className="text-center py-6">
-                <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  {searchEnabled
-                    ? t("navigation:commandPalette.empty")
-                    : t("navigation:search.minCharsHint")}
-                </p>
+                {isSearching ? (
+                  <>
+                    <Loader2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground animate-spin" />
+                    <p className="text-sm text-muted-foreground">
+                      {t("workspace:search.searching")}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      {searchEnabled
+                        ? t("navigation:commandPalette.empty")
+                        : t("navigation:search.minCharsHint")}
+                    </p>
+                  </>
+                )}
               </div>
             </CommandEmpty>
             <CommandList>

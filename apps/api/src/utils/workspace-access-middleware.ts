@@ -15,6 +15,7 @@ type WorkspaceIdSource =
         | "project"
         | "task"
         | "appointment"
+        | "milestone"
         | "label"
         | "timeEntry"
         | "activity"
@@ -187,6 +188,7 @@ async function resolveAccessTarget(
     | "project"
     | "task"
     | "appointment"
+    | "milestone"
     | "label"
     | "timeEntry"
     | "activity"
@@ -249,6 +251,25 @@ async function resolveAccessTarget(
         return {
           workspaceId: appointment?.workspaceId ?? null,
           projectId: appointment?.projectId ?? null,
+        };
+      }
+
+      case "milestone": {
+        const [milestone] = await db
+          .select({
+            workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.milestoneTable.projectId,
+          })
+          .from(schema.milestoneTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.milestoneTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.milestoneTable.id, id))
+          .limit(1);
+        return {
+          workspaceId: milestone?.workspaceId ?? null,
+          projectId: milestone?.projectId ?? null,
         };
       }
 
@@ -480,6 +501,14 @@ export const workspaceAccess = {
   fromTasks: (idKey = "taskIds") =>
     workspaceAccessMiddleware({
       sources: [{ type: "lookupMany", resource: "task", idKey }],
+    }),
+
+  fromMilestone: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "milestone", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
     }),
 
   fromLabel: (idKey = "id") =>

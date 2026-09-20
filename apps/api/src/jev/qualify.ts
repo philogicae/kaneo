@@ -21,11 +21,14 @@ import {
 } from "./budget";
 import {
   askJev,
+  describeJevError,
   isJevEnabled,
   type JevAnswers,
   type JevAsker,
   type JevQuestion,
 } from "./client";
+import { gatherBounded } from "./parallel";
+import { redactSecrets } from "./redact";
 
 const DEFAULT_LABEL_THRESHOLD = 0.5;
 const MAX_LABEL_CANDIDATES = 64;
@@ -125,8 +128,10 @@ export async function suggestTaskQualification(
 
   const state = {
     task: {
-      title: input.title,
-      description: (input.description ?? "").slice(0, DESCRIPTION_CHARS),
+      title: redactSecrets(input.title),
+      description: redactSecrets(
+        (input.description ?? "").slice(0, DESCRIPTION_CHARS),
+      ),
     },
   };
 
@@ -160,8 +165,9 @@ export async function suggestTaskQualification(
         "The task in `task.title` and `task.description` is being filed. " +
         `Should it carry the label "${label.name}"?`,
       criteria: {
-        true: `The task clearly falls under "${label.name}".`,
-        false: "The label does not describe this task.",
+        true: `The task clearly falls under "${label.name}" - it performs or needs that kind of work.`,
+        false:
+          "The label does not describe this task; a shared broad domain is not enough.",
       },
     });
     if (entry.tokens > budget) {
@@ -176,15 +182,13 @@ export async function suggestTaskQualification(
     const batches = splitByBudget(entries, budget).map((batch) =>
       Object.fromEntries(batch.map((entry) => [entry.name, entry.question])),
     );
-    const responses = await Promise.all(
-      batches.map((questions) => asker(state, questions)),
+    const responses = await gatherBounded(
+      batches.map((questions) => () => asker(state, questions)),
     );
     answers = Object.assign({}, ...responses);
   } catch (error) {
     console.warn(
-      `[jev] task qualification skipped: ${
-        error instanceof Error ? error.message : error
-      }`,
+      `[jev] task qualification skipped: ${describeJevError(error)}`,
     );
     return null;
   }

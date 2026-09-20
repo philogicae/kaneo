@@ -1,7 +1,7 @@
 ---
 name: kaneo
 description: Operate a Kaneo instance through MCP. Use for finding workspaces, projects, users and tasks; backlog triage, assignment, dependencies, comments and delivery evidence; project setup, user onboarding and workspace provisioning guidance; labels, scheduling and notification routing. Discover the connected tool catalog first, distinguish MCP operations from web-only setup, and apply the project's workflow without inventing tools or changing data during a read-only request.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Kaneo

@@ -7,7 +7,10 @@ import {
   workspaceTable,
 } from "../../database/schema";
 
-async function getNotifications(userId: string) {
+async function getNotifications(
+  userId: string,
+  paging: { limit?: number; offset?: number } = {},
+) {
   const rows = await db
     .select({
       notification: notificationTable,
@@ -26,7 +29,8 @@ async function getNotifications(userId: string) {
     .leftJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
     .where(eq(notificationTable.userId, userId))
     .orderBy(desc(notificationTable.createdAt))
-    .limit(50);
+    .limit(paging.limit ?? 50)
+    .offset(paging.offset ?? 0);
 
   return rows.map(({ notification, projectId, workspaceId }) => {
     if (!projectId && !workspaceId) {

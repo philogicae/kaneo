@@ -59,7 +59,12 @@
             "type": "boolean"
           },
           "hasSmtp": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "SMTP_HOST and SMTP_FROM are configured."
+          },
+          "hasEmail": {
+            "type": "boolean",
+            "description": "Any email transport is configured: Resend (RESEND_API_KEY) or SMTP. Prefer this over hasSmtp to decide whether mail can be sent."
           },
           "hasGithubSignIn": {
             "type": "boolean"
@@ -96,6 +101,7 @@
           "disableWorkspaceCreation",
           "isDemoMode",
           "hasSmtp",
+          "hasEmail",
           "hasGithubSignIn",
           "hasGoogleSignIn",
           "hasDiscordSignIn",
@@ -309,6 +315,13 @@
           "status": {
             "type": "string"
           },
+          "milestoneId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Roadmap sprint/phase the task belongs to, when assigned."
+          },
           "priority": {
             "type": "string",
             "description": "One of: no-priority, low, medium, high, urgent."
@@ -417,6 +430,7 @@
           "number",
           "description",
           "status",
+          "milestoneId",
           "priority",
           "startDate",
           "dueDate",
@@ -774,40 +788,203 @@
         ],
         "description": "When no page/limit is given, everything is returned on a single page."
       },
-      "BulkTaskResult": {
+      "WorkspaceTaskList": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceTask"
+            }
           },
-          "updatedCount": {
+          "pagination": {
+            "$ref": "#/components/schemas/WorkspaceTaskPagination"
+          }
+        },
+        "required": [
+          "tasks",
+          "pagination"
+        ]
+      },
+      "WorkspaceTask": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "number": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "milestoneId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Roadmap sprint/phase the task belongs to, when assigned."
+          },
+          "priority": {
+            "type": "string",
+            "description": "One of: no-priority, low, medium, high, urgent."
+          },
+          "startDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "reminderOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "number"
+            },
+            "description": "Reminder offsets in minutes before the task's start date (Telegram reminders)."
+          },
+          "recurrence": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly"
+                ]
+              },
+              "interval": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "frequency",
+              "interval"
+            ],
+            "description": "Recurrence of the task; the next occurrence is spawned on completion."
+          },
+          "position": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "userId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assigneeName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assigneeId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assigneeImage": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskLabel"
+            }
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectSlug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "number",
+          "description",
+          "status",
+          "milestoneId",
+          "priority",
+          "startDate",
+          "dueDate",
+          "reminderOffsets",
+          "recurrence",
+          "position",
+          "createdAt",
+          "userId",
+          "assigneeName",
+          "assigneeId",
+          "assigneeImage",
+          "projectId",
+          "labels",
+          "projectName",
+          "projectSlug"
+        ]
+      },
+      "WorkspaceTaskPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "Total tasks matching the filters, across the workspace."
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalPages": {
             "type": "number"
           }
         },
         "required": [
-          "success",
-          "updatedCount"
-        ]
-      },
-      "CreatedTask": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Task"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "labels": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/TaskLabel"
-                }
-              }
-            },
-            "required": [
-              "labels"
-            ]
-          }
+          "total",
+          "page",
+          "pageSize",
+          "totalPages"
         ]
       },
       "Task": {
@@ -852,6 +1029,13 @@
           "status": {
             "type": "string",
             "description": "The slug of the column the task sits in."
+          },
+          "milestoneId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Roadmap sprint/phase the task belongs to, when assigned."
           },
           "priority": {
             "type": "string",
@@ -937,12 +1121,49 @@
           "title",
           "description",
           "status",
+          "milestoneId",
           "priority",
           "startDate",
           "dueDate",
           "reminderOffsets",
           "recurrence",
           "createdAt"
+        ]
+      },
+      "BulkTaskResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "updatedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "success",
+          "updatedCount"
+        ]
+      },
+      "CreatedTask": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Task"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TaskLabel"
+                }
+              }
+            },
+            "required": [
+              "labels"
+            ]
+          }
         ]
       },
       "TaskQualification": {
@@ -1687,6 +1908,74 @@
           "workspaceId"
         ]
       },
+      "MilestoneList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Milestone"
+        }
+      },
+      "Milestone": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "color": {
+            "type": "string",
+            "description": "Semantic palette name (resolved by the web) or a hex color."
+          },
+          "position": {
+            "type": "number",
+            "description": "Left-to-right order in the roadmap, ascending."
+          },
+          "startDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "name",
+          "description",
+          "color",
+          "position",
+          "startDate",
+          "endDate",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "Notification": {
         "type": "object",
         "properties": {
@@ -1994,7 +2283,7 @@
           },
           "totalCount": {
             "type": "number",
-            "description": "Total matches found before the `limit` slice, so a caller can tell that more exist."
+            "description": "Matches returned after relevance filtering and the per-category caps. It is NOT an exhaustive database count: when Jev reranking is enabled, candidates below the relevance floor are dropped, and each category over-fetches at most 50 candidates. Use it as a lower bound, not as proof of absence."
           },
           "searchQuery": {
             "type": "string",
@@ -3464,6 +3753,41 @@
           "chat"
         ]
       },
+      "ProjectRelations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TaskRelation"
+        }
+      },
+      "TaskRelation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "sourceTaskId": {
+            "type": "string"
+          },
+          "targetTaskId": {
+            "type": "string"
+          },
+          "relationType": {
+            "type": "string",
+            "description": "How the two tasks relate: `subtask`, `blocks`, or `related`."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "sourceTaskId",
+          "targetTaskId",
+          "relationType",
+          "createdAt"
+        ]
+      },
       "TaskRelationWithTasks": {
         "allOf": [
           {
@@ -3538,35 +3862,6 @@
           "projectId",
           "userId",
           "assigneeName"
-        ]
-      },
-      "TaskRelation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "sourceTaskId": {
-            "type": "string"
-          },
-          "targetTaskId": {
-            "type": "string"
-          },
-          "relationType": {
-            "type": "string",
-            "description": "How the two tasks relate: `subtask`, `blocks`, or `related`."
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "sourceTaskId",
-          "targetTaskId",
-          "relationType",
-          "createdAt"
         ]
       },
       "ExternalLink": {
@@ -7600,6 +7895,269 @@
         }
       }
     },
+    "/task/workspace/{workspaceId}": {
+      "get": {
+        "operationId": "listWorkspaceTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List workspace tasks",
+        "description": "List tasks across every project of a workspace, as one flat, filterable, paginated list. Use it for cross-project reads such as the caller's open tasks, everything urgent, tasks due in a window, or tasks carrying a label; each row carries its project id/name/slug so `{projectSlug}-{number}` short ids can be built.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Column slug, or `planned` for the backlog or `archived`."
+            },
+            "required": false,
+            "description": "Column slug, or `planned` for the backlog or `archived`.",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "no-priority",
+                "low",
+                "medium",
+                "high",
+                "urgent"
+              ]
+            },
+            "required": false,
+            "name": "priority",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Assignee user id, or `unassigned` for tasks with no assignee."
+            },
+            "required": false,
+            "description": "Assignee user id, or `unassigned` for tasks with no assignee.",
+            "name": "assigneeId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Exact label name, case-insensitive."
+            },
+            "required": false,
+            "description": "Exact label name, case-insensitive.",
+            "name": "label",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Case-insensitive text match on title and description."
+            },
+            "required": false,
+            "description": "Case-insensitive text match on title and description.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Only tasks due at or before this ISO date-time."
+            },
+            "required": false,
+            "description": "Only tasks due at or before this ISO date-time.",
+            "name": "dueBefore",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Only tasks due at or after this ISO date-time."
+            },
+            "required": false,
+            "description": "Only tasks due at or after this ISO date-time.",
+            "name": "dueAfter",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$"
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "priority",
+                "dueDate",
+                "position",
+                "title",
+                "number"
+              ]
+            },
+            "required": false,
+            "name": "sortBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "required": false,
+            "name": "sortOrder",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The workspace task list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceTaskList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown workspace, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task/milestone/{taskId}": {
+      "put": {
+        "operationId": "updateTaskMilestone",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Assign task to milestone",
+        "description": "Move a task into a roadmap sprint/phase of the same project, or pass null to clear its assignment. The task itself is never deleted by a milestone change.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "taskId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "milestoneId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "Milestone to move the task into, or null to clear it."
+                  }
+                },
+                "required": [
+                  "milestoneId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown task, or the milestone belongs to another project",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing task:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/task/bulk": {
       "patch": {
         "operationId": "bulkUpdateTasks",
@@ -10011,6 +10569,28 @@
             "required": true,
             "name": "projectId",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Maximum appointments to return."
+            },
+            "required": false,
+            "description": "Maximum appointments to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Appointments to skip; use with limit to page."
+            },
+            "required": false,
+            "description": "Appointments to skip; use with limit to page.",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -11728,6 +12308,455 @@
         }
       }
     },
+    "/milestone": {
+      "get": {
+        "operationId": "listMilestones",
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "List milestones",
+        "description": "List a project's sprints/phases (roadmap zones), ordered left to right by `position`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The project's milestones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No access to the project's workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createMilestone",
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "Create milestone",
+        "description": "Add a sprint/phase to a project; it appends to the right of the roadmap. Tasks can then be assigned with the task milestone endpoint.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "color": {
+                    "type": "string",
+                    "description": "Semantic palette name shared with labels (gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald), or a hex color."
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "description": "Optional ISO 8601 date-time."
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "description": "Optional ISO 8601 date-time."
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Milestone created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing project:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/milestone/{id}": {
+      "get": {
+        "operationId": "getMilestone",
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "Get milestone",
+        "description": "Get a milestone by id.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The milestone",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown milestone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No access to the milestone's workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Milestone not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateMilestone",
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "Update milestone",
+        "description": "Update a milestone (fetch it, merge supplied fields, then send a full body). Null dates clear them; tasks assigned to it keep existing.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "color": {
+                    "type": "string",
+                    "description": "Semantic palette name shared with labels (gray, purple, teal, green, orange, sky, yellow, pink, red, blue, cyan, indigo, fuchsia, lime, emerald), or a hex color."
+                  },
+                  "startDate": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "endDate": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "color"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Milestone updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid body, or unknown milestone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing project:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteMilestone",
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "Delete milestone",
+        "description": "Delete a sprint/phase. Its tasks are kept and fall back to the roadmap's no-sprint lane.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Milestone deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Milestone"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown milestone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing project:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Milestone not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/milestone/reorder/{projectId}": {
+      "put": {
+        "operationId": "reorderMilestones",
+        "tags": [
+          "Milestones"
+        ],
+        "summary": "Reorder milestones",
+        "description": "Set the roadmap order of a project's milestones. Every milestone of the project must be listed exactly once with its new position.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "milestones": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "position": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "position"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "milestones"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reordered milestones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, or the list does not cover every milestone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access, or missing project:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/notification": {
       "get": {
         "operationId": "listNotifications",
@@ -11735,7 +12764,31 @@
           "Notifications"
         ],
         "summary": "List notifications",
-        "description": "Get every notification for the current user, read and unread.",
+        "description": "Get the current user's notifications, newest first. Paginated: limit (default 50, max 200) and offset.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Maximum number of items to return."
+            },
+            "required": false,
+            "description": "Maximum number of items to return.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "description": "Number of items to skip; use with limit to page."
+            },
+            "required": false,
+            "description": "Number of items to skip; use with limit to page.",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of notifications",
@@ -15974,6 +17027,61 @@
           },
           "404": {
             "description": "Stored bot or chat not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/task-relation/project/{projectId}": {
+      "get": {
+        "operationId": "getProjectRelations",
+        "tags": [
+          "Task Relations"
+        ],
+        "summary": "Get project relations",
+        "description": "Get every task relation whose two endpoints belong to the project. The roadmap reads this once instead of fetching relations per task.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The project's task relations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRelations"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown project, or its workspace could not be determined",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No access to the project's workspace",
             "content": {
               "text/plain": {
                 "schema": {

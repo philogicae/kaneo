@@ -13,9 +13,10 @@
 > - `lint` scripts run Biome with `--write` and can rewrite unrelated files — prefer `pnpm exec biome check <paths>` while iterating.
 > - `apps/docs/openapi.json` is a committed artifact checked by CI (`pnpm openapi:check`); regenerate with `pnpm openapi:check:fix` after any route/schema change.
 > - `i18n/en-US.json` is the source of truth; `pnpm i18n:schema` regenerates `i18n/schema.json` after key changes. `scripts/i18n/check.mjs --fix` only adds missing keys — it never prunes extras, so removing a key means removing it from **every** locale file.
+
 - **Jev (TypeSafe System One).** Optional via `TYPESAFE_API_KEY` in root `.env` (`KANEO_JEV_*` knobs documented in `.env.sample`): `apps/api/src/jev/` reranks/filters global search candidates and auto-qualifies task creation (priority + semantic labels; `branch:*`/`machine:*` are never picked automatically). Every integration is fail-open — without a key or on any error, previous behavior is unchanged. Requests stay under the Jev context budget: oversized items are truncated and the questions split into parallel batches (`KANEO_JEV_MAX_REQUEST_TOKENS`).
-> - `pnpm-workspace.yaml` pins security-relevant overrides (`better-auth`, `hono`, `esbuild`…). Don't bypass them in package manifests.
-> - User-visible web copy must use static i18n keys — no hardcoded UI copy.
+  > - `pnpm-workspace.yaml` pins security-relevant overrides (`better-auth`, `hono`, `esbuild`…). Don't bypass them in package manifests.
+  > - User-visible web copy must use static i18n keys — no hardcoded UI copy.
 
 ## Project overview
 
@@ -26,7 +27,7 @@
 
 ## Setup commands
 
-- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.4.2`).
+- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.5.1`).
 - `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:coverage` (unit + coverage, aggregated per workspace in the CI job summary) · `pnpm test:integration` (local libSQL/SQLite file)
 - `pnpm lint` = Biome **--write** (rewrites files); CI gate is `pnpm exec biome ci .` — run that for a read-only check.
 - `pnpm i18n:check` / `i18n:schema` · `pnpm openapi:check` / `openapi:check:fix`

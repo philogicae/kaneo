@@ -257,7 +257,7 @@ function WorkspaceRuleCard({
         <div className="flex shrink-0 items-center gap-3">
           {isConnected ? (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <CheckCircle className="size-4 text-green-600" />
+              <CheckCircle className="size-4 text-success-foreground" />
               <span>
                 {state.isActive
                   ? t("settings:notificationsPage.statusConnected")
@@ -746,7 +746,7 @@ export function NotificationPreferencesSettings() {
           <div className="flex items-center gap-3">
             {preferences?.emailEnabled ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="size-4 text-green-600" />
+                <CheckCircle className="size-4 text-success-foreground" />
                 <span>{t("settings:notificationsPage.statusConnected")}</span>
               </div>
             ) : null}
@@ -836,7 +836,7 @@ export function NotificationPreferencesSettings() {
           <div className="flex items-center gap-3">
             {preferences?.gotifyConfigured ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="size-4 text-green-600" />
+                <CheckCircle className="size-4 text-success-foreground" />
                 <span>
                   {preferences.gotifyEnabled
                     ? t("settings:notificationsPage.statusConnected")
@@ -966,7 +966,7 @@ export function NotificationPreferencesSettings() {
           <div className="flex items-center gap-3">
             {preferences?.ntfyConfigured ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="size-4 text-green-600" />
+                <CheckCircle className="size-4 text-success-foreground" />
                 <span>
                   {preferences.ntfyEnabled
                     ? t("settings:notificationsPage.statusConnected")
@@ -1107,7 +1107,7 @@ export function NotificationPreferencesSettings() {
           <div className="flex items-center gap-3">
             {preferences?.webhookConfigured ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="size-4 text-green-600" />
+                <CheckCircle className="size-4 text-success-foreground" />
                 <span>
                   {preferences.webhookEnabled
                     ? t("settings:notificationsPage.statusConnected")

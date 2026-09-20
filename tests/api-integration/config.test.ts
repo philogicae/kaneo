@@ -22,6 +22,7 @@ describe("API integration: config", () => {
     expect(payload).toSatisfy((value: Record<string, unknown>) =>
       [
         "hasSmtp",
+        "hasEmail",
         "hasGithubSignIn",
         "hasGoogleSignIn",
         "hasDiscordSignIn",

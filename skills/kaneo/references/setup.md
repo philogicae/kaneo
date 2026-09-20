@@ -11,8 +11,8 @@ Use this procedure only for requested setup. First inventory what exists; reuse 
 | Create/rename a workspace or edit its description                       | Web UI; no workspace-write MCP tool                                         |
 | Invite by email, accept invitations, change membership or roles         | Web UI; no corresponding MCP tools                                          |
 | Retrieve an existing shareable invitation                               | MCP: `get_workspace_invite_link`; creating/revoking links is web-only       |
-| Create/update projects, columns and labels                              | MCP where listed in the connected catalog; label rename/recolor is web-only |
-| Archive/unarchive a project                                             | Web UI; no project-archive MCP tool (`archived` task status is different)   |
+| Create/update projects, columns and labels                              | MCP where listed in the connected catalog; `update_label` renames/recolors, project archive has its own tools |
+| Archive/unarchive a project                                             | MCP: `archive_project` / `unarchive_project` (`archived` task status is different) |
 | Configure custom fields, templates, assets or non-Telegram integrations | Web UI; no corresponding MCP tools                                          |
 
 An API endpoint existing in the codebase does not make it an MCP tool. Hand off unavailable operations with the exact UI action, desired outcome and read-back check. Do not change server settings or improvise auth API calls to complete setup.
@@ -59,10 +59,10 @@ Dev work can use branch/machine labels; support or personal work usually needs o
 
 ### Idempotent label setup
 
-1. Call `list_workspace_labels`; separate definitions (`taskId: null`) from task copies. The identity is workspace + exact name for a definition, task + exact name for a copy.
+1. Call `list_workspace_labels`; it returns definitions (`taskId: null`) by default. Pass `includeCopies: true` only if you also need task-scoped copies; the identity is workspace + exact name for a definition, task + exact name for a copy.
 2. If the definition exists, reuse its ID. `create_label` silently returns an existing same-scope label and ignores the proposed color; inspect the result.
 3. For a missing definition, use `create_label` with `workspaceId`, `name`, `color`, and **no `taskId`**. Attach separately with the definition's ID when needed.
-4. Re-list definitions and compare names/colors to the requested set. Report conflicts instead of trying delete/recreate. There is no `update_label` MCP tool; use the web label editor for rename/recolor.
+4. Re-list definitions and compare names/colors to the requested set. Report conflicts instead of trying delete/recreate. `update_label` renames or recolors a definition (it fetches, merges then PUTs); a name collision with another workspace label is rejected, and renaming cascades to task copies.
 
 Examples are MCP call envelopes, not commands to execute automatically. Replace every `<...>` placeholder with a verified value; tests check their argument schemas, not the existence of those IDs.
 
@@ -105,7 +105,7 @@ A partially completed setup should report the verified workspace/project IDs, wh
 
 ## Notifications
 
-- **In-app:** `list_notifications` reads recent notifications; it does not acknowledge them or update preferences. Users configure their own preferences in settings.
+- **In-app:** `list_notifications` reads notifications newest-first (`limit`/`offset`, default 50, max 200); it does not acknowledge them or update preferences. Users configure their own preferences in settings.
 - **Telegram:** first inspect `telegram_list_config`; reuse the existing bot → chat → rule chain. Confirm the recipient, workspace/project scope and event filter **before enabling routing**, because notifications can disclose private task content. See [Telegram routing](mcp-guidelines.md#telegram-routing-model).
 - If no bot exists, prefer entering its BotFather token directly in account settings rather than pasting credentials into chat. `telegram_create_bot` accepts a token but validates its shape locally, not Telegram connectivity. Never include it in evidence.
 - Link the verified chat using `telegram_create_chat`, then route with `telegram_create_rule`; the convenience tool `telegram_configure_notifications` can do both. Linking alone does not deliver notifications. Read back the rule; a stored rule is not proof a message was delivered. Ask before any external test message.

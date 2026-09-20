@@ -26,6 +26,8 @@ type Task = {
   number: number | null;
   description: string | null;
   status: string;
+  // Roadmap sprint/phase the task belongs to, when assigned.
+  milestoneId?: string | null;
   priority: string | null;
   startDate: string | null;
   dueDate: string | null;

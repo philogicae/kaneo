@@ -27,6 +27,7 @@ import {
   clientRegistrationSchema,
   oauthErrorSchema,
 } from "./schemas";
+import { McpSessionStore } from "./sessions";
 import { registerMcpTools, toMcpToolRegistrar } from "./tools";
 
 const publicApiUrl = (process.env.KANEO_API_URL || "http://localhost:1337")
@@ -38,12 +39,8 @@ const internalApiUrl = (
   .replace(/\/api\/?$/, "")
   .replace(/\/+$/, "");
 
-type McpSession = {
-  transport: WebStandardStreamableHTTPServerTransport;
-  userId: string;
-};
-
-const sessions = new Map<string, McpSession>();
+const sessions =
+  new McpSessionStore<WebStandardStreamableHTTPServerTransport>();
 
 function createMcpServerForUser(token: string): LegacyMcpServer {
   const server = new LegacyMcpServer({
@@ -275,11 +272,9 @@ mcp.all("/mcp", async (c) => {
   const sessionId = c.req.header("mcp-session-id");
 
   if (sessionId) {
-    const existing = sessions.get(sessionId);
-    // A mismatched owner is reported as missing rather than forbidden so the
-    // response cannot confirm that someone else's session id is valid.
-    if (existing && existing.userId === authResult.userId) {
-      return existing.transport.handleRequest(c.req.raw);
+    const transport = sessions.get(sessionId, authResult.userId);
+    if (transport) {
+      return transport.handleRequest(c.req.raw);
     }
     return c.json({ error: "Session not found" }, 404);
   }
@@ -312,10 +307,7 @@ mcp.all("/mcp", async (c) => {
   const response = await transport.handleRequest(c.req.raw);
 
   if (transport.sessionId) {
-    sessions.set(transport.sessionId, {
-      transport,
-      userId: authResult.userId,
-    });
+    sessions.set(transport.sessionId, authResult.userId, transport);
   }
 
   return response;
@@ -428,88 +420,35 @@ mcp.post("/mcp/token", async (c) => {
   });
 });
 
-mcp.get("/.well-known/oauth-protected-resource/api/mcp", (c) =>
-  c.json({
-    resource: `${publicApiUrl}/api/mcp`,
-    authorization_servers: [`${publicApiUrl}/api`],
-  }),
-);
+// One source for the discovery documents: the router mounts them under /api
+// and `mcpWellKnownRoutes` mounts the same payloads at the server root.
+function protectedResourceMetadata(baseUrl: string) {
+  return {
+    resource: `${baseUrl}/api/mcp`,
+    authorization_servers: [`${baseUrl}/api`],
+  };
+}
 
-mcp.get("/.well-known/oauth-authorization-server/api", (c) =>
-  c.json({
-    issuer: `${publicApiUrl}/api`,
-    authorization_endpoint: `${publicApiUrl}/api/mcp/authorize`,
-    token_endpoint: `${publicApiUrl}/api/mcp/token`,
-    registration_endpoint: `${publicApiUrl}/api/mcp/register`,
+function authorizationServerMetadata(baseUrl: string) {
+  return {
+    issuer: `${baseUrl}/api`,
+    authorization_endpoint: `${baseUrl}/api/mcp/authorize`,
+    token_endpoint: `${baseUrl}/api/mcp/token`,
+    registration_endpoint: `${baseUrl}/api/mcp/register`,
     response_types_supported: ["code"],
     grant_types_supported: ["authorization_code"],
     code_challenge_methods_supported: ["S256"],
     token_endpoint_auth_methods_supported: ["none"],
-  }),
+  };
+}
+
+mcp.get("/.well-known/oauth-protected-resource/api/mcp", (c) =>
+  c.json(protectedResourceMetadata(publicApiUrl)),
 );
 
-mcp.all("/mcp", async (c) => {
-  const authResult = await validateBearerToken(c.req.raw);
-  if (!authResult) {
-    const prmUrl = `${publicApiUrl}/api/.well-known/oauth-protected-resource/api/mcp`;
-    c.header("WWW-Authenticate", `Bearer resource_metadata="${prmUrl}"`);
-    return c.json(
-      {
-        error: "invalid_token",
-        error_description: "Missing or invalid token",
-      },
-      401,
-    );
-  }
-
-  const sessionId = c.req.header("mcp-session-id");
-
-  if (sessionId) {
-    const existing = sessions.get(sessionId);
-    // A mismatched owner is reported as missing rather than forbidden so the
-    // response cannot confirm that someone else's session id is valid.
-    if (existing && existing.userId === authResult.userId) {
-      return existing.transport.handleRequest(c.req.raw);
-    }
-    return c.json({ error: "Session not found" }, 404);
-  }
-
-  if (c.req.method !== "POST") {
-    return c.json({ error: "Method not allowed" }, 405);
-  }
-
-  if (!isJsonContentType(c.req.header("content-type"))) {
-    return c.json({ error: "Unsupported Media Type" }, 415);
-  }
-
-  if (!(await isLegacyRequest(c.req.raw.clone()))) {
-    const modern = createModernMcpHandler(authResult.token, internalApiUrl);
-    return modern.fetch(c.req.raw);
-  }
-
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: () => randomUUID(),
-  });
-
-  transport.onclose = () => {
-    if (transport.sessionId) {
-      sessions.delete(transport.sessionId);
-    }
-  };
-
-  const server = createMcpServerForUser(authResult.token);
-  await server.connect(transport);
-  const response = await transport.handleRequest(c.req.raw);
-
-  if (transport.sessionId) {
-    sessions.set(transport.sessionId, {
-      transport,
-      userId: authResult.userId,
-    });
-  }
-
-  return response;
-});
+mcp.get("/.well-known/oauth-authorization-server/api", (c) =>
+  c.json(authorizationServerMetadata(publicApiUrl)),
+);
 
 export default mcp;
 
@@ -517,23 +456,11 @@ export function mcpWellKnownRoutes(baseUrl: string) {
   const wellKnown = new Hono();
 
   wellKnown.get("/.well-known/oauth-protected-resource/api/mcp", (c) =>
-    c.json({
-      resource: `${baseUrl}/api/mcp`,
-      authorization_servers: [`${baseUrl}/api`],
-    }),
+    c.json(protectedResourceMetadata(baseUrl)),
   );
 
   wellKnown.get("/.well-known/oauth-authorization-server/api", (c) =>
-    c.json({
-      issuer: `${baseUrl}/api`,
-      authorization_endpoint: `${baseUrl}/api/mcp/authorize`,
-      token_endpoint: `${baseUrl}/api/mcp/token`,
-      registration_endpoint: `${baseUrl}/api/mcp/register`,
-      response_types_supported: ["code"],
-      grant_types_supported: ["authorization_code"],
-      code_challenge_methods_supported: ["S256"],
-      token_endpoint_auth_methods_supported: ["none"],
-    }),
+    c.json(authorizationServerMetadata(baseUrl)),
   );
 
   return wellKnown;

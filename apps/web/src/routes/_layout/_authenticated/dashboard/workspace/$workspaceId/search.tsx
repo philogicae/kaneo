@@ -78,7 +78,7 @@ function SearchComponent() {
           </Link>
         }
       >
-        <div className="space-y-6">
+        <div className="mx-auto w-full max-w-3xl space-y-6">
           <div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />

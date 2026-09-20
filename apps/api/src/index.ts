@@ -36,6 +36,7 @@ import mattermostIntegration from "./mattermost-integration";
 import mcpRoutes, { mcpWellKnownRoutes } from "./mcp";
 import { migrateColumns } from "./migrations/column-migration";
 import { migrateLabelColors } from "./migrations/label-color-migration";
+import milestone from "./milestone";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
@@ -589,6 +590,7 @@ export function createApp() {
   const commentApi = api.route("/comment", comment);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
+  const milestoneApi = api.route("/milestone", milestone);
   const notificationApi = api.route("/notification", notification);
   const notificationPreferencesApi = api.route(
     "/notification-preferences",
@@ -788,6 +790,7 @@ export function createApp() {
     invitationApi,
     invitationPublicApi,
     labelApi,
+    milestoneApi,
     notificationApi,
     notificationPreferencesApi,
     projectApi,
@@ -897,6 +900,7 @@ const {
   invitationPublicApi,
   labelApi,
   mattermostIntegrationApi,
+  milestoneApi,
   notificationApi,
   notificationPreferencesApi,
   projectApi,
@@ -937,6 +941,7 @@ export type AppType =
   | typeof commentApi
   | typeof timeEntryApi
   | typeof labelApi
+  | typeof milestoneApi
   | typeof notificationApi
   | typeof notificationPreferencesApi
   | typeof searchApi

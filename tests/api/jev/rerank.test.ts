@@ -44,6 +44,13 @@ describe("estimateJevTokens", () => {
     expect(estimateJevTokens("{}")).toBe(2);
     expect(estimateJevTokens("hello world")).toBe(2);
   });
+
+  it("counts a non-ASCII character as two tokens", () => {
+    expect(estimateJevTokens("日本語")).toBe(6);
+    expect(estimateJevTokens("café")).toBeGreaterThan(
+      estimateJevTokens("cafe"),
+    );
+  });
 });
 
 describe("rerankByRelevance", () => {
@@ -186,7 +193,7 @@ describe("rerankByRelevance", () => {
     const seen = { batchSizes: [] as number[] };
     const items: Item[] = Array.from({ length: 6 }, (_, i) => ({
       id: `i${i}`,
-      text: `${"x".repeat(400)}-${i}`,
+      text: `${"lorem ipsum ".repeat(40)}-${i}`,
     }));
 
     const kept = await rerankByRelevance({
@@ -194,7 +201,7 @@ describe("rerankByRelevance", () => {
       items,
       topk: 2,
       textOf,
-      maxRequestTokens: 600,
+      maxRequestTokens: 300,
       ask: scoringAsker((text) => (text.endsWith("-0") ? 4 : 0), seen),
     });
 
@@ -205,7 +212,7 @@ describe("rerankByRelevance", () => {
   it("runs budget batches in parallel", async () => {
     const items: Item[] = Array.from({ length: 4 }, (_, index) => ({
       id: `i${index}`,
-      text: "x".repeat(400),
+      text: "lorem ipsum dolor sit amet ".repeat(20),
     }));
     let inFlight = 0;
     let maxInFlight = 0;
@@ -215,7 +222,7 @@ describe("rerankByRelevance", () => {
       items,
       topk: 1,
       textOf,
-      maxRequestTokens: 600,
+      maxRequestTokens: 300,
       ask: async (_state, questions) => {
         inFlight++;
         maxInFlight = Math.max(maxInFlight, inFlight);
@@ -234,7 +241,7 @@ describe("rerankByRelevance", () => {
   it("truncates an oversized candidate instead of failing the pass", async () => {
     const seen: string[] = [];
     const items: Item[] = [
-      { id: "huge", text: "x".repeat(20_000) },
+      { id: "huge", text: "lorem ipsum dolor sit amet ".repeat(1_000) },
       { id: "small", text: "alpha" },
     ];
 
@@ -258,8 +265,8 @@ describe("rerankByRelevance", () => {
     });
 
     expect(kept?.map((item) => item.id)).toEqual(["huge", "small"]);
-    const hugeContent = seen.find((content) => content.startsWith("x"));
-    expect(hugeContent?.length).toBeLessThan(20_000);
+    const hugeContent = seen.find((content) => content.startsWith("lorem"));
+    expect(hugeContent?.length).toBeLessThan(28_000);
     expect(hugeContent?.endsWith("…")).toBe(true);
   });
 
@@ -300,5 +307,89 @@ describe("rerankByRelevance", () => {
 
     expect(kept).toBeNull();
     warn.mockRestore();
+  });
+
+  it("drops low-confidence rejects by default", async () => {
+    const items: Item[] = [
+      { id: "a", text: "alpha" },
+      { id: "b", text: "beta" },
+    ];
+    const ask: JevAsker = async (_state, questions) =>
+      Object.fromEntries(
+        Object.keys(questions).map((name) => [
+          name,
+          { score: name.endsWith("c0") ? 4 : 0, confidence: 0.2 },
+        ]),
+      );
+
+    const kept = await rerankByRelevance({
+      query: "q",
+      items,
+      topk: 5,
+      textOf,
+      ask,
+    });
+
+    expect(kept?.map((item) => item.id)).toEqual(["a"]);
+  });
+
+  it("fills the remaining places with unsure rejects when asked", async () => {
+    const items: Item[] = [
+      { id: "a", text: "alpha" },
+      { id: "b", text: "beta" },
+      { id: "c", text: "gamma" },
+    ];
+    const ask: JevAsker = async (_state, questions) =>
+      Object.fromEntries(
+        Object.keys(questions).map((name) => [
+          name,
+          {
+            score: name.endsWith("c0") ? 4 : name.endsWith("c1") ? 0 : 1,
+            confidence: name.endsWith("c1") ? 0.2 : 0.9,
+          },
+        ]),
+      );
+
+    const kept = await rerankByRelevance({
+      query: "q",
+      items,
+      topk: 5,
+      textOf,
+      ask,
+      keepUnsure: true,
+    });
+
+    // The sure candidate first, then the unsure reject; the confident reject
+    // stays out.
+    expect(kept?.map((item) => item.id)).toEqual(["a", "b"]);
+  });
+
+  it("redacts secret-shaped candidate text before asking Jev", async () => {
+    const seen: string[] = [];
+    const items: Item[] = [
+      { id: "a", text: "deploy with token=supersecretvalue123 now" },
+      { id: "b", text: "plain text" },
+    ];
+
+    await rerankByRelevance({
+      query: "q",
+      items,
+      topk: 2,
+      textOf,
+      ask: async (state, questions) => {
+        const candidates = (
+          state as { candidates: Array<{ id: string; content: string }> }
+        ).candidates;
+        for (const candidate of candidates) {
+          seen.push(candidate.content);
+        }
+        return Object.fromEntries(
+          Object.keys(questions).map((name) => [name, { score: 4 }]),
+        );
+      },
+    });
+
+    expect(seen.join("\n")).not.toContain("supersecretvalue123");
+    expect(seen.join("\n")).toContain("[redacted]");
   });
 });

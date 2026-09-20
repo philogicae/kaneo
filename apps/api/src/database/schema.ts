@@ -726,6 +726,39 @@ export const workflowRuleTable = sqliteTable(
   ],
 );
 
+// Project-scoped sprint/phase: the roadmap lays milestones out left to right
+// and groups their tasks in zones. Deleting a milestone clears its tasks'
+// assignment (SET NULL) instead of deleting the tasks.
+export const milestoneTable = sqliteTable(
+  "milestone",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    description: text("description"),
+    // Semantic palette name shared with labels (resolved by the web).
+    color: text("color").notNull().default("sky"),
+    position: integer("position").default(0).notNull(),
+    startDate: integer("start_date", { mode: "timestamp_ms" }),
+    endDate: integer("end_date", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("milestone_projectId_idx").on(table.projectId)],
+);
+
 export const taskTable = sqliteTable(
   "task",
   {
@@ -748,6 +781,13 @@ export const taskTable = sqliteTable(
     description: text("description"),
     status: text("status").notNull().default("to-do"),
     columnId: text("column_id").references(() => columnTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    // Sprint/phase of the roadmap; a task belongs to at most one. SQLite
+    // cannot add ON DELETE SET NULL through ALTER TABLE, so deleting a
+    // milestone detaches its tasks explicitly in the controller.
+    milestoneId: text("milestone_id").references(() => milestoneTable.id, {
       onDelete: "set null",
       onUpdate: "cascade",
     }),
@@ -778,6 +818,7 @@ export const taskTable = sqliteTable(
     index("task_dueDate_idx").on(table.dueDate),
     index("task_assigneeId_idx").on(table.userId),
     index("task_columnId_idx").on(table.columnId),
+    index("task_milestoneId_idx").on(table.milestoneId),
     unique("task_project_number_unique").on(table.projectId, table.number),
   ],
 );

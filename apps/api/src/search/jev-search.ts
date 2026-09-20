@@ -4,6 +4,7 @@
 // best first. Without a key, or on any failure, the previous results are
 // returned unchanged.
 
+import { envFlag } from "../jev/budget";
 import { askJev, isJevEnabled, type JevAsker } from "../jev/client";
 import { CANDIDATE_CAP, rerankByRelevance } from "../jev/rerank";
 
@@ -75,6 +76,11 @@ export async function rerankSearchResults<T extends JevSearchResult>(
     textOf: searchResultText,
     kind: "search results",
     ask: asker,
+    // The SQL pass already matched the query text; returning nothing because
+    // Jev was not confident is worse than returning the maybe-relevant rows
+    // the user used to get. Unsure rejects fill the places the sure ones
+    // leave (KANEO_JEV_KEEP_UNSURE=0 restores the hard floor).
+    keepUnsure: envFlag("KANEO_JEV_KEEP_UNSURE", true),
   });
   if (kept === null) {
     return fallback;

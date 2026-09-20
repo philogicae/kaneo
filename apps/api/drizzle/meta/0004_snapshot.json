@@ -1,0 +1,5379 @@
+{
+	"version": "6",
+	"dialect": "sqlite",
+	"id": "8e7e0925-c326-42d9-b20c-02c4b80d4505",
+	"prevId": "c9456a04-ad0a-4bf8-a3bc-4b53bfffbd13",
+	"tables": {
+		"access_team_member": {
+			"name": "access_team_member",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"team_id": {
+					"name": "team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"access_team_member_teamId_idx": {
+					"name": "access_team_member_teamId_idx",
+					"columns": ["team_id"],
+					"isUnique": false
+				},
+				"access_team_member_userId_idx": {
+					"name": "access_team_member_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"access_team_member_unique": {
+					"name": "access_team_member_unique",
+					"columns": ["team_id", "user_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"access_team_member_team_id_access_team_id_fk": {
+					"name": "access_team_member_team_id_access_team_id_fk",
+					"tableFrom": "access_team_member",
+					"tableTo": "access_team",
+					"columnsFrom": ["team_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"access_team_member_user_id_user_id_fk": {
+					"name": "access_team_member_user_id_user_id_fk",
+					"tableFrom": "access_team_member",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"access_team_project": {
+			"name": "access_team_project",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"team_id": {
+					"name": "team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"access_team_project_teamId_idx": {
+					"name": "access_team_project_teamId_idx",
+					"columns": ["team_id"],
+					"isUnique": false
+				},
+				"access_team_project_projectId_idx": {
+					"name": "access_team_project_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"access_team_project_unique": {
+					"name": "access_team_project_unique",
+					"columns": ["team_id", "project_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"access_team_project_team_id_access_team_id_fk": {
+					"name": "access_team_project_team_id_access_team_id_fk",
+					"tableFrom": "access_team_project",
+					"tableTo": "access_team",
+					"columnsFrom": ["team_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"access_team_project_project_id_project_id_fk": {
+					"name": "access_team_project_project_id_project_id_fk",
+					"tableFrom": "access_team_project",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"access_team": {
+			"name": "access_team",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_by": {
+					"name": "created_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"access_team_name_idx": {
+					"name": "access_team_name_idx",
+					"columns": ["name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"access_team_created_by_user_id_fk": {
+					"name": "access_team_created_by_user_id_fk",
+					"tableFrom": "access_team",
+					"tableTo": "user",
+					"columnsFrom": ["created_by"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"access_team_workspace": {
+			"name": "access_team_workspace",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"team_id": {
+					"name": "team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"all_projects": {
+					"name": "all_projects",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"access_team_workspace_teamId_idx": {
+					"name": "access_team_workspace_teamId_idx",
+					"columns": ["team_id"],
+					"isUnique": false
+				},
+				"access_team_workspace_workspaceId_idx": {
+					"name": "access_team_workspace_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"access_team_workspace_unique": {
+					"name": "access_team_workspace_unique",
+					"columns": ["team_id", "workspace_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"access_team_workspace_team_id_access_team_id_fk": {
+					"name": "access_team_workspace_team_id_access_team_id_fk",
+					"tableFrom": "access_team_workspace",
+					"tableTo": "access_team",
+					"columnsFrom": ["team_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"access_team_workspace_workspace_id_workspace_id_fk": {
+					"name": "access_team_workspace_workspace_id_workspace_id_fk",
+					"tableFrom": "access_team_workspace",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"account": {
+			"name": "account",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"account_id": {
+					"name": "account_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"provider_id": {
+					"name": "provider_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"access_token": {
+					"name": "access_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"refresh_token": {
+					"name": "refresh_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"id_token": {
+					"name": "id_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"access_token_expires_at": {
+					"name": "access_token_expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"refresh_token_expires_at": {
+					"name": "refresh_token_expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"scope": {
+					"name": "scope",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"password": {
+					"name": "password",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"account_userId_idx": {
+					"name": "account_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"account_user_id_user_id_fk": {
+					"name": "account_user_id_user_id_fk",
+					"tableFrom": "account",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"activity": {
+			"name": "activity",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"type": {
+					"name": "type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"content": {
+					"name": "content",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"event_data": {
+					"name": "event_data",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"external_user_name": {
+					"name": "external_user_name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"external_user_avatar": {
+					"name": "external_user_avatar",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"external_source": {
+					"name": "external_source",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"external_url": {
+					"name": "external_url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"activity_task_id_idx": {
+					"name": "activity_task_id_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"activity_userId_idx": {
+					"name": "activity_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"activity_task_external_source_external_url_unique": {
+					"name": "activity_task_external_source_external_url_unique",
+					"columns": ["task_id", "external_source", "external_url"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"activity_task_id_task_id_fk": {
+					"name": "activity_task_id_task_id_fk",
+					"tableFrom": "activity",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"activity_user_id_user_id_fk": {
+					"name": "activity_user_id_user_id_fk",
+					"tableFrom": "activity",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"apikey": {
+			"name": "apikey",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"config_id": {
+					"name": "config_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'default'"
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"start": {
+					"name": "start",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"reference_id": {
+					"name": "reference_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"prefix": {
+					"name": "prefix",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"key": {
+					"name": "key",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"refill_interval": {
+					"name": "refill_interval",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"refill_amount": {
+					"name": "refill_amount",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"last_refill_at": {
+					"name": "last_refill_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"enabled": {
+					"name": "enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": true
+				},
+				"rate_limit_enabled": {
+					"name": "rate_limit_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": true
+				},
+				"rate_limit_time_window": {
+					"name": "rate_limit_time_window",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 86400000
+				},
+				"rate_limit_max": {
+					"name": "rate_limit_max",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 10
+				},
+				"request_count": {
+					"name": "request_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 0
+				},
+				"remaining": {
+					"name": "remaining",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"last_request": {
+					"name": "last_request",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"permissions": {
+					"name": "permissions",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"metadata": {
+					"name": "metadata",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"apikey_configId_idx": {
+					"name": "apikey_configId_idx",
+					"columns": ["config_id"],
+					"isUnique": false
+				},
+				"apikey_key_idx": {
+					"name": "apikey_key_idx",
+					"columns": ["key"],
+					"isUnique": false
+				},
+				"apikey_referenceId_idx": {
+					"name": "apikey_referenceId_idx",
+					"columns": ["reference_id"],
+					"isUnique": false
+				},
+				"apikey_userId_idx": {
+					"name": "apikey_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"apikey_reference_id_user_id_fk": {
+					"name": "apikey_reference_id_user_id_fk",
+					"tableFrom": "apikey",
+					"tableTo": "user",
+					"columnsFrom": ["reference_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"apikey_user_id_user_id_fk": {
+					"name": "apikey_user_id_user_id_fk",
+					"tableFrom": "apikey",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"appointment_reminder_sent": {
+			"name": "appointment_reminder_sent",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"appointment_id": {
+					"name": "appointment_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"reminder_type": {
+					"name": "reminder_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"appointment_reminder_sent_appointmentId_idx": {
+					"name": "appointment_reminder_sent_appointmentId_idx",
+					"columns": ["appointment_id"],
+					"isUnique": false
+				},
+				"appointment_reminder_sent_appointment_type_unique": {
+					"name": "appointment_reminder_sent_appointment_type_unique",
+					"columns": ["appointment_id", "reminder_type"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"appointment_reminder_sent_appointment_id_appointment_id_fk": {
+					"name": "appointment_reminder_sent_appointment_id_appointment_id_fk",
+					"tableFrom": "appointment_reminder_sent",
+					"tableTo": "appointment",
+					"columnsFrom": ["appointment_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"appointment": {
+			"name": "appointment",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 0
+				},
+				"number": {
+					"name": "number",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 1
+				},
+				"assignee_id": {
+					"name": "assignee_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"title": {
+					"name": "title",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"priority": {
+					"name": "priority",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'medium'"
+				},
+				"start_date": {
+					"name": "start_date",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"due_date": {
+					"name": "due_date",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"reminder_offsets": {
+					"name": "reminder_offsets",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"recurrence": {
+					"name": "recurrence",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"appointment_projectId_idx": {
+					"name": "appointment_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"appointment_startDate_idx": {
+					"name": "appointment_startDate_idx",
+					"columns": ["start_date"],
+					"isUnique": false
+				},
+				"appointment_assigneeId_idx": {
+					"name": "appointment_assigneeId_idx",
+					"columns": ["assignee_id"],
+					"isUnique": false
+				},
+				"appointment_project_number_unique": {
+					"name": "appointment_project_number_unique",
+					"columns": ["project_id", "number"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"appointment_project_id_project_id_fk": {
+					"name": "appointment_project_id_project_id_fk",
+					"tableFrom": "appointment",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"appointment_assignee_id_user_id_fk": {
+					"name": "appointment_assignee_id_user_id_fk",
+					"tableFrom": "appointment",
+					"tableTo": "user",
+					"columnsFrom": ["assignee_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"asset": {
+			"name": "asset",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"activity_id": {
+					"name": "activity_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"object_key": {
+					"name": "object_key",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"filename": {
+					"name": "filename",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"mime_type": {
+					"name": "mime_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"size": {
+					"name": "size",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"kind": {
+					"name": "kind",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'image'"
+				},
+				"surface": {
+					"name": "surface",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'description'"
+				},
+				"created_by": {
+					"name": "created_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"asset_object_key_unique": {
+					"name": "asset_object_key_unique",
+					"columns": ["object_key"],
+					"isUnique": true
+				},
+				"asset_workspaceId_idx": {
+					"name": "asset_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"asset_projectId_idx": {
+					"name": "asset_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"asset_taskId_idx": {
+					"name": "asset_taskId_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"asset_activityId_idx": {
+					"name": "asset_activityId_idx",
+					"columns": ["activity_id"],
+					"isUnique": false
+				},
+				"asset_createdBy_idx": {
+					"name": "asset_createdBy_idx",
+					"columns": ["created_by"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"asset_workspace_id_workspace_id_fk": {
+					"name": "asset_workspace_id_workspace_id_fk",
+					"tableFrom": "asset",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"asset_project_id_project_id_fk": {
+					"name": "asset_project_id_project_id_fk",
+					"tableFrom": "asset",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"asset_task_id_task_id_fk": {
+					"name": "asset_task_id_task_id_fk",
+					"tableFrom": "asset",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"asset_activity_id_activity_id_fk": {
+					"name": "asset_activity_id_activity_id_fk",
+					"tableFrom": "asset",
+					"tableTo": "activity",
+					"columnsFrom": ["activity_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"asset_created_by_user_id_fk": {
+					"name": "asset_created_by_user_id_fk",
+					"tableFrom": "asset",
+					"tableTo": "user",
+					"columnsFrom": ["created_by"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"billing_event": {
+			"name": "billing_event",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"event_type": {
+					"name": "event_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"processed_at": {
+					"name": "processed_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"billing_reminder_sent": {
+			"name": "billing_reminder_sent",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"reminder_type": {
+					"name": "reminder_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"trial_ends_at": {
+					"name": "trial_ends_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"billing_reminder_sent_workspaceId_idx": {
+					"name": "billing_reminder_sent_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"billing_reminder_sent_userId_idx": {
+					"name": "billing_reminder_sent_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"billing_reminder_sent_user_type_unique": {
+					"name": "billing_reminder_sent_user_type_unique",
+					"columns": ["user_id", "reminder_type"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"billing_reminder_sent_user_id_user_id_fk": {
+					"name": "billing_reminder_sent_user_id_user_id_fk",
+					"tableFrom": "billing_reminder_sent",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"billing_reminder_sent_workspace_id_workspace_id_fk": {
+					"name": "billing_reminder_sent_workspace_id_workspace_id_fk",
+					"tableFrom": "billing_reminder_sent",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"column": {
+			"name": "column",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"slug": {
+					"name": "slug",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"icon": {
+					"name": "icon",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"color": {
+					"name": "color",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"is_final": {
+					"name": "is_final",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"column_projectId_idx": {
+					"name": "column_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"column_project_id_project_id_fk": {
+					"name": "column_project_id_project_id_fk",
+					"tableFrom": "column",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"comment": {
+			"name": "comment",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"content": {
+					"name": "content",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"comment_task_idx": {
+					"name": "comment_task_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"comment_user_idx": {
+					"name": "comment_user_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"comment_task_id_task_id_fk": {
+					"name": "comment_task_id_task_id_fk",
+					"tableFrom": "comment",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"comment_user_id_user_id_fk": {
+					"name": "comment_user_id_user_id_fk",
+					"tableFrom": "comment",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"custom_field_definition": {
+			"name": "custom_field_definition",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"type": {
+					"name": "type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"required": {
+					"name": "required",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"default_value": {
+					"name": "default_value",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"options": {
+					"name": "options",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"custom_field_def_projectId_idx": {
+					"name": "custom_field_def_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"custom_field_definition_project_id_project_id_fk": {
+					"name": "custom_field_definition_project_id_project_id_fk",
+					"tableFrom": "custom_field_definition",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"custom_field_value": {
+			"name": "custom_field_value",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"field_id": {
+					"name": "field_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"value": {
+					"name": "value",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"custom_field_value_taskId_idx": {
+					"name": "custom_field_value_taskId_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"custom_field_value_fieldId_idx": {
+					"name": "custom_field_value_fieldId_idx",
+					"columns": ["field_id"],
+					"isUnique": false
+				},
+				"custom_field_value_task_field_unique": {
+					"name": "custom_field_value_task_field_unique",
+					"columns": ["task_id", "field_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"custom_field_value_task_id_task_id_fk": {
+					"name": "custom_field_value_task_id_task_id_fk",
+					"tableFrom": "custom_field_value",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"custom_field_value_field_id_custom_field_definition_id_fk": {
+					"name": "custom_field_value_field_id_custom_field_definition_id_fk",
+					"tableFrom": "custom_field_value",
+					"tableTo": "custom_field_definition",
+					"columnsFrom": ["field_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"device_code": {
+			"name": "device_code",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"device_code": {
+					"name": "device_code",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_code": {
+					"name": "user_code",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"last_polled_at": {
+					"name": "last_polled_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"polling_interval": {
+					"name": "polling_interval",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"client_id": {
+					"name": "client_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"scope": {
+					"name": "scope",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"device_code_device_code_uidx": {
+					"name": "device_code_device_code_uidx",
+					"columns": ["device_code"],
+					"isUnique": true
+				},
+				"device_code_user_code_uidx": {
+					"name": "device_code_user_code_uidx",
+					"columns": ["user_code"],
+					"isUnique": true
+				},
+				"device_code_user_id_idx": {
+					"name": "device_code_user_id_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"device_code_user_id_user_id_fk": {
+					"name": "device_code_user_id_user_id_fk",
+					"tableFrom": "device_code",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"external_link": {
+			"name": "external_link",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"integration_id": {
+					"name": "integration_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"resource_type": {
+					"name": "resource_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"external_id": {
+					"name": "external_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"url": {
+					"name": "url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"title": {
+					"name": "title",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"metadata": {
+					"name": "metadata",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"external_link_taskId_idx": {
+					"name": "external_link_taskId_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"external_link_integrationId_idx": {
+					"name": "external_link_integrationId_idx",
+					"columns": ["integration_id"],
+					"isUnique": false
+				},
+				"external_link_externalId_idx": {
+					"name": "external_link_externalId_idx",
+					"columns": ["external_id"],
+					"isUnique": false
+				},
+				"external_link_resourceType_idx": {
+					"name": "external_link_resourceType_idx",
+					"columns": ["resource_type"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"external_link_task_id_task_id_fk": {
+					"name": "external_link_task_id_task_id_fk",
+					"tableFrom": "external_link",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"external_link_integration_id_integration_id_fk": {
+					"name": "external_link_integration_id_integration_id_fk",
+					"tableFrom": "external_link",
+					"tableTo": "integration",
+					"columnsFrom": ["integration_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"github_integration": {
+			"name": "github_integration",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"repository_owner": {
+					"name": "repository_owner",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"repository_name": {
+					"name": "repository_name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"installation_id": {
+					"name": "installation_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"is_active": {
+					"name": "is_active",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"github_integration_project_id_unique": {
+					"name": "github_integration_project_id_unique",
+					"columns": ["project_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"github_integration_project_id_project_id_fk": {
+					"name": "github_integration_project_id_project_id_fk",
+					"tableFrom": "github_integration",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"integration": {
+			"name": "integration",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"type": {
+					"name": "type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"config": {
+					"name": "config",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"is_active": {
+					"name": "is_active",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"integration_projectId_idx": {
+					"name": "integration_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"integration_type_idx": {
+					"name": "integration_type_idx",
+					"columns": ["type"],
+					"isUnique": false
+				},
+				"integration_project_type_unique": {
+					"name": "integration_project_type_unique",
+					"columns": ["project_id", "type"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"integration_project_id_project_id_fk": {
+					"name": "integration_project_id_project_id_fk",
+					"tableFrom": "integration",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"invitation_project_grant": {
+			"name": "invitation_project_grant",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"invitation_id": {
+					"name": "invitation_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"invitation_project_grant_invitationId_idx": {
+					"name": "invitation_project_grant_invitationId_idx",
+					"columns": ["invitation_id"],
+					"isUnique": false
+				},
+				"invitation_project_grant_unique": {
+					"name": "invitation_project_grant_unique",
+					"columns": ["invitation_id", "project_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"invitation_project_grant_invitation_id_invitation_id_fk": {
+					"name": "invitation_project_grant_invitation_id_invitation_id_fk",
+					"tableFrom": "invitation_project_grant",
+					"tableTo": "invitation",
+					"columnsFrom": ["invitation_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"invitation_project_grant_project_id_project_id_fk": {
+					"name": "invitation_project_grant_project_id_project_id_fk",
+					"tableFrom": "invitation_project_grant",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"invitation": {
+			"name": "invitation",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"email": {
+					"name": "email",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"role": {
+					"name": "role",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"team_id": {
+					"name": "team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'pending'"
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"inviter_id": {
+					"name": "inviter_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"invitation_workspaceId_idx": {
+					"name": "invitation_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"invitation_email_idx": {
+					"name": "invitation_email_idx",
+					"columns": ["email"],
+					"isUnique": false
+				},
+				"invitation_inviterId_idx": {
+					"name": "invitation_inviterId_idx",
+					"columns": ["inviter_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"invitation_workspace_id_workspace_id_fk": {
+					"name": "invitation_workspace_id_workspace_id_fk",
+					"tableFrom": "invitation",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"invitation_inviter_id_user_id_fk": {
+					"name": "invitation_inviter_id_user_id_fk",
+					"tableFrom": "invitation",
+					"tableTo": "user",
+					"columnsFrom": ["inviter_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"invitation_team": {
+			"name": "invitation_team",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"invitation_id": {
+					"name": "invitation_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"team_id": {
+					"name": "team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"invitation_team_invitationId_idx": {
+					"name": "invitation_team_invitationId_idx",
+					"columns": ["invitation_id"],
+					"isUnique": false
+				},
+				"invitation_team_unique": {
+					"name": "invitation_team_unique",
+					"columns": ["invitation_id", "team_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"invitation_team_invitation_id_invitation_id_fk": {
+					"name": "invitation_team_invitation_id_invitation_id_fk",
+					"tableFrom": "invitation_team",
+					"tableTo": "invitation",
+					"columnsFrom": ["invitation_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"invitation_team_team_id_access_team_id_fk": {
+					"name": "invitation_team_team_id_access_team_id_fk",
+					"tableFrom": "invitation_team",
+					"tableTo": "access_team",
+					"columnsFrom": ["team_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"invitation_workspace_grant": {
+			"name": "invitation_workspace_grant",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"invitation_id": {
+					"name": "invitation_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"all_projects": {
+					"name": "all_projects",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"invitation_workspace_grant_invitationId_idx": {
+					"name": "invitation_workspace_grant_invitationId_idx",
+					"columns": ["invitation_id"],
+					"isUnique": false
+				},
+				"invitation_workspace_grant_unique": {
+					"name": "invitation_workspace_grant_unique",
+					"columns": ["invitation_id", "workspace_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"invitation_workspace_grant_invitation_id_invitation_id_fk": {
+					"name": "invitation_workspace_grant_invitation_id_invitation_id_fk",
+					"tableFrom": "invitation_workspace_grant",
+					"tableTo": "invitation",
+					"columnsFrom": ["invitation_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"invitation_workspace_grant_workspace_id_workspace_id_fk": {
+					"name": "invitation_workspace_grant_workspace_id_workspace_id_fk",
+					"tableFrom": "invitation_workspace_grant",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"job_lease": {
+			"name": "job_lease",
+			"columns": {
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"owner": {
+					"name": "owner",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"label": {
+			"name": "label",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"color": {
+					"name": "color",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"label_task_id_idx": {
+					"name": "label_task_id_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"label_workspace_id_idx": {
+					"name": "label_workspace_id_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"label_workspace_name_unique": {
+					"name": "label_workspace_name_unique",
+					"columns": ["workspace_id", "name"],
+					"isUnique": true,
+					"where": "\"label\".\"task_id\" is null"
+				},
+				"label_task_name_unique": {
+					"name": "label_task_name_unique",
+					"columns": ["task_id", "name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"label_task_id_task_id_fk": {
+					"name": "label_task_id_task_id_fk",
+					"tableFrom": "label",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"label_workspace_id_workspace_id_fk": {
+					"name": "label_workspace_id_workspace_id_fk",
+					"tableFrom": "label",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"mcp_oauth_state": {
+			"name": "mcp_oauth_state",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"kind": {
+					"name": "kind",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"key": {
+					"name": "key",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"payload": {
+					"name": "payload",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"mcp_oauth_state_kind_key_uidx": {
+					"name": "mcp_oauth_state_kind_key_uidx",
+					"columns": ["kind", "key"],
+					"isUnique": true
+				},
+				"mcp_oauth_state_expiresAt_idx": {
+					"name": "mcp_oauth_state_expiresAt_idx",
+					"columns": ["expires_at"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"milestone": {
+			"name": "milestone",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"color": {
+					"name": "color",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'sky'"
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"start_date": {
+					"name": "start_date",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"end_date": {
+					"name": "end_date",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"milestone_projectId_idx": {
+					"name": "milestone_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"milestone_project_id_project_id_fk": {
+					"name": "milestone_project_id_project_id_fk",
+					"tableFrom": "milestone",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"notification": {
+			"name": "notification",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"title": {
+					"name": "title",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"content": {
+					"name": "content",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"type": {
+					"name": "type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'info'"
+				},
+				"event_data": {
+					"name": "event_data",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"is_read": {
+					"name": "is_read",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": false
+				},
+				"resource_id": {
+					"name": "resource_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"resource_type": {
+					"name": "resource_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"notification_userId_idx": {
+					"name": "notification_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"notification_user_id_user_id_fk": {
+					"name": "notification_user_id_user_id_fk",
+					"tableFrom": "notification",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"project": {
+			"name": "project",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"slug": {
+					"name": "slug",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"icon": {
+					"name": "icon",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": "'Layout'"
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"is_public": {
+					"name": "is_public",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": false
+				},
+				"archived_at": {
+					"name": "archived_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"last_task_number": {
+					"name": "last_task_number",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				}
+			},
+			"indexes": {
+				"project_workspaceId_position_idx": {
+					"name": "project_workspaceId_position_idx",
+					"columns": ["workspace_id", "position"],
+					"isUnique": false
+				},
+				"project_workspace_id_id_unique": {
+					"name": "project_workspace_id_id_unique",
+					"columns": ["workspace_id", "id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"project_workspace_id_workspace_id_fk": {
+					"name": "project_workspace_id_workspace_id_fk",
+					"tableFrom": "project",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"session": {
+			"name": "session",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"token": {
+					"name": "token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"ip_address": {
+					"name": "ip_address",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"user_agent": {
+					"name": "user_agent",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"active_organization_id": {
+					"name": "active_organization_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"active_team_id": {
+					"name": "active_team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"impersonated_by": {
+					"name": "impersonated_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"session_token_unique": {
+					"name": "session_token_unique",
+					"columns": ["token"],
+					"isUnique": true
+				},
+				"session_userId_idx": {
+					"name": "session_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"session_user_id_user_id_fk": {
+					"name": "session_user_id_user_id_fk",
+					"tableFrom": "session",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"task_relation": {
+			"name": "task_relation",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"source_task_id": {
+					"name": "source_task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"target_task_id": {
+					"name": "target_task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"relation_type": {
+					"name": "relation_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"task_relation_source_idx": {
+					"name": "task_relation_source_idx",
+					"columns": ["source_task_id"],
+					"isUnique": false
+				},
+				"task_relation_target_idx": {
+					"name": "task_relation_target_idx",
+					"columns": ["target_task_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"task_relation_source_task_id_task_id_fk": {
+					"name": "task_relation_source_task_id_task_id_fk",
+					"tableFrom": "task_relation",
+					"tableTo": "task",
+					"columnsFrom": ["source_task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"task_relation_target_task_id_task_id_fk": {
+					"name": "task_relation_target_task_id_task_id_fk",
+					"tableFrom": "task_relation",
+					"tableTo": "task",
+					"columnsFrom": ["target_task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"task_reminder_sent": {
+			"name": "task_reminder_sent",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"reminder_type": {
+					"name": "reminder_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"task_reminder_sent_taskId_idx": {
+					"name": "task_reminder_sent_taskId_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"task_reminder_sent_task_type_unique": {
+					"name": "task_reminder_sent_task_type_unique",
+					"columns": ["task_id", "reminder_type"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"task_reminder_sent_task_id_task_id_fk": {
+					"name": "task_reminder_sent_task_id_task_id_fk",
+					"tableFrom": "task_reminder_sent",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"task": {
+			"name": "task",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"position": {
+					"name": "position",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 0
+				},
+				"number": {
+					"name": "number",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 1
+				},
+				"assignee_id": {
+					"name": "assignee_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"title": {
+					"name": "title",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'to-do'"
+				},
+				"column_id": {
+					"name": "column_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"milestone_id": {
+					"name": "milestone_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"priority": {
+					"name": "priority",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'low'"
+				},
+				"start_date": {
+					"name": "start_date",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"due_date": {
+					"name": "due_date",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"reminder_offsets": {
+					"name": "reminder_offsets",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"recurrence": {
+					"name": "recurrence",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"task_projectId_idx": {
+					"name": "task_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"task_dueDate_idx": {
+					"name": "task_dueDate_idx",
+					"columns": ["due_date"],
+					"isUnique": false
+				},
+				"task_assigneeId_idx": {
+					"name": "task_assigneeId_idx",
+					"columns": ["assignee_id"],
+					"isUnique": false
+				},
+				"task_columnId_idx": {
+					"name": "task_columnId_idx",
+					"columns": ["column_id"],
+					"isUnique": false
+				},
+				"task_milestoneId_idx": {
+					"name": "task_milestoneId_idx",
+					"columns": ["milestone_id"],
+					"isUnique": false
+				},
+				"task_project_number_unique": {
+					"name": "task_project_number_unique",
+					"columns": ["project_id", "number"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"task_project_id_project_id_fk": {
+					"name": "task_project_id_project_id_fk",
+					"tableFrom": "task",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"task_assignee_id_user_id_fk": {
+					"name": "task_assignee_id_user_id_fk",
+					"tableFrom": "task",
+					"tableTo": "user",
+					"columnsFrom": ["assignee_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				},
+				"task_column_id_column_id_fk": {
+					"name": "task_column_id_column_id_fk",
+					"tableFrom": "task",
+					"tableTo": "column",
+					"columnsFrom": ["column_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				},
+				"task_milestone_id_milestone_id_fk": {
+					"name": "task_milestone_id_milestone_id_fk",
+					"tableFrom": "task",
+					"tableTo": "milestone",
+					"columnsFrom": ["milestone_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"team_member": {
+			"name": "team_member",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"team_id": {
+					"name": "team_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"teamMember_teamId_idx": {
+					"name": "teamMember_teamId_idx",
+					"columns": ["team_id"],
+					"isUnique": false
+				},
+				"teamMember_userId_idx": {
+					"name": "teamMember_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"team_member_team_id_team_id_fk": {
+					"name": "team_member_team_id_team_id_fk",
+					"tableFrom": "team_member",
+					"tableTo": "team",
+					"columnsFrom": ["team_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"team_member_user_id_user_id_fk": {
+					"name": "team_member_user_id_user_id_fk",
+					"tableFrom": "team_member",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"team": {
+			"name": "team",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"team_workspaceId_idx": {
+					"name": "team_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"team_workspace_id_workspace_id_fk": {
+					"name": "team_workspace_id_workspace_id_fk",
+					"tableFrom": "team",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"telegram_bot": {
+			"name": "telegram_bot",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"bot_token": {
+					"name": "bot_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"events": {
+					"name": "events",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"telegram_bot_userId_idx": {
+					"name": "telegram_bot_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"telegram_bot_user_token_unique": {
+					"name": "telegram_bot_user_token_unique",
+					"columns": ["user_id", "bot_token"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"telegram_bot_user_id_user_id_fk": {
+					"name": "telegram_bot_user_id_user_id_fk",
+					"tableFrom": "telegram_bot",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"telegram_chat": {
+			"name": "telegram_chat",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"bot_id": {
+					"name": "bot_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"chat_id": {
+					"name": "chat_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"label": {
+					"name": "label",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"telegram_chat_botId_idx": {
+					"name": "telegram_chat_botId_idx",
+					"columns": ["bot_id"],
+					"isUnique": false
+				},
+				"telegram_chat_bot_chat_unique": {
+					"name": "telegram_chat_bot_chat_unique",
+					"columns": ["bot_id", "chat_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"telegram_chat_bot_id_telegram_bot_id_fk": {
+					"name": "telegram_chat_bot_id_telegram_bot_id_fk",
+					"tableFrom": "telegram_chat",
+					"tableTo": "telegram_bot",
+					"columnsFrom": ["bot_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"telegram_rule": {
+			"name": "telegram_rule",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"chat_id": {
+					"name": "chat_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"thread_id": {
+					"name": "thread_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"is_active": {
+					"name": "is_active",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"telegram_rule_chatId_idx": {
+					"name": "telegram_rule_chatId_idx",
+					"columns": ["chat_id"],
+					"isUnique": false
+				},
+				"telegram_rule_workspaceId_idx": {
+					"name": "telegram_rule_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"telegram_rule_projectId_idx": {
+					"name": "telegram_rule_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"telegram_rule_chat_id_telegram_chat_id_fk": {
+					"name": "telegram_rule_chat_id_telegram_chat_id_fk",
+					"tableFrom": "telegram_rule",
+					"tableTo": "telegram_chat",
+					"columnsFrom": ["chat_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"telegram_rule_workspace_id_workspace_id_fk": {
+					"name": "telegram_rule_workspace_id_workspace_id_fk",
+					"tableFrom": "telegram_rule",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"telegram_rule_project_id_project_id_fk": {
+					"name": "telegram_rule_project_id_project_id_fk",
+					"tableFrom": "telegram_rule",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"time_entry": {
+			"name": "time_entry",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"task_id": {
+					"name": "task_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"start_time": {
+					"name": "start_time",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"end_time": {
+					"name": "end_time",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"duration": {
+					"name": "duration",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": 0
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"time_entry_taskId_idx": {
+					"name": "time_entry_taskId_idx",
+					"columns": ["task_id"],
+					"isUnique": false
+				},
+				"time_entry_userId_idx": {
+					"name": "time_entry_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"time_entry_task_id_task_id_fk": {
+					"name": "time_entry_task_id_task_id_fk",
+					"tableFrom": "time_entry",
+					"tableTo": "task",
+					"columnsFrom": ["task_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"time_entry_user_id_user_id_fk": {
+					"name": "time_entry_user_id_user_id_fk",
+					"tableFrom": "time_entry",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"trial_grant": {
+			"name": "trial_grant",
+			"columns": {
+				"email_hash": {
+					"name": "email_hash",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"trial_ends_at": {
+					"name": "trial_ends_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user_avatar": {
+			"name": "user_avatar",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"mime_type": {
+					"name": "mime_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"size": {
+					"name": "size",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"data": {
+					"name": "data",
+					"type": "blob",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"user_avatar_user_id_unique": {
+					"name": "user_avatar_user_id_unique",
+					"columns": ["user_id"],
+					"isUnique": true
+				},
+				"user_avatar_userId_idx": {
+					"name": "user_avatar_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"user_avatar_user_id_user_id_fk": {
+					"name": "user_avatar_user_id_user_id_fk",
+					"tableFrom": "user_avatar",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user_notification_preference": {
+			"name": "user_notification_preference",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"email_enabled": {
+					"name": "email_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"ntfy_enabled": {
+					"name": "ntfy_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"ntfy_server_url": {
+					"name": "ntfy_server_url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"ntfy_topic": {
+					"name": "ntfy_topic",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"ntfy_token": {
+					"name": "ntfy_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"gotify_enabled": {
+					"name": "gotify_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"gotify_server_url": {
+					"name": "gotify_server_url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"gotify_token": {
+					"name": "gotify_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"webhook_enabled": {
+					"name": "webhook_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"webhook_url": {
+					"name": "webhook_url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"webhook_secret": {
+					"name": "webhook_secret",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"task_assignment_enabled": {
+					"name": "task_assignment_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": true
+				},
+				"task_comment_enabled": {
+					"name": "task_comment_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": true
+				},
+				"task_status_change_enabled": {
+					"name": "task_status_change_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": true
+				},
+				"due_date_reminder_enabled": {
+					"name": "due_date_reminder_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": true
+				},
+				"due_date_reminder_lead_time_minutes": {
+					"name": "due_date_reminder_lead_time_minutes",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 1440
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"user_notification_preference_user_id_unique": {
+					"name": "user_notification_preference_user_id_unique",
+					"columns": ["user_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"user_notification_preference_user_id_user_id_fk": {
+					"name": "user_notification_preference_user_id_user_id_fk",
+					"tableFrom": "user_notification_preference",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user_notification_workspace_project": {
+			"name": "user_notification_workspace_project",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_rule_id": {
+					"name": "workspace_rule_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"user_notification_workspace_project_ruleId_idx": {
+					"name": "user_notification_workspace_project_ruleId_idx",
+					"columns": ["workspace_rule_id"],
+					"isUnique": false
+				},
+				"user_notification_workspace_project_projectId_idx": {
+					"name": "user_notification_workspace_project_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"user_notification_workspace_project_workspaceId_projectId_idx": {
+					"name": "user_notification_workspace_project_workspaceId_projectId_idx",
+					"columns": ["workspace_id", "project_id"],
+					"isUnique": false
+				},
+				"unwp_workspaceId_workspaceRuleId_idx": {
+					"name": "unwp_workspaceId_workspaceRuleId_idx",
+					"columns": ["workspace_id", "workspace_rule_id"],
+					"isUnique": false
+				},
+				"user_notification_workspace_project_rule_project_unique": {
+					"name": "user_notification_workspace_project_rule_project_unique",
+					"columns": ["workspace_rule_id", "project_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"user_notification_workspace_project_workspace_id_workspace_id_fk": {
+					"name": "user_notification_workspace_project_workspace_id_workspace_id_fk",
+					"tableFrom": "user_notification_workspace_project",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_notification_workspace_project_workspace_id_workspace_rule_id_user_notification_workspace_rule_workspace_id_id_fk": {
+					"name": "user_notification_workspace_project_workspace_id_workspace_rule_id_user_notification_workspace_rule_workspace_id_id_fk",
+					"tableFrom": "user_notification_workspace_project",
+					"tableTo": "user_notification_workspace_rule",
+					"columnsFrom": ["workspace_id", "workspace_rule_id"],
+					"columnsTo": ["workspace_id", "id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_notification_workspace_project_workspace_id_project_id_project_workspace_id_id_fk": {
+					"name": "user_notification_workspace_project_workspace_id_project_id_project_workspace_id_id_fk",
+					"tableFrom": "user_notification_workspace_project",
+					"tableTo": "project",
+					"columnsFrom": ["workspace_id", "project_id"],
+					"columnsTo": ["workspace_id", "id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user_notification_workspace_rule": {
+			"name": "user_notification_workspace_rule",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"is_active": {
+					"name": "is_active",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": true
+				},
+				"email_enabled": {
+					"name": "email_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"ntfy_enabled": {
+					"name": "ntfy_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"gotify_enabled": {
+					"name": "gotify_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"webhook_enabled": {
+					"name": "webhook_enabled",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"project_mode": {
+					"name": "project_mode",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'all'"
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"user_notification_workspace_rule_userId_idx": {
+					"name": "user_notification_workspace_rule_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"user_notification_workspace_rule_workspaceId_idx": {
+					"name": "user_notification_workspace_rule_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"user_notification_workspace_rule_user_workspace_unique": {
+					"name": "user_notification_workspace_rule_user_workspace_unique",
+					"columns": ["user_id", "workspace_id"],
+					"isUnique": true
+				},
+				"user_notification_workspace_rule_workspace_id_id_unique": {
+					"name": "user_notification_workspace_rule_workspace_id_id_unique",
+					"columns": ["workspace_id", "id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"user_notification_workspace_rule_user_id_user_id_fk": {
+					"name": "user_notification_workspace_rule_user_id_user_id_fk",
+					"tableFrom": "user_notification_workspace_rule",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_notification_workspace_rule_workspace_id_workspace_id_fk": {
+					"name": "user_notification_workspace_rule_workspace_id_workspace_id_fk",
+					"tableFrom": "user_notification_workspace_rule",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user_project_access": {
+			"name": "user_project_access",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"granted_by": {
+					"name": "granted_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"user_project_access_userId_idx": {
+					"name": "user_project_access_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"user_project_access_projectId_idx": {
+					"name": "user_project_access_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"user_project_access_unique": {
+					"name": "user_project_access_unique",
+					"columns": ["user_id", "project_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"user_project_access_user_id_user_id_fk": {
+					"name": "user_project_access_user_id_user_id_fk",
+					"tableFrom": "user_project_access",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_project_access_project_id_project_id_fk": {
+					"name": "user_project_access_project_id_project_id_fk",
+					"tableFrom": "user_project_access",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_project_access_granted_by_user_id_fk": {
+					"name": "user_project_access_granted_by_user_id_fk",
+					"tableFrom": "user_project_access",
+					"tableTo": "user",
+					"columnsFrom": ["granted_by"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user": {
+			"name": "user",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"email": {
+					"name": "email",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"email_verified": {
+					"name": "email_verified",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"image": {
+					"name": "image",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"locale": {
+					"name": "locale",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"is_anonymous": {
+					"name": "is_anonymous",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": false
+				},
+				"role": {
+					"name": "role",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"banned": {
+					"name": "banned",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false,
+					"default": false
+				},
+				"ban_reason": {
+					"name": "ban_reason",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"ban_expires": {
+					"name": "ban_expires",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"user_email_unique": {
+					"name": "user_email_unique",
+					"columns": ["email"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"user_workspace_access": {
+			"name": "user_workspace_access",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"all_projects": {
+					"name": "all_projects",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"granted_by": {
+					"name": "granted_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"user_workspace_access_userId_idx": {
+					"name": "user_workspace_access_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				},
+				"user_workspace_access_workspaceId_idx": {
+					"name": "user_workspace_access_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"user_workspace_access_unique": {
+					"name": "user_workspace_access_unique",
+					"columns": ["user_id", "workspace_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"user_workspace_access_user_id_user_id_fk": {
+					"name": "user_workspace_access_user_id_user_id_fk",
+					"tableFrom": "user_workspace_access",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_workspace_access_workspace_id_workspace_id_fk": {
+					"name": "user_workspace_access_workspace_id_workspace_id_fk",
+					"tableFrom": "user_workspace_access",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"user_workspace_access_granted_by_user_id_fk": {
+					"name": "user_workspace_access_granted_by_user_id_fk",
+					"tableFrom": "user_workspace_access",
+					"tableTo": "user",
+					"columnsFrom": ["granted_by"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"verification": {
+			"name": "verification",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"identifier": {
+					"name": "identifier",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"value": {
+					"name": "value",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"verification_identifier_idx": {
+					"name": "verification_identifier_idx",
+					"columns": ["identifier"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"workflow_rule": {
+			"name": "workflow_rule",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"project_id": {
+					"name": "project_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"integration_type": {
+					"name": "integration_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"event_type": {
+					"name": "event_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"column_id": {
+					"name": "column_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"workflow_rule_projectId_idx": {
+					"name": "workflow_rule_projectId_idx",
+					"columns": ["project_id"],
+					"isUnique": false
+				},
+				"workflow_rule_columnId_idx": {
+					"name": "workflow_rule_columnId_idx",
+					"columns": ["column_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"workflow_rule_project_id_project_id_fk": {
+					"name": "workflow_rule_project_id_project_id_fk",
+					"tableFrom": "workflow_rule",
+					"tableTo": "project",
+					"columnsFrom": ["project_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				},
+				"workflow_rule_column_id_column_id_fk": {
+					"name": "workflow_rule_column_id_column_id_fk",
+					"tableFrom": "workflow_rule",
+					"tableTo": "column",
+					"columnsFrom": ["column_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"workspace_billing": {
+			"name": "workspace_billing",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"founding_free": {
+					"name": "founding_free",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": false
+				},
+				"trial_ends_at": {
+					"name": "trial_ends_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"creem_customer_id": {
+					"name": "creem_customer_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"creem_subscription_id": {
+					"name": "creem_subscription_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"creem_product_id": {
+					"name": "creem_product_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"plan": {
+					"name": "plan",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"billing_interval": {
+					"name": "billing_interval",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"status": {
+					"name": "status",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"seats": {
+					"name": "seats",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 1
+				},
+				"current_period_end": {
+					"name": "current_period_end",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"canceled_at": {
+					"name": "canceled_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"workspace_billing_workspace_id_unique": {
+					"name": "workspace_billing_workspace_id_unique",
+					"columns": ["workspace_id"],
+					"isUnique": true
+				},
+				"workspace_billing_creem_subscription_id_unique": {
+					"name": "workspace_billing_creem_subscription_id_unique",
+					"columns": ["creem_subscription_id"],
+					"isUnique": true
+				},
+				"workspace_billing_workspaceId_idx": {
+					"name": "workspace_billing_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"workspace_billing_workspace_id_workspace_id_fk": {
+					"name": "workspace_billing_workspace_id_workspace_id_fk",
+					"tableFrom": "workspace_billing",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"workspace_invite_link": {
+			"name": "workspace_invite_link",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"token": {
+					"name": "token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"role": {
+					"name": "role",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'member'"
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"max_uses": {
+					"name": "max_uses",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"used_count": {
+					"name": "used_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": 0
+				},
+				"created_by": {
+					"name": "created_by",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"workspace_invite_link_token_unique": {
+					"name": "workspace_invite_link_token_unique",
+					"columns": ["token"],
+					"isUnique": true
+				},
+				"workspaceInviteLink_workspaceId_idx": {
+					"name": "workspaceInviteLink_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"workspaceInviteLink_token_idx": {
+					"name": "workspaceInviteLink_token_idx",
+					"columns": ["token"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"workspace_invite_link_workspace_id_workspace_id_fk": {
+					"name": "workspace_invite_link_workspace_id_workspace_id_fk",
+					"tableFrom": "workspace_invite_link",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"workspace_invite_link_created_by_user_id_fk": {
+					"name": "workspace_invite_link_created_by_user_id_fk",
+					"tableFrom": "workspace_invite_link",
+					"tableTo": "user",
+					"columnsFrom": ["created_by"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"workspace_role": {
+			"name": "workspace_role",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"role": {
+					"name": "role",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"permission": {
+					"name": "permission",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "(cast((julianday('now') - 2440587.5)*86400000 as integer))"
+				}
+			},
+			"indexes": {
+				"workspace_role_workspaceId_idx": {
+					"name": "workspace_role_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"workspace_role_role_idx": {
+					"name": "workspace_role_role_idx",
+					"columns": ["role"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"workspace_role_workspace_id_workspace_id_fk": {
+					"name": "workspace_role_workspace_id_workspace_id_fk",
+					"tableFrom": "workspace_role",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "cascade"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"workspace": {
+			"name": "workspace",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"slug": {
+					"name": "slug",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"logo": {
+					"name": "logo",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"metadata": {
+					"name": "metadata",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"workspace_slug_unique": {
+					"name": "workspace_slug_unique",
+					"columns": ["slug"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"workspace_member": {
+			"name": "workspace_member",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"workspace_id": {
+					"name": "workspace_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"role": {
+					"name": "role",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'member'"
+				},
+				"access_scope": {
+					"name": "access_scope",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false,
+					"default": "'full'"
+				},
+				"joined_at": {
+					"name": "joined_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"workspace_member_workspaceId_idx": {
+					"name": "workspace_member_workspaceId_idx",
+					"columns": ["workspace_id"],
+					"isUnique": false
+				},
+				"workspace_member_userId_idx": {
+					"name": "workspace_member_userId_idx",
+					"columns": ["user_id"],
+					"isUnique": false
+				}
+			},
+			"foreignKeys": {
+				"workspace_member_workspace_id_workspace_id_fk": {
+					"name": "workspace_member_workspace_id_workspace_id_fk",
+					"tableFrom": "workspace_member",
+					"tableTo": "workspace",
+					"columnsFrom": ["workspace_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"workspace_member_user_id_user_id_fk": {
+					"name": "workspace_member_user_id_user_id_fk",
+					"tableFrom": "workspace_member",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		}
+	},
+	"views": {},
+	"enums": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	},
+	"internal": {
+		"indexes": {}
+	}
+}

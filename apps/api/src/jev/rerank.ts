@@ -6,17 +6,35 @@
 // its previous order.
 //
 // The official limits: 64k tokens per request, 32k for the state plus the
-// longest question. Batches stay well under that, and a candidate too large
-// for its share is truncated instead of failing the whole pass.
+// longest question. Batches stay well under that, a candidate too large for
+// its share is truncated, and a batch the estimate undercounted is halved and
+// retried instead of failing the whole pass.
+//
+// Two hardening passes from the reference implementation:
+// - answers keep their confidence, and `keepUnsure` lets low-confidence
+//   rejects fill the remaining places after the sure ones: a dropped result
+//   is invisible to the caller afterwards, so an unsure reject is cheap
+//   insurance rather than a final decision.
+// - candidate text is redacted before it leaves the machine (Jev is a
+//   third-party API and board text routinely carries pasted secrets).
 
 import {
   baseRequestTokens,
+  envFlag,
   envRatio,
   estimateJevTokens,
   resolvedMaxRequestTokens,
   splitByBudget,
 } from "./budget";
-import type { JevAsker, JevScoreQuestion } from "./client";
+import {
+  describeJevError,
+  type JevAsker,
+  JevError,
+  type JevScoreQuestion,
+  logJev,
+} from "./client";
+import { gatherBounded } from "./parallel";
+import { redactSecrets } from "./redact";
 
 // Hard ceiling on candidates sent to Jev in one retrieval pass.
 export const CANDIDATE_CAP = 50;
@@ -33,6 +51,10 @@ const MIN_CANDIDATE_CHARS = 64;
 // could plausibly serve the query - and the floor is tunable live with
 // KANEO_JEV_MIN_RATIO (0-1).
 export const DEFAULT_MIN_RATIO = 0.5;
+
+// Below this confidence, dropping a candidate is not safe enough to be final:
+// the reference reranker keeps unsure rejects as cheap insurance.
+export const UNSURE_CONFIDENCE = 0.5;
 
 // The usefulness scale each candidate is scored against. Levels describe
 // situations, not degrees: a "moderately relevant" level gives the model
@@ -59,10 +81,20 @@ export type RerankOptions<T> = {
   kind?: string;
   minRatio?: number;
   maxRequestTokens?: number;
+  // Fill remaining places with candidates Jev was unsure about (confidence
+  // below 0.5) instead of dropping them silently. Resolved from
+  // KANEO_JEV_KEEP_UNSURE when unset.
+  keepUnsure?: boolean;
+};
+
+/** A Jev answer's value plus its confidence (null when not reported). */
+type Answer = {
+  value: number;
+  confidence: number | null;
 };
 
 function candidateText<T>(textOf: (item: T) => string, item: T): string {
-  const text = textOf(item).trim();
+  const text = redactSecrets(textOf(item)).trim();
   if (text.length <= CANDIDATE_TEXT_CHARS) {
     return text;
   }
@@ -86,21 +118,34 @@ function scoreQuestion(index: number, kind: string): JevScoreQuestion {
   };
 }
 
+function answerConfidence(answer: Record<string, unknown>): number | null {
+  const value = answer.confidence;
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return null;
+  }
+  return value;
+}
+
 function scoreAnswer(
   answers: Record<string, Record<string, unknown>>,
   name: string,
-): number {
-  const value = answers[name]?.score;
-  if (typeof value !== "number" || Number.isNaN(value)) {
-    throw new TypeError(`Invalid Jev answer for ${name}`);
+): Answer {
+  const answer = answers[name];
+  const value = answer?.score;
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new JevError(`Invalid Jev answer for ${name}`);
   }
-  return value;
+  return { value, confidence: answerConfidence(answer ?? {}) };
+}
+
+function isMaxTokensError(error: unknown): boolean {
+  return error instanceof JevError && error.errorType === "max_tokens_exceeded";
 }
 
 async function scoreCandidates<T>(
   options: RerankOptions<T>,
   entries: Array<{ id: string; content: string }>,
-): Promise<Map<number, number>> {
+): Promise<Map<number, Answer>> {
   const { ask, query } = options;
   const maxRequestTokens = resolvedMaxRequestTokens(options.maxRequestTokens);
   const questionOf = (index: number) => {
@@ -140,12 +185,11 @@ async function scoreCandidates<T>(
     return { index, tokens: entryTokens + questionTokens };
   });
 
-  const perBatch = await Promise.all(
-    splitByBudget(sized, itemBudget).map(async (batch) => {
-      const indexes = batch.map((item) => item.index);
-      const questions = Object.fromEntries(
-        indexes.map((index) => questionOf(index)),
-      );
+  const askBatch = async (indexes: number[]): Promise<Map<number, Answer>> => {
+    const questions = Object.fromEntries(
+      indexes.map((index) => questionOf(index)),
+    );
+    try {
       const answers = await ask(
         {
           query,
@@ -153,14 +197,34 @@ async function scoreCandidates<T>(
         },
         questions,
       );
-      return indexes.map((index) => {
-        const [name] = questionOf(index);
-        return [index, scoreAnswer(answers, name)] as const;
-      });
-    }),
-  );
+      return new Map(
+        indexes.map((index) => {
+          const [name] = questionOf(index);
+          return [index, scoreAnswer(answers, name)] as const;
+        }),
+      );
+    } catch (error) {
+      // The estimate undercounted this batch: halve it and ask both halves
+      // instead of falling back to the embedding order. One oversized
+      // candidate is a real failure and still throws.
+      if (!isMaxTokensError(error) || indexes.length <= 1) {
+        throw error;
+      }
+      const mid = Math.floor(indexes.length / 2);
+      const halves = await Promise.all([
+        askBatch(indexes.slice(0, mid)),
+        askBatch(indexes.slice(mid)),
+      ]);
+      return new Map(halves.flatMap((half) => [...half]));
+    }
+  };
 
-  return new Map(perBatch.flat());
+  const results = await gatherBounded(
+    splitByBudget(sized, itemBudget).map(
+      (batch) => () => askBatch(batch.map((item) => item.index)),
+    ),
+  );
+  return new Map(results.flatMap((result) => [...result]));
 }
 
 export async function rerankByRelevance<T>(
@@ -179,24 +243,54 @@ export async function rerankByRelevance<T>(
     content: candidateText(textOf, item),
   }));
 
-  let scores: Map<number, number>;
+  let scores: Map<number, Answer>;
   try {
     scores = await scoreCandidates(options, entries);
   } catch (error) {
-    console.warn(
-      `[jev] reranking skipped: ${error instanceof Error ? error.message : error}`,
-    );
+    const detail = describeJevError(error);
+    console.warn(`[jev] reranking skipped: ${detail}`);
+    logJev("rerank_skipped", {
+      query: options.query.slice(0, 300),
+      candidates: candidates.length,
+      reason: error instanceof JevError ? error.errorType : "",
+      error: detail,
+    });
     return null;
   }
 
   const levelSpan = Math.max(RELEVANCE_LEVELS.length - 1, 1);
   const floor = resolvedMinRatio(options.minRatio);
+  const answers = candidates.map(
+    (_, index) => scores.get(index) ?? { value: 0, confidence: null },
+  );
   const ranked = candidates
     .map((_, index) => index)
-    .sort((a, b) => (scores.get(b) ?? 0) - (scores.get(a) ?? 0) || a - b);
-  const kept = ranked
-    .filter((index) => (scores.get(index) ?? 0) / levelSpan >= floor)
-    .slice(0, topk);
+    .sort(
+      (a, b) => (answers[b]?.value ?? 0) - (answers[a]?.value ?? 0) || a - b,
+    );
+  const sure = ranked.filter(
+    (index) => (answers[index]?.value ?? 0) / levelSpan >= floor,
+  );
+  const keepUnsure =
+    options.keepUnsure ?? envFlag("KANEO_JEV_KEEP_UNSURE", false);
+  const sureSet = new Set(sure);
+  const unsure = keepUnsure
+    ? ranked.filter(
+        (index) =>
+          !sureSet.has(index) &&
+          (answers[index]?.confidence ?? 1) < UNSURE_CONFIDENCE,
+      )
+    : [];
+  const kept = [...sure, ...unsure].slice(0, topk);
+
+  logJev("rerank", {
+    query: options.query.slice(0, 300),
+    kind: options.kind ?? "candidates",
+    candidates: candidates.length,
+    min_ratio: floor,
+    kept: kept.length,
+    unsure_kept: Math.min(unsure.length, Math.max(topk - sure.length, 0)),
+  });
 
   return kept.map((index) => candidates[index] as T);
 }

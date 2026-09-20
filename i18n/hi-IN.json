@@ -489,6 +489,11 @@
 				"title": "नया वर्कस्पेस बनाएँ"
 			}
 		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
+		},
 		"pagination": {
 			"label": "पेजिनेशन",
 			"morePages": "और पेज",
@@ -758,6 +763,51 @@
 			"switchToDark": "डार्क मोड पर स्विच करें",
 			"switchToLight": "लाइट मोड पर स्विच करें"
 		}
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_one": "{{count}} sprint",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
 	},
 	"settings": {
 		"account": "खाता",
@@ -2515,6 +2565,7 @@
 			"unassigned": "असाइन नहीं किया गया",
 			"unit": "इकाई",
 			"unitDay": "दिन",
+			"unitHint": "Finer units narrow the period to one that supports them.",
 			"unitHour": "घंटा",
 			"unitLabelDay": "दिन",
 			"unitLabelHour": "घंटा",

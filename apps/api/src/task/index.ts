@@ -8,6 +8,7 @@ import {
   workspaceTable,
 } from "../database/schema";
 import { isJevEnabled } from "../jev/client";
+import { assignTaskMilestoneBody } from "../milestone/schema";
 import {
   apiRouter,
   type BaseVariables,
@@ -36,6 +37,7 @@ import deleteTask from "./controllers/delete-task";
 import exportTasks from "./controllers/export-tasks";
 import getTask from "./controllers/get-task";
 import getTasks from "./controllers/get-tasks";
+import getWorkspaceTasks from "./controllers/get-workspace-tasks";
 import importTasks from "./controllers/import-tasks";
 import moveTask from "./controllers/move-task";
 import qualifyTask from "./controllers/qualify-task";
@@ -47,6 +49,7 @@ import updateTask from "./controllers/update-task";
 import updateTaskAssignee from "./controllers/update-task-assignee";
 import updateTaskDescription from "./controllers/update-task-description";
 import updateTaskDueDate from "./controllers/update-task-due-date";
+import updateTaskMilestone from "./controllers/update-task-milestone";
 import updateTaskPriority from "./controllers/update-task-priority";
 import updateTaskStatus from "./controllers/update-task-status";
 import updateTaskTitle from "./controllers/update-task-title";
@@ -62,6 +65,7 @@ import {
   taskQualificationSchema,
   taskSchema,
   taskWithAssigneeSchema,
+  workspaceTaskListSchema,
 } from "./response";
 import {
   bulkUpdateBody,
@@ -81,6 +85,8 @@ import {
   updateStatusBody,
   updateTaskBody,
   updateTitleBody,
+  workspaceIdParam,
+  workspaceTasksQuery,
 } from "./schema";
 
 const listTasksRoute = createRoute({
@@ -99,6 +105,59 @@ const listTasksRoute = createRoute({
       "Unknown project, or its workspace could not be determined",
     ),
     403: errorResponse("No access to the project's workspace"),
+  },
+});
+
+const listWorkspaceTasksRoute = createRoute({
+  method: "get",
+  operationId: "listWorkspaceTasks",
+  path: "/workspace/{workspaceId}",
+  tags: ["Tasks"],
+  summary: "List workspace tasks",
+  description:
+    "List tasks across every project of a workspace, as one flat, filterable, paginated list. Use it for cross-project reads such as the caller's open tasks, everything urgent, tasks due in a window, or tasks carrying a label; each row carries its project id/name/slug so `{projectSlug}-{number}` short ids can be built.",
+  middleware: [
+    workspaceAccess.fromParam(),
+    requireWorkspacePermission({ task: ["read"] }),
+  ] as const,
+  request: { params: workspaceIdParam, query: workspaceTasksQuery },
+  responses: {
+    200: jsonResponse("The workspace task list", workspaceTaskListSchema),
+    400: errorResponse(
+      "Unknown workspace, or its workspace could not be determined",
+    ),
+    403: errorResponse("No workspace access, or missing task:read permission"),
+  },
+});
+
+const updateTaskMilestoneRoute = createRoute({
+  method: "put",
+  operationId: "updateTaskMilestone",
+  path: "/milestone/{taskId}",
+  tags: ["Tasks"],
+  summary: "Assign task to milestone",
+  description:
+    "Move a task into a roadmap sprint/phase of the same project, or pass null to clear its assignment. The task itself is never deleted by a milestone change.",
+  middleware: [
+    workspaceAccess.fromTaskId("taskId"),
+    requireWorkspacePermission({ task: ["update"] }),
+  ] as const,
+  request: {
+    params: z.object({ taskId: z.string() }),
+    body: {
+      required: true,
+      content: { "application/json": { schema: assignTaskMilestoneBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("The updated task", taskSchema),
+    400: errorResponse(
+      "Unknown task, or the milestone belongs to another project",
+    ),
+    403: errorResponse(
+      "No workspace access, or missing task:update permission",
+    ),
+    404: errorResponse("Task not found"),
   },
 });
 
@@ -600,6 +659,33 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     const tasks = await getTasks(projectId, filters);
 
     return c.json(tasks, 200);
+  })
+  .openapi(listWorkspaceTasksRoute, async (c) => {
+    const { workspaceId } = c.req.valid("param");
+    const filters = c.req.valid("query") || {};
+    const userId = c.get("userId");
+    if (!userId) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    return c.json(await getWorkspaceTasks(workspaceId, userId, filters), 200);
+  })
+  .openapi(updateTaskMilestoneRoute, async (c) => {
+    const { taskId } = c.req.valid("param");
+    const { milestoneId } = c.req.valid("json");
+    const userId = c.get("userId");
+    if (!userId) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    return c.json(
+      await updateTaskMilestone({
+        id: taskId,
+        milestoneId,
+        currentUserId: userId,
+      }),
+      200,
+    );
   })
   .openapi(bulkUpdateTasksRoute, async (c) => {
     const { taskIds, operation, value } = c.req.valid("json");

@@ -545,10 +545,10 @@ export const auth = betterAuth({
 
         if (
           result?.success === false &&
-          result.reason === "SMTP_NOT_CONFIGURED"
+          result.reason === "EMAIL_NOT_CONFIGURED"
         ) {
           console.warn(
-            "Invitation created but email not sent due to SMTP not being configured",
+            "Invitation created but email not sent: no email transport (Resend or SMTP) is configured",
           );
           return;
         }

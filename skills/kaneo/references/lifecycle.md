@@ -86,6 +86,6 @@ Evidence comment envelope:
 ## Evidence and read-back
 
 - Descriptions = stable scope; comments = findings, decisions, blockers and verification, one per meaningful milestone, not per tool call. Do not fabricate evidence or silently rewrite another person's comments.
-- Read back task fields with `get_task`; labels with `list_workspace_labels` filtered by `taskId` or paginated `list_tasks`; comments with `list_task_comments`; dependencies with `get_task_relations`. See the full verification table in [MCP guidelines](mcp-guidelines.md#read-back-and-recovery).
+- Read back task fields with `get_task`; labels with `list_task_labels`; comments with `list_task_comments`; dependencies with `get_task_relations`. See the full verification table in [MCP guidelines](mcp-guidelines.md#read-back-and-recovery).
 - Follow-ups discovered during authorized delivery are filed when project rules require it and reported before implementation. An audit of this skill alone must not create live tracking data.
 - End with truthful states: unfinished work is not Done; locally verified work awaiting acceptance is not accepted. Never delete tasks, comments or history without explicit authorization.

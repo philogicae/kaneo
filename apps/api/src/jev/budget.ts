@@ -13,6 +13,10 @@ const _TOKEN_PIECES = /[A-Za-z]+|\d+|[^\sA-Za-z\d]/g;
 // Tokenizer-free estimate tuned for JSON-heavy Jev states, ported from the
 // reference implementation (calibrated against Jev usage): a word costs one
 // token per six letters, a digit half a token, any other symbol nine tenths.
+// A non-ASCII character costs two: the reference measured a batch estimated at
+// 20k tokens carrying 80k real ones in CJK, and the request failed. Accented
+// Latin is overcounted on purpose - an overcount only costs an extra
+// concurrent request, an undercount silently drops Jev.
 export function estimateJevTokens(text: string): number {
   let tokens = 0;
   for (const piece of text.match(_TOKEN_PIECES) ?? []) {
@@ -21,6 +25,8 @@ export function estimateJevTokens(text: string): number {
       tokens += piece.length / 2;
     } else if ((first >= 65 && first <= 90) || (first >= 97 && first <= 122)) {
       tokens += 1 + Math.floor((piece.length - 1) / 6);
+    } else if (first > 127) {
+      tokens += 2 * piece.length;
     } else {
       tokens += 0.9;
     }
@@ -36,6 +42,19 @@ export function envRatio(name: string, fallback: number): number {
     return fallback;
   }
   return Math.min(Math.max(raw, 0), 1);
+}
+
+// A boolean env override; accepts the usual on/off spellings (and 0/1) and
+// falls back when unset or unrecognized.
+export function envFlag(name: string, fallback: boolean): boolean {
+  const raw = process.env[name]?.trim().toLowerCase() ?? "";
+  if (raw === "1" || raw === "true" || raw === "yes" || raw === "on") {
+    return true;
+  }
+  if (raw === "0" || raw === "false" || raw === "no" || raw === "off") {
+    return false;
+  }
+  return fallback;
 }
 
 export function resolvedMaxRequestTokens(value: number | undefined): number {

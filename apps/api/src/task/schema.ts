@@ -6,6 +6,8 @@ export const taskParam = z.object({ id: z.string() });
 
 export const projectIdParam = z.object({ projectId: z.string() });
 
+export const workspaceIdParam = z.object({ workspaceId: z.string() });
+
 const priority = z.enum(VALID_PRIORITIES);
 
 // Required object of optional filters: a RouteParameter cannot itself be optional.
@@ -22,6 +24,38 @@ export const listTasksQuery = z.object({
   sortOrder: z.enum(["asc", "desc"]).optional(),
   dueBefore: z.string().optional(),
   dueAfter: z.string().optional(),
+});
+
+// Cross-project task listing for one workspace: the flat, filterable read an
+// agent needs to answer "my open tasks", "what is urgent" or "tasks with
+// label X" without iterating every project board.
+export const workspaceTasksQuery = z.object({
+  status: z.string().optional().openapi({
+    description: "Column slug, or `planned` for the backlog or `archived`.",
+  }),
+  priority: priority.optional(),
+  assigneeId: z.string().optional().openapi({
+    description:
+      "Assignee user id, or `unassigned` for tasks with no assignee.",
+  }),
+  label: z.string().optional().openapi({
+    description: "Exact label name, case-insensitive.",
+  }),
+  q: z.string().optional().openapi({
+    description: "Case-insensitive text match on title and description.",
+  }),
+  dueBefore: z.string().optional().openapi({
+    description: "Only tasks due at or before this ISO date-time.",
+  }),
+  dueAfter: z.string().optional().openapi({
+    description: "Only tasks due at or after this ISO date-time.",
+  }),
+  page: pagingNumber(1, 1_000_000).optional(),
+  limit: pagingNumber(1, 200).optional(),
+  sortBy: z
+    .enum(["createdAt", "priority", "dueDate", "position", "title", "number"])
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
 });
 
 export const bulkUpdateBody = z.object({

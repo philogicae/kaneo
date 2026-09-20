@@ -21,6 +21,9 @@ export const taskSchema = z
     status: z.string().openapi({
       description: "The slug of the column the task sits in.",
     }),
+    milestoneId: z.string().nullable().openapi({
+      description: "Roadmap sprint/phase the task belongs to, when assigned.",
+    }),
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
@@ -108,6 +111,9 @@ export const boardTaskSchema = z
     number: z.number().nullable(),
     description: z.string().nullable(),
     status: z.string(),
+    milestoneId: z.string().nullable().openapi({
+      description: "Roadmap sprint/phase the task belongs to, when assigned.",
+    }),
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
@@ -182,6 +188,33 @@ export const boardSchema = z
 export const bulkResultSchema = z
   .object({ success: z.boolean(), updatedCount: z.number() })
   .openapi("BulkTaskResult");
+
+// Flat cross-project task rows: each row carries its project identity so a
+// short id (`{projectSlug}-{number}`) can be built without a second lookup.
+export const workspaceTaskSchema = boardTaskSchema
+  .omit({ externalLinks: true })
+  .extend({
+    projectName: z.string(),
+    projectSlug: z.string(),
+  })
+  .openapi("WorkspaceTask");
+
+export const workspaceTaskListSchema = z
+  .object({
+    tasks: z.array(workspaceTaskSchema),
+    pagination: z
+      .object({
+        total: z.number().openapi({
+          description:
+            "Total tasks matching the filters, across the workspace.",
+        }),
+        page: z.number(),
+        pageSize: z.number(),
+        totalPages: z.number(),
+      })
+      .openapi("WorkspaceTaskPagination"),
+  })
+  .openapi("WorkspaceTaskList");
 
 export const moveTaskResultSchema = z
   .object({

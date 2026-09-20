@@ -4,6 +4,7 @@ import {
   CalendarRange,
   Check,
   Menu,
+  Milestone,
   Plus,
   SquareKanban,
 } from "lucide-react";
@@ -21,12 +22,19 @@ import { cn } from "@/lib/cn";
 type MobileProjectNavProps = {
   workspaceId: string;
   projectId: string;
-  activeView: "backlog" | "board" | "calendar" | "gantt" | "appointments";
+  activeView:
+    | "backlog"
+    | "board"
+    | "calendar"
+    | "gantt"
+    | "appointments"
+    | "roadmap";
   onSelectBoard: () => void;
   onSelectBacklog: () => void;
   onSelectAppointments: () => void;
   onSelectCalendar: () => void;
   onSelectGantt: () => void;
+  onSelectRoadmap: () => void;
   onSelectProject: (projectId: string) => void;
   onAddProject: () => void;
 };
@@ -40,6 +48,7 @@ export default function MobileProjectNav({
   onSelectAppointments,
   onSelectCalendar,
   onSelectGantt,
+  onSelectRoadmap,
   onSelectProject,
   onAddProject,
 }: MobileProjectNavProps) {
@@ -129,6 +138,19 @@ export default function MobileProjectNav({
               >
                 <CalendarDays className="size-3.5" />
                 Gantt
+              </button>
+              <button
+                type="button"
+                onClick={onSelectRoadmap}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "roadmap"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <Milestone className="size-3.5" />
+                {t("roadmap:tab")}
               </button>
             </div>
           </div>

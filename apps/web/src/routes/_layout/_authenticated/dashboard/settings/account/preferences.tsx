@@ -18,6 +18,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/hooks/use-locale";
+import { cn } from "@/lib/cn";
 import {
   isWeekStartDay,
   useUserPreferencesStore,
@@ -109,7 +110,7 @@ function RouteComponent() {
         </div>
 
         <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="space-y-2">
             <div className="space-y-0.5">
               <Label className="text-sm font-medium">
                 {t("settings:preferencesPage.theme")}
@@ -118,32 +119,56 @@ function RouteComponent() {
                 {t("settings:preferencesPage.themeDescription")}
               </p>
             </div>
-            <Select
-              value={theme}
-              onValueChange={(value) => value && setTheme(value)}
+            <fieldset
+              className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+              aria-label={t("settings:preferencesPage.theme")}
             >
-              <SelectTrigger size="sm" className="w-full sm:w-40">
-                <SelectValue
-                  placeholder={t("settings:preferencesPage.selectTheme")}
+              {(["light", "dark", "volt", "system"] as const).map((option) => (
+                <label
+                  key={option}
+                  className={cn(
+                    "flex cursor-pointer flex-col gap-2 rounded-lg border p-2 text-left transition-colors focus-within:ring-2 focus-within:ring-ring/40",
+                    theme === option
+                      ? "border-ring ring-2 ring-ring/30"
+                      : "border-border hover:bg-accent/50",
+                  )}
                 >
-                  {themeLabels[theme]}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">
-                  {t("settings:preferencesPage.themeLight")}
-                </SelectItem>
-                <SelectItem value="dark">
-                  {t("settings:preferencesPage.themeDark")}
-                </SelectItem>
-                <SelectItem value="volt">
-                  {t("settings:preferencesPage.themeVolt")}
-                </SelectItem>
-                <SelectItem value="system">
-                  {t("settings:preferencesPage.themeSystem")}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+                  <input
+                    type="radio"
+                    name="theme"
+                    value={option}
+                    checked={theme === option}
+                    onChange={() => setTheme(option)}
+                    className="sr-only"
+                  />
+                  <span
+                    className={cn(
+                      "relative block h-10 w-full overflow-hidden rounded-md border",
+                      `theme-preview-${option}`,
+                    )}
+                    style={{
+                      background: "var(--preview-bg)",
+                      borderColor: "var(--preview-border)",
+                    }}
+                  >
+                    <span
+                      className="absolute top-1.5 left-1.5 h-4 w-8 rounded-sm border"
+                      style={{
+                        background: "var(--preview-card)",
+                        borderColor: "var(--preview-border)",
+                      }}
+                    />
+                    <span
+                      className="absolute right-1.5 bottom-1.5 size-2.5 rounded-full"
+                      style={{ background: "var(--preview-accent)" }}
+                    />
+                  </span>
+                  <span className="text-xs font-medium">
+                    {themeLabels[option]}
+                  </span>
+                </label>
+              ))}
+            </fieldset>
           </div>
 
           <Separator />

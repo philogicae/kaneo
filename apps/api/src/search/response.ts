@@ -40,7 +40,7 @@ export const searchResponseSchema = z
     results: z.array(searchResultSchema),
     totalCount: z.number().openapi({
       description:
-        "Total matches found before the `limit` slice, so a caller can tell that more exist.",
+        "Matches returned after relevance filtering and the per-category caps. It is NOT an exhaustive database count: when Jev reranking is enabled, candidates below the relevance floor are dropped, and each category over-fetches at most 50 candidates. Use it as a lower bound, not as proof of absence.",
     }),
     searchQuery: z.string().openapi({ description: "The query that was run." }),
   })

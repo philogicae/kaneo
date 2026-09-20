@@ -6,6 +6,15 @@ type McpToolResult = {
   isError?: boolean;
 };
 
+/** MCP tool annotations (the spec's behavioral hints). */
+export type McpToolAnnotations = {
+  title?: string;
+  readOnlyHint?: boolean;
+  destructiveHint?: boolean;
+  idempotentHint?: boolean;
+  openWorldHint?: boolean;
+};
+
 /** Minimal tool-registration contract shared by legacy and modern MCP servers. */
 export type McpToolRegistrar = {
   registerTool(
@@ -13,6 +22,8 @@ export type McpToolRegistrar = {
     config: {
       description: string;
       inputSchema: z.ZodObject;
+      title?: string;
+      annotations?: McpToolAnnotations;
     },
     callback: (args: unknown) => Promise<McpToolResult>,
   ): unknown;
@@ -21,7 +32,12 @@ export type McpToolRegistrar = {
 type ShapeToolServer = {
   registerTool(
     name: string,
-    config: { description: string; inputSchema: z.ZodRawShape },
+    config: {
+      description: string;
+      inputSchema: z.ZodRawShape;
+      title?: string;
+      annotations?: McpToolAnnotations;
+    },
     callback: (args: unknown) => Promise<McpToolResult>,
   ): unknown;
 };
@@ -34,9 +50,51 @@ export function toMcpToolRegistrar(server: ShapeToolServer): McpToolRegistrar {
         {
           description: config.description,
           inputSchema: config.inputSchema.shape,
+          ...(config.title ? { title: config.title } : {}),
+          ...(config.annotations ? { annotations: config.annotations } : {}),
         },
         (args) => callback(args),
       ),
+  };
+}
+
+const READ_ONLY_NAMES = new Set(["whoami", "search", "get_public_url"]);
+const DESTRUCTIVE_NAMES = new Set([
+  "move_task_to_appointments",
+  "detach_label_from_task",
+  "bulk_update_tasks",
+]);
+
+function humanizeToolName(name: string): string {
+  const words = name.replace(/_/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+// Behavioral hints inferred from the tool name so every client sees a
+// consistent consent surface: reads are marked read-only, deletes and
+// conversions destructive, and the whole catalog stays closed-world (tools
+// only call this instance's REST API).
+export function inferToolAnnotations(name: string): McpToolAnnotations {
+  const readOnly =
+    READ_ONLY_NAMES.has(name) ||
+    name.startsWith("list_") ||
+    name.startsWith("get_") ||
+    name.startsWith("telegram_list_");
+  const destructive =
+    DESTRUCTIVE_NAMES.has(name) ||
+    name.startsWith("delete_") ||
+    name.startsWith("telegram_delete_");
+  return {
+    title: humanizeToolName(name),
+    readOnlyHint: readOnly,
+    destructiveHint: destructive,
+    idempotentHint:
+      readOnly ||
+      destructive ||
+      name.startsWith("update_") ||
+      name.startsWith("set_") ||
+      name === "attach_label_to_task",
+    openWorldHint: false,
   };
 }
 
@@ -261,11 +319,20 @@ function buildFullAppointmentUpdateBody(
         : undefined;
   if (userId !== undefined) body.userId = userId;
 
-  if (patch.reminderOffsets !== undefined) {
-    body.reminderOffsets = patch.reminderOffsets as number[] | null;
+  // The appointment endpoint clears reminders/recurrence when the keys are
+  // absent, so a partial patch must carry the existing values forward or a
+  // title-only edit silently drops them.
+  const reminderOffsets =
+    patch.reminderOffsets !== undefined
+      ? patch.reminderOffsets
+      : existing.reminderOffsets;
+  if (reminderOffsets !== undefined) {
+    body.reminderOffsets = reminderOffsets as number[] | null;
   }
-  if (patch.recurrence !== undefined) {
-    body.recurrence = patch.recurrence as RecurrenceInput | null;
+  const recurrence =
+    patch.recurrence !== undefined ? patch.recurrence : existing.recurrence;
+  if (recurrence !== undefined) {
+    body.recurrence = recurrence as RecurrenceInput | null;
   }
 
   return body;
@@ -368,6 +435,21 @@ const labelColorSchema = z
     `Expected a hex color like #FF6600 or a semantic name (${LABEL_COLOR_SLUGS.join(", ")})`,
   );
 
+// Public web origin for user-facing links, not the internal API baseUrl. The
+// localhost fallback is unusable in a real deployment, so warn once when the
+// env var is missing instead of silently emitting wrong links.
+let warnedMissingClientUrl = false;
+function resolvePublicUrl() {
+  const configured = process.env.KANEO_CLIENT_URL?.replace(/\/+$/, "");
+  if (!configured && !warnedMissingClientUrl) {
+    warnedMissingClientUrl = true;
+    console.warn(
+      "[mcp] KANEO_CLIENT_URL is not set; link-building tools fall back to http://localhost:5173",
+    );
+  }
+  return configured || "http://localhost:5173";
+}
+
 /** Register Kaneo's authenticated tool catalog on an MCP server adapter. */
 export function registerMcpTools(
   server: McpToolRegistrar,
@@ -375,24 +457,33 @@ export function registerMcpTools(
   token: string,
 ): void {
   const client = new ApiClient(baseUrl, token);
-  // Public web origin for user-facing links, not the internal API baseUrl.
-  const publicUrl = () =>
-    (process.env.KANEO_CLIENT_URL || "http://localhost:5173").replace(
-      /\/+$/,
-      "",
-    );
+  const publicUrl = resolvePublicUrl;
   const registerTool = <InputSchema extends z.ZodObject>(
     name: string,
-    config: { description: string; inputSchema: InputSchema },
+    config: {
+      description: string;
+      inputSchema: InputSchema;
+      title?: string;
+      annotations?: McpToolAnnotations;
+    },
     callback: (args: z.output<InputSchema>) => Promise<McpToolResult>,
   ) =>
-    server.registerTool(name, config, async (args) => {
-      const parsed = config.inputSchema.safeParse(args);
-      if (!parsed.success) {
-        return errorResult(z.prettifyError(parsed.error));
-      }
-      return callback(parsed.data);
-    });
+    server.registerTool(
+      name,
+      {
+        description: config.description,
+        inputSchema: config.inputSchema,
+        title: config.title ?? humanizeToolName(name),
+        annotations: { ...inferToolAnnotations(name), ...config.annotations },
+      },
+      async (args) => {
+        const parsed = config.inputSchema.safeParse(args);
+        if (!parsed.success) {
+          return errorResult(z.prettifyError(parsed.error));
+        }
+        return callback(parsed.data);
+      },
+    );
 
   registerTool(
     "whoami",
@@ -474,13 +565,18 @@ export function registerMcpTools(
   registerTool(
     "create_project",
     {
-      description: "Create a project in a workspace.",
+      description:
+        "Create a project in a workspace. `slug` is the task-number prefix shown as `<slug>-<number>` (short, uppercase, no spaces). `icon` is a Lucide icon name (e.g. `Layout`, `Rocket`).",
       inputSchema: z.object({
-        name: nonEmptyString,
-        workspaceId: nonEmptyString,
-        icon: nonEmptyString,
-        slug: nonEmptyString,
-        description: z.string().optional(),
+        name: nonEmptyString.describe("Project name"),
+        workspaceId: nonEmptyString.describe(
+          "Workspace id (from list_workspaces)",
+        ),
+        icon: nonEmptyString.describe("Lucide icon name, e.g. `Layout`"),
+        slug: nonEmptyString.describe(
+          "Task-number prefix, e.g. `KAN` for KAN-12",
+        ),
+        description: z.string().optional().describe("Project description"),
       }),
     },
     async (args) =>
@@ -505,11 +601,16 @@ export function registerMcpTools(
         "Update project metadata by fetching the project, merging supplied fields and sending a full update (not an atomic PATCH). Serialize concurrent edits. Changing isPublic changes visibility and requires explicit authorization.",
       inputSchema: z.object({
         projectId: nonEmptyString.describe("Project id (from list_projects)"),
-        name: optionalNonEmptyString,
-        icon: z.string().optional(),
-        slug: optionalNonEmptyString,
-        description: z.string().optional(),
-        isPublic: z.boolean().optional(),
+        name: optionalNonEmptyString.describe("Project name"),
+        icon: z.string().optional().describe("Lucide icon name, e.g. `Layout`"),
+        slug: optionalNonEmptyString.describe(
+          "Task-number prefix, e.g. `KAN` for KAN-12",
+        ),
+        description: z.string().optional().describe("Project description"),
+        isPublic: z
+          .boolean()
+          .optional()
+          .describe("Public visibility; changes require authorization"),
       }),
     },
     async (args) => {
@@ -554,17 +655,70 @@ export function registerMcpTools(
   );
 
   registerTool(
+    "archive_project",
+    {
+      description:
+        "Archive a project: it disappears from the default project list without deleting anything. Reversible with `unarchive_project`. Requires `project:update` permission.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/project/${encodeURIComponent(args.projectId)}/archive`,
+          { method: "PUT" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "unarchive_project",
+    {
+      description:
+        "Restore an archived project to the default project list. Reverses `archive_project`; use `list_projects` with `includeArchived` to find archived ids.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe(
+          "Archived project id (from list_projects with includeArchived)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/project/${encodeURIComponent(args.projectId)}/unarchive`,
+          { method: "PUT" },
+        ),
+      ),
+  );
+
+  registerTool(
     "list_tasks",
     {
       description:
-        "List tasks for a project (optionally filtered/sorted). Paginated: `page`/`limit` (limit max 100, default 50). Response is the project board (data.columns[].tasks, data.plannedTasks, data.archivedTasks) plus a `pagination` block; sort/pagination apply to the flat task list before grouping.",
+        "List tasks for a project (optionally filtered/sorted). Paginated: `page`/`limit` (limit max 200, default 50); the response is the project board (data.columns[].tasks, data.plannedTasks, data.archivedTasks) plus a `pagination` block, so read `pagination.total` to know whether more pages exist. Use `status` = a column slug (list_project_columns), `planned` for the backlog or `archived`. For cross-project or text search use the `search` tool.",
       inputSchema: z.object({
-        projectId: nonEmptyString,
-        status: optionalNonEmptyString,
-        priority: prioritySchema.optional(),
-        assigneeId: optionalNonEmptyString,
-        page: z.number().int().positive().optional(),
-        limit: z.number().int().positive().max(100).optional(),
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        status: optionalNonEmptyString.describe(
+          "Column slug (from list_project_columns), or `planned`/`archived`",
+        ),
+        priority: prioritySchema.optional().describe("Exact priority filter"),
+        assigneeId: optionalNonEmptyString.describe(
+          "Assignee user id (from list_workspace_members)",
+        ),
+        page: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe("1-based page (default 1)"),
+        limit: z
+          .number()
+          .int()
+          .positive()
+          .max(200)
+          .optional()
+          .describe("Tasks per page (default 50, max 200)"),
         sortBy: z
           .enum([
             "createdAt",
@@ -574,10 +728,18 @@ export function registerMcpTools(
             "title",
             "number",
           ])
-          .optional(),
-        sortOrder: z.enum(["asc", "desc"]).optional(),
-        dueBefore: optionalIsoDateTimeSchema,
-        dueAfter: optionalIsoDateTimeSchema,
+          .optional()
+          .describe("Sort field (default `position`)"),
+        sortOrder: z
+          .enum(["asc", "desc"])
+          .optional()
+          .describe("Sort direction"),
+        dueBefore: optionalIsoDateTimeSchema.describe(
+          "Only tasks due at or before this date-time",
+        ),
+        dueAfter: optionalIsoDateTimeSchema.describe(
+          "Only tasks due at or after this date-time",
+        ),
         timezone: timezoneSchema,
       }),
     },
@@ -612,11 +774,101 @@ export function registerMcpTools(
   );
 
   registerTool(
+    "list_workspace_tasks",
+    {
+      description:
+        "List tasks across every project of a workspace as one flat, filterable, paginated list. This is the tool for cross-project questions (`my open tasks`, `everything urgent`, `due this week`, `tasks with label bug`) — no need to iterate every project. Each row carries `projectId`, `projectName`, `projectSlug` and `number`, so its short id is `{projectSlug}-{number}`. Read `pagination.total` to know whether more pages exist.",
+      inputSchema: z.object({
+        workspaceId: nonEmptyString.describe(
+          "Workspace id (from list_workspaces)",
+        ),
+        status: optionalNonEmptyString.describe(
+          "Column slug (from list_project_columns), or `planned`/`archived`",
+        ),
+        priority: prioritySchema.optional().describe("Exact priority filter"),
+        assigneeId: optionalNonEmptyString.describe(
+          "Assignee user id (from list_workspace_members), or `unassigned`",
+        ),
+        label: optionalNonEmptyString.describe(
+          "Exact label name, case-insensitive",
+        ),
+        q: optionalNonEmptyString.describe(
+          "Case-insensitive text match on title and description",
+        ),
+        dueBefore: optionalIsoDateTimeSchema.describe(
+          "Only tasks due at or before this date-time",
+        ),
+        dueAfter: optionalIsoDateTimeSchema.describe(
+          "Only tasks due at or after this date-time",
+        ),
+        page: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe("1-based page (default 1)"),
+        limit: z
+          .number()
+          .int()
+          .positive()
+          .max(200)
+          .optional()
+          .describe("Tasks per page (default 50, max 200)"),
+        sortBy: z
+          .enum([
+            "createdAt",
+            "priority",
+            "dueDate",
+            "position",
+            "title",
+            "number",
+          ])
+          .optional()
+          .describe("Sort field (default `position`)"),
+        sortOrder: z
+          .enum(["asc", "desc"])
+          .optional()
+          .describe("Sort direction"),
+        timezone: timezoneSchema,
+      }),
+    },
+    async (args) => {
+      const { workspaceId, timezone, dueBefore, dueAfter, ...rest } = args;
+      return run(() => {
+        const qs = new URLSearchParams();
+        for (const [k, v] of Object.entries(rest)) {
+          if (v !== undefined && v !== null) qs.set(k, String(v));
+        }
+        if (!qs.has("page")) qs.set("page", "1");
+        if (!qs.has("limit")) qs.set("limit", "50");
+        if (dueBefore !== undefined) {
+          qs.set(
+            "dueBefore",
+            resolveDateTimeInput(dueBefore, timezone) as string,
+          );
+        }
+        if (dueAfter !== undefined) {
+          qs.set(
+            "dueAfter",
+            resolveDateTimeInput(dueAfter, timezone) as string,
+          );
+        }
+        return client.json(
+          `/api/task/workspace/${encodeURIComponent(workspaceId)}?${qs.toString()}`,
+          { method: "GET" },
+        );
+      });
+    },
+  );
+
+  registerTool(
     "get_task",
     {
       description:
-        "Get task fields by opaque task ID. Does not include labels, comments or relations; use list_workspace_labels/list_tasks, list_task_comments or get_task_relations for those.",
-      inputSchema: z.object({ taskId: nonEmptyString }),
+        "Get task fields by opaque task ID. Does not include labels, comments or relations; use list_task_labels, list_task_comments or get_task_relations for those.",
+      inputSchema: z.object({
+        taskId: nonEmptyString.describe("Task id (from list_tasks/search)"),
+      }),
     },
     async (args) =>
       run(() =>
@@ -627,19 +879,91 @@ export function registerMcpTools(
   );
 
   registerTool(
+    "get_task_by_short_id",
+    {
+      description:
+        'Resolve a human short id such as `KAN-12` to its task in one call, across every workspace the user can access. Returns `match: "exact"` with the full task, or `match: "none"` with close candidates when no project key + number pair matches. Use this instead of guessing ids or scanning boards.',
+      inputSchema: z.object({
+        shortId: nonEmptyString.describe(
+          "Short id as shown in the UI, e.g. `KAN-12` (project key + number)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        // Same shape as the API's short-id pattern: a project key can contain
+        // any Unicode letters/numbers (ПА-23, 测试项-5), so ASCII-only matching
+        // would silently miss valid ids. NFKC aligns composed/decomposed forms.
+        const parsed = args.shortId
+          .normalize("NFKC")
+          .match(/^(\p{L}[\p{L}\p{N}\p{M}_-]*)-(\d{1,9})$/u);
+        if (!parsed?.[1] || !parsed[2]) {
+          throw new Error(
+            `"${args.shortId}" is not a short id; expected a project key and number like KAN-12.`,
+          );
+        }
+        const slug = parsed[1].toLowerCase();
+        const number = Number.parseInt(parsed[2], 10);
+        const search = (await client.json(
+          `/api/search?q=${encodeURIComponent(args.shortId)}&type=tasks&limit=20`,
+          { method: "GET" },
+        )) as {
+          results?: Array<{
+            id: string;
+            type: string;
+            title?: string;
+            projectSlug?: string;
+            taskNumber?: number;
+          }>;
+        };
+        const results = search.results ?? [];
+        const exact = results.find(
+          (result) =>
+            result.type === "task" &&
+            (result.projectSlug ?? "").toLowerCase() === slug &&
+            result.taskNumber === number,
+        );
+        if (!exact) {
+          return {
+            match: "none",
+            shortId: args.shortId,
+            candidates: results.slice(0, 5).map((result) => ({
+              id: result.id,
+              title: result.title,
+              projectSlug: result.projectSlug,
+              taskNumber: result.taskNumber,
+            })),
+            note: "No exact project-key + number match. The id may belong to another workspace, or the project key differs; check the candidates or search by title.",
+          };
+        }
+        const task = await client.json(
+          `/api/task/${encodeURIComponent(exact.id)}`,
+          { method: "GET" },
+        );
+        return { match: "exact", shortId: args.shortId, task };
+      }),
+  );
+
+  registerTool(
     "create_task",
     {
       description:
         "Create a task in a project. `status` is a column slug (from list_project_columns), or `planned` to file the task in the backlog (off the board). The response carries the task's final `priority` and `labels`: read them before making further edits. Attach context labels such as `branch:<name>` or `machine:*` yourself; they are never added for you. Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`.",
       inputSchema: z.object({
-        projectId: nonEmptyString,
-        title: nonEmptyString,
-        description: z.string(),
-        priority: prioritySchema,
-        status: nonEmptyString,
-        startDate: optionalIsoDateTimeSchema,
-        dueDate: optionalIsoDateTimeSchema,
-        userId: optionalNonEmptyString,
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        title: nonEmptyString.describe("Task title"),
+        description: z.string().describe("Task description (may be empty)"),
+        priority: prioritySchema.describe("Task priority"),
+        status: nonEmptyString.describe(
+          "Column slug (from list_project_columns), or `planned` for the backlog",
+        ),
+        startDate: optionalIsoDateTimeSchema.describe(
+          "Start date; reminders count down from it",
+        ),
+        dueDate: optionalIsoDateTimeSchema.describe("Due date"),
+        userId: optionalNonEmptyString.describe(
+          "Assignee user id (from list_workspace_members)",
+        ),
         reminderOffsets: reminderOffsetsSchema,
         recurrence: recurrenceSchema,
         timezone: timezoneSchema,
@@ -686,10 +1010,10 @@ export function registerMcpTools(
       description:
         "Suggest a priority and labels for a task from its title and description, before creating it. Use it when the user leaves the priority or tags open, or to double-check a categorization. Returns `priority` (with `priorityConfidence`) and the `labels` to attach. If `enabled` is false, no suggestion is available: choose the priority and labels yourself.",
       inputSchema: z.object({
-        projectId: nonEmptyString,
-        title: nonEmptyString,
-        description: z.string().optional(),
-        priority: prioritySchema.optional(),
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        title: nonEmptyString.describe("Task title"),
+        description: z.string().optional().describe("Task description"),
+        priority: prioritySchema.optional().describe("Priority hint"),
       }),
     },
     async (args) =>
@@ -711,15 +1035,27 @@ export function registerMcpTools(
     "update_task",
     {
       description:
-        "Update a task (fetches current task, merges fields, then full update). Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`. `reminderOffsets` are minutes before the task's start date; pass null to clear all reminders.",
+        "Update a task (fetches current task, merges fields, then full update). Dates must be ISO 8601: with an explicit offset, or a local time plus the user's `timezone`. `reminderOffsets` are minutes before the task's start date; pass null to clear all reminders. `projectId` must equal the task's current project (it is part of the full body); to relocate a task use `move_task`.",
       inputSchema: z.object({
-        taskId: nonEmptyString,
-        title: optionalNonEmptyString,
-        description: z.string().nullable().optional(),
-        status: optionalNonEmptyString,
-        priority: prioritySchema.optional(),
-        projectId: optionalNonEmptyString,
-        position: z.number().optional(),
+        taskId: nonEmptyString.describe("Task id (from list_tasks/search)"),
+        title: optionalNonEmptyString.describe("New title"),
+        description: z
+          .string()
+          .nullable()
+          .optional()
+          .describe("New description; null clears it"),
+        status: optionalNonEmptyString.describe(
+          "Column slug (from list_project_columns), `planned` or `archived`",
+        ),
+        priority: prioritySchema.optional().describe("New priority"),
+        projectId: optionalNonEmptyString.describe(
+          "Must equal the task's current project; use move_task to relocate",
+        ),
+        position: z
+          .number()
+          .int()
+          .optional()
+          .describe("Numeric position within the column"),
         startDate: nullableOptionalIsoDateTimeSchema,
         dueDate: nullableOptionalIsoDateTimeSchema,
         userId: nullableOptionalNonEmptyString,
@@ -862,7 +1198,11 @@ export function registerMcpTools(
     {
       description:
         "Delete one of your comments from a task. Requires both authorship and task:update permission, plus explicit user authorization to delete history.",
-      inputSchema: z.object({ commentId: nonEmptyString }),
+      inputSchema: z.object({
+        commentId: nonEmptyString.describe(
+          "Comment id (from list_task_comments)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -876,15 +1216,44 @@ export function registerMcpTools(
     "list_workspace_labels",
     {
       description:
-        "List labels defined in a workspace. The response mixes workspace-level labels (taskId null) with task-level copies attached to tasks; prefer taskId null entries for attach_label_to_task.",
-      inputSchema: z.object({ workspaceId: nonEmptyString }),
+        "List the labels defined in a workspace (the ones attach_label_to_task accepts). Task-scoped copies attached to tasks are filtered out by default; pass includeCopies to include them, or use list_task_labels for one task's labels.",
+      inputSchema: z.object({
+        workspaceId: nonEmptyString.describe(
+          "Workspace id (from list_workspaces)",
+        ),
+        includeCopies: z
+          .boolean()
+          .optional()
+          .describe("Also return task-scoped label copies"),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const labels = (await client.json(
+          `/api/label/workspace/${encodeURIComponent(args.workspaceId)}`,
+          { method: "GET" },
+        )) as Array<Record<string, unknown>>;
+        if (args.includeCopies === true) {
+          return labels;
+        }
+        return labels.filter((label) => label.taskId == null);
+      }),
+  );
+
+  registerTool(
+    "list_task_labels",
+    {
+      description:
+        "List the labels attached to one task (task-scoped copies, with the ids detach_label_from_task expects). To add one, pass a workspace label id (list_workspace_labels) to attach_label_to_task.",
+      inputSchema: z.object({
+        taskId: nonEmptyString.describe("Task id (from list_tasks/search)"),
+      }),
     },
     async (args) =>
       run(() =>
-        client.json(
-          `/api/label/workspace/${encodeURIComponent(args.workspaceId)}`,
-          { method: "GET" },
-        ),
+        client.json(`/api/label/task/${encodeURIComponent(args.taskId)}`, {
+          method: "GET",
+        }),
       ),
   );
 
@@ -910,6 +1279,209 @@ export function registerMcpTools(
             workspaceId: args.workspaceId,
             ...(args.taskId !== undefined ? { taskId: args.taskId } : {}),
           }),
+        }),
+      ),
+  );
+
+  registerTool(
+    "update_label",
+    {
+      description:
+        "Rename or recolor a label (workspace-level definition, from list_workspace_labels). Fetches the label, merges supplied fields then sends a full update; renaming cascades to every task copy, and a name already used by another workspace label is rejected with a clear error.",
+      inputSchema: z.object({
+        labelId: nonEmptyString.describe(
+          "Label id (from list_workspace_labels)",
+        ),
+        name: optionalNonEmptyString.describe("New label name"),
+        color: labelColorSchema
+          .optional()
+          .describe("New color: hex (#4A5568) or palette name"),
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const existing = (await client.json(
+          `/api/label/${encodeURIComponent(args.labelId)}`,
+          { method: "GET" },
+        )) as { name?: unknown; color?: unknown };
+        const name =
+          args.name ?? (typeof existing.name === "string" ? existing.name : "");
+        if (!name) {
+          throw new Error("Cannot update label: missing name.");
+        }
+        const color =
+          args.color ??
+          (typeof existing.color === "string" ? existing.color : "");
+        if (!color) {
+          throw new Error("Cannot update label: missing color.");
+        }
+        return client.json(`/api/label/${encodeURIComponent(args.labelId)}`, {
+          method: "PUT",
+          body: JSON.stringify({ name, color }),
+        });
+      }),
+  );
+
+  registerTool(
+    "list_milestones",
+    {
+      description:
+        "List a project's roadmap sprints/phases (milestones), ordered left to right by `position`. Use it before assigning tasks to a sprint or to render a roadmap; `assign_task_milestone` does the assignment.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/milestone?projectId=${encodeURIComponent(args.projectId)}`,
+          { method: "GET" },
+        ),
+      ),
+  );
+
+  registerTool(
+    "create_milestone",
+    {
+      description:
+        "Create a roadmap sprint/phase in a project; it appends to the right of the roadmap. `color` is a palette name (sky, teal, purple, ...) or a hex color (default sky). Assign tasks with `assign_task_milestone`.",
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        name: nonEmptyString.describe("Sprint/phase name"),
+        description: optionalNonEmptyString.describe("Optional description"),
+        color: labelColorSchema
+          .optional()
+          .describe("Palette name or hex color (default sky)"),
+        startDate: optionalIsoDateTimeSchema.describe("Optional start date"),
+        endDate: optionalIsoDateTimeSchema.describe("Optional end date"),
+        timezone: timezoneSchema,
+      }),
+    },
+    async (args) =>
+      run(() => {
+        const body: Record<string, string> = {
+          projectId: args.projectId,
+          name: args.name,
+        };
+        if (args.description !== undefined) {
+          body.description = args.description;
+        }
+        if (args.color !== undefined) {
+          body.color = args.color;
+        }
+        if (args.startDate !== undefined) {
+          body.startDate = resolveDateTimeInput(
+            args.startDate,
+            args.timezone,
+          ) as string;
+        }
+        if (args.endDate !== undefined) {
+          body.endDate = resolveDateTimeInput(
+            args.endDate,
+            args.timezone,
+          ) as string;
+        }
+        return client.json("/api/milestone", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      }),
+  );
+
+  registerTool(
+    "update_milestone",
+    {
+      description:
+        "Rename, recolor, re-describe or re-date a milestone. Fetches the milestone, merges supplied fields, then sends a full update; an explicit null date clears it.",
+      inputSchema: z.object({
+        milestoneId: nonEmptyString.describe(
+          "Milestone id (from list_milestones)",
+        ),
+        name: optionalNonEmptyString.describe("New name"),
+        description: z
+          .string()
+          .nullable()
+          .optional()
+          .describe("New description; null clears it"),
+        color: labelColorSchema.optional().describe("Palette name or hex"),
+        startDate: nullableOptionalIsoDateTimeSchema,
+        endDate: nullableOptionalIsoDateTimeSchema,
+        timezone: timezoneSchema,
+      }),
+    },
+    async (args) =>
+      run(async () => {
+        const existing = (await client.json(
+          `/api/milestone/${encodeURIComponent(args.milestoneId)}`,
+          { method: "GET" },
+        )) as Record<string, unknown>;
+        const name =
+          args.name ?? (typeof existing.name === "string" ? existing.name : "");
+        if (!name) {
+          throw new Error("Cannot update milestone: missing name.");
+        }
+        const color =
+          args.color ??
+          (typeof existing.color === "string" ? existing.color : "sky");
+        const body: Record<string, unknown> = { name, color };
+        if (args.description !== undefined) {
+          body.description = args.description;
+        }
+        if (args.startDate !== undefined) {
+          body.startDate =
+            args.startDate === null
+              ? null
+              : resolveDateTimeInput(args.startDate, args.timezone);
+        }
+        if (args.endDate !== undefined) {
+          body.endDate =
+            args.endDate === null
+              ? null
+              : resolveDateTimeInput(args.endDate, args.timezone);
+        }
+        return client.json(
+          `/api/milestone/${encodeURIComponent(args.milestoneId)}`,
+          { method: "PUT", body: JSON.stringify(body) },
+        );
+      }),
+  );
+
+  registerTool(
+    "delete_milestone",
+    {
+      description:
+        "Delete a roadmap sprint/phase. Its tasks are kept and fall back to the roadmap's no-sprint lane; use `update_milestone` to rename instead when in doubt.",
+      inputSchema: z.object({
+        milestoneId: nonEmptyString.describe(
+          "Milestone id (from list_milestones)",
+        ),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/milestone/${encodeURIComponent(args.milestoneId)}`, {
+          method: "DELETE",
+        }),
+      ),
+  );
+
+  registerTool(
+    "assign_task_milestone",
+    {
+      description:
+        "Move a task into a roadmap sprint/phase of the same project, or pass null to clear its assignment. The task itself is never deleted; dates and status are untouched.",
+      inputSchema: z.object({
+        taskId: nonEmptyString.describe("Task id (from list_tasks/search)"),
+        milestoneId: nonEmptyString
+          .nullable()
+          .describe("Milestone id (from list_milestones), or null to clear"),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/task/milestone/${encodeURIComponent(args.taskId)}`, {
+          method: "PUT",
+          body: JSON.stringify({ milestoneId: args.milestoneId }),
         }),
       ),
   );
@@ -953,7 +1525,11 @@ export function registerMcpTools(
     {
       description:
         "Remove a label from its current task by deleting the task-scoped copy. Pass that copy's labelId, not the workspace definition ID. This does not preserve the copy as a workspace label.",
-      inputSchema: z.object({ labelId: nonEmptyString }),
+      inputSchema: z.object({
+        labelId: nonEmptyString.describe(
+          "Task-scoped copy id (from list_task_labels)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -1620,7 +2196,9 @@ export function registerMcpTools(
     {
       description:
         "List all relations (subtask/blocks/related) involving a task.",
-      inputSchema: z.object({ taskId: nonEmptyString }),
+      inputSchema: z.object({
+        taskId: nonEmptyString.describe("Task id (from list_tasks/search)"),
+      }),
     },
     async (args) =>
       run(() =>
@@ -1675,7 +2253,11 @@ export function registerMcpTools(
     {
       description:
         "List workspace members. Each row's id is the user ID to pass as userId to assignee tools (not a membership ID); role is workspace-scoped and does not prove effective permissions.",
-      inputSchema: z.object({ workspaceId: nonEmptyString }),
+      inputSchema: z.object({
+        workspaceId: nonEmptyString.describe(
+          "Workspace id (from list_workspaces)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -1750,7 +2332,7 @@ export function registerMcpTools(
     "search",
     {
       description:
-        "Search tasks (all statuses), appointments, projects, workspaces, comments and activities. Results are capped with no pagination; totalCount is not an exhaustive database count. Narrow by type/scope, or use list_tasks pagination before concluding a task is absent. A result id belongs to its returned type.",
+        "Search tasks (all statuses), appointments, projects, workspaces, comments and activities. Multi-word queries match every word anywhere in the text (order-independent), and a `PROJ-12`-shaped query pins that exact short ID on top. Results are capped with no pagination; totalCount is not an exhaustive database count. Narrow by type/scope, or use list_tasks pagination before concluding a task is absent. A result id belongs to its returned type.",
       inputSchema: z.object({
         q: nonEmptyString.describe("Search query"),
         type: z
@@ -1791,7 +2373,9 @@ export function registerMcpTools(
     {
       description:
         "List a project's columns. Their slugs are the values update_task_status and create_task accept as a status.",
-      inputSchema: z.object({ projectId: nonEmptyString }),
+      inputSchema: z.object({
+        projectId: nonEmptyString.describe("Project id (from list_projects)"),
+      }),
     },
     async (args) =>
       run(() =>
@@ -1889,7 +2473,11 @@ export function registerMcpTools(
     {
       description:
         "Delete a column. It must be empty — move or delete its tasks first.",
-      inputSchema: z.object({ columnId: nonEmptyString }),
+      inputSchema: z.object({
+        columnId: nonEmptyString.describe(
+          "Column id (from list_project_columns)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -1905,22 +2493,27 @@ export function registerMcpTools(
       description:
         "Apply one operation to tasks in the same workspace. Preflight IDs and status validity in every target project; batches may partially persist and missing IDs may be skipped. Verify updatedCount and read back before retrying. Label operations take a label ID. updateDueDate requires an explicit-offset ISO date-time (no timezone argument), or null to clear. delete requires explicit confirmation.",
       inputSchema: z.object({
-        taskIds: z.array(nonEmptyString).min(1),
-        operation: z.enum([
-          "updateStatus",
-          "updatePriority",
-          "updateAssignee",
-          "delete",
-          "addLabel",
-          "removeLabel",
-          "updateDueDate",
-        ]),
+        taskIds: z
+          .array(nonEmptyString)
+          .min(1)
+          .describe("Task ids to update, all in the same workspace"),
+        operation: z
+          .enum([
+            "updateStatus",
+            "updatePriority",
+            "updateAssignee",
+            "delete",
+            "addLabel",
+            "removeLabel",
+            "updateDueDate",
+          ])
+          .describe("Operation applied to every task"),
         value: z
           .string()
           .nullable()
           .optional()
           .describe(
-            "New value for the operation. Unused by delete; null clears an assignee or due date.",
+            "Value for the operation: updateStatus → column slug/`planned`/`archived`; updatePriority → no-priority|low|medium|high|urgent; updateAssignee → user id (null unassigns); addLabel/removeLabel → workspace label id; updateDueDate → ISO date-time with explicit offset, or null to clear. Unused by delete.",
           ),
       }),
     },
@@ -1940,8 +2533,10 @@ export function registerMcpTools(
   registerTool(
     "delete_task",
     {
-      description: "Delete a task by ID.",
-      inputSchema: z.object({ taskId: nonEmptyString }),
+      description: "Delete a task by ID. Irreversible.",
+      inputSchema: z.object({
+        taskId: nonEmptyString.describe("Task id (from list_tasks/search)"),
+      }),
     },
     async (args) =>
       run(() =>
@@ -2000,18 +2595,34 @@ export function registerMcpTools(
     "list_appointments",
     {
       description:
-        "List a project's appointments, sorted by start date. Appointments are task-like scheduled items that never appear on the board or in the backlog; they surface in the Appointments view, Calendar, and Gantt.",
+        "List a project's appointments, sorted by start date. Appointments are task-like scheduled items that never appear on the board or in the backlog; they surface in the Appointments view, Calendar, and Gantt. Paginated with `limit`/`offset` (default 50, max 200); a full page may hide more, so page until a short one.",
       inputSchema: z.object({
         projectId: nonEmptyString.describe("Project id (from list_projects)"),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(200)
+          .optional()
+          .describe("Maximum appointments to return (default 50)"),
+        offset: z
+          .number()
+          .int()
+          .min(0)
+          .optional()
+          .describe("Appointments to skip (default 0)"),
       }),
     },
-    async (args) =>
-      run(() =>
-        client.json(
-          `/api/appointment?projectId=${encodeURIComponent(args.projectId)}`,
-          { method: "GET" },
-        ),
-      ),
+    async (args) => {
+      const qs = new URLSearchParams({
+        projectId: args.projectId,
+        limit: String(args.limit ?? 50),
+        offset: String(args.offset ?? 0),
+      });
+      return run(() =>
+        client.json(`/api/appointment?${qs.toString()}`, { method: "GET" }),
+      );
+    },
   );
 
   registerTool(
@@ -2019,7 +2630,11 @@ export function registerMcpTools(
     {
       description:
         "Get a single appointment by its appointmentId (from list_appointments).",
-      inputSchema: z.object({ appointmentId: nonEmptyString }),
+      inputSchema: z.object({
+        appointmentId: nonEmptyString.describe(
+          "Appointment id (from list_appointments)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -2135,7 +2750,11 @@ export function registerMcpTools(
     {
       description:
         "Delete an appointment by its appointmentId. The appointment is removed for good; this does not affect tasks.",
-      inputSchema: z.object({ appointmentId: nonEmptyString }),
+      inputSchema: z.object({
+        appointmentId: nonEmptyString.describe(
+          "Appointment id (from list_appointments)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -2193,7 +2812,11 @@ export function registerMcpTools(
     {
       description:
         "Delete a time entry, e.g. to cancel a mistaken log. Irreversible.",
-      inputSchema: z.object({ timeEntryId: nonEmptyString }),
+      inputSchema: z.object({
+        timeEntryId: nonEmptyString.describe(
+          "Time entry id (from list_task_time_entries)",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -2310,9 +2933,30 @@ export function registerMcpTools(
   registerTool(
     "list_notifications",
     {
-      description: "List the signed-in user's notifications (50 most recent).",
-      inputSchema: z.object({}),
+      description:
+        "List the signed-in user's notifications, newest first. Paginated: `limit` (default 50, max 200) and `offset`; receiving exactly `limit` items means more may exist.",
+      inputSchema: z.object({
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(200)
+          .optional()
+          .describe("Maximum notifications to return (default 50)"),
+        offset: z
+          .number()
+          .int()
+          .min(0)
+          .optional()
+          .describe("Notifications to skip (default 0)"),
+      }),
     },
-    async () => run(() => client.json("/api/notification")),
+    async (args) => {
+      const qs = new URLSearchParams({
+        limit: String(args.limit ?? 50),
+        offset: String(args.offset ?? 0),
+      });
+      return run(() => client.json(`/api/notification?${qs.toString()}`));
+    },
   );
 }

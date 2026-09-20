@@ -44,7 +44,7 @@ Kaneo supports many optional configuration options including:
 - `KANEO_INTERNAL_API_URL` - API origin used only for server-side requests from the built-in HTTP MCP endpoint. Defaults to `http://127.0.0.1:1337`; override it only if the API is not reachable there from its own process.
 - SSO providers (GitHub OAuth via `GITHUB_OAUTH_CLIENT_ID` / `GITHUB_OAUTH_CLIENT_SECRET`, Google, Discord, Custom OAuth/OIDC)
 - GitHub repository integration (GitHub App: `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`, optional `GITHUB_APP_NAME`), separate from GitHub SSO
-- SMTP configuration for email
+- SMTP or Resend configuration for email
 - Access control settings
 - CORS configuration
 - Private-network notification receivers (`KANEO_ALLOW_PRIVATE_WEBHOOK_DESTINATIONS=true` lets ntfy/Gotify/webhook destinations resolve to private addresses; off by default to prevent SSRF)
@@ -64,7 +64,15 @@ For sending emails (workspace invitations, magic links, etc.), configure these v
 
 > **Note:** If you're using an SMTP server with a self-signed or invalid TLS certificate, set `SMTP_IGNORE_TLS=true` to bypass certificate validation.
 
-When SMTP is configured, sign-in uses email verification codes by default. Set `DISABLE_EMAIL_OTP_SIGN_IN=true` to use email/password sign-in instead (workspace invitation emails still use SMTP).
+#### Resend
+
+[Resend](https://resend.com) is supported as an alternative transport (no SMTP relay needed):
+- `RESEND_API_KEY` - API key from https://resend.com/api-keys
+- `RESEND_FROM` - From header, e.g. `Kaneo <noreply@yourdomain.com>` (falls back to `SMTP_FROM` when unset)
+
+When `RESEND_API_KEY` is set, every email (magic link, OTP, password reset, invitations, notifications, trial reminders) goes through Resend's API; an API key wins over SMTP when both are configured. The `/api/config` response exposes `hasEmail` (any transport configured) so clients can decide whether mail can be sent.
+
+When an email transport is configured (Resend or SMTP), sign-in uses email verification codes by default. Set `DISABLE_EMAIL_OTP_SIGN_IN=true` to use email/password sign-in instead (invitation and notification emails still need a transport).
 
 ## Common Issues & Troubleshooting
 
