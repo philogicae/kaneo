@@ -1,39 +1,9 @@
-## [1.1.0] - 2026-09-18
+## [1.2.0] - 2026-09-20
 
 ### 🚀 Features
 
-- Feat: add Jev (TypeSafe) search reranking and task auto-qualification, Scalar API reference, local-disk asset storage docs; rework fork docs
-
-- apps/api/src/jev/ (new): optional TypeSafe System One integration — client with retry/backoff, token-budget batching (budget.ts), search
-  reranking (rerank.ts) and task qualification (priority + semantic labels, branch:_/machine:_ excluded); fail-open without TYPESAFE_API_KEY
-- apps/api/src/search/jev-search.ts (new), global-search.ts: over-fetch candidates (CANDIDATE_CAP) and rerank/filter by relevance when Jev
-  is enabled; totalCount reflects kept results; short-id matches pinned
-- apps/api/src/task/controllers/qualify-task.ts (new), create-task.ts, index.ts, schema.ts, response.ts: POST /task/qualify/{projectId}
-  suggestion endpoint; create-task runs qualification (qualify=true), attaches suggested labels as task-scoped copies, returns CreatedTask
-  with final priority + labels
-- apps/api/src/mcp/tools.ts: new qualify_task MCP tool; create_task description documents authoritative priority/labels in response
-- apps/api/src/index.ts, package.json: serve Scalar interactive API reference at /api/docs reading /api/openapi (@scalar/hono-api-reference
-  0.12.1)
-- apps/docs/: fork docs rework — remove drim/migration/storage-backends guides, rewrite compose/env-variables/object-storage (S3*\* →
-  local-disk STORAGE*\*), new pages (appointments-calendar-gantt, custom-fields, dashboard-and-analytics, recurrence-and-reminders,
-  search-and-command-palette, teams-and-scoped-access, agent-skill), docs.json nav updates
-- apps/docs/openapi.json: regenerate (CreatedTask, TaskQualification, SuggestedTaskLabel, qualifyTask route)
-- .env.sample, ENVIRONMENT*SETUP.md, README.md, CONTRIBUTING.md, AGENTS.md: document TYPESAFE_API_KEY + KANEO_JEV*\_ tuning, STORAGE\_\_
-  variables, GHCR publish workflow, updated structure/deploy notes
-- schema.ts, skills/kaneo (1.1.0), turbo.json: reminder comment fix (due→start date), qualify*task in catalog + usage guidance, turbo
-  globalEnv cleanup (drop AWS*/REDIS*/S3* leftovers, add STORAGE\_\*)
-- pnpm-lock.yaml: @scalar/hono-api-reference dependency
-- tests/api/ (new: jev/client, jev/qualify, jev/rerank, search/jev-search, task/qualify-task; mcp-tools): cover client retries, budget
-  batching, rerank fallback, qualification thresholds, MCP passthrough
-
-### ⚙️ Miscellaneous Tasks
-
-- Chore: update changelog
-
-## [1.0.6] - 2026-09-17
-
-### 🚀 Features
-
+- Feat(peekareq): add budgeted private code-review evaluation
+- Feat: add maintainer-triggered Peekareview code reviews
 - Feat: expand MCP tooling, project analytics and workspace UX
 
 MCP (HTTP):
@@ -257,9 +227,72 @@ Pagination:
 - apps/api/src/project/controllers/get-project-charts.ts + schema.ts + apps/docs/openapi.json: DEFAULT_RANGE 3m→1m and "default 1m" descriptions
 - i18n: team:memberAccess.\* (8 keys) + membersTable.ariaMemberActions across 20 locales + schema.json
 - tests/api-integration: access-teams (scoped assignee/member list/mention, direct grant/revoke, all-projects lift, creator grant), project-charts defaults, task assignee message
+- Feat: add Jev (TypeSafe) search reranking and task auto-qualification, Scalar API reference, local-disk asset storage docs; rework fork docs
+
+- apps/api/src/jev/ (new): optional TypeSafe System One integration — client with retry/backoff, token-budget batching (budget.ts), search
+  reranking (rerank.ts) and task qualification (priority + semantic labels, branch:_/machine:_ excluded); fail-open without TYPESAFE_API_KEY
+- apps/api/src/search/jev-search.ts (new), global-search.ts: over-fetch candidates (CANDIDATE_CAP) and rerank/filter by relevance when Jev
+  is enabled; totalCount reflects kept results; short-id matches pinned
+- apps/api/src/task/controllers/qualify-task.ts (new), create-task.ts, index.ts, schema.ts, response.ts: POST /task/qualify/{projectId}
+  suggestion endpoint; create-task runs qualification (qualify=true), attaches suggested labels as task-scoped copies, returns CreatedTask
+  with final priority + labels
+- apps/api/src/mcp/tools.ts: new qualify_task MCP tool; create_task description documents authoritative priority/labels in response
+- apps/api/src/index.ts, package.json: serve Scalar interactive API reference at /api/docs reading /api/openapi (@scalar/hono-api-reference
+  0.12.1)
+- apps/docs/: fork docs rework — remove drim/migration/storage-backends guides, rewrite compose/env-variables/object-storage (S3*\* →
+  local-disk STORAGE*\*), new pages (appointments-calendar-gantt, custom-fields, dashboard-and-analytics, recurrence-and-reminders,
+  search-and-command-palette, teams-and-scoped-access, agent-skill), docs.json nav updates
+- apps/docs/openapi.json: regenerate (CreatedTask, TaskQualification, SuggestedTaskLabel, qualifyTask route)
+- .env.sample, ENVIRONMENT*SETUP.md, README.md, CONTRIBUTING.md, AGENTS.md: document TYPESAFE_API_KEY + KANEO_JEV*_ tuning, STORAGE\__
+  variables, GHCR publish workflow, updated structure/deploy notes
+- schema.ts, skills/kaneo (1.1.0), turbo.json: reminder comment fix (due→start date), qualify*task in catalog + usage guidance, turbo
+  globalEnv cleanup (drop AWS*/REDIS*/S3* leftovers, add STORAGE\_\*)
+- pnpm-lock.yaml: @scalar/hono-api-reference dependency
+- tests/api/ (new: jev/client, jev/qualify, jev/rerank, search/jev-search, task/qualify-task; mcp-tools): cover client retries, budget
+  batching, rerank fallback, qualification thresholds, MCP passthrough
+- Feat: roadmap par sprints (milestones + graphe SVG + permissions), durcissement Jev (erreurs typées/retries/validation/rédaction/concurrence/keep-unsure), audit MCP/API (cross-projet, short-id, update_label, archive projet, pagination, TTL sessions), transport Resend, UI (404, charts, thèmes, labels, recherche); fix: update_appointment partiel, ajustement initial du graphe Roadmap, caches vitest isolés; chore: turbo 2.10.13→2.11.2, pnpm 12.4.2→12.5.1
+
+- apps/api/src/milestone/ (new), database/schema.ts, drizzle/0004\_\*: sprints par projet (table milestone + task.milestone_id), CRUD/reorder
+  protégés par project:update, détachement transactionnel des tâches à la suppression, index dédiés
+- apps/api/src/task/: GET /task/workspace/{id} cross-projet filtrable/paginé (get-workspace-tasks.ts), PUT /task/milestone/{taskId},
+  extraction de task-order.ts
+- apps/api/src/task-relation/: GET /task-relation/project/{projectId} (relations intra-projet en une lecture pour le graphe)
+- apps/api/src/jev/: JevError + validation de chaque réponse contre sa question + modèle obligatoire + provenance structurée,
+  retries 408/425/429/5xx avec Retry-After capé, parallel.ts (concurrence 4), redact.ts (secrets avant envoi),
+  rerank.ts (keep-unsure, split max_tokens_exceeded), budget non-ASCII ×2
+- apps/api/src/search/: matching tokenisé multi-mots (AND, ordre libre), short-id épinglé, totalCount documenté comme borne basse ;
+  jev-search.ts garde les incertains par défaut
+- apps/api/src/mcp/: annotations/titres/descriptions, list_task_labels, list_workspace_tasks, get_task_by_short_id, update_label,
+  archive_project/unarchive_project, pagination notifications/rendez-vous, sessions.ts (TTL 30 min), documents well-known factorisés
+- apps/api/src/notification/, appointment/: limit/offset (sans limite, la liste complète reste servie au calendrier/Gantt)
+- apps/api/src/utils/get-settings.ts, config/response.ts, auth.ts: hasEmail (Resend ou SMTP) et raison EMAIL_NOT_CONFIGURED
+- packages/email/: resend.ts (transport HTTP prioritaire sur SMTP, erreurs bornées) + deliver() unique pour tous les envois + tests
+- apps/web/src/components/roadmap/, lib/roadmap-layout.\*, route + fetchers/hooks/types: onglet Roadmap desktop/mobile, graphe SVG
+  (zones, nœuds, arêtes orientées, chemin critique, pan/zoom, fit suivi), barre sprints masquée sans project:update
+- apps/web/src/components/task/: éditeur de labels à tous les breakpoints (+ masqué sans label:update), popover Sprint
+- apps/web/src/routes, components, store, index.css: 404 habillée, recherche max-w-3xl, palette (debounce 250 ms + « Searching… »),
+  unité des charts toujours sélectionnable (+ rangeSupportingUnit), sélecteur de thème en radios natifs à aperçus,
+  tokens text-success-foreground
+- skills/kaneo/: 1.2.0 — catalogue milestones/labels/archive, pagination, notes setup
+- i18n/, apps/docs/openapi.json: nouvelles clés (20 locales) + schéma + référence OpenAPI régénérés
+- tests/: unitaires (jev client/rerank/redact, mcp-sessions, mcp-tools, search) + intégration (milestones, project-relations,
+  workspace-tasks, config)
+- .github/workflows/ci.yml, Dockerfile.kaneo, package.json, pnpm-lock.yaml, AGENTS.md: turbo 2.10.13→2.11.2,
+  pnpm 12.4.2→12.5.1 (CI, image, doc)
+- vitest.config.ts (6 workspaces): fsModuleCachePath par workspace — le cache racine partagé faisait échouer pnpm test
+  (ENOTEMPTY) quand les six suites démarraient en parallèle après un changement de lockfile
 
 ### 🐛 Bug Fixes
 
+- Fix(web): prevent 404 on activity query with undefined task ID
+
+Co-authored-by: sentry[bot] <39604003+sentry[bot]@users.noreply.github.com>
+
+- Fix(web): prevent 404 on activity query when taskId is undefined
+- Fix(web): use HttpError for activity fetcher
+- Fix(web): use HttpError across fetchers
+- Fix(web): redirect on 401 from mutations, preserve gitea body
+- Fix: handle review relay redirects and explicit reruns
 - Fix: harden MCP auth and label flows, rework self-hosted compose
 
 MCP:
@@ -316,6 +349,27 @@ Self-hosting & tooling:
   - ENVIRONMENT_SETUP.md: KANEO_DATA_PATH default ./data/kaneo.db→./data (DATABASE_PATH unchanged)
   - pnpm-lock.yaml: in-range bumps — @types/node 26.5.1→26.6.1, @types/nodemailer 8.0.1→8.0.2, kysely 0.29.5→0.29.6 (drizzle-orm/better-auth peer hashes), @tanstack/react-query 5.102.8→5.103.1 (+query-core), framer-motion 13.3.0→13.4.0, rolldown 1.2.8→1.2.9 (+bindings), unplugin 3.3.0→3.4.0, prettier 3.9.6→3.9.7, @oxc-project/types 0.149.0→0.150.0, electron-to-chromium 1.5.428→1.5.430, baseline-browser-mapping 2.11.23→2.11.24
   - package.json, biome.json: @biomejs/biome 2.5.13→2.5.14, $schema aligned; biome ci passes (1266 files)
+
+- Fix: keep dense chart series visible in a scrollable plot, honour the documented 200-task page size; feat: add a per-sprint roadmap list below md
+
+- apps/api/src/task/controllers/get-tasks.ts: per-project page size cap 100→200, aligned with the schema, OpenAPI and MCP contract (pagination.pageSize reflects the request)
+- apps/web/src/components/dashboard/charts/chart-utils.ts: add plotMinWidth() — below 3px per bucket the plot floors at 6px and scrolls instead of collapsing bars to 0px
+- apps/web/src/components/dashboard/charts/chart-utils.test.ts: +3 cases (fill-the-card, dense floor, unmeasured)
+- apps/web/src/components/dashboard/charts/velocity-chart.tsx: self-measure the plot (callback ref + ResizeObserver), wrap it in an overflow-x-auto/minWidth container and move the tooltip inside the scrolled area; unchanged for readable windows
+- apps/web/src/components/roadmap/roadmap-mobile-list.tsx (new): per-sprint list with colour dot + "x/y done" header and task rows (state dot, number, title, assignee · labels), same filter and state colours as the graph, click opens the task sheet
+- apps/web/src/components/roadmap/roadmap-mobile-list.test.tsx (new): 3 component tests — sections/rows render, filter keeps only matches, row click opens the task
+- apps/web/src/components/roadmap/index.tsx: below md render the list, keep the SVG canvas at md and up
+- tests/api-integration/list-pagination.test.ts: assert limit=200 → pageSize 200 on the per-project board
+
+### 💼 Changes
+
+- Merge pull request #1750 from usekaneo/seer/fix/web-activity-query-404
+
+fix(web): prevent 404 on activity query when taskId is undefined
+
+- Merge pull request #1751 from usekaneo/fix/fetcher-http-error
+
+fix(web): use HttpError across fetchers
 
 ### 🚜 Refactor
 
@@ -376,8 +430,14 @@ s3-request-presigner, creem (billing), ioredis; drizzle-kit moved to devDependen
   - @pnpm/exe 12.3.4 packageManagerDependency pin; billing (unit + integration), redis,
     leader-lock and trial-reminders test suites deleted, task-image-upload suite updated
 
+### 📚 Documentation
+
+- Docs: update contributors and sponsors
+
 ### ⚙️ Miscellaneous Tasks
 
+- Chore: gitignore .superpowers scratch
+- Ci: add PR size labeler action
 - Chore(infra): modernize runtime and deploy stack
 
 - Dockerfile.kaneo: node:24-alpine -> platformatic/node-caged:26-alpine in all four stages;
@@ -451,6 +511,12 @@ s3-request-presigner, creem (billing), ioredis; drizzle-kit moved to devDependen
   testTimeout
 - AGENTS.md documents pnpm test:coverage in setup commands
 - Chore: add changelog
+- Chore: update changelog
+- Chore: update changelog
+
+### ◀️ Revert
+
+- Revert: remove Peekareq code-review experiment
 
 ## [2.25.0] - 2026-09-17
 
@@ -7259,7 +7325,7 @@ ended up reset):
 - Feat(chart): add kaneo.extraEnv for arbitrary env vars
 
 Adds a standard extraEnv escape hatch to the kaneo container so users
-can inject CUSTOM*OAUTH*\_, SMTP\_\_, DEVICE_AUTH_CLIENT_IDS, etc. without
+can inject CUSTOM*OAUTH*_, SMTP\__, DEVICE_AUTH_CLIENT_IDS, etc. without
 forking the chart. Each entry is a regular Kubernetes EnvVar and supports
 both `value` and `valueFrom` (e.g. SecretKeyRef). Entries are appended
 after chart-defined vars; duplicate names override.
