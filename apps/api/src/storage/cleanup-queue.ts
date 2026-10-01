@@ -29,36 +29,43 @@ export async function queueStorageCleanup(
 }
 
 export async function retryStorageCleanup(): Promise<{ degraded: boolean }> {
-  // Never-attempted rows first, then oldest attempt, then key, so a bounded
-  // batch is stable and fairly ordered. Ordering in SQL keeps the derived
-  // table out of the query, which the sqlite builder cannot type.
-  const pending = await db
+  // Ranking within each of the two cohorts — never attempted, and already
+  // attempted — and then interleaving them by rank, so a permanent-failure
+  // backlog can never starve new keys and a continuous stream of new keys can
+  // never starve a retry. A plain sort by attempt time would let whichever
+  // cohort is larger fill the whole batch.
+  const ranked = db
     .select({
       objectKey: storageCleanupTable.objectKey,
       lastAttemptAt: storageCleanupTable.lastAttemptAt,
+      rank: sql<number>`row_number() over (partition by ${storageCleanupTable.lastAttemptAt} is null order by coalesce(${storageCleanupTable.lastAttemptAt}, ${storageCleanupTable.createdAt}), ${storageCleanupTable.objectKey})`.as(
+        "cleanup_rank",
+      ),
     })
     .from(storageCleanupTable)
+    .as("ranked_cleanup");
+  const pending = await db
+    .select()
+    .from(ranked)
     .orderBy(
-      sql`${storageCleanupTable.lastAttemptAt} is null desc`,
-      sql`coalesce(${storageCleanupTable.lastAttemptAt}, ${storageCleanupTable.createdAt}) asc`,
-      sql`${storageCleanupTable.objectKey} asc`,
+      sql`${ranked.rank} asc`,
+      sql`${ranked.lastAttemptAt} asc`,
+      sql`${ranked.objectKey} asc`,
     )
     .limit(100);
   let degraded = false;
   for (const item of pending) {
     await withStorageObject(item.objectKey, async (tx) => {
-      const queued = await tx
-        .select({ objectKey: storageCleanupTable.objectKey })
-        .from(storageCleanupTable)
-        .where(eq(storageCleanupTable.objectKey, item.objectKey))
-        .limit(1)
-        .then((rows) => rows[0]);
-      if (!queued) return;
+      const queued = await tx.query.storageCleanupTable.findFirst({
+        where: eq(storageCleanupTable.objectKey, item.objectKey),
+      });
       if (!queued) return;
       const verification = await tx.query.jobLeaseTable.findFirst({
         where: eq(jobLeaseTable.name, `storage-verification:${item.objectKey}`),
       });
       if (verification && verification.expiresAt > new Date()) return;
+      // The lease above already excludes concurrent reference changes, so a
+      // plain read is enough to tell a live key from an orphaned one.
       const [asset] = await tx
         .select({ id: assetTable.id })
         .from(assetTable)

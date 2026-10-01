@@ -4,6 +4,7 @@ import { notificationTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { deliverNotification } from "../../notification-preferences/delivery";
 import { canAccessProject } from "../../utils/access-scope";
+import { canReceiveResourceNotification } from "../resource-access";
 
 export type CreateNotificationInput = {
   userId: string;
@@ -44,6 +45,20 @@ export async function persistNotification(
   // A project-scoped notification would deep-link to a surface the recipient
   // is refused on: drop it instead of storing a dead link.
   if (projectId && !(await canAccessProject(userId, projectId))) {
+    return null;
+  }
+
+  // A task- or workspace-referenced notification is only readable if the
+  // recipient can reach that resource at all, so the boundary is enforced where
+  // the row is created rather than only where it is read.
+  if (
+    !(await canReceiveResourceNotification(
+      userId,
+      resourceId,
+      resourceType,
+      database,
+    ))
+  ) {
     return null;
   }
 

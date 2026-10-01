@@ -821,6 +821,11 @@ export const taskTable = sqliteTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    // Monotonic write counter, bumped by a trigger on every UPDATE. It stands
+    // in for Postgres' `xmin`: integration sync compares it to detect a local
+    // edit made while a provider request was in flight, which a timestamp
+    // cannot see when the edit is written and then reverted (ABA).
+    revision: integer("revision").default(0).notNull(),
   },
   (table) => [
     index("task_projectId_idx").on(table.projectId),
@@ -1569,6 +1574,13 @@ export const externalLinkTable = sqliteTable(
     index("external_link_integrationId_idx").on(table.integrationId),
     index("external_link_externalId_idx").on(table.externalId),
     index("external_link_resourceType_idx").on(table.resourceType),
+    // Partial index for the deferred-edit replay sweep: it only ever reads
+    // issue links that still carry queued work, and `id` is its cursor.
+    index("external_link_deferred_issue_idx")
+      .on(table.id)
+      .where(
+        sql`${table.resourceType} = 'issue' AND ${table.metadata} LIKE '%"deferredIssueEdit":%'`,
+      ),
   ],
 );
 

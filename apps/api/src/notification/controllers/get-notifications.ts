@@ -6,6 +6,7 @@ import {
   taskTable,
   workspaceTable,
 } from "../../database/schema";
+import { notificationResourceAccess } from "../resource-access";
 
 async function getNotifications(
   userId: string,
@@ -27,7 +28,18 @@ async function getNotifications(
     )
     .leftJoin(projectTable, eq(taskTable.projectId, projectTable.id))
     .leftJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
-    .where(eq(notificationTable.userId, userId))
+    // Historical rows are filtered at read time too: a forged or stale
+    // reference must not be enriched now that creation is guarded.
+    .where(
+      and(
+        eq(notificationTable.userId, userId),
+        notificationResourceAccess(
+          userId,
+          notificationTable.resourceId,
+          notificationTable.resourceType,
+        ),
+      ),
+    )
     .orderBy(desc(notificationTable.createdAt))
     .limit(paging.limit ?? 50)
     .offset(paging.offset ?? 0);

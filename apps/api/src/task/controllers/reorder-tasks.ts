@@ -97,21 +97,23 @@ export default async function reorderTasks(
       column_id:
         task.status === undefined ? null : (columns.get(task.status) ?? null),
     }));
-    // One JSON parameter keeps large boards below PostgreSQL's bind limit.
+    // One JSON parameter keeps large boards below the driver's bind limit;
+    // json_each is libSQL's counterpart to jsonb_to_recordset.
+    const changes = sql`changes`;
     const after = await tx
       .update(taskTable)
       .set({
-        position: sql`changes.position`,
-        status: sql`coalesce(changes.status, ${taskTable.status})`,
-        columnId: sql`case when changes.status is null then ${taskTable.columnId} else changes.column_id end`,
+        position: sql`${changes}.value ->> 'position'`,
+        status: sql`coalesce(${changes}.value ->> 'status', ${taskTable.status})`,
+        columnId: sql`case when ${changes}.value ->> 'status' is null then ${taskTable.columnId} else ${changes}.value ->> 'column_id' end`,
       })
       .from(
-        sql`jsonb_to_recordset(${JSON.stringify(values)}::jsonb) as changes(id text, position integer, status text, column_id text)`,
+        sql`(select value from json_each(${JSON.stringify(values)})) as ${changes}`,
       )
       .where(
         and(
           eq(taskTable.projectId, projectId),
-          sql`${taskTable.id} = changes.id`,
+          sql`${taskTable.id} = ${changes}.value ->> 'id'`,
         ),
       )
       .returning({

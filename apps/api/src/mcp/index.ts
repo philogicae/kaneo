@@ -9,6 +9,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "../auth";
 import { apiRouter, createRoute, jsonResponse } from "../openapi";
+import { type BanState, isBanActive } from "../utils/user-ban";
 import {
   beginMcpAuthorization,
   decideMcpAuthorizationRequest,
@@ -17,6 +18,7 @@ import {
 } from "./controllers/oauth-consent";
 import { createModernMcpHandler } from "./modern";
 import { exchangeCode } from "./oauth";
+import { oauthRequestBounds } from "./request-bounds";
 import {
   authorizationDecisionResponseSchema,
   authorizationDecisionSchema,
@@ -84,7 +86,7 @@ async function validateBearerToken(
 
   if (bearerToken) {
     const session = await getSessionFromBearerToken(bearerToken);
-    if (session?.user?.id) {
+    if (session?.user?.id && !isBanActive(session.user as BanState)) {
       return { userId: session.user.id, token: bearerToken };
     }
   }
@@ -103,6 +105,16 @@ async function validateBearerToken(
 }
 
 const mcp = apiRouter();
+// Every OAuth endpoint is public and internet-facing, so the body, URL and
+// in-flight bounds apply before any validation or database work happens.
+for (const path of [
+  "/mcp/register",
+  "/mcp/authorize",
+  "/mcp/authorize/request/*",
+  "/mcp/token",
+]) {
+  mcp.use(path, oauthRequestBounds);
+}
 
 const jsonError = (description: string) =>
   jsonResponse(description, oauthErrorSchema);

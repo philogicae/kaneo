@@ -151,7 +151,7 @@ async function duplicateTask({
 
   await assertValidTaskStatus(sourceTask.status, sourceTask.projectId);
   if (sourceTask.userId)
-    await assertAssignableUser(sourceTask.userId, project.workspaceId);
+    await assertAssignableUser(sourceTask.userId, sourceTask.projectId);
   const column = await db.query.columnTable.findFirst({
     where: and(
       eq(columnTable.projectId, sourceTask.projectId),

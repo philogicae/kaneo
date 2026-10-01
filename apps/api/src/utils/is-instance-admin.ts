@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import db from "../database";
 import { userTable } from "../database/schema";
+import { hasInstanceAdminRole } from "./instance-admin-role";
 
 export async function isInstanceAdminUser(userId: string): Promise<boolean> {
   const [row] = await db
@@ -10,13 +11,15 @@ export async function isInstanceAdminUser(userId: string): Promise<boolean> {
     .where(eq(userTable.id, userId))
     .limit(1);
 
-  return row?.role === "admin";
+  // The role column is a comma-separated list, so an exact match would miss
+  // `user,admin`.
+  return hasInstanceAdminRole(row?.role);
 }
 
 export async function isInstanceAdmin(c: Context): Promise<boolean> {
   const user = c.get("user") as { role?: string | null } | null | undefined;
   if (user?.role) {
-    return user.role === "admin";
+    return hasInstanceAdminRole(user.role);
   }
 
   const userId = c.get("userId");

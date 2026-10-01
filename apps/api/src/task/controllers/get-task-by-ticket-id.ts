@@ -1,4 +1,4 @@
-import { and, eq, ilike, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -7,7 +7,10 @@ import {
   userTable,
   workspaceUserTable,
 } from "../../database/schema";
-import { escapeLikePattern } from "../../search/like-pattern";
+import {
+  caseInsensitiveLike,
+  escapeLikePattern,
+} from "../../search/like-pattern";
 import { TASK_SHORT_ID_PATTERN } from "../../search/task-short-id";
 import { hasInstanceAdminRole } from "../../utils/instance-admin-role";
 import getTask from "./get-task";
@@ -46,7 +49,7 @@ export default async function getTaskByTicketId(
     .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
     .where(
       and(
-        ilike(projectTable.slug, escapeLikePattern(match[1])),
+        caseInsensitiveLike(projectTable.slug, escapeLikePattern(match[1])),
         eq(taskTable.number, number),
         workspaceId ? eq(projectTable.workspaceId, workspaceId) : undefined,
         projectId ? eq(projectTable.id, projectId) : undefined,

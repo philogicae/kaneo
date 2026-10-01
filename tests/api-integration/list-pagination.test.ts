@@ -165,10 +165,12 @@ describe("list pagination", () => {
       sliced.tasks.map((task: { position: number }) => task.position),
     ).toEqual([2, 3]);
 
+    // Without tasksLimit the detail payload stays a project payload; the
+    // board is fetched separately.
     const full = await (
       await app.request(`/api/project/${scene.project.id}`)
     ).json();
-    expect(full.tasks).toHaveLength(3);
+    expect(full).not.toHaveProperty("tasks");
   });
 
   it("honours the documented 200-task page size on the per-project board", async () => {

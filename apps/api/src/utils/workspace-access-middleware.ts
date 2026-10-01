@@ -278,21 +278,38 @@ async function resolveAccessTarget(
           .select({
             workspaceId: schema.labelTable.workspaceId,
             taskId: schema.labelTable.taskId,
+            taskWorkspaceId: schema.projectTable.workspaceId,
+            taskProjectId: schema.taskTable.projectId,
           })
           .from(schema.labelTable)
+          .leftJoin(
+            schema.taskTable,
+            eq(schema.labelTable.taskId, schema.taskTable.id),
+          )
+          .leftJoin(
+            schema.projectTable,
+            eq(schema.taskTable.projectId, schema.projectTable.id),
+          )
           .where(eq(schema.labelTable.id, id))
           .limit(1);
         if (!label) return NO_TARGET;
-        // Legacy task-scoped copies can carry a null workspaceId; resolve the
-        // project (and workspace) through the task they belong to.
-        if (label.taskId) {
-          const taskTarget = await resolveAccessTarget("task", label.taskId);
-          return {
-            workspaceId: label.workspaceId ?? taskTarget.workspaceId,
-            projectId: taskTarget.projectId,
-          };
+        // Two different, known workspaces mean the row is corrupt: it must not
+        // authorize a read, a mutation or an external provider sync, and
+        // neither of its two workspaces is a trustworthy answer. A null
+        // workspaceId is only legacy data for a task-scoped copy, resolved
+        // through the task it belongs to.
+        if (
+          label.taskId &&
+          label.workspaceId &&
+          label.taskWorkspaceId &&
+          label.taskWorkspaceId !== label.workspaceId
+        ) {
+          return NO_TARGET;
         }
-        return { workspaceId: label.workspaceId ?? null, projectId: null };
+        return {
+          workspaceId: label.workspaceId ?? label.taskWorkspaceId ?? null,
+          projectId: label.taskProjectId ?? null,
+        };
       }
 
       case "timeEntry": {
@@ -514,11 +531,10 @@ export const workspaceAccess = {
   fromLabel: (idKey = "id") =>
     workspaceAccessMiddleware({
       sources: [
+        // The label lookup joins its task and project, so a task-scoped copy
+        // (including a legacy row with a null workspaceId) resolves to the
+        // task's own workspace and an inconsistent row resolves to none.
         { type: "lookup", resource: "label", idKey },
-        // Task-scoped labels can (in legacy data) carry a null workspaceId;
-        // resolving the described task's workspace keeps attach/detach
-        // working and authorizes against the task's workspace instead.
-        { type: "lookup", resource: "task", idKey: "taskId" },
         { type: "query", key: "workspaceId" },
       ],
     }),

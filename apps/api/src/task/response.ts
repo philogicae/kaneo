@@ -211,8 +211,6 @@ export const boardSchema = z
         page: z.number(),
         pageSize: z.number(),
         totalPages: z.number(),
-        // Related-row continuation is an upstream capability this fork does not
-        // expose: labels, links and columns come back with the whole page.
         relatedPage: z.number().optional(),
         relatedPageSize: z.number().optional(),
         relatedTotalPages: z.number().optional(),

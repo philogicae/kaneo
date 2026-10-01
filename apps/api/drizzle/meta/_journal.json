@@ -43,6 +43,13 @@
       "when": 1790853136685,
       "tag": "0005_add_project_background_and_utility_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791860000000,
+      "tag": "0006_storage_cleanup_and_task_revision",
+      "breakpoints": true
     }
   ]
 }

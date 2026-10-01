@@ -4,7 +4,10 @@ import db, { schema } from "../../apps/api/src/database";
 import getInstanceStatus from "../../apps/api/src/instance/controllers/get-instance-status";
 import { filterAssignableUsers } from "../../apps/api/src/utils/assert-assignable-user";
 import { resetTestDatabase } from "./helpers/database";
-import { createWorkspaceMember } from "./helpers/fixtures";
+import {
+  createProjectFixture,
+  createWorkspaceMember,
+} from "./helpers/fixtures";
 
 async function createUser(role: string | null) {
   const id = `user-${randomUUID()}`;
@@ -48,12 +51,17 @@ describe("API integration: instance admin role in SQL", () => {
 
   it("lets a multi-role admin be assigned tasks outside their workspaces", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
+    const { project } = await createProjectFixture({
+      workspaceId: owner.workspace.id,
+    });
     const admin = await createUser("user,admin");
     const outsider = await createUser("user");
 
+    // Assignability is project-scoped in this fork, so an admin who never joined
+    // the workspace is still assignable while a plain outsider is not.
     const assignable = await filterAssignableUsers(
       [owner.user.id, admin.id, outsider.id],
-      owner.workspace.id,
+      project.id,
     );
 
     expect([...assignable].sort()).toEqual([admin.id, owner.user.id].sort());

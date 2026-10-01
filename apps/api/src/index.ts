@@ -17,7 +17,7 @@ import appointment from "./appointment";
 import { auth } from "./auth";
 import admin from "./admin";
 import { organizationRoutes } from "./auth-openapi";
-import calendarFeed from "./calendar-feed";
+import calendarFeed, { publicCalendarFeed } from "./calendar-feed";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
@@ -70,12 +70,19 @@ import user from "./user";
 import getAvatar from "./user/controllers/get-avatar";
 import { canAccessProject } from "./utils/access-scope";
 import { authenticateApiRequest } from "./utils/authenticate-api-request";
-import { authorizeAssetAccess } from "./utils/authorize-asset-access";
+import {
+  authorizeAssetAccess,
+  isPublicAsset,
+} from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
+import { clientIpMiddleware } from "./utils/client-ip";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
+import { drainPasswordResetDeliveries } from "./utils/password-reset-delivery";
 import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
+import { drainSignInEmails } from "./utils/sign-in-email-tasks";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
+import { verifyApiKey } from "./utils/verify-api-key";
 import workflowRule from "./workflow-rule";
 import workspace from "./workspace";
 import workspaceSharing from "./workspace-sharing";
@@ -87,6 +94,12 @@ import {
   removeUserConnection,
   shutdownWebSocketAdapter,
 } from "./ws";
+import {
+  assertWebSocketOrigin,
+  handleWebSocketMessage,
+  MAX_WEBSOCKET_MESSAGE_BYTES,
+} from "./ws/security";
+import { syncWorkspaceAccess } from "./ws/workspace-access";
 
 type ApiKey = {
   id: string;
@@ -152,6 +165,11 @@ function buildContentDisposition(filename: string, inline: boolean) {
 export function createApp() {
   const app = new Hono<AppVariables>();
 
+  // Resolves the client address once, from the transport peer and the hops a
+  // trusted proxy chain reports, and hands Better Auth a private header it is
+  // the only reader of.
+  app.use("*", clientIpMiddleware());
+
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
       return err.getResponse();
@@ -161,6 +179,11 @@ export function createApp() {
     return c.json({ message: "Internal Server Error" }, 500);
   });
   const nodeWs = createNodeWebSocket({ app });
+  // node-ws exposes its ws server, but does not accept constructor options.
+  // Set the receiver limit before any connection can upgrade, including
+  // fragmented messages, before node-ws converts text buffers to strings.
+  nodeWs.wss.options.maxPayload = MAX_WEBSOCKET_MESSAGE_BYTES;
+  nodeWs.wss.options.perMessageDeflate = false;
   const { upgradeWebSocket, injectWebSocket } = nodeWs;
   const corsOriginSource = [
     process.env.CORS_ORIGINS,
@@ -361,6 +384,24 @@ export function createApp() {
     return c.json(result);
   });
 
+  // The feed link itself is the secret, so it is mounted before the
+  // authenticating `*` middleware below: a subscriber holds no session.
+  api.route("/calendar-feed", publicCalendarFeed);
+
+  // Better Auth's API-key plugin validates the key itself and never checks the
+  // owner's ban state, so a banned user would keep a working key. Reject such a
+  // key before any auth route — including /auth/get-session — sees it.
+  api.use("/auth/*", async (c, next) => {
+    const apiKeyHeader = c.req.header("x-api-key")?.trim();
+    if (
+      apiKeyHeader &&
+      !(await verifyApiKey(apiKeyHeader, { consume: false }))
+    ) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+    return next();
+  });
+
   api.openapi(
     createRoute({
       method: "get",
@@ -409,6 +450,8 @@ export function createApp() {
           objectKey: schema.assetTable.objectKey,
           mimeType: schema.assetTable.mimeType,
           filename: schema.assetTable.filename,
+          surface: schema.assetTable.surface,
+          createdBy: schema.assetTable.createdBy,
           workspaceId: schema.assetTable.workspaceId,
           projectId: schema.assetTable.projectId,
           isPublic: schema.projectTable.isPublic,
@@ -438,7 +481,7 @@ export function createApp() {
 
         return new Response(object.body as BodyInit, {
           headers: {
-            "Cache-Control": asset.isPublic
+            "Cache-Control": isPublicAsset(asset)
               ? "public, max-age=300"
               : "private, max-age=120",
             "Content-Disposition": buildContentDisposition(
@@ -639,29 +682,29 @@ export function createApp() {
 
   api.on(["POST", "GET", "PUT", "PATCH", "DELETE"], "/auth/*", async (c) => {
     const authHeader = c.req.header("Authorization");
-    const apiKeyHeader = c.req.header("x-api-key");
+    const apiKeyHeader = c.req.header("x-api-key")?.trim();
     const bearerToken = authHeader?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
     if (bearerToken && !apiKeyHeader) {
-      const session = await auth.api.getSession({
-        headers: c.req.raw.headers,
-      });
+      // A bearer credential must not be able to fall back to a browser cookie,
+      // so the cookie never travels with it.
+      const headers = new Headers(c.req.raw.headers);
+      headers.delete("cookie");
+      const session = await auth.api.getSession({ headers });
 
       // Preserve Better Auth bearer session tokens on auth routes.
       if (session?.session && session.user) {
-        return auth.handler(c.req.raw);
+        return auth.handler(new Request(c.req.raw, { headers }));
       }
 
-      const headers = new Headers(c.req.raw.headers);
+      if (!(await verifyApiKey(bearerToken, { consume: false }))) {
+        throw new HTTPException(401, { message: "Unauthorized" });
+      }
 
       // Better Auth API key plugin validates from x-api-key by default.
       headers.set("x-api-key", bearerToken);
 
-      return auth.handler(
-        new Request(c.req.raw, {
-          headers,
-        }),
-      );
+      return auth.handler(new Request(c.req.raw, { headers }));
     }
 
     return auth.handler(c.req.raw);
@@ -771,15 +814,10 @@ export function createApp() {
   api.get(
     "/ws/user",
     upgradeWebSocket(async (c) => {
-      try {
-        await authenticateApiRequest(c);
-      } catch (error) {
-        if (error instanceof HTTPException) {
-          throw error;
-        }
-        console.error("API authentication failed:", error);
-        throw new HTTPException(500, { message: "Internal Server Error" });
-      }
+      // The `*` middleware above already authenticated the handshake, so the
+      // API key's single quota unit is spent once. Re-authenticating here would
+      // reject the very key that just opened the socket.
+      assertWebSocketOrigin(c.req.raw.headers);
 
       const userId = c.get("userId");
       let conn: ReturnType<typeof addUserConnection> | null = null;
@@ -788,26 +826,10 @@ export function createApp() {
         onOpen(_evt, ws) {
           if (userId) {
             conn = addUserConnection(userId, ws);
+            void syncWorkspaceAccess(userId, ws);
           }
         },
-        onMessage(evt) {
-          try {
-            const raw =
-              typeof evt.data === "string"
-                ? evt.data
-                : Buffer.isBuffer(evt.data)
-                  ? evt.data.toString()
-                  : null;
-            if (raw) {
-              const msg = JSON.parse(raw) as { type?: string };
-              if (msg?.type === "ping") {
-                // keepalive, no-op
-              }
-            }
-          } catch {
-            // Ignore malformed messages
-          }
-        },
+        onMessage: handleWebSocketMessage,
         onClose() {
           if (conn && userId) {
             removeUserConnection(userId, conn);
@@ -820,19 +842,11 @@ export function createApp() {
   api.get(
     "/ws/:projectId",
     upgradeWebSocket(async (c) => {
+      assertWebSocketOrigin(c.req.raw.headers);
       const projectId = c.req.param("projectId");
 
-      try {
-        await authenticateApiRequest(c);
-      } catch (error) {
-        if (error instanceof HTTPException) {
-          throw error;
-        }
-        console.error("API authentication failed:", error);
-        throw new HTTPException(500, { message: "Internal Server Error" });
-      }
-
       const userId = c.get("userId");
+
       // Carried on the connection so a later revocation of this workspace can
       // close it.
       let projectWorkspaceId = "";
@@ -876,27 +890,7 @@ export function createApp() {
             );
           }
         },
-        onMessage(evt) {
-          // Respond to client keepalive pings (sent every 30s to prevent
-          // Cloudflare from closing idle connections at 100s timeout)
-          try {
-            const raw =
-              typeof evt.data === "string"
-                ? evt.data
-                : Buffer.isBuffer(evt.data)
-                  ? evt.data.toString()
-                  : null;
-            if (raw) {
-              const msg = JSON.parse(raw) as { type?: string };
-              if (msg?.type === "ping") {
-                // No-op: receiving the ping is enough to satisfy Cloudflare.
-                // A pong response is optional but helps confirm liveness.
-              }
-            }
-          } catch {
-            // Ignore malformed messages
-          }
-        },
+        onMessage: handleWebSocketMessage,
         onClose() {
           if (conn && projectId) {
             removeConnection(projectId, conn);
@@ -1008,6 +1002,14 @@ export async function startServer(
     shutdownScheduler();
     await shutdownWebSocketAdapter();
     server.close();
+    // Accepted recovery/sign-in requests must not lose their mail to the exit.
+    const [, signInEmailsDrained] = await Promise.all([
+      drainPasswordResetDeliveries(),
+      drainSignInEmails(),
+    ]);
+    if (!signInEmailsDrained) {
+      console.warn("Timed out waiting for pending sign-in emails");
+    }
     process.exit(0);
   };
 

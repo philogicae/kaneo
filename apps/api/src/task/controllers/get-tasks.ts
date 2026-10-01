@@ -1,16 +1,36 @@
-import { and, asc, eq, gte, inArray, lte, max, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  getTableColumns,
+  gte,
+  inArray,
+  lte,
+  type SQL,
+  sql,
+  type SQLWrapper,
+} from "drizzle-orm";
+import { alias } from "drizzle-orm/sqlite-core";
 import { HTTPException } from "hono/http-exception";
-import db from "../../database";
 import {
   columnTable,
   externalLinkTable,
   labelTable,
   projectTable,
   taskTable,
+  taskRelationTable,
   userTable,
 } from "../../database/schema";
+import { boundedTaskRead, type TaskReadDatabase } from "../bounded-read";
+import {
+  boardDescription,
+  boardProjectDescription,
+  descriptionDeferred,
+  projectDescriptionDeferred,
+} from "../description-pages";
 import { getSubtaskCounts } from "../get-subtask-counts";
-import { buildTaskOrderBy, type TaskSortField } from "../task-order";
+import { buildTaskOrderBy, sortValue, type TaskSortField } from "../task-order";
+import { taskIsCompleted } from "../task-is-completed";
 
 export type GetTasksOptions = {
   /**
@@ -24,16 +44,75 @@ export type GetTasksOptions = {
   dueBefore?: string;
   limit?: number;
   page?: number;
+  /** Bounded read deadline, in ms; only tests override it. */
+  deadlineMs?: number;
+  relatedPage?: number;
   priority?: string;
   sortBy?: TaskSortField;
   sortOrder?: "asc" | "desc";
   status?: string;
 };
 
-async function getTasks(projectId: string, options: GetTasksOptions = {}) {
-  const project = await db.query.projectTable.findFirst({
-    where: eq(projectTable.id, projectId),
-  });
+const RELATED_PAGE_SIZE = 100;
+
+/**
+ * A digest of the rows a revision covers.
+ *
+ * Postgres summed `hashtextextended` over a JSON array of the columns; libSQL
+ * has neither, so the same idea is a SHA3 over the ordered concatenation of the
+ * same columns. `group_concat` needs an explicit order or two equal sets could
+ * hash differently, and the ordering column comes first in the field list.
+ */
+function digest(fields: SQLWrapper[], orderBy: SQLWrapper): SQL<string> {
+  // ifnull() per field: `||` with a NULL yields NULL, and group_concat skips
+  // NULL entries entirely, so a row with a null column would vanish from the
+  // digest instead of contributing a distinguishable value. The inner coalesce
+  // covers the empty set, and SQLite needs it there anyway: an ORDER BY inside
+  // a nested aggregate is only parsed inside a function call.
+  const joined = sql.join(
+    fields.map((field) => sql`ifnull(${field}, '')`),
+    sql` || char(31) || `,
+  );
+  return sql<string>`coalesce(hex(sha3(coalesce(group_concat(${joined}, char(30) order by ${orderBy}), ''), 256)), '0')`;
+}
+
+/** Only public pages are cacheable, so only they pay for a revision. */
+function revision(
+  publicOnly: boolean | undefined,
+  digest_: SQL<string>,
+): SQL<string> {
+  return publicOnly ? digest_ : sql<string>`'0'`;
+}
+
+async function getTasksPage(
+  db: TaskReadDatabase,
+  projectId: string,
+  options: GetTasksOptions,
+) {
+  const [project] = await db
+    .select({
+      ...getTableColumns(projectTable),
+      revision: revision(
+        options.publicOnly,
+        digest(
+          [
+            projectTable.id,
+            projectTable.name,
+            projectTable.slug,
+            projectTable.icon,
+            projectTable.isPublic,
+            projectTable.description,
+            projectTable.backgroundVersion,
+          ],
+          projectTable.id,
+        ),
+      ),
+      description: boardProjectDescription,
+      descriptionDeferred: projectDescriptionDeferred,
+    })
+    .from(projectTable)
+    .where(eq(projectTable.id, projectId))
+    .limit(1);
 
   if (!project) {
     throw new HTTPException(404, {
@@ -64,49 +143,56 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
   }
 
   const whereClause = and(...conditions);
-  const usePagination = options.page != null || options.limit != null;
   const page = options.page && options.page > 0 ? options.page : 1;
   const pageSize =
     options.limit && options.limit > 0 ? Math.min(options.limit, 200) : 50;
   const offset = (page - 1) * pageSize;
+  const relatedPage = options.relatedPage ?? 1;
+  const relatedOffset = (relatedPage - 1) * RELATED_PAGE_SIZE;
 
   const orderByClause = buildTaskOrderBy(
     options.sortBy ?? "position",
     options.sortOrder ?? "asc",
   );
 
-  const [taskCount] = await db
-    .select({ count: sql<number>`count(*)` })
+  // The count query also carries the board's task revision: every column that
+  // can reorder or re-render a card across pages feeds the digest.
+  const taskCountQuery = db
+    .select({
+      count: sql<number>`count(*)`,
+      revision: revision(
+        options.publicOnly,
+        digest(
+          [
+            taskTable.id,
+            sortValue(options.sortBy),
+            taskTable.status,
+            // The row's write counter detects content edits without hashing
+            // the description, which can be large.
+            taskTable.revision,
+            userTable.name,
+            userTable.image,
+          ],
+          taskTable.id,
+        ),
+      ),
+    })
     .from(taskTable)
-    .where(whereClause);
+    .$dynamic();
+  const [taskCount] = await (
+    options.publicOnly
+      ? taskCountQuery.leftJoin(userTable, eq(taskTable.userId, userTable.id))
+      : taskCountQuery
+  ).where(whereClause);
 
   const total = Number(taskCount?.count ?? 0);
-
-  // Public pages are cacheable, so they need a cheap signal that a card or a
-  // label/link on another page changed. The newest row timestamp across the
-  // project's related data is enough, and needs no Postgres hash aggregate.
-  let relatedRevision = "0";
-  if (options.publicOnly) {
-    const [labelRow] = await db
-      .select({ updatedAt: max(labelTable.updatedAt) })
-      .from(labelTable)
-      .innerJoin(taskTable, eq(labelTable.taskId, taskTable.id))
-      .where(eq(taskTable.projectId, projectId));
-    const [linkRow] = await db
-      .select({ updatedAt: max(externalLinkTable.updatedAt) })
-      .from(externalLinkTable)
-      .innerJoin(taskTable, eq(externalLinkTable.taskId, taskTable.id))
-      .where(eq(taskTable.projectId, projectId));
-    relatedRevision = `${labelRow?.updatedAt?.getTime() ?? 0}:${
-      linkRow?.updatedAt?.getTime() ?? 0
-    }`;
-  }
 
   const taskSelection = {
     id: taskTable.id,
     title: taskTable.title,
     number: taskTable.number,
-    description: taskTable.description,
+    description: boardDescription,
+    descriptionDeferred,
     status: taskTable.status,
     milestoneId: taskTable.milestoneId,
     priority: taskTable.priority,
@@ -123,19 +209,24 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     projectId: taskTable.projectId,
   };
 
-  const query = db
+  const paginatedTasks = await db
     .select(taskSelection)
     .from(taskTable)
     .leftJoin(userTable, eq(taskTable.userId, userTable.id))
     .leftJoin(projectTable, eq(taskTable.projectId, projectTable.id))
     .where(whereClause)
-    .orderBy(orderByClause);
-
-  const paginatedTasks = usePagination
-    ? await query.limit(pageSize).offset(offset)
-    : await query;
+    .orderBy(orderByClause, asc(taskTable.id))
+    .limit(pageSize)
+    .offset(offset);
 
   const taskIds = paginatedTasks.map((task) => task.id);
+
+  const subtaskCounts = await getSubtaskCounts(
+    db,
+    taskIds,
+    project.workspaceId,
+    options.publicOnly ?? false,
+  );
 
   const labelsData =
     taskIds.length > 0
@@ -148,6 +239,9 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
           })
           .from(labelTable)
           .where(inArray(labelTable.taskId, taskIds))
+          .orderBy(asc(labelTable.id))
+          .limit(RELATED_PAGE_SIZE)
+          .offset(relatedOffset)
       : [];
 
   const externalLinksData =
@@ -156,6 +250,9 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
           .select()
           .from(externalLinkTable)
           .where(inArray(externalLinkTable.taskId, taskIds))
+          .orderBy(asc(externalLinkTable.id))
+          .limit(RELATED_PAGE_SIZE)
+          .offset(relatedOffset)
       : [];
 
   const taskLabelsMap = new Map<
@@ -198,9 +295,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     }
     taskExternalLinksMap.get(externalLink.taskId)?.push({
       ...externalLink,
-      metadata: externalLink.metadata
-        ? JSON.parse(externalLink.metadata)
-        : null,
+      metadata: parseMetadata(externalLink.metadata),
     });
   }
 
@@ -208,16 +303,165 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     .select()
     .from(columnTable)
     .where(eq(columnTable.projectId, projectId))
-    .orderBy(asc(columnTable.position));
+    .orderBy(asc(columnTable.position), asc(columnTable.id))
+    .limit(RELATED_PAGE_SIZE)
+    .offset(relatedOffset);
 
-  // Progress over direct children is board-filter independent, so it is loaded
-  // for the whole page rather than per column.
-  const subtaskCounts = await getSubtaskCounts(
-    db,
-    paginatedTasks.map((task) => task.id),
-    project.workspaceId,
-    options.publicOnly ?? false,
+  // Keep every selected task representable even when its column falls on a
+  // later metadata page. At most 100 distinct task statuses can be present.
+  const missingStatuses = Array.from(
+    new Set(paginatedTasks.map((task) => task.status)),
+  ).filter(
+    (status) =>
+      status !== "planned" &&
+      status !== "archived" &&
+      !projectColumns.some((column) => column.slug === status),
   );
+  if (missingStatuses.length) {
+    const taskColumns = await db
+      .select()
+      .from(columnTable)
+      .where(
+        and(
+          eq(columnTable.projectId, projectId),
+          inArray(columnTable.slug, missingStatuses),
+        ),
+      )
+      .orderBy(
+        asc(columnTable.slug),
+        asc(columnTable.position),
+        asc(columnTable.id),
+      )
+      .limit(RELATED_PAGE_SIZE);
+    // One column per slug: the query is ordered by slug first, so the first
+    // row for each is the one the page would have shown.
+    const seen = new Set(projectColumns.map((column) => column.slug));
+    for (const column of taskColumns) {
+      if (seen.has(column.slug)) continue;
+      seen.add(column.slug);
+      projectColumns.push(column);
+    }
+  }
+
+  const [columnCount] = await db
+    .select({
+      count: sql<number>`count(*)`,
+      revision: revision(
+        options.publicOnly,
+        digest(
+          [
+            columnTable.id,
+            columnTable.slug,
+            columnTable.position,
+            columnTable.name,
+            columnTable.icon,
+            columnTable.isFinal,
+          ],
+          columnTable.id,
+        ),
+      ),
+    })
+    .from(columnTable)
+    .where(eq(columnTable.projectId, projectId));
+
+  let labelCount = 0;
+  let linkCount = 0;
+  let labelRevision = "0";
+  let linkRevision = "0";
+  if (taskIds.length) {
+    const [labels] = await db
+      .select({
+        count: sql<number>`count(*)`,
+        revision: revision(
+          options.publicOnly,
+          digest(
+            [
+              labelTable.id,
+              labelTable.taskId,
+              labelTable.name,
+              labelTable.color,
+            ],
+            labelTable.id,
+          ),
+        ),
+      })
+      .from(labelTable)
+      .where(inArray(labelTable.taskId, taskIds));
+    const [links] = await db
+      .select({
+        count: sql<number>`count(*)`,
+        revision: revision(
+          options.publicOnly,
+          digest(
+            [
+              externalLinkTable.id,
+              externalLinkTable.taskId,
+              externalLinkTable.updatedAt,
+            ],
+            externalLinkTable.id,
+          ),
+        ),
+      })
+      .from(externalLinkTable)
+      .where(inArray(externalLinkTable.taskId, taskIds));
+    labelCount = Number(labels?.count ?? 0);
+    linkCount = Number(links?.count ?? 0);
+    labelRevision = labels?.revision ?? "0";
+    linkRevision = links?.revision ?? "0";
+  }
+
+  let publicRelatedRevision = "0";
+  if (options.publicOnly) {
+    // Every task page must detect edits to cards or metadata loaded earlier.
+    const [labels] = await db
+      .select({
+        revision: digest(
+          [labelTable.id, labelTable.taskId, labelTable.name, labelTable.color],
+          labelTable.id,
+        ),
+      })
+      .from(labelTable)
+      .innerJoin(taskTable, eq(labelTable.taskId, taskTable.id))
+      .where(whereClause);
+    const [links] = await db
+      .select({
+        revision: digest(
+          [externalLinkTable.id, externalLinkTable.updatedAt],
+          externalLinkTable.id,
+        ),
+      })
+      .from(externalLinkTable)
+      .innerJoin(taskTable, eq(externalLinkTable.taskId, taskTable.id))
+      .where(whereClause);
+    const parent = alias(taskTable, "board_parent");
+    const [children] = await db
+      .select({
+        revision: digest(
+          [
+            taskRelationTable.id,
+            taskTable.id,
+            // Completion belongs to the child's workflow, so a column change
+            // that finishes a subtask has to show up here.
+            sql<string>`case when ${taskIsCompleted} then '1' else '0' end`,
+          ],
+          taskRelationTable.id,
+        ),
+      })
+      .from(taskRelationTable)
+      .innerJoin(parent, eq(taskRelationTable.sourceTaskId, parent.id))
+      .innerJoin(taskTable, eq(taskRelationTable.targetTaskId, taskTable.id))
+      .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
+      .where(
+        and(
+          eq(parent.projectId, projectId),
+          eq(taskRelationTable.relationType, "subtask"),
+          eq(projectTable.workspaceId, project.workspaceId),
+          eq(projectTable.isPublic, true),
+        ),
+      );
+    publicRelatedRevision = `${labels?.revision}:${links?.revision}:${children?.revision}`;
+  }
+
   const withRelations = (task: (typeof paginatedTasks)[number]) => ({
     ...task,
     labels: taskLabelsMap.get(task.id) || [],
@@ -229,6 +473,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     id: column.slug,
     slug: column.slug,
     name: column.name,
+    position: column.position,
     icon: column.icon,
     isFinal: column.isFinal,
     tasks: paginatedTasks
@@ -251,6 +496,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       slug: project.slug,
       icon: project.icon,
       description: project.description,
+      descriptionDeferred: project.descriptionDeferred,
       isPublic: project.isPublic,
       workspaceId: project.workspaceId,
       backgroundVersion: project.backgroundVersion,
@@ -261,19 +507,48 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     pagination: {
       total,
       // Anonymous public pages are cacheable, so they carry a revision that
-      // changes whenever a card on an earlier page could have changed. Built
-      // from the newest task/label/link timestamps rather than a Postgres hash
-      // aggregate, which libSQL has no equivalent for.
+      // changes whenever a card on an earlier page could have changed.
       ...(options.publicOnly
         ? {
-            revision: `${project.backgroundVersion ?? ""}:${project.createdAt.getTime()}:${total}:${relatedRevision}`,
+            revision: `${project.revision}:${total}:${taskCount?.revision}:${columnCount?.count}:${columnCount?.revision}:${publicRelatedRevision}`,
+            relatedRevision: `${labelCount}:${labelRevision}:${linkCount}:${linkRevision}`,
           }
         : {}),
-      page: usePagination ? page : 1,
-      pageSize: usePagination ? pageSize : total,
-      totalPages: usePagination ? Math.max(1, Math.ceil(total / pageSize)) : 1,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+      relatedPage,
+      relatedPageSize: RELATED_PAGE_SIZE,
+      relatedTotalPages: Math.max(
+        1,
+        Math.ceil(
+          Math.max(Number(columnCount?.count ?? 0), labelCount, linkCount) /
+            RELATED_PAGE_SIZE,
+        ),
+      ),
     },
   };
 }
 
-export default getTasks;
+function parseMetadata(raw: string | null): Record<string, unknown> | null {
+  if (!raw) return null;
+  try {
+    const value: unknown = JSON.parse(raw);
+    return value !== null && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+export default function getTasks(
+  projectId: string,
+  options: GetTasksOptions = {},
+) {
+  return boundedTaskRead(
+    (db) => getTasksPage(db, projectId, options),
+    "Task list request took too long; retry later",
+    options.deadlineMs,
+  );
+}

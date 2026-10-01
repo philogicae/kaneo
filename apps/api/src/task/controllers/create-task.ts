@@ -1,10 +1,13 @@
-import { and, eq, max } from "drizzle-orm";
+import { extractAssetIds } from "../../storage/cleanup-assets";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
+  assetTable,
   columnTable,
   customFieldDefinitionTable,
   customFieldValueTable,
+  projectTable,
   taskTable,
   userTable,
 } from "../../database/schema";
@@ -22,6 +25,7 @@ import {
   assertValidTaskStatus,
 } from "../validate-task-fields";
 import { claimTaskNumber } from "./claim-task-numbers";
+import { nextTaskPosition } from "./next-task-position";
 import { loadQualificationContext } from "./qualify-task";
 
 type CustomFieldInput = {
@@ -90,6 +94,7 @@ async function createTask({
   description,
   priority,
   customFields,
+  draftAssetIds,
   reminderOffsets,
   recurrence,
   qualify = false,
@@ -104,6 +109,7 @@ async function createTask({
   description?: string;
   priority?: string;
   customFields?: CustomFieldInput[];
+  draftAssetIds?: string[];
   reminderOffsets?: number[] | null;
   recurrence?: RecurrenceRule | null;
   qualify?: boolean;
@@ -177,22 +183,17 @@ async function createTask({
     ),
   });
 
-  const [maxPositionResult] = await db
-    .select({ maxPosition: max(taskTable.position) })
-    .from(taskTable)
-    .where(
-      and(
-        eq(taskTable.projectId, projectId),
-        column?.id
-          ? eq(taskTable.columnId, column.id)
-          : eq(taskTable.status, resolvedStatus),
-      ),
-    );
-
-  const nextPosition = (maxPositionResult?.maxPosition ?? 0) + 1;
-
   const createdTask = await db.transaction(async (tx) => {
     const taskNumber = await claimTaskNumber(projectId, tx);
+    // Inside the transaction, after claimTaskNumber locked the project, so a
+    // concurrent create cannot allocate the same position or reuse a legacy
+    // overflowed one.
+    const nextPosition = await nextTaskPosition(
+      tx,
+      projectId,
+      resolvedStatus,
+      column?.id ?? null,
+    );
 
     const [task] = await tx
       .insert(taskTable)
@@ -212,6 +213,47 @@ async function createTask({
         position: nextPosition,
       })
       .returning();
+
+    if (task && draftAssetIds?.length) {
+      // Only uploads the description still references are claimed; the rest
+      // stay drafts for the cleanup job.
+      const referenced = extractAssetIds(description);
+      const ids = [...new Set(draftAssetIds)].filter((id) =>
+        referenced.has(id),
+      );
+      if (ids.length) {
+        // claimTaskNumber already holds the project row lock here, so the
+        // workspace read below cannot race another create.
+        const project = await tx.query.projectTable.findFirst({
+          columns: { workspaceId: true },
+          where: eq(projectTable.id, projectId),
+        });
+        if (!project)
+          throw new HTTPException(404, { message: "Project not found" });
+        const claimed = await tx
+          .update(assetTable)
+          .set({
+            taskId: task.id,
+            surface: "description",
+            workspaceId: project.workspaceId,
+          })
+          .where(
+            and(
+              inArray(assetTable.id, ids),
+              eq(assetTable.projectId, projectId),
+              eq(assetTable.createdBy, currentUserId),
+              eq(assetTable.surface, "draft"),
+              isNull(assetTable.taskId),
+            ),
+          )
+          .returning({ id: assetTable.id });
+        if (claimed.length !== ids.length)
+          throw new HTTPException(400, {
+            message:
+              "Some staged uploads are unavailable or belong to another owner/project",
+          });
+      }
+    }
 
     if (task && mergedCustomFields.length) {
       await tx.insert(customFieldValueTable).values(

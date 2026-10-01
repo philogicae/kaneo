@@ -17,12 +17,27 @@ type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type Changes = Partial<
   Pick<
     Task,
-    "title" | "status" | "priority" | "description" | "userId" | "dueDate"
+    | "title"
+    | "status"
+    | "priority"
+    | "description"
+    | "userId"
+    | "dueDate"
+    | "startDate"
+    | "reminderOffsets"
   >
 >;
 export type TaskBefore = Pick<
   Task,
-  "id" | "projectId" | "title" | "status" | "priority" | "userId" | "dueDate"
+  | "id"
+  | "projectId"
+  | "title"
+  | "status"
+  | "priority"
+  | "userId"
+  | "dueDate"
+  | "startDate"
+  | "reminderOffsets"
 > & { description?: string | null; columnId?: string | null };
 
 export async function recordTaskMutation(
@@ -40,10 +55,20 @@ export async function recordTaskMutation(
       eventData: { oldTitle: before.title, newTitle: changes.title },
     });
   }
-  if (
-    changes.dueDate !== undefined &&
-    before.dueDate?.getTime() !== changes.dueDate?.getTime()
-  ) {
+  // Reminder history is keyed to the dates the offsets count down from, so
+  // moving or clearing a date invalidates what has already been sent.
+  const scheduleChanged =
+    (changes.dueDate !== undefined &&
+      before.dueDate?.getTime() !== changes.dueDate?.getTime()) ||
+    // Start-date reminders are anchored to it just as due-date ones are, so
+    // moving or clearing it invalidates what already went out.
+    (changes.startDate !== undefined &&
+      before.startDate?.getTime() !== changes.startDate?.getTime());
+  const offsetsChanged =
+    changes.reminderOffsets !== undefined &&
+    JSON.stringify(changes.reminderOffsets ?? null) !==
+      JSON.stringify(before.reminderOffsets ?? null);
+  if (scheduleChanged || offsetsChanged) {
     await tx
       .delete(taskReminderSentTable)
       .where(eq(taskReminderSentTable.taskId, before.id));

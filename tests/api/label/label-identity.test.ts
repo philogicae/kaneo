@@ -17,14 +17,23 @@ const mockSyncLabelToGitHub = vi.fn();
 const mockSyncLabelToGitea = vi.fn();
 
 function makeSelectMock(rows: unknown[]) {
-  const chain: Record<string, Mock> = {
-    from: vi.fn(() => chain),
-    innerJoin: vi.fn(() => chain),
-    where: vi.fn(() => chain),
+  // Awaitable as well as chainable: the controller awaits some reads directly
+  // and chains `limit` on others.
+  const chain: Record<string, Mock> = Object.assign(Promise.resolve(rows), {
+    from: vi.fn(),
+    innerJoin: vi.fn(),
+    where: vi.fn(),
     limit: vi.fn(() => Promise.resolve(rows)),
-  };
+  });
+  chain.from.mockReturnValue(chain);
+  chain.innerJoin.mockReturnValue(chain);
+  chain.where.mockReturnValue(chain);
   return chain;
 }
+
+// The affected-board lookup a label edit publishes; the tests only assert the
+// label's own writes.
+const mockSelectDistinct = vi.fn(() => makeSelectMock([]));
 
 function makeUpdateMock(returningRows: unknown[]) {
   const build = (withReturning: boolean) => {
@@ -64,6 +73,7 @@ vi.mock("../../../apps/api/src/database", () => ({
         },
         select: (...args: unknown[]) => mockSelect(...args),
         update: (...args: unknown[]) => mockUpdate(...args),
+        selectDistinct: (...args: unknown[]) => mockSelectDistinct(...args),
       }),
   },
 }));

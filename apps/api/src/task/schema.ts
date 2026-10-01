@@ -19,6 +19,7 @@ export const listTasksQuery = z.object({
   assigneeId: z.string().optional(),
   // Number("abc") is NaN, which used to reach the limit/offset clause unchecked.
   page: pagingNumber(1, 1_000_000).optional(),
+  relatedPage: pagingNumber(1, 1_000_000).optional(),
   limit: pagingNumber(1, 200).optional(),
   sortBy: z
     .enum(["createdAt", "priority", "dueDate", "position", "title", "number"])
@@ -143,7 +144,7 @@ export const updateTaskBody = z.object({
   priority,
   status: z.string(),
   projectId: z.string(),
-  position: z.number(),
+  position: z.number().int().min(0).max(MAX_TASK_POSITION),
   userId: z.string().optional(),
   reminderOffsets,
   recurrence: recurrenceRule,
@@ -227,9 +228,11 @@ export const ticketIdQuery = z.object({
 
 export const descriptionPageQuery = z.object({
   offset: pagingNumber(0, 2_000_000_000, 0),
+  // The page version is the SHA3 hex of the paged text, so it is exactly the
+  // 64 characters that digest renders as.
   version: z
     .string()
-    .regex(/^[0-9]{1,10}$/)
+    .regex(/^[0-9a-f]{64}$/)
     .optional(),
 });
 

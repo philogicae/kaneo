@@ -13,7 +13,6 @@ import { join, resolve } from "node:path";
 const COMMITTED = resolve("apps/docs/openapi.json");
 const FIX = process.argv.includes("--fix");
 // Invoke pnpm through Node so Windows paths and arguments never pass through cmd.exe.
-// biome-ignore lint/suspicious/noUndeclaredEnvVars: this entrypoint runs outside Turbo's task cache.
 const packageManager = process.env.npm_execpath;
 if (!packageManager) {
   throw new Error(
@@ -35,7 +34,9 @@ const runPnpm = (args) =>
   );
 
 function generate(into) {
-  runPnpm(["turbo", "build", "--filter=@kaneo/api^..."]);
+  // Build @kaneo/api's workspace dependencies first: the export script imports
+  // the built packages, not their sources.
+  runPnpm(["exec", "vp", "run", "--filter", "@kaneo/api^...", "build"]);
   runPnpm([
     "--filter",
     "@kaneo/api",

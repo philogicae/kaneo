@@ -19,9 +19,8 @@ describe("getMcpUrl", () => {
 
   it("falls back to the current origin for same-origin deployments", () => {
     vi.stubEnv("VITE_API_URL", "");
-    vi.stubGlobal("window", {
-      location: { origin: "https://kaneo.example.com" },
-    });
-    expect(getMcpUrl()).toBe("https://kaneo.example.com/api/mcp");
+    // jsdom's `window.location` is unforgeable, so assert against the origin
+    // the environment actually has rather than faking one.
+    expect(getMcpUrl()).toBe(`${window.location.origin}/api/mcp`);
   });
 });

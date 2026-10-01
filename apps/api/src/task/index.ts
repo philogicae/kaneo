@@ -1053,7 +1053,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(getTaskRoute, async (c) => {
     const { id } = c.req.valid("param");
 
-    const task = await getTask(id);
+    const task = await getTask(id, c.req.valid("query").view === "board");
 
     return c.json(task, 200);
   })

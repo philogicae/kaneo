@@ -44,6 +44,26 @@ function toTestDatabasePath(input: string) {
   return input.replace(/(\.[a-z0-9]+)?$/i, (match) => `_test${match || ".db"}`);
 }
 
+/**
+ * One database file per worker.
+ *
+ * SQLite has a single writer, so two workers sharing a file serialise on every
+ * statement and corrupt each other's fixtures; the suite ran single-file for
+ * that reason and took half an hour. Splitting by worker keeps each worker's
+ * rows to itself and lets the files run in parallel.
+ */
+function withWorkerSuffix(path: string) {
+  if (path === ":memory:" || !path) return path;
+  // Pool id, not worker id: worker ids keep incrementing as files are handed
+  // out, which would create a database per file instead of one per worker.
+  const pool = process.env.VITEST_POOL_ID;
+  if (!pool || pool === "1") return path;
+  return path.replace(
+    /(\.[a-z0-9]+)?$/i,
+    (match) => `_w${pool}${match || ".db"}`,
+  );
+}
+
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const envDatabasePath = process.env.DATABASE_PATH?.trim();
 const rawDatabasePath =
@@ -51,11 +71,14 @@ const rawDatabasePath =
   readDatabasePathFromEnvFile() ||
   resolve(repoRoot, "data/kaneo.db");
 
-process.env.DATABASE_PATH = toTestDatabasePath(rawDatabasePath);
+process.env.DATABASE_PATH = withWorkerSuffix(
+  toTestDatabasePath(rawDatabasePath),
+);
 
 if (
   process.env.DATABASE_PATH !== ":memory:" &&
-  !/_test(\.\w+)?$/i.test(process.env.DATABASE_PATH)
+  // The optional `_w<N>` segment is the per-worker file this suite splits into.
+  !/_test(_w\d+)?(\.\w+)?$/i.test(process.env.DATABASE_PATH)
 ) {
   throw new Error(
     `Integration tests require DATABASE_PATH to point to a *_test database (got "${process.env.DATABASE_PATH}")`,

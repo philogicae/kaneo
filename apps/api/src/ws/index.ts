@@ -19,6 +19,10 @@ import type {
   UserBroadcast,
   UserBroadcastMessage,
 } from "./broadcast-adapter";
+import {
+  getRelationSourceProject,
+  getSubtaskParentProjects,
+} from "../task/get-subtask-parent-projects";
 import { InMemoryBroadcastAdapter } from "./in-memory-broadcast-adapter";
 
 const INSTANCE_ID = randomUUID();
@@ -91,11 +95,22 @@ function deliverToLocalUserConnections(
   if (!connections) return;
 
   const payload = JSON.stringify(message);
+  // A deleted account keeps nothing: tell the client, then hang up rather than
+  // leave a socket it can never authenticate again.
+  const allAccessRevoked = message.type === "USER_ACCESS_REVOKED";
   for (const conn of connections) {
     try {
       conn.ws.send(payload);
     } catch {
       connections.delete(conn);
+    }
+    if (allAccessRevoked) {
+      connections.delete(conn);
+      try {
+        conn.ws.close(1008, "User access revoked");
+      } catch {
+        // Already closed.
+      }
     }
   }
   if (connections.size === 0) {
@@ -157,8 +172,28 @@ export async function revokeWorkspaceConnections(
   broadcastToUser(userId, {
     type: "WORKSPACE_ACCESS_REVOKED",
     workspaceId,
-    ...(options.force ? { force: true } : {}),
   });
+}
+
+/**
+ * Close every connection a deleted account still holds.
+ *
+ * The account row is gone, so no membership lookup can tell a client what it may
+ * still open: close all of it and say so once.
+ */
+export function revokeUserConnections(userId: string) {
+  for (const [projectId, connections] of projectConnections) {
+    for (const conn of [...connections]) {
+      if (conn.userId !== userId) continue;
+      removeConnection(projectId, conn);
+      try {
+        conn.ws.close(1008, "User access revoked");
+      } catch {
+        // Already closed.
+      }
+    }
+  }
+  broadcastToUser(userId, { type: "USER_ACCESS_REVOKED" });
 }
 
 /**
@@ -510,6 +545,8 @@ type TaskEvent = {
   taskId: string;
   sourceTaskId: string | undefined;
   targetTaskId: string | undefined;
+  // A status change already refreshed its parent boards; do not repeat it.
+  skipSubtaskParentRefresh?: boolean;
 };
 
 const taskUpdateEvents = [
@@ -568,7 +605,33 @@ subscribeToEvent<{
     { type: "TASK_MOVED", projectId: fromProjectId, taskId },
     initiatorId,
   );
+  refreshParentBoards(await getSubtaskParentProjects([taskId]), toProjectId);
 });
+
+// A subtask's counters live on its parents' boards, which may be different
+// projects the mutating window is not even displaying. Include the initiating
+// window: its local mutation refreshes the child project, while it may be
+// displaying a different parent board. Never send child data.
+function refreshParentBoards(
+  projects: { projectId: string }[],
+  currentProjectId = "",
+) {
+  for (const { projectId } of projects) {
+    if (projectId === currentProjectId) continue;
+    broadcastToProject(projectId, {
+      type: "TASK_RELATION_UPDATED",
+      projectId,
+      taskId: "",
+    });
+  }
+}
+
+subscribeToEvent<{ projects: { projectId: string }[] }>(
+  "subtask-parents.refresh",
+  async ({ projects }) => {
+    refreshParentBoards(projects);
+  },
+);
 
 subscribeToEvent<{
   projectId: string;
@@ -657,6 +720,17 @@ for (const eventName of taskUpdateEvents) {
       },
       initiatorId,
     );
+
+    if (eventName === "task.status_changed" && !data.skipSubtaskParentRefresh) {
+      refreshParentBoards(await getSubtaskParentProjects([taskId]), projectId);
+    } else if (eventName === "task-relation.deleted" && data.sourceTaskId) {
+      // The relation row is gone by broadcast time, so the parent board has to
+      // be found from the source task that still exists.
+      refreshParentBoards(
+        await getRelationSourceProject(data.sourceTaskId),
+        projectId,
+      );
+    }
   });
 }
 

@@ -1,6 +1,12 @@
 import { and, eq } from "drizzle-orm";
 import db from "../../../database";
-import { columnTable, projectTable, taskTable } from "../../../database/schema";
+import {
+  columnTable,
+  integrationTable,
+  projectTable,
+  taskTable,
+} from "../../../database/schema";
+import { publishEvent } from "../../../events";
 import { claimTaskNumber } from "../../../task/controllers/claim-task-numbers";
 import type { GitHubConfig } from "../config";
 import { createExternalLink, findExternalLink } from "../services/link-manager";
@@ -63,68 +69,85 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
     const priority = extractIssuePriority(issue.labels);
     const status = extractIssueStatus(issue.labels);
 
-    const existingLink = await findExternalLink(
-      integration.id,
-      "issue",
-      issue.number.toString(),
-    );
+    // One statement boundary for the link check and both writes. The webhook
+    // and a resumable import reach this point concurrently; without it both see
+    // no link and each create a task for the same issue.
+    const createdTask = await db.transaction(async (tx) => {
+      // The same integration row the import locks, so the two paths serialise.
+      const [current] = await tx
+        .select()
+        .from(integrationTable)
+        .where(eq(integrationTable.id, integration.id));
+      if (!current?.isActive || current.config !== integration.config)
+        return null;
 
-    if (existingLink) {
-      console.log(
-        `Issue #${issue.number} already linked to task ${existingLink.taskId} in project ${projectId}, skipping`,
+      const existingLink = await findExternalLink(
+        integration.id,
+        "issue",
+        issue.number.toString(),
+        tx,
       );
-      continue;
-    }
+      if (existingLink) return null;
 
-    const nextTaskNumber = await claimTaskNumber(projectId);
+      const targetStatus = await resolveTargetStatus(
+        projectId,
+        "issue_opened",
+        status || "to-do",
+        tx,
+      );
+      const targetColumn = await tx.query.columnTable.findFirst({
+        where: and(
+          eq(columnTable.projectId, projectId),
+          eq(columnTable.slug, targetStatus),
+        ),
+      });
+      const number = await claimTaskNumber(projectId, tx);
 
-    const resolvedStatus = await resolveTargetStatus(
-      projectId,
-      "issue_opened",
-      status || "to-do",
-    );
+      const [task] = await tx
+        .insert(taskTable)
+        .values({
+          projectId,
+          userId: null,
+          title: issue.title,
+          description: formatTaskDescriptionFromIssue(issue.body),
+          status: targetStatus,
+          columnId: targetColumn?.id ?? null,
+          priority: priority ?? "low",
+          number,
+        })
+        .returning();
+      if (!task) throw new Error("Failed to create task from GitHub issue");
 
-    const targetStatus = resolvedStatus;
-    const targetColumn = await db.query.columnTable.findFirst({
-      where: and(
-        eq(columnTable.projectId, projectId),
-        eq(columnTable.slug, targetStatus),
-      ),
+      await createExternalLink(
+        {
+          taskId: task.id,
+          integrationId: integration.id,
+          resourceType: "issue",
+          externalId: issue.number.toString(),
+          url: issue.html_url,
+          title: issue.title,
+          metadata: {
+            state: "open",
+            createdFrom: "github",
+            author: issue.user?.login,
+          },
+        },
+        tx,
+      );
+      return task;
     });
 
-    const taskValues: typeof taskTable.$inferInsert = {
-      projectId,
-      userId: null,
-      title: issue.title,
-      description: formatTaskDescriptionFromIssue(issue.body),
-      status: targetStatus,
-      columnId: targetColumn?.id ?? null,
-      priority: priority ?? "low",
-      number: nextTaskNumber,
-    };
+    if (!createdTask) continue;
 
-    const [createdTask] = await db
-      .insert(taskTable)
-      .values(taskValues)
-      .returning();
-
-    if (!createdTask) {
-      console.error("Failed to create task from GitHub issue");
-      continue;
-    }
-
-    await createExternalLink({
+    await publishEvent("task.created", {
+      ...createdTask,
       taskId: createdTask.id,
-      integrationId: integration.id,
-      resourceType: "issue",
+      userId: createdTask.userId ?? "",
+      type: "task",
+      content: null,
+      source: "github",
       externalId: issue.number.toString(),
-      url: issue.html_url,
-      title: issue.title,
-      metadata: {
-        state: "open",
-        createdFrom: "github",
-        author: issue.user?.login,
-      },
+      actor: issue.user?.login ?? "github-webhook",
     });
 
     const project = await db.query.projectTable.findFirst({

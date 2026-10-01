@@ -42,6 +42,7 @@ import {
   projectListSchema,
   projectMemberListSchema,
   projectSchema,
+  toPublicProject,
 } from "./response";
 import {
   createProjectBody,
@@ -473,7 +474,7 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
       includeArchived === "true",
       c.get("userId"),
     );
-    return c.json(projects, 200);
+    return c.json(projects.map(toPublicProject), 200);
   })
   .openapi(createProjectRoute, async (c) => {
     const { name, icon, slug, description } = c.req.valid("json");
@@ -486,7 +487,7 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
       description ?? null,
       c.get("userId"),
     );
-    return c.json(newProject, 200);
+    return c.json(toPublicProject(newProject), 200);
   })
   .openapi(getProjectRoute, async (c) => {
     const { id } = c.req.valid("param");
@@ -496,7 +497,7 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
       tasksLimit,
       tasksOffset,
     });
-    return c.json(projectData, 200);
+    return c.json(toPublicProject(projectData), 200);
   })
   .openapi(getProjectChartsRoute, async (c) => {
     const { id } = c.req.valid("param");
@@ -688,7 +689,7 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const workspaceId = c.get("workspaceId");
     const { projects } = c.req.valid("json");
     const reordered = await reorderProjectsCtrl(workspaceId, projects);
-    return c.json(reordered, 200);
+    return c.json(reordered.map(toPublicProject), 200);
   })
   .openapi(updateProjectRoute, async (c) => {
     const { id } = c.req.valid("param");
@@ -705,25 +706,25 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
       // Publishing a project is a separate capability from editing it.
       await hasWorkspacePermission(c, { project: ["share"] }),
     );
-    return c.json(updatedProject, 200);
+    return c.json(toPublicProject(updatedProject), 200);
   })
   .openapi(deleteProjectRoute, async (c) => {
     const { id } = c.req.valid("param");
     const workspaceId = c.get("workspaceId");
     const deletedProject = await deleteProjectCtrl(id, workspaceId);
-    return c.json(deletedProject, 200);
+    return c.json(toPublicProject(deletedProject), 200);
   })
   .openapi(archiveProjectRoute, async (c) => {
     const { id } = c.req.valid("param");
     const workspaceId = c.get("workspaceId");
     const archivedProject = await archiveProjectCtrl(id, workspaceId);
-    return c.json(archivedProject, 200);
+    return c.json(toPublicProject(archivedProject), 200);
   })
   .openapi(unarchiveProjectRoute, async (c) => {
     const { id } = c.req.valid("param");
     const workspaceId = c.get("workspaceId");
     const unarchivedProject = await unarchiveProjectCtrl(id, workspaceId);
-    return c.json(unarchivedProject, 200);
+    return c.json(toPublicProject(unarchivedProject), 200);
   })
   .openapi(deleteProjectBackgroundRoute, async (c) => {
     const { id } = c.req.valid("param");
