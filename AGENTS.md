@@ -27,7 +27,7 @@
 
 ## Setup commands
 
-- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.5.1`).
+- Node ≥ 26, pnpm 12 (`packageManager: pnpm@12.8.1`).
 - `pnpm dev` (turbo dev) · `pnpm build` · `pnpm typecheck` · `pnpm test` (unit) · `pnpm test:coverage` (unit + coverage, aggregated per workspace in the CI job summary) · `pnpm test:integration` (local libSQL/SQLite file)
 - `pnpm lint` = Biome **--write** (rewrites files); CI gate is `pnpm exec biome ci .` — run that for a read-only check.
 - `pnpm i18n:check` / `i18n:schema` · `pnpm openapi:check` / `openapi:check:fix`
