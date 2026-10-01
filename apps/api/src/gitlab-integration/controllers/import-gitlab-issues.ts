@@ -209,8 +209,7 @@ async function importSingleIssue(
               eq(externalLinkTable.taskId, existingLink.taskId),
               eq(externalLinkTable.integrationId, integrationId),
             ),
-          )
-          .for("update");
+          );
         if (!linked) return "skipped" as const;
 
         const updateData: Record<string, unknown> = {

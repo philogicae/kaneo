@@ -48,6 +48,10 @@ vi.mock("@/hooks/queries/task/use-get-tasks", () => ({
   useGetTasks: (projectId: string) => useGetTasks(projectId),
 }));
 
+vi.mock("@/hooks/queries/appointment/use-get-appointments", () => ({
+  default: () => ({ data: [] }),
+}));
+
 vi.mock("@/hooks/use-mobile", () => ({
   useIsMobile: () => false,
 }));
@@ -66,6 +70,10 @@ vi.mock("@/components/task/task-details-sheet", () => ({
   default: () => null,
 }));
 
+vi.mock("@/components/appointments/appointment-dialog", () => ({
+  default: () => null,
+}));
+
 vi.mock("@/components/page-title", () => ({
   default: () => null,
 }));
@@ -80,6 +88,7 @@ vi.mock("@/components/gantt/gantt-task-bar", () => ({
 // jumpToToday key (or its interpolated siblings) stops matching what the
 // component actually requests.
 vi.mock("react-i18next", () => ({
+  initReactI18next: { type: "3rdParty", init: () => {} },
   useTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
       const [namespace, path] = key.split(":");
@@ -163,7 +172,7 @@ describe("Gantt jump-to-today", () => {
       }),
     );
     const { rerender } = render(<GanttRoute />);
-    const search = screen.getByPlaceholderText("Search scheduled tickets...");
+    const search = screen.getByPlaceholderText("Search");
     fireEvent.change(search, { target: { value: "no match" } });
     routeParams.projectId = "project-2";
     mockProjectWithTask(
@@ -290,12 +299,9 @@ describe("Gantt jump-to-today", () => {
     // The search narrows the *visible* timeline down to nothing, even though
     // today is still within the unfiltered project's date range — the button
     // has nothing left to scroll to and must reflect that.
-    fireEvent.change(
-      screen.getByPlaceholderText("Search scheduled tickets..."),
-      {
-        target: { value: "no such task" },
-      },
-    );
+    fireEvent.change(screen.getByPlaceholderText("Search"), {
+      target: { value: "no such task" },
+    });
 
     expect(
       screen.getByText('No scheduled tasks match "no such task"'),

@@ -1,84 +1,88 @@
 <p align="center">
   <a href="https://kaneo.app">
-    <img src="https://assets.kaneo.app/logo-text.png" alt="Kaneo's logo" width="450" />
+    <img src="https://assets.kaneo.app/logo-text.png" alt="Kaneo's logo" width="420" />
   </a>
 </p>
 
 <div align="center">
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/usekaneo/kaneo/ci.yml?branch=main)](https://github.com/usekaneo/kaneo/actions)
-[![AI Policy: Human Voice](https://img.shields.io/badge/AI_Policy-Human_Voice-blue?logo=data:image%2Fsvg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8c3R5bGU%2BCiAgICAuaWNvbiB7CiAgICAgIGZpbGw6IG5vbmU7CiAgICAgIHN0cm9rZTogIzAwMDAwMDsKICAgICAgc3Ryb2tlLXdpZHRoOiAyLjI1OwogICAgICBzdHJva2UtbGluZWNhcDogcm91bmQ7CiAgICAgIHN0cm9rZS1saW5lam9pbjogcm91bmQ7CiAgICB9CiAgICBAbWVkaWEgKHByZWZlcnMtY29sb3Itc2NoZW1lOiBkYXJrKSB7CiAgICAgIC5pY29uIHsgc3Ryb2tlOiAjZmZmZmZmOyB9CiAgICB9CiAgPC9zdHlsZT4KICA8cGF0aCBjbGFzcz0iaWNvbiIgZD0iTTE5LjQxNCAxNC40MTRDMjEgMTIuODI4IDIyIDExLjUgMjIgOS41YTUuNSA1LjUgMCAwIDAtOS41OTEtMy42NzYuNi42IDAgMCAxLS44MTguMDAxQTUuNSA1LjUgMCAwIDAgMiA5LjVjMCAyLjMgMS41IDQgMyA1LjVsNS41MzUgNS4zNjJhMiAyIDAgMCAwIDIuODc5LjA1MiAyLjEyIDIuMTIgMCAwIDAtLjAwNC0zIDIuMTI0IDIuMTI0IDAgMSAwIDMtMyAyLjEyNCAyLjEyNCAwIDAgMCAzLjAwNCAwIDIgMiAwIDAgMCAwLTIuODI4bC0xLjg4MS0xLjg4MmEyLjQxIDIuNDEgMCAwIDAtMy40MDkgMGwtMS43MSAxLjcxYTIgMiAwIDAgMS0yLjgyOCAwIDIgMiAwIDAgMSAwLTIuODI4bDIuODIzLTIuNzYyIi8%2BCjwvc3ZnPgo%3D)](https://github.com/usekaneo/kaneo/blob/main/AI_POLICY.md)
-[![Discord](https://img.shields.io/discord/1326250681530843178?color=7389D8&label=&logo=discord&logoColor=ffffff)](https://discord.gg/rU4tSyhXXU)
-[![Sponsors](https://img.shields.io/github/sponsors/andrejsshell)](https://github.com/sponsors/andrejsshell)
+[![CI](https://github.com/philogicae/kaneo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/philogicae/kaneo/actions/workflows/ci.yml)
+
 </div>
 
-<div align="center">
-  <h3>
-    <a href="https://cloud.kaneo.app">Cloud</a>
-    <span> | </span>
-    <a href="https://kaneo.app/docs/core/installation">Installation</a>
-    <span> | </span>
-    <a href="https://kaneo.app">Website</a>
-    <span> | </span>
-    <a href="https://discord.gg/rU4tSyhXXU">Discord</a>
-  </h3>
-</div>
+A customized fork of [Kaneo](https://github.com/usekaneo/kaneo) — the simple, fast, self-hosted project management platform — tailored for and deployed as a personal self-hosted instance.
 
-<p align="center">
-  Fast, simple, open-source project management.
-</p>
+**This fork adds on top of upstream:**
 
-<p align="center">
-  <img src="screenshots/readme@1x.png" srcset="screenshots/readme@1x.png 1x, screenshots/readme.png 2x" alt="Kaneo project board with the Kaneo logo and tagline" />
-</p>
+- **SQLite/libSQL storage** — PostgreSQL replaced by a single local [libSQL](https://github.com/tursodatabase/libsql) (Turso) file, and uploaded assets stored on local disk: one container, no database sidecar, no external service
+- **Unified notifications** — one Notifications page for general, Telegram, Discord and Slack rules (per-project management for Discord/Slack), unified bots / chats / rules configuration, per-task reminders, task recurrence, and notification templates
+- **Appointments** — calendar and Gantt scheduling with reminders, unified Appointments / Calendar / Gantt dashboard tabs, and dedicated MCP tools
+- **Access teams & workspace sharing** — per-project access teams, public workspace sharing, and workspace invite links
+- **MCP improvements** — extra tools (bulk task updates, appointments, Telegram management, task qualification), API-key and OAuth hardening for the HTTP endpoint at `/api/mcp`, in-app MCP setup docs
+- **Jev (TypeSafe System One)** — optional semantic reranking of global search results and auto-qualification of new tasks (priority + semantic labels); disabled by default, enabled via `TYPESAFE_API_KEY` (see `.env.sample`)
+- **Agent skills over HTTP** — the bundled `skills/kaneo` agent skill is served at `/api/skills` alongside the MCP endpoint
+- **Interactive API reference** — a [Scalar](https://scalar.com) UI served at `/api/docs` on top of the OpenAPI 3.1 document at `/api/openapi`
+- **Dashboard work** — unified all-projects view, weekly project charts, backlog tabs, collapsible sidebar with UI scale control
+- **Cross-workspace search** and small UX refinements across the board
+- **Self-hosted deployment** — a single `compose.yml` that builds locally via `Dockerfile.kaneo`, plus a GHCR image published by `.github/workflows/publish.yml`
 
-## Built for your team's work
+> This is a personal fork, not an official Kaneo release. For the upstream project, docs, cloud offering, and community, go to [usekaneo/kaneo](https://github.com/usekaneo/kaneo).
 
-- **See work your way:** Board, List, Calendar, and Gantt views, plus a backlog, filters, and search.
-- **Keep task context together:** descriptions, attachments, subtasks, dependencies, labels, comments, and time tracking.
-- **Work with your team:** shared workspaces, invitations, custom roles, live updates, and public project views.
-- **Shape your workflow:** custom columns and fields, with rules that move tasks when repository activity changes.
-- **Stay informed:** in-app notifications, email, ntfy, Gotify, and personal webhooks.
-- **Connect other tools:** GitHub and Gitea, chat integrations, project webhooks, a [REST API](https://kaneo.app/docs/api-reference/introduction), and [MCP](https://kaneo.app/docs/core/integrations/mcp) for AI assistants.
+## Deploy (self-hosted)
 
-## Installation
+Requires Docker with Compose. One container runs the API and the web app; the database is a local libSQL file bind-mounted from the host.
 
-- **Cloud:** [Get started with Kaneo Cloud](https://cloud.kaneo.app).
-- **Self-hosted:** Follow the [installation guide](https://kaneo.app/docs/core/installation).
+```bash
+git clone https://github.com/philogicae/kaneo.git
+cd kaneo
+cp .env.sample .env
+# set KANEO_CLIENT_URL and AUTH_SECRET (openssl rand -hex 32)
+docker compose up -d --build
+```
 
-## Contributing
+Open [http://localhost:5173](http://localhost:5173). The interactive API reference is at [/api/docs](http://localhost:5173/api/docs) and the OpenAPI 3.1 document at `/api/openapi` — both are public. The MCP endpoint is `/api/mcp` and the bundled agent skills are served at `/api/skills`.
 
-Code, translations, documentation, and bug reports are welcome. Start with the [contributing guide](CONTRIBUTING.md) and [local development setup](ENVIRONMENT_SETUP.md).
+The database lives at `./data/kaneo.db` (resolved from the repository root; the container bind-mounts the host directory at `/app/data`) — override the host directory with `KANEO_DATA_PATH` in `.env`. The directory must be writable by the container user (uid 1001) so libSQL can create the database and its WAL/SHM sidecars:
 
-Join us on [Discord](https://discord.gg/rU4tSyhXXU) or share bugs and feature requests in [GitHub Issues](https://github.com/usekaneo/kaneo/issues).
+```bash
+mkdir -p ./data && chown -R 1001:1001 ./data
+```
 
-## Sponsors
+Or run the prebuilt GHCR image instead of building locally:
 
-Kaneo is open source. If you find it useful, consider [sponsoring the project](https://github.com/sponsors/andrejsshell) to help support ongoing development.
+```bash
+docker compose -f compose.remote.yml up -d
+```
 
-### Partners
+Environment variables: see [.env.sample](.env.sample) and [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md).
 
-<p>
-  <img src="apps/site/public/images/blacksmith-powered.png" alt="CI powered by Blacksmith" width="368" />
-</p>
+## Development
 
-This project is tested with BrowserStack.
+Requires Node.js 26 and pnpm 12 (see `packageManager`).
 
-### Community sponsors
+```bash
+pnpm install
+pnpm dev               # start dev servers
+pnpm build             # build all workspaces
+pnpm test              # unit tests
+pnpm test:integration  # API integration tests (local libSQL test file)
+pnpm typecheck         # typecheck all workspaces
+pnpm lint              # biome (writes fixes)
+pnpm i18n:check        # locale files vs en-US source of truth
+pnpm openapi:check     # API reference vs routes
+```
 
-<!-- sponsors --><a href="https://github.com/danielsada"><img src="https:&#x2F;&#x2F;github.com&#x2F;danielsada.png" width="60px" alt="User avatar: Daniel Sada" /></a><a href="https://github.com/randoneering"><img src="https:&#x2F;&#x2F;github.com&#x2F;randoneering.png" width="60px" alt="User avatar: (justin)randoneering" /></a><a href="https://github.com/barbanet"><img src="https:&#x2F;&#x2F;github.com&#x2F;barbanet.png" width="60px" alt="User avatar: Damián Culotta" /></a><a href="https://github.com/t0yohei"><img src="https:&#x2F;&#x2F;github.com&#x2F;t0yohei.png" width="60px" alt="User avatar: t0yohei" /></a><a href="https://github.com/ryanilano"><img src="https:&#x2F;&#x2F;github.com&#x2F;ryanilano.png" width="60px" alt="User avatar: Ryan Ilano" /></a><a href="https://github.com/bojanmilevski"><img src="https:&#x2F;&#x2F;github.com&#x2F;bojanmilevski.png" width="60px" alt="User avatar: Bojan Milevski" /></a><!-- sponsors -->
+Read [AGENTS.md](AGENTS.md) for architecture, conventions, and boundaries before changing anything. The database schema lives in `apps/api/src/database/schema.ts`; generate migrations with `pnpm --filter @kaneo/api db:generate`.
+
+The documentation site source lives in [`apps/docs`](apps/docs) (Mintlify — `mint dev` for a local preview); `apps/docs/openapi.json` is a committed artifact kept in sync by `pnpm openapi:check`.
+
+## Acknowledgments
+
+All credit for Kaneo goes to the upstream team and contributors: [usekaneo/kaneo](https://github.com/usekaneo/kaneo) · [kaneo.app/docs](https://kaneo.app/docs/core).
+
+This fork tracks upstream and stays close to it; divergences are the ones listed above. MCP is exposed through the built-in HTTP endpoint at `/api/mcp`; upstream's stdio package [@kaneo/mcp](https://www.npmjs.com/package/@kaneo/mcp) is not used here.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-  <img src="https://repobeats.axiom.co/api/embed/3e8367ec2b2350e4fc48662df33c81dac657b833.svg" alt="Repobeats analytics image" />
-</div>
-
-<p align="center">
-  Built with ❤️ by the Kaneo team and <a href="https://github.com/usekaneo/kaneo/graphs/contributors">contributors</a>
-</p>
+MIT — see [LICENSE](LICENSE). Upstream © the Kaneo team and contributors; fork changes © 2026 philogicae.

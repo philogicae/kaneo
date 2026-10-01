@@ -1,22 +1,21 @@
-import { eq } from "drizzle-orm";
+import { and, eq, like, notLike } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { taskTable } from "../../database/schema";
-import {
-  publishTaskMutation,
-  recordTaskMutation,
-} from "./task-mutation-effects";
+import { taskReminderSentTable, taskTable } from "../../database/schema";
+import { publishEvent } from "../../events";
 
 async function updateTaskDueDate({
   id,
   dueDate,
+  reminderOffsets,
   currentUserId,
 }: {
   id: string;
   dueDate: Date | null;
+  reminderOffsets?: number[] | null;
   currentUserId: string;
 }) {
-  let existingTask = await db.query.taskTable.findFirst({
+  const existingTask = await db.query.taskTable.findFirst({
     where: eq(taskTable.id, id),
   });
 
@@ -26,24 +25,48 @@ async function updateTaskDueDate({
     });
   }
 
-  const updatedTask = await db.transaction(async (tx) => {
-    const [locked] = await tx
-      .select()
-      .from(taskTable)
-      .where(eq(taskTable.id, id))
-      .for("update");
-    if (!locked) throw new HTTPException(404, { message: "Task not found" });
-    existingTask = locked;
+  // Per-task Telegram reminders count down from the start date, so a due-date
+  // change must not reset them (that could double-send inside the same window).
+  // Due-date driven reminders (in-app, generic webhook) are reset so the new
+  // date triggers fresh notifications.
+  const dueDateChanged =
+    (dueDate?.getTime() ?? null) !== (existingTask.dueDate?.getTime() ?? null);
+  const offsetsChanged =
+    reminderOffsets !== undefined &&
+    JSON.stringify(reminderOffsets ?? null) !==
+      JSON.stringify(existingTask.reminderOffsets ?? null);
 
-    const [task] = await tx
-      .update(taskTable)
-      .set({ dueDate: dueDate || null })
-      .where(eq(taskTable.id, id))
-      .returning();
-    if (task)
-      await recordTaskMutation(tx, existingTask, { dueDate }, currentUserId);
-    return task;
-  });
+  if (dueDateChanged) {
+    await db
+      .delete(taskReminderSentTable)
+      .where(
+        and(
+          eq(taskReminderSentTable.taskId, id),
+          notLike(taskReminderSentTable.reminderType, "telegram_unified:%"),
+        ),
+      );
+  }
+  if (offsetsChanged) {
+    await db
+      .delete(taskReminderSentTable)
+      .where(
+        and(
+          eq(taskReminderSentTable.taskId, id),
+          like(taskReminderSentTable.reminderType, "telegram_unified:%"),
+        ),
+      );
+  }
+
+  const [updatedTask] = await db
+    .update(taskTable)
+    .set({
+      dueDate: dueDate || null,
+      ...(reminderOffsets !== undefined
+        ? { reminderOffsets: reminderOffsets ?? null }
+        : {}),
+    })
+    .where(eq(taskTable.id, id))
+    .returning();
 
   if (!updatedTask) {
     throw new HTTPException(500, {
@@ -51,9 +74,17 @@ async function updateTaskDueDate({
     });
   }
 
-  await publishTaskMutation(existingTask, updatedTask, currentUserId, {
-    fields: ["dueDate"],
-  });
+  if (dueDateChanged) {
+    await publishEvent("task.due_date_changed", {
+      taskId: updatedTask.id,
+      projectId: updatedTask.projectId,
+      userId: currentUserId,
+      oldDueDate: existingTask.dueDate,
+      newDueDate: dueDate,
+      title: updatedTask.title,
+      type: "due_date_changed",
+    });
+  }
 
   return updatedTask;
 }

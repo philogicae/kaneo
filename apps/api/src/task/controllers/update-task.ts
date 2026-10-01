@@ -1,19 +1,15 @@
-import { and, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { columnTable, projectTable, taskTable } from "../../database/schema";
+import {
+  columnTable,
+  taskReminderSentTable,
+  taskTable,
+} from "../../database/schema";
 import { publishEvent } from "../../events";
-import {
-  publishTaskMutation,
-  recordTaskMutation,
-} from "./task-mutation-effects";
-import {
-  assertAssignableUser,
-  getProjectWorkspaceId,
-} from "../../utils/assert-assignable-user";
-import { boardDescription, descriptionDeferred } from "../description-pages";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
+import type { RecurrenceRule } from "../recurrence";
 import { assertValidTaskStatus } from "../validate-task-fields";
-import { assertTaskPosition } from "./next-task-position";
 
 async function updateTask(
   id: string,
@@ -22,26 +18,23 @@ async function updateTask(
   startDate: Date | undefined,
   dueDate: Date | undefined,
   projectId: string,
-  description: string | undefined,
+  description: string,
   priority: string,
   position: number,
   userId?: string,
   currentUserId?: string,
+  reminderOffsets?: number[] | null,
+  recurrence?: RecurrenceRule | null,
 ) {
-  assertTaskPosition(position);
-
-  let [existingTask] = await db
+  const [existingTask] = await db
     .select({
       id: taskTable.id,
-      title: taskTable.title,
-      priority: taskTable.priority,
-      userId: taskTable.userId,
-      dueDate: taskTable.dueDate,
-      description:
-        description === undefined ? sql<null>`null` : taskTable.description,
+      description: taskTable.description,
       status: taskTable.status,
-      position: taskTable.position,
       projectId: taskTable.projectId,
+      startDate: taskTable.startDate,
+      dueDate: taskTable.dueDate,
+      reminderOffsets: taskTable.reminderOffsets,
     })
     .from(taskTable)
     .where(eq(taskTable.id, id))
@@ -64,10 +57,7 @@ async function updateTask(
   const normalizedUserId = userId?.trim() || undefined;
 
   if (normalizedUserId) {
-    await assertAssignableUser(
-      normalizedUserId,
-      await getProjectWorkspaceId(projectId),
-    );
+    await assertAssignableUser(normalizedUserId, projectId);
   }
 
   const column = await db.query.columnTable.findFirst({
@@ -77,72 +67,26 @@ async function updateTask(
     ),
   });
 
-  const initialPosition = existingTask.position;
-  const initialStatus = existingTask.status;
-  const updatedTask = await db.transaction(async (tx) => {
-    const [project] = await tx
-      .select({ id: projectTable.id })
-      .from(projectTable)
-      .where(eq(projectTable.id, projectId))
-      .for("update");
-    if (!project)
-      throw new HTTPException(404, { message: "Project not found" });
-    const [locked] = await tx
-      .select({
-        id: taskTable.id,
-        title: taskTable.title,
-        priority: taskTable.priority,
-        userId: taskTable.userId,
-        dueDate: taskTable.dueDate,
-        description:
-          description === undefined ? sql<null>`null` : taskTable.description,
-        status: taskTable.status,
-        columnId: taskTable.columnId,
-        position: taskTable.position,
-        projectId: taskTable.projectId,
-      })
-      .from(taskTable)
-      .where(and(eq(taskTable.id, id), eq(taskTable.projectId, projectId)))
-      .for("update");
-    if (!locked)
-      throw new HTTPException(409, {
-        message: "Task changed projects; retry the update",
-      });
-    if (locked.position !== initialPosition || locked.status !== initialStatus)
-      throw new HTTPException(409, {
-        message: "Task order changed; refresh before updating",
-      });
-    existingTask = locked;
-
-    const [task] = await tx
-      .update(taskTable)
-      .set({
-        title,
-        status,
-        columnId: column?.id ?? null,
-        startDate: startDate || null,
-        dueDate: dueDate || null,
-        projectId,
-        description,
-        priority,
-        position,
-        userId: normalizedUserId ?? null,
-      })
-      .where(and(eq(taskTable.id, id), eq(taskTable.projectId, projectId)))
-      .returning({
-        ...getTableColumns(taskTable),
-        description: boardDescription,
-        descriptionDeferred,
-      });
-    if (task)
-      await recordTaskMutation(
-        tx,
-        existingTask,
-        { title, dueDate: dueDate ?? null },
-        currentUserId,
-      );
-    return task;
-  });
+  const [updatedTask] = await db
+    .update(taskTable)
+    .set({
+      title,
+      status,
+      columnId: column?.id ?? null,
+      startDate: startDate || null,
+      dueDate: dueDate || null,
+      projectId,
+      description,
+      priority,
+      position,
+      userId: normalizedUserId ?? null,
+      ...(reminderOffsets !== undefined
+        ? { reminderOffsets: reminderOffsets ?? null }
+        : {}),
+      ...(recurrence !== undefined ? { recurrence: recurrence ?? null } : {}),
+    })
+    .where(eq(taskTable.id, id))
+    .returning();
 
   if (!updatedTask) {
     throw new HTTPException(500, {
@@ -150,15 +94,42 @@ async function updateTask(
     });
   }
 
-  await publishTaskMutation(
-    {
-      ...existingTask,
-      description:
-        description === undefined ? undefined : existingTask.description,
-    },
-    { ...updatedTask, description: description ?? updatedTask.description },
-    currentUserId,
-  );
+  // Reminder history is keyed to the date the offsets count down from, so
+  // moving (or clearing) a date invalidates what has already been sent. This
+  // must run even when the caller did not send reminderOffsets, otherwise a
+  // start-date change elsewhere (e.g. MCP update_task) leaves a stale dedupe
+  // row that silently swallows the reminder for the new date.
+  const offsetsChanged =
+    reminderOffsets !== undefined &&
+    JSON.stringify(reminderOffsets ?? null) !==
+      JSON.stringify(existingTask.reminderOffsets ?? null);
+  const datesChanged =
+    (startDate?.getTime() ?? null) !==
+      (existingTask.startDate?.getTime() ?? null) ||
+    (dueDate?.getTime() ?? null) !== (existingTask.dueDate?.getTime() ?? null);
+  if (offsetsChanged || datesChanged) {
+    await db
+      .delete(taskReminderSentTable)
+      .where(eq(taskReminderSentTable.taskId, id));
+  }
+
+  if (existingTask.status !== status) {
+    await publishEvent("task.status_changed", {
+      taskId: updatedTask.id,
+      projectId: updatedTask.projectId,
+      userId: currentUserId,
+      oldStatus: existingTask.status,
+      newStatus: status,
+      title: updatedTask.title,
+      assigneeId: updatedTask.userId,
+      type: "status_changed",
+    });
+
+    await publishEvent("task-relation.refresh", {
+      projectId: updatedTask.projectId,
+      userId: currentUserId,
+    });
+  }
 
   await publishEvent("task.updated", {
     taskId: updatedTask.id,
@@ -167,6 +138,9 @@ async function updateTask(
     status: updatedTask.status,
     userId: currentUserId,
   });
+
+  if (existingTask.description !== description) {
+  }
 
   return updatedTask;
 }

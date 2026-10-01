@@ -8,18 +8,133 @@ export function isWeekStartDay(value: number): value is WeekStartDay {
   return WEEK_START_DAYS.some((day) => day === value);
 }
 
+export const PROJECT_SORT_MODES = [
+  "custom",
+  "name",
+  "date",
+  "completion",
+] as const;
+export type ProjectSortMode = (typeof PROJECT_SORT_MODES)[number];
+
+export function isProjectSortMode(value: unknown): value is ProjectSortMode {
+  return (
+    typeof value === "string" &&
+    (PROJECT_SORT_MODES as readonly string[]).includes(value)
+  );
+}
+
+export const WORKSPACE_SORT_MODES = ["custom", "name", "date"] as const;
+export type WorkspaceSortMode = (typeof WORKSPACE_SORT_MODES)[number];
+
+export function isWorkspaceSortMode(
+  value: unknown,
+): value is WorkspaceSortMode {
+  return (
+    typeof value === "string" &&
+    (WORKSPACE_SORT_MODES as readonly string[]).includes(value)
+  );
+}
+
+export const CHART_RANGE_OPTIONS = [
+  "1w",
+  "1m",
+  "3m",
+  "6m",
+  "12m",
+  "all",
+] as const;
+export type ChartRange = (typeof CHART_RANGE_OPTIONS)[number];
+
+export function isChartRange(value: unknown): value is ChartRange {
+  return (
+    typeof value === "string" &&
+    (CHART_RANGE_OPTIONS as readonly string[]).includes(value)
+  );
+}
+
+export const CHART_UNIT_OPTIONS = ["hour", "day", "week", "month"] as const;
+export type ChartUnit = (typeof CHART_UNIT_OPTIONS)[number];
+
+export function isChartUnit(value: unknown): value is ChartUnit {
+  return (
+    typeof value === "string" &&
+    (CHART_UNIT_OPTIONS as readonly string[]).includes(value)
+  );
+}
+
+// Mirror of the API's ALLOWED_UNITS: the dashboard disables units the server
+// rejects, and falls back to the daily default when the window changes.
+export const CHART_UNITS_BY_RANGE: Record<ChartRange, readonly ChartUnit[]> = {
+  "1w": ["hour", "day", "week"],
+  "1m": ["day", "week"],
+  "3m": ["day", "week", "month"],
+  "6m": ["day", "week", "month"],
+  "12m": ["day", "week", "month"],
+  all: ["week", "month"],
+};
+
+// The product default is daily buckets; "all" has no daily reading, so it
+// falls back to weekly ones.
+export function defaultChartUnit(range: ChartRange): ChartUnit {
+  return CHART_UNITS_BY_RANGE[range].includes("day") ? "day" : "week";
+}
+
+// The window a unit needs when the current one cannot carry it. Finer units
+// need a narrower window (hour -> 1 week, day -> 12 months); picking one
+// adjusts the period instead of leaving the option dead, which is what the
+// unit selector used to do. Week fits every window, so it never moves.
+export function rangeSupportingUnit(
+  current: ChartRange,
+  unit: ChartUnit,
+): ChartRange {
+  if (CHART_UNITS_BY_RANGE[current].includes(unit)) {
+    return current;
+  }
+  if (unit === "hour") {
+    return "1w";
+  }
+  if (unit === "day") {
+    return "12m";
+  }
+  return "all";
+}
+
+// Interface density as root font-size multiplier: every rem-based Tailwind
+// size (text, spacing, sidebar width) follows the root font size. The
+// stepper moves in 5% steps within these bounds.
+export const UI_SCALE_MIN = 0.8;
+export const UI_SCALE_MAX = 1.25;
+export const UI_SCALE_STEP = 0.05;
+
+export function isUiScale(value: unknown): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= UI_SCALE_MIN &&
+    value <= UI_SCALE_MAX
+  );
+}
+
+// Snap to the 5% grid (and to whole percents) so repeated steps and stored
+// values never accumulate float drift.
+export function clampUiScale(value: number): number {
+  const snapped = Math.round(value / UI_SCALE_STEP) * UI_SCALE_STEP;
+  const clamped = Math.min(UI_SCALE_MAX, Math.max(UI_SCALE_MIN, snapped));
+  return Math.round(clamped * 100) / 100;
+}
+
 type UserPreferencesStore = {
-  theme: "light" | "dark" | "system";
+  theme: "light" | "dark" | "volt" | "system";
   setTheme: (
-    theme: "light" | "dark" | "system",
+    theme: "light" | "dark" | "volt" | "system",
     coordinates?: { x: number; y: number },
   ) => void;
 
   viewMode: "board" | "list";
   setViewMode: (mode: "board" | "list") => void;
 
-  compactMode: boolean;
-  setCompactMode: (compact: boolean) => void;
+  uiScale: number;
+  setUiScale: (scale: number) => void;
 
   showTaskNumbers: boolean;
   setShowTaskNumbers: (show: boolean) => void;
@@ -48,6 +163,19 @@ type UserPreferencesStore = {
 
   weekStartsOn: WeekStartDay;
   setWeekStartsOn: (weekStartsOn: WeekStartDay) => void;
+
+  projectsSort: ProjectSortMode;
+  setProjectsSort: (mode: ProjectSortMode) => void;
+
+  workspaceSort: WorkspaceSortMode;
+  setWorkspaceSort: (mode: WorkspaceSortMode) => void;
+  workspaceOrder: string[];
+  setWorkspaceOrder: (ids: string[]) => void;
+
+  chartsRange: ChartRange;
+  setChartsRange: (range: ChartRange) => void;
+  chartsUnit: ChartUnit;
+  setChartsUnit: (unit: ChartUnit) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -55,7 +183,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     (set) => ({
       theme: "dark",
       setTheme: (
-        theme: "light" | "dark" | "system",
+        theme: "light" | "dark" | "volt" | "system",
         coordinates?: { x: number; y: number },
       ) => {
         if (coordinates) {
@@ -84,8 +212,8 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       viewMode: "board",
       setViewMode: (mode) => set({ viewMode: mode }),
 
-      compactMode: false,
-      setCompactMode: (compact) => set({ compactMode: compact }),
+      uiScale: 1,
+      setUiScale: (uiScale) => set({ uiScale: clampUiScale(uiScale) }),
 
       showTaskNumbers: true,
       setShowTaskNumbers: (show) => set({ showTaskNumbers: show }),
@@ -128,13 +256,74 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
 
       weekStartsOn: 0,
       setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
+
+      // Alphabetical by default; the stored custom order only applies once
+      // the user explicitly picks it.
+      projectsSort: "name",
+      setProjectsSort: (mode) => set({ projectsSort: mode }),
+
+      workspaceSort: "name",
+      setWorkspaceSort: (mode) => set({ workspaceSort: mode }),
+      workspaceOrder: [],
+      setWorkspaceOrder: (ids) => set({ workspaceOrder: ids }),
+
+      // Default reading: the last month, bucketed by day. The window can be
+      // narrowed to a week or widened to all history.
+      chartsRange: "1m",
+      setChartsRange: (range) => set({ chartsRange: range }),
+      // Daily buckets by default (weekly for "all"); the unit selector refines
+      // them down to the hour or coarsens them up to the month.
+      chartsUnit: "day",
+      setChartsUnit: (unit) => set({ chartsUnit: unit }),
     }),
     {
       name: "user-preferences",
       storage: createJSONStorage(() => localStorage),
+      // The current default window is 1 month; sessions persisted while 6
+      // months, then 3 months, were the defaults still hold one of those. Move
+      // them once so the new default shows, while a window deliberately picked
+      // after the migration is never overridden.
+      version: 1,
+      migrate: (persistedState, version) => {
+        const state = (persistedState ?? {}) as Partial<UserPreferencesStore>;
+        if (
+          version < 1 &&
+          (state.chartsRange === "3m" || state.chartsRange === "6m")
+        ) {
+          state.chartsRange = "1m";
+        }
+        return state as UserPreferencesStore;
+      },
       onRehydrateStorage: () => (state) => {
         if (state && !isWeekStartDay(state.weekStartsOn)) {
           state.setWeekStartsOn(0);
+        }
+        if (state && !isProjectSortMode(state.projectsSort)) {
+          state.setProjectsSort("name");
+        }
+        if (state && !isWorkspaceSortMode(state.workspaceSort)) {
+          state.setWorkspaceSort("name");
+        }
+        if (state && !isUiScale(state.uiScale)) {
+          state.setUiScale(1);
+        }
+        if (state && !Array.isArray(state.workspaceOrder)) {
+          state.setWorkspaceOrder([]);
+        }
+        if (state) {
+          const range = isChartRange(state.chartsRange)
+            ? state.chartsRange
+            : "1m";
+          if (range !== state.chartsRange) {
+            state.setChartsRange(range);
+          }
+          if (!isChartUnit(state.chartsUnit)) {
+            state.setChartsUnit(defaultChartUnit(range));
+          } else if (!CHART_UNITS_BY_RANGE[range].includes(state.chartsUnit)) {
+            // A legacy pair the current tables reject: keep the finer unit the
+            // user picked and widen/narrow the window to one that carries it.
+            state.setChartsRange(rangeSupportingUnit(range, state.chartsUnit));
+          }
         }
       },
     },

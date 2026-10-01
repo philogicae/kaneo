@@ -27,6 +27,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/preview-card";
+import useMoveTaskToAppointments from "@/hooks/mutations/appointment/use-move-task-to-appointments";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
 import useGetCustomFieldValuesByProject from "@/hooks/queries/custom-field/use-get-custom-field-values-by-project";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
@@ -57,6 +58,19 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
 }: BacklogTaskRowProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { mutateAsync: moveTaskToAppointments } = useMoveTaskToAppointments();
+  const handleMoveToAppointments = async (moveTask: Task) => {
+    try {
+      await moveTaskToAppointments({
+        taskId: moveTask.id,
+        projectId: moveTask.projectId,
+      });
+      toast.success(t("appointments:toast.moved"));
+    } catch {
+      toast.error(t("appointments:toast.error"));
+    }
+  };
+
   const {
     attributes,
     listeners,
@@ -311,6 +325,7 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
               worskpaceId: workspace.id,
             }}
             onDeleteClick={() => setIsDeleteTaskModalOpen(true)}
+            onMoveToAppointments={handleMoveToAppointments}
           />
         )}
       </ContextMenu>

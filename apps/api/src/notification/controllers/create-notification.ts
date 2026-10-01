@@ -3,43 +3,40 @@ import db from "../../database";
 import { notificationTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { deliverNotification } from "../../notification-preferences/delivery";
+import { canAccessProject } from "../../utils/access-scope";
 
-import { safeOutboundError } from "../../utils/outbound-request";
-import { canReceiveResourceNotification } from "../resource-access";
-
-export async function persistNotification(
-  {
-    userId,
-    title,
-    content,
-    type,
-    eventData,
-    resourceId,
-    resourceType,
-  }: {
-    userId: string;
-    title?: string | null;
-    content?: string | null;
-    type?: string;
-    eventData?: Record<string, unknown> | null;
-    resourceId?: string;
-    resourceType?: string;
-  },
-  database: Pick<typeof db, "query" | "insert" | "select"> = db,
-) {
-  if (
-    !(await canReceiveResourceNotification(
-      userId,
-      resourceId,
-      resourceType,
-      database,
-    ))
-  ) {
+async function createNotification({
+  userId,
+  title,
+  content,
+  type,
+  eventData,
+  resourceId,
+  resourceType,
+  projectId,
+}: {
+  userId: string;
+  title?: string | null;
+  content?: string | null;
+  type?: string;
+  eventData?: Record<string, unknown> | null;
+  resourceId?: string;
+  resourceType?: string;
+  projectId?: string | null;
+}) {
+  // A project-scoped notification would deep-link to a surface the recipient
+  // is refused on: drop it instead of storing a dead link.
+  if (projectId && !(await canAccessProject(userId, projectId))) {
     return null;
   }
 
+  // Appointments reuse the assignment preference: they are assigned like
+  // tasks and have no status of their own.
   const preferenceKey =
-    type === "task_assignee_changed" || type === "task_created"
+    type === "task_assignee_changed" ||
+    type === "task_created" ||
+    type === "appointment_created" ||
+    type === "appointment_updated"
       ? "taskAssignmentEnabled"
       : type === "task_comment" || type === "task_mention"
         ? "taskCommentEnabled"
@@ -50,17 +47,18 @@ export async function persistNotification(
             : null;
 
   if (preferenceKey) {
-    const preference =
-      await database.query.userNotificationPreferenceTable.findFirst({
+    const preference = await db.query.userNotificationPreferenceTable.findFirst(
+      {
         where: (table, { eq }) => eq(table.userId, userId),
-      });
+      },
+    );
 
     if (preference?.[preferenceKey] === false) {
       return null;
     }
   }
 
-  const [notification] = await database
+  const [notification] = await db
     .insert(notificationTable)
     .values({
       id: createId(),
@@ -74,29 +72,19 @@ export async function persistNotification(
     })
     .returning();
 
-  return notification;
-}
-
-export async function dispatchNotification(
-  notification: typeof notificationTable.$inferSelect,
-) {
-  await publishEvent("notification.created", {
-    notificationId: notification.id,
-    userId: notification.userId,
-  });
-  void deliverNotification(notification.id).catch((error) => {
-    console.error("Failed to deliver notification", {
+  if (notification) {
+    await publishEvent("notification.created", {
       notificationId: notification.id,
-      error: safeOutboundError(error),
+      userId,
     });
-  });
-}
+    void deliverNotification(notification.id).catch((error) => {
+      console.error("Failed to deliver notification", {
+        notificationId: notification.id,
+        error,
+      });
+    });
+  }
 
-async function createNotification(
-  data: Parameters<typeof persistNotification>[0],
-) {
-  const notification = await persistNotification(data);
-  if (notification) await dispatchNotification(notification);
   return notification;
 }
 

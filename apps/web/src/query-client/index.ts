@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/react";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { handleUnauthorized, isUnauthorizedError } from "@/lib/http-error";
 
@@ -24,7 +23,7 @@ function isCancellationError(error: Error): boolean {
   );
 }
 
-// In-module cooldown so an offline tab doesn't fire one Sentry event per cache
+// In-module cooldown so an offline tab doesn't spam one console error per cache
 // entry on every retry tick. Network-class only; API errors are not rate-limited.
 const NETWORK_REPORT_COOLDOWN_MS = 60_000;
 const networkErrorCooldowns = new Map<string, number>();
@@ -50,7 +49,7 @@ function captureCacheError(error: unknown, context: "query" | "mutation") {
     if (networkErrorCooldowns.size > 50) networkErrorCooldowns.clear();
   }
 
-  Sentry.captureException(error, { tags: { area } });
+  console.error(`Query cache ${area} error:`, error);
 }
 
 const queryClient = new QueryClient({

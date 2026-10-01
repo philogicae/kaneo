@@ -1,5 +1,6 @@
 import { addWeeks, endOfWeek, isWithinInterval, startOfWeek } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { taskMatchesTextQuery } from "@/lib/task-search";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 import type { ProjectWithTasks } from "@/types/project";
 import type Task from "@/types/task";
@@ -65,12 +66,15 @@ export function useTaskFiltersWithLabelsSupport(
   project: ProjectWithTasks | null | undefined,
   projectId?: string,
   textQuery?: string,
-  descriptionMatches?: ReadonlySet<string>,
 ) {
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
   const storageKey = projectId ? `kaneo:board-filters:${projectId}` : null;
   const [filters, setFilters] = useState<BoardFilters>(DEFAULT_FILTERS);
   const { getValuesForTask } = useGetCachedCustomFieldValues();
+  // StrictMode remounts effects on the first commit: without this gate the
+  // write effect would clobber the stored value with the default before the
+  // read effect restored it (filters reset on every dev reload).
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (!storageKey || typeof window === "undefined") return;
@@ -86,43 +90,26 @@ export function useTaskFiltersWithLabelsSupport(
       setFilters(normalizeFilters(parsed));
     } catch {
       setFilters(DEFAULT_FILTERS);
+    } finally {
+      setHydrated(true);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (!storageKey || typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(filters));
-    } catch {
-      // Storage may be unavailable or full; keep filters working in memory.
-    }
-  }, [filters, storageKey]);
+    if (!hydrated || !storageKey || typeof window === "undefined") return;
+    window.localStorage.setItem(storageKey, JSON.stringify(filters));
+  }, [filters, storageKey, hydrated]);
 
   const filterTasks = useCallback(
     (tasks: Task[]): Task[] => {
       const normalizedTextQuery = textQuery?.trim().toLowerCase();
 
       return tasks.filter((task) => {
-        if (normalizedTextQuery) {
-          const title = task.title?.toLowerCase() ?? "";
-          const description = task.description?.toLowerCase() ?? "";
-          const taskNumber = task.number?.toString() ?? "";
-          const taskIdentifier =
-            taskNumber && project?.slug
-              ? `${project.slug}-${taskNumber}`.toLowerCase()
-              : "";
-          const taskShortIdentifier = taskNumber ? `#${taskNumber}` : "";
-          const matchesText =
-            descriptionMatches?.has(task.id) ||
-            title.includes(normalizedTextQuery) ||
-            description.includes(normalizedTextQuery) ||
-            taskNumber.includes(normalizedTextQuery) ||
-            taskIdentifier.startsWith(normalizedTextQuery) ||
-            taskShortIdentifier.startsWith(normalizedTextQuery);
-
-          if (!matchesText) {
-            return false;
-          }
+        if (
+          normalizedTextQuery &&
+          !taskMatchesTextQuery(task, normalizedTextQuery, project?.slug)
+        ) {
+          return false;
         }
 
         if (
@@ -239,14 +226,7 @@ export function useTaskFiltersWithLabelsSupport(
         return true;
       });
     },
-    [
-      filters,
-      project?.slug,
-      textQuery,
-      weekStartsOn,
-      getValuesForTask,
-      descriptionMatches,
-    ],
+    [filters, project?.slug, textQuery, weekStartsOn, getValuesForTask],
   );
 
   const filteredProject = useMemo(() => {

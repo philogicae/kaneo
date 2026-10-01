@@ -1,28 +1,28 @@
-import { extractAssetIds } from "../../storage/cleanup-assets";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, max } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
-  assetTable,
   columnTable,
   customFieldDefinitionTable,
   customFieldValueTable,
   taskTable,
-  projectTable,
   userTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
+import { isJevEnabled } from "../../jev/client";
 import {
-  assertAssignableUser,
-  getProjectWorkspaceId,
-} from "../../utils/assert-assignable-user";
+  suggestTaskQualification,
+  type TaskQualification,
+} from "../../jev/qualify";
+import createLabel from "../../label/controllers/create-label";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
+import type { RecurrenceRule } from "../recurrence";
 import {
   assertRequiredCustomFields,
   assertValidTaskStatus,
-  isCustomFieldValueEmpty,
 } from "../validate-task-fields";
 import { claimTaskNumber } from "./claim-task-numbers";
-import { nextTaskPosition } from "./next-task-position";
+import { loadQualificationContext } from "./qualify-task";
 
 type CustomFieldInput = {
   fieldId: string;
@@ -45,6 +45,40 @@ function deduplicateCustomFields(
   return Array.from(fieldsById.values());
 }
 
+// Suggested labels are attached as task-scoped copies through the regular
+// label controller, so events and GitHub/Gitea syncs stay the same. A failed
+// label must not fail the creation.
+async function attachQualificationLabels(
+  qualification: TaskQualification | null,
+  taskId: string,
+  workspaceId: string | undefined,
+  userId: string,
+): Promise<Array<{ id: string; name: string; color: string }>> {
+  if (!qualification || !workspaceId) {
+    return [];
+  }
+
+  const labels: Array<{ id: string; name: string; color: string }> = [];
+  for (const suggestion of qualification.labels) {
+    try {
+      const label = await createLabel(
+        suggestion.name,
+        suggestion.color,
+        taskId,
+        workspaceId,
+        userId,
+      );
+      labels.push({ id: label.id, name: label.name, color: label.color });
+    } catch (error) {
+      console.error(
+        `Failed to attach suggested label "${suggestion.name}":`,
+        error,
+      );
+    }
+  }
+  return labels;
+}
+
 async function createTask({
   projectId,
   currentUserId,
@@ -56,7 +90,9 @@ async function createTask({
   description,
   priority,
   customFields,
-  draftAssetIds,
+  reminderOffsets,
+  recurrence,
+  qualify = false,
 }: {
   projectId: string;
   currentUserId: string;
@@ -68,13 +104,34 @@ async function createTask({
   description?: string;
   priority?: string;
   customFields?: CustomFieldInput[];
-  draftAssetIds?: string[];
+  reminderOffsets?: number[] | null;
+  recurrence?: RecurrenceRule | null;
+  qualify?: boolean;
 }) {
   const resolvedStatus = status || "to-do";
-  const resolvedPriority = priority || "no-priority";
   const normalizedCustomFields = deduplicateCustomFields(customFields);
 
   const normalizedUserId = userId?.trim() || undefined;
+
+  // Auto-qualification (opt-in per caller, so internal clones such as
+  // recurrence occurrences keep their source values): Jev reads the task and
+  // picks the priority and semantic labels when a TypeSafe key is configured.
+  let qualification: TaskQualification | null = null;
+  let workspaceId: string | undefined;
+  if (qualify && isJevEnabled()) {
+    const context = await loadQualificationContext(projectId);
+    workspaceId = context.workspaceId;
+    qualification = await suggestTaskQualification({
+      title,
+      description,
+      projectName: context.projectName,
+      workspaceName: context.workspaceName,
+      labels: context.labels,
+      providedPriority: priority,
+    });
+  }
+
+  const resolvedPriority = qualification?.priority ?? priority ?? "no-priority";
 
   await assertValidTaskStatus(resolvedStatus, projectId);
 
@@ -91,15 +148,7 @@ async function createTask({
       !providedFieldIds.has(field.id) &&
       field.required &&
       field.defaultValue != null &&
-      !isCustomFieldValueEmpty(
-        field.defaultValue,
-        field.type as
-          | "number"
-          | "boolean"
-          | "date"
-          | "dropdown"
-          | "multiselect",
-      )
+      field.defaultValue.trim() !== ""
     ) {
       mergedCustomFields.push({
         fieldId: field.id,
@@ -113,10 +162,7 @@ async function createTask({
   let assignee: { name: string } | undefined;
 
   if (normalizedUserId) {
-    await assertAssignableUser(
-      normalizedUserId,
-      await getProjectWorkspaceId(projectId),
-    );
+    await assertAssignableUser(normalizedUserId, projectId);
 
     [assignee] = await db
       .select({ name: userTable.name })
@@ -131,14 +177,22 @@ async function createTask({
     ),
   });
 
+  const [maxPositionResult] = await db
+    .select({ maxPosition: max(taskTable.position) })
+    .from(taskTable)
+    .where(
+      and(
+        eq(taskTable.projectId, projectId),
+        column?.id
+          ? eq(taskTable.columnId, column.id)
+          : eq(taskTable.status, resolvedStatus),
+      ),
+    );
+
+  const nextPosition = (maxPositionResult?.maxPosition ?? 0) + 1;
+
   const createdTask = await db.transaction(async (tx) => {
     const taskNumber = await claimTaskNumber(projectId, tx);
-    const nextPosition = await nextTaskPosition(
-      tx,
-      projectId,
-      resolvedStatus,
-      column?.id ?? null,
-    );
 
     const [task] = await tx
       .insert(taskTable)
@@ -150,50 +204,14 @@ async function createTask({
         columnId: column?.id ?? null,
         startDate: startDate || null,
         dueDate: dueDate || null,
+        reminderOffsets: reminderOffsets ?? null,
+        recurrence: recurrence ?? null,
         description: description || "",
         priority: resolvedPriority,
         number: taskNumber,
         position: nextPosition,
       })
       .returning();
-
-    if (task && draftAssetIds?.length) {
-      const referenced = extractAssetIds(description);
-      const ids = [...new Set(draftAssetIds)].filter((id) =>
-        referenced.has(id),
-      );
-      if (ids.length) {
-        // claimTaskNumber already holds the project row lock in this transaction.
-        const project = await tx.query.projectTable.findFirst({
-          columns: { workspaceId: true },
-          where: eq(projectTable.id, projectId),
-        });
-        if (!project)
-          throw new HTTPException(404, { message: "Project not found" });
-        const claimed = await tx
-          .update(assetTable)
-          .set({
-            taskId: task.id,
-            surface: "description",
-            workspaceId: project.workspaceId,
-          })
-          .where(
-            and(
-              inArray(assetTable.id, ids),
-              eq(assetTable.projectId, projectId),
-              eq(assetTable.createdBy, currentUserId),
-              eq(assetTable.surface, "draft"),
-              isNull(assetTable.taskId),
-            ),
-          )
-          .returning({ id: assetTable.id });
-        if (claimed.length !== ids.length)
-          throw new HTTPException(400, {
-            message:
-              "Some staged uploads are unavailable or belong to another owner/project",
-          });
-      }
-    }
 
     if (task && mergedCustomFields.length) {
       await tx.insert(customFieldValueTable).values(
@@ -223,9 +241,19 @@ async function createTask({
     content: null,
   });
 
+  // The qualification labels are attached after the task exists; the returned
+  // task carries them so callers see what was applied.
+  const labels = await attachQualificationLabels(
+    qualification,
+    createdTask.id,
+    workspaceId,
+    currentUserId,
+  );
+
   return {
     ...createdTask,
     assigneeName: assignee?.name,
+    labels,
   };
 }
 

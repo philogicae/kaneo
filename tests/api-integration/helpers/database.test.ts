@@ -82,13 +82,13 @@ async function seedTaskReminderSentRow(): Promise<string> {
 }
 
 async function rowExists(tableName: string, id: string): Promise<boolean> {
-  const result = await db.execute<{ exists: boolean }>(sql`
+  const rows = await db.all<{ present: number }>(sql`
     SELECT EXISTS (
-      SELECT 1 FROM ${sql.raw(`"${tableName}"`)}
+      SELECT 1 FROM ${sql.identifier(tableName)}
       WHERE id = ${id}
-    ) AS exists
+    ) AS present
   `);
-  return result.rows[0]?.exists === true;
+  return Number(rows[0]?.present) === 1;
 }
 
 describe("resetTestDatabase", () => {
@@ -125,14 +125,14 @@ describe("resetTestDatabase", () => {
     const id = `row-${randomUUID()}`;
     const quoted = `"${tableName}"`;
 
-    await db.execute(
+    await db.run(
       sql.raw(
         `CREATE TABLE ${quoted} (id text PRIMARY KEY, label text NOT NULL)`,
       ),
     );
 
     try {
-      await db.execute(
+      await db.run(
         sql.raw(`INSERT INTO ${quoted} (id, label) VALUES ('${id}', 'seed')`),
       );
 
@@ -140,7 +140,7 @@ describe("resetTestDatabase", () => {
 
       expect(await rowExists(tableName, id)).toBe(false);
     } finally {
-      await db.execute(sql.raw(`DROP TABLE ${quoted}`));
+      await db.run(sql.raw(`DROP TABLE ${quoted}`));
     }
   });
 });

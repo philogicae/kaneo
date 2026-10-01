@@ -45,15 +45,21 @@ export async function nextTaskPosition(
       message: "Task column has reached its capacity",
     });
   }
-  await tx.execute(sql`
-    WITH ranked AS (
-      SELECT ${taskTable.id} AS id,
-        row_number() OVER (ORDER BY ${taskTable.position}, ${taskTable.createdAt}, ${taskTable.id}) AS position
-      FROM ${taskTable}
-      WHERE ${scope}
+  // SQLite has no UPDATE ... FROM, so rank in a subquery and correlate the
+  // update on the row number. run() rather than execute() is the libsql idiom.
+  await tx.run(sql`
+    UPDATE ${taskTable} SET position = (
+      SELECT ranked.position FROM (
+        SELECT ${taskTable.id} AS id,
+          row_number() OVER (
+            ORDER BY ${taskTable.position}, ${taskTable.createdAt}, ${taskTable.id}
+          ) - 1 AS position
+        FROM ${taskTable}
+        WHERE ${scope}
+      ) AS ranked
+      WHERE ranked.id = ${taskTable.id}
     )
-    UPDATE ${taskTable} SET position = ranked.position::integer
-    FROM ranked WHERE ${taskTable.id} = ranked.id
+    WHERE ${scope}
   `);
   return total + 1;
 }

@@ -72,8 +72,7 @@ export async function verifyApiKey(
           ),
         ),
       )
-      .limit(1)
-      .for("update");
+      .limit(1);
 
     if (!apiKey) {
       return null;

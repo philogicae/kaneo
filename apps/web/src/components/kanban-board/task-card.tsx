@@ -6,12 +6,13 @@ import {
   Calendar,
   CalendarClock,
   CalendarX,
+  GitMerge,
+  GitPullRequest,
   SlidersHorizontal,
+  SquareCheck,
 } from "lucide-react";
 import { type CSSProperties, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TaskProgressBadges } from "@/components/task/task-progress-badges";
-import { TaskPullRequests } from "@/components/task/task-pull-requests";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -33,13 +34,15 @@ import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
 import useGetCustomFieldValuesByProject from "@/hooks/queries/custom-field/use-get-custom-field-values-by-project";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
+import { cn } from "@/lib/cn";
 import {
   dueDateStatusColors,
   getDueDateStatus,
   isTaskCompleted,
 } from "@/lib/due-date-status";
 import { getInitials } from "@/lib/get-initials";
-import { getPriorityIcon } from "@/lib/priority";
+import { getTaskItemStats } from "@/lib/get-task-item-stats";
+import { getPriorityBorderClass, getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
@@ -50,10 +53,12 @@ import { TaskLabels } from "./task-labels";
 
 type TaskCardProps = {
   task: Task;
-  disableDragDrop?: boolean;
+  // While the board is grouped, cards are read-only: groups mix tasks from
+  // several status columns, so a drop would have no unambiguous meaning.
+  dragDisabled?: boolean;
 };
 
-function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
+function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
   const { t } = useTranslation();
   const {
     attributes,
@@ -62,7 +67,7 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id, disabled: disableDragDrop });
+  } = useSortable({ id: task.id, disabled: dragDisabled });
   const { project } = useProjectStore();
   const taskIsCompleted = isTaskCompleted(task.status, project?.columns);
   const { data: workspace } = useActiveWorkspace();
@@ -70,15 +75,52 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
   const navigate = useNavigate();
   const {
     showAssignees,
-    showPriority,
     showDueDates,
     showLabels,
     showTaskNumbers,
+    showTaskItemCounts,
   } = useUserPreferencesStore();
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
   const { toggleSelection, isSelected, isFocused } = useBulkSelectionStore();
   const isTaskSelected = isSelected(task.id);
   const isTaskFocused = isFocused(task.id);
+  const taskItemStats = useMemo(
+    () => getTaskItemStats(task.description),
+    [task.description],
+  );
+
+  const pullRequests = useMemo(() => {
+    return (task.externalLinks ?? []).filter(
+      (link) => link.resourceType === "pull_request",
+    );
+  }, [task.externalLinks]);
+
+  const getPRInfo = (pr: (typeof pullRequests)[number]) => {
+    const isMerged = pr.metadata?.merged === true;
+    const isDraft = pr.metadata?.draft === true;
+
+    if (isMerged) {
+      return {
+        icon: <GitMerge className="h-3 w-3 text-info-foreground" />,
+        status: t("tasks:pr.merged"),
+        statusClass: "text-info-foreground",
+      };
+    }
+
+    if (isDraft) {
+      return {
+        icon: <GitPullRequest className="h-3 w-3 text-muted-foreground" />,
+        status: t("tasks:pr.draft"),
+        statusClass: "text-muted-foreground",
+      };
+    }
+
+    return {
+      icon: <GitPullRequest className="h-3 w-3 text-success-foreground" />,
+      status: t("tasks:pr.open"),
+      statusClass: "text-success-foreground",
+    };
+  };
 
   const { data: projectCustomFieldValues = [] } =
     useGetCustomFieldValuesByProject(task.projectId);
@@ -93,18 +135,9 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
 
   const activeCustomFieldValues = useMemo(
     () =>
-      customFieldValues.filter((field) => {
-        if (field.value === null || field.value === "") return false;
-        if (field.fieldType === "multiselect") {
-          try {
-            const parsed = JSON.parse(field.value);
-            return Array.isArray(parsed) && parsed.length > 0;
-          } catch {
-            return false;
-          }
-        }
-        return true;
-      }),
+      customFieldValues.filter(
+        (field) => field.value !== null && field.value !== "",
+      ),
     [customFieldValues],
   );
 
@@ -171,22 +204,29 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    // Drag wiring is skipped when grouping disables card dragging, so the
+    // card keeps its normal accessibility without dnd-kit's aria-disabled
+    // state.
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...(dragDisabled ? {} : { ...attributes, ...listeners })}
+    >
       <ContextMenu>
         <ContextMenuTrigger asChild>
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- false positive for onClick and onKeyDown */}
           <div
             onClick={handleTaskCardClick}
             className={`group relative rounded-lg border bg-background p-3 shadow-xs/5 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98] ${
-              disableDragDrop ? "cursor-default" : "cursor-move"
+              dragDisabled ? "cursor-default" : "cursor-move"
             } ${
               isDragging
                 ? "border-ring/40 bg-card shadow-lg"
-                : "hover:border-border/90 hover:bg-background hover:shadow-sm"
+                : "hover:bg-background hover:shadow-sm"
             } ${
               isTaskSelected
                 ? "border-ring/40 bg-accent/50 shadow-sm ring-1 ring-inset ring-ring/30"
-                : "border-border"
+                : getPriorityBorderClass(task.priority ?? "")
             } ${isTaskFocused ? "ring-2 ring-inset ring-ring/50" : ""}`}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -202,34 +242,29 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
               </div>
             )}
 
-            {showAssignees && (
-              <div className="absolute top-3 right-3">
-                {task.userId ? (
-                  <Avatar className="h-5 w-5">
-                    <AvatarImage
-                      src={assignee?.user?.image ?? ""}
-                      alt={assignee?.user?.name || ""}
-                    />
-                    <AvatarFallback className="text-xs font-medium border border-border/30">
-                      {getInitials(assignee?.user?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <div
-                    className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-muted"
-                    title={t("tasks:assignee.unassigned")}
-                  >
-                    <span className="text-[10px] font-medium text-muted-foreground">
-                      ?
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+            {/*
+              Top-right cluster: assignee first, then the priority mark. The
+              old bottom priority chip is gone — this is the only priority
+              indicator on the card now.
+             */}
+            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+              {showAssignees && task.userId && (
+                <Avatar className="h-5 w-5">
+                  <AvatarImage
+                    src={assignee?.user?.image ?? ""}
+                    alt={assignee?.user?.name || ""}
+                  />
+                  <AvatarFallback className="text-xs font-medium border border-border/30">
+                    {getInitials(assignee?.user?.name)}
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              {getPriorityIcon(task.priority ?? "")}
+            </div>
 
             <div className="mb-2.5 pr-6">
               <div
-                className="overflow-hidden break-words leading-5 font-medium text-foreground/95 text-[15px]"
+                className="overflow-hidden wrap-break-word leading-5 font-medium text-foreground/95 text-[15px]"
                 style={{
                   display: "-webkit-box",
                   WebkitLineClamp: 3,
@@ -248,13 +283,7 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
               </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-1.5">
-              {showPriority && (
-                <span className="inline-flex items-center gap-1 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground h-5.5">
-                  {getPriorityIcon(task.priority ?? "")}
-                </span>
-              )}
-
+            <div className="flex items-center gap-1.5">
               {activeCustomFieldValues.length > 0 && (
                 <HoverCard openDelay={200} closeDelay={100}>
                   <HoverCardTrigger asChild>
@@ -284,43 +313,37 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
                     onPointerDown={(e) => e.stopPropagation()}
                   >
                     <div className="space-y-1.5">
-                      {activeCustomFieldValues.map((field) => {
-                        const value = field.value;
-
-                        if (!value) return null;
-
-                        let displayValue: string = value;
-                        if (field.fieldType === "multiselect") {
-                          try {
-                            const parsed = JSON.parse(value);
-                            if (Array.isArray(parsed)) {
-                              displayValue = parsed.join(", ");
-                            }
-                          } catch {
-                            displayValue = value;
-                          }
-                        }
-
-                        return (
-                          <div
-                            key={field.id}
-                            className="flex items-center justify-between gap-2 text-xs"
-                          >
-                            <span className="font-medium text-muted-foreground truncate">
-                              {field.fieldName}
-                            </span>
-                            <span className="text-foreground truncate max-w-24">
-                              {displayValue}
-                            </span>
-                          </div>
-                        );
-                      })}
+                      {activeCustomFieldValues.map((field) => (
+                        <div
+                          key={field.id}
+                          className="flex items-center justify-between gap-2 text-xs"
+                        >
+                          <span className="font-medium text-muted-foreground truncate">
+                            {field.fieldName}
+                          </span>
+                          <span className="text-foreground truncate max-w-24">
+                            {field.value}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </HoverCardContent>
                 </HoverCard>
               )}
-
-              <TaskProgressBadges task={task} />
+              {showTaskItemCounts && taskItemStats.total > 0 && (
+                <span
+                  className={cn(
+                    "flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-muted/50 text-muted-foreground h-5.5",
+                    {
+                      "bg-success/10 text-success-foreground":
+                        taskItemStats.completed === taskItemStats.total,
+                    },
+                  )}
+                >
+                  <SquareCheck className="h-3 w-3" />
+                  {taskItemStats.completed}/{taskItemStats.total}
+                </span>
+              )}
 
               {showDueDates && task.dueDate && (
                 <div
@@ -338,7 +361,114 @@ function TaskCard({ task, disableDragDrop = false }: TaskCardProps) {
                 </div>
               )}
 
-              <TaskPullRequests externalLinks={task.externalLinks} />
+              {pullRequests.length === 1 && (
+                <HoverCard openDelay={200} closeDelay={100}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(pullRequests[0].url, "_blank");
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground"
+                    >
+                      {getPRInfo(pullRequests[0]).icon}
+                      <span>#{pullRequests[0].externalId}</span>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    className="w-72 p-3"
+                    side="bottom"
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {getPRInfo(pullRequests[0]).icon}
+                        <span>{getPRInfo(pullRequests[0]).status}</span>
+                        <span className="text-muted-foreground/50">•</span>
+                        <span>#{pullRequests[0].externalId}</span>
+                      </div>
+                      <p className="text-sm font-medium leading-snug">
+                        {pullRequests[0].title || t("tasks:pr.label")}
+                      </p>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              )}
+
+              {pullRequests.length > 1 &&
+                (() => {
+                  const hasOpen = pullRequests.some(
+                    (pr) => !pr.metadata?.merged && !pr.metadata?.draft,
+                  );
+                  const allMerged = pullRequests.every(
+                    (pr) => pr.metadata?.merged,
+                  );
+                  const iconColor = allMerged
+                    ? "text-info-foreground"
+                    : hasOpen
+                      ? "text-success-foreground"
+                      : "text-muted-foreground";
+
+                  return (
+                    <HoverCard openDelay={200} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground"
+                        >
+                          <GitPullRequest className={`h-3 w-3 ${iconColor}`} />
+                          <span>
+                            {t("tasks:pr.count", {
+                              count: pullRequests.length,
+                            })}
+                          </span>
+                        </button>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        className="w-auto min-w-56 max-w-96 p-1"
+                        side="bottom"
+                        onClick={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                      >
+                        {pullRequests.map((pr, index) => {
+                          const prInfo = getPRInfo(pr);
+                          const repoMatch = pr.url.match(
+                            /github\.com\/([^/]+\/[^/]+)\/pull/,
+                          );
+                          const repoName = repoMatch ? repoMatch[1] : null;
+                          return (
+                            <div key={pr.id}>
+                              {index > 0 && (
+                                <hr className="border-border my-1" />
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => window.open(pr.url, "_blank")}
+                                className="w-full px-2 py-1.5 text-left hover:bg-muted/50 rounded transition-colors"
+                              >
+                                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                                  {prInfo.icon}
+                                  <span>
+                                    {repoName}#{pr.externalId}
+                                  </span>
+                                </div>
+                                <p className="text-xs leading-tight line-clamp-2 mt-0.5">
+                                  {pr.title || t("tasks:pr.label")}
+                                </p>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {prInfo.status}
+                                </span>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </HoverCardContent>
+                    </HoverCard>
+                  );
+                })()}
             </div>
           </div>
         </ContextMenuTrigger>

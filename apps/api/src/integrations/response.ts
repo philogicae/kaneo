@@ -11,6 +11,14 @@ export const integrationEventsSchema = z
   })
   .openapi("IntegrationEvents");
 
+// Discord, Slack and the per-project Telegram integration separate comments
+// from @mentions, so their event filter carries one extra key.
+export const mentionIntegrationEventsSchema = integrationEventsSchema
+  .extend({
+    taskMentionCreated: z.boolean(),
+  })
+  .openapi("MentionIntegrationEvents");
+
 export const genericWebhookEventsSchema = integrationEventsSchema
   .extend({
     taskDeleted: z.boolean(),

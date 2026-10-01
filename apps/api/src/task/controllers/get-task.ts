@@ -26,9 +26,12 @@ async function getTask(taskId: string, board = false) {
           }
         : {}),
       status: taskTable.status,
+      milestoneId: taskTable.milestoneId,
       priority: taskTable.priority,
       startDate: taskTable.startDate,
       dueDate: taskTable.dueDate,
+      reminderOffsets: taskTable.reminderOffsets,
+      recurrence: taskTable.recurrence,
       position: taskTable.position,
       createdAt: taskTable.createdAt,
       userId: taskTable.userId,

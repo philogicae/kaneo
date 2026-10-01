@@ -16,13 +16,13 @@ type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 async function sweepExpired(dbOrTx: typeof db | Transaction) {
   // Never issue an unbounded delete or evict a live consent request. Fixed
   // rate-counter rows are reused rather than accumulated per time window.
-  // Drizzle stores these timezone-less timestamps as UTC; compare in UTC too.
-  await dbOrTx.execute(sql`
+  // Drizzle stores these timezone-less timestamps as epoch milliseconds, and
+  // SQLite serialises writers, so the sweep needs no row lock.
+  await dbOrTx.run(sql`
     DELETE FROM ${mcpOauthStateTable} WHERE id IN (
       SELECT id FROM ${mcpOauthStateTable}
-      WHERE kind <> 'rate' AND expires_at <= (now() AT TIME ZONE 'UTC')
+      WHERE kind <> 'rate' AND expires_at <= ${Date.now()}
       ORDER BY expires_at LIMIT ${EXPIRED_STATE_BATCH}
-      FOR UPDATE SKIP LOCKED
     )
   `);
 }

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { HTTPException } from "hono/http-exception";
 import { and, eq, sql } from "drizzle-orm";
 import db from "../database";
+import { withLease } from "../database/lease";
 import {
   assetTable,
   jobLeaseTable,
@@ -105,12 +106,16 @@ export async function withStorageObject<T>(
     tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
   ) => Promise<T>,
 ): Promise<T> {
-  return db.transaction(async (tx) => {
-    await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(hashtext('storage-object'), hashtext(${objectKey}))`,
-    );
-    return apply(tx);
-  });
+  // SQLite serialises writers, so the transaction itself is the lock; the lease
+  // only keeps a second caller from starting a competing transaction.
+  return withLease(
+    `storage-object:${objectKey}`,
+    () =>
+      db.transaction(async (tx) => {
+        return apply(tx);
+      }),
+    { busy: () => new Error(`Storage object ${objectKey} is busy`) },
+  );
 }
 
 // A durable lease protects the object while verification runs without a pooled connection.

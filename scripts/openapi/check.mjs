@@ -13,6 +13,7 @@ import { join, resolve } from "node:path";
 const COMMITTED = resolve("apps/docs/openapi.json");
 const FIX = process.argv.includes("--fix");
 // Invoke pnpm through Node so Windows paths and arguments never pass through cmd.exe.
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: this entrypoint runs outside Turbo's task cache.
 const packageManager = process.env.npm_execpath;
 if (!packageManager) {
   throw new Error(
@@ -21,25 +22,21 @@ if (!packageManager) {
 }
 const RUN = {
   stdio: ["ignore", "ignore", "inherit"],
-  env: {
-    ...process.env,
-    AUTH_SECRET: "openapi-export-only-secret-not-for-serving",
-  },
 };
 
-// Standalone pnpm (@pnpm/exe) exposes a native binary as npm_execpath, which Node cannot load.
-const runsViaNode = /\.[cm]?js$/.test(packageManager);
-function pnpm(args) {
-  if (runsViaNode) {
-    execFileSync(process.execPath, [packageManager, ...args], RUN);
-  } else {
-    execFileSync(packageManager, args, RUN);
-  }
-}
+// npm_execpath is a JS entrypoint for npm-installed pnpm but a native binary
+// for standalone installs; only the former can be exec'd through Node.
+const pnpmIsJavaScript = /\.(c|m)?js$/.test(packageManager);
+const runPnpm = (args) =>
+  execFileSync(
+    pnpmIsJavaScript ? process.execPath : packageManager,
+    pnpmIsJavaScript ? [packageManager, ...args] : args,
+    RUN,
+  );
 
 function generate(into) {
-  pnpm(["exec", "vp", "run", "--filter", "@kaneo/api^...", "build"]);
-  pnpm([
+  runPnpm(["turbo", "build", "--filter=@kaneo/api^..."]);
+  runPnpm([
     "--filter",
     "@kaneo/api",
     "exec",

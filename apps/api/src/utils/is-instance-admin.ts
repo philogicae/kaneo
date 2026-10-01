@@ -2,24 +2,25 @@ import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import db from "../database";
 import { userTable } from "../database/schema";
-import { hasInstanceAdminRole } from "./instance-admin-role";
 
-export { hasInstanceAdminRole };
-
-export async function isInstanceAdmin(c: Context): Promise<boolean> {
-  const user = c.get("user") as { role?: string | null } | null | undefined;
-  if (user?.role) {
-    return hasInstanceAdminRole(user.role);
-  }
-
-  const userId = c.get("userId");
-  if (!userId) return false;
-
+export async function isInstanceAdminUser(userId: string): Promise<boolean> {
   const [row] = await db
     .select({ role: userTable.role })
     .from(userTable)
     .where(eq(userTable.id, userId))
     .limit(1);
 
-  return hasInstanceAdminRole(row?.role);
+  return row?.role === "admin";
+}
+
+export async function isInstanceAdmin(c: Context): Promise<boolean> {
+  const user = c.get("user") as { role?: string | null } | null | undefined;
+  if (user?.role) {
+    return user.role === "admin";
+  }
+
+  const userId = c.get("userId");
+  if (!userId) return false;
+
+  return isInstanceAdminUser(userId);
 }

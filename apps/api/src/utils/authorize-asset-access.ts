@@ -1,32 +1,36 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { canAccessProject } from "./access-scope";
 import { resolveAssetBearerOrCookie } from "./authenticate-api-request";
 import { validateWorkspaceAccess } from "./validate-workspace-access";
 
 type AssetAccessTarget = {
   workspaceId: string;
+  projectId: string;
   isPublic: boolean | null;
-  surface: string;
-  createdBy?: string | null;
 };
 
-/** Only description assets belong to the public project representation. */
-export function isPublicAsset(asset: AssetAccessTarget): boolean {
-  return asset.isPublic === true && asset.surface === "description";
-}
-
+/**
+ * Authorizes a request for a stored asset.
+ *
+ * Assets that belong to a public project are readable by anyone, so the
+ * credential check must be skipped entirely for them:
+ * `resolveAssetBearerOrCookie` throws a 401 for anonymous callers rather than
+ * returning an empty user, so calling it first makes the public case
+ * unreachable.
+ */
 export async function authorizeAssetAccess(
   c: Context,
   asset: AssetAccessTarget,
 ): Promise<void> {
-  if (isPublicAsset(asset)) {
+  if (asset.isPublic) {
     return;
   }
 
   const { userId, apiKeyId } = await resolveAssetBearerOrCookie(c);
-  if (asset.surface.startsWith("draft") && asset.createdBy !== userId)
-    throw new HTTPException(403, {
-      message: "Staged uploads are private to their owner",
-    });
   await validateWorkspaceAccess(userId, asset.workspaceId, apiKeyId);
+
+  if (!(await canAccessProject(userId, asset.projectId))) {
+    throw new HTTPException(403, { message: "No access to this asset" });
+  }
 }

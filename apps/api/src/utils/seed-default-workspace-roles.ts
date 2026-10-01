@@ -1,5 +1,5 @@
 import { DEFAULT_ROLE_NAMES, defaultRolePayloads } from "@kaneo/permissions";
-import { and, inArray, sql } from "drizzle-orm";
+import { and, inArray } from "drizzle-orm";
 import db, { schema } from "../database";
 
 /**
@@ -18,24 +18,6 @@ import db, { schema } from "../database";
  */
 export async function seedDefaultWorkspaceRoles() {
   try {
-    const tableExists = await db.execute(sql`
-      SELECT EXISTS (
-        SELECT 1
-        FROM information_schema.tables
-        WHERE table_name = 'workspace_role'
-      ) AS exists;
-    `);
-
-    const exists =
-      tableExists.rows[0]?.exists === true ||
-      tableExists.rows[0]?.exists === "t";
-    if (!exists) {
-      console.log(
-        "🛈 workspace_role table does not exist; skipping default-role seed.",
-      );
-      return;
-    }
-
     const workspaces = await db
       .select({ id: schema.workspaceTable.id })
       .from(schema.workspaceTable);

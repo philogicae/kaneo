@@ -74,8 +74,7 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
       const [current] = await tx
         .select()
         .from(integrationTable)
-        .where(eq(integrationTable.id, integration.id))
-        .for("update");
+        .where(eq(integrationTable.id, integration.id));
       if (!current?.isActive || current.config !== integration.config)
         return null;
       const existingLink = await findExternalLink(

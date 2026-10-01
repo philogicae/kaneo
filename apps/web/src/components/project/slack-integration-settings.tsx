@@ -32,6 +32,7 @@ type SlackIntegrationFormValues = {
   taskTitleChanged: boolean;
   taskDescriptionChanged: boolean;
   taskCommentCreated: boolean;
+  taskMentionCreated: boolean;
 };
 
 function EventToggle({
@@ -48,6 +49,7 @@ function EventToggle({
     | "taskTitleChanged"
     | "taskDescriptionChanged"
     | "taskCommentCreated"
+    | "taskMentionCreated"
   >;
   label: string;
 }) {
@@ -92,6 +94,7 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
         taskTitleChanged: z.boolean(),
         taskDescriptionChanged: z.boolean(),
         taskCommentCreated: z.boolean(),
+        taskMentionCreated: z.boolean(),
       }),
     [],
   );
@@ -114,6 +117,7 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
       taskDescriptionChanged:
         integration?.events?.taskDescriptionChanged ?? false,
       taskCommentCreated: integration?.events?.taskCommentCreated ?? true,
+      taskMentionCreated: integration?.events?.taskMentionCreated ?? true,
     }),
     [integration],
   );
@@ -129,6 +133,7 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
       taskTitleChanged: false,
       taskDescriptionChanged: false,
       taskCommentCreated: true,
+      taskMentionCreated: true,
     },
   });
   const { reset } = form;
@@ -157,6 +162,7 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
         taskTitleChanged: values.taskTitleChanged,
         taskDescriptionChanged: values.taskDescriptionChanged,
         taskCommentCreated: values.taskCommentCreated,
+        taskMentionCreated: values.taskMentionCreated,
       };
 
       if (!isConnected) {
@@ -239,6 +245,7 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
         taskTitleChanged: false,
         taskDescriptionChanged: false,
         taskCommentCreated: true,
+        taskMentionCreated: true,
       });
       toast.success(t("settings:slackIntegration.toast.removed"));
     } catch (error) {
@@ -287,7 +294,7 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
               <div className="flex items-center gap-3">
                 {isConnected && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="size-4 text-green-600" />
+                    <CheckCircle className="size-4 text-success-foreground" />
                     <span>
                       {integration?.isActive
                         ? t("settings:slackIntegration.connected")
@@ -395,6 +402,11 @@ export function SlackIntegrationSettings({ projectId }: { projectId: string }) {
               control={form.control}
               label={t("settings:slackIntegration.events.taskCommentCreated")}
               name="taskCommentCreated"
+            />
+            <EventToggle
+              control={form.control}
+              label={t("settings:slackIntegration.events.taskMentionCreated")}
+              name="taskMentionCreated"
             />
           </div>
 

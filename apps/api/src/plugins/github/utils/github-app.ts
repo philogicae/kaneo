@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/node";
 import { config } from "dotenv-mono";
 import { App, Octokit } from "octokit";
 import { boundedGithubFetch } from "../../../utils/bounded-github-fetch";
@@ -76,11 +75,6 @@ export async function getInstallationOctokit(
   if (!app) {
     throw new Error("GitHub App not configured");
   }
-  Sentry.addBreadcrumb({
-    category: "integration",
-    level: "info",
-    data: { integration: "github", op: "installationOctokit" },
-  });
   return app.getInstallationOctokit(installationId);
 }
 
@@ -92,15 +86,6 @@ export async function getInstallationIdForRepo(
   if (!app) {
     throw new Error("GitHub App not configured");
   }
-
-  Sentry.addBreadcrumb({
-    category: "integration",
-    level: "info",
-    data: {
-      integration: "github",
-      op: "getInstallationIdForRepo",
-    },
-  });
 
   const { data: installation } =
     await app.octokit.rest.apps.getRepoInstallation({

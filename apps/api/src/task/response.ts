@@ -25,9 +25,26 @@ export const taskSchema = z
     status: z.string().openapi({
       description: "The slug of the column the task sits in.",
     }),
+    milestoneId: z.string().nullable().openapi({
+      description: "Roadmap sprint/phase the task belongs to, when assigned.",
+    }),
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
+    reminderOffsets: z.array(z.number()).nullable().openapi({
+      description:
+        "Reminder offsets in minutes before the task's start date (Telegram reminders).",
+    }),
+    recurrence: z
+      .object({
+        frequency: z.enum(["daily", "weekly", "monthly"]),
+        interval: z.number(),
+      })
+      .nullable()
+      .openapi({
+        description:
+          "Recurrence of the task; the next occurrence is spawned on completion.",
+      }),
     createdAt: responseTimestamp,
     customFields: z
       .array(z.object({ fieldId: z.string(), value: z.string() }))
@@ -54,9 +71,36 @@ export const taskWithAssigneeSchema = taskSchema
   })
   .openapi("TaskWithAssignee");
 
-const taskLabelSchema = z
+export const taskLabelSchema = z
   .object({ id: z.string(), name: z.string(), color: z.string() })
   .openapi("TaskLabel");
+
+// Creation returns the labels too: when Jev qualifies the task, the caller
+// sees the priority and tags that were actually applied.
+export const createdTaskSchema = taskSchema
+  .extend({ labels: z.array(taskLabelSchema) })
+  .openapi("CreatedTask");
+
+const suggestedLabelSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    color: z.string(),
+    probability: z.number(),
+  })
+  .openapi("SuggestedTaskLabel");
+
+export const taskQualificationSchema = z
+  .object({
+    enabled: z.boolean().openapi({
+      description:
+        "False when this instance has no suggestion service configured.",
+    }),
+    priority: z.string().nullable(),
+    priorityConfidence: z.number().nullable(),
+    labels: z.array(suggestedLabelSchema),
+  })
+  .openapi("TaskQualification");
 
 const taskExternalLinkSchema = z
   .object({
@@ -87,9 +131,26 @@ export const boardTaskSchema = z
         "True when the list omits a large description; load the task detail or description pages to read it. Do not replace stored text with this null summary.",
     }),
     status: z.string(),
+    milestoneId: z.string().nullable().openapi({
+      description: "Roadmap sprint/phase the task belongs to, when assigned.",
+    }),
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
+    reminderOffsets: z.array(z.number()).nullable().openapi({
+      description:
+        "Reminder offsets in minutes before the task's start date (Telegram reminders).",
+    }),
+    recurrence: z
+      .object({
+        frequency: z.enum(["daily", "weekly", "monthly"]),
+        interval: z.number(),
+      })
+      .nullable()
+      .openapi({
+        description:
+          "Recurrence of the task; the next occurrence is spawned on completion.",
+      }),
     position: z.number().nullable(),
     createdAt: responseTimestamp,
     userId: z.string().nullable(),
@@ -173,6 +234,33 @@ export const boardSchema = z
 export const bulkResultSchema = z
   .object({ success: z.boolean(), updatedCount: z.number() })
   .openapi("BulkTaskResult");
+
+// Flat cross-project task rows: each row carries its project identity so a
+// short id (`{projectSlug}-{number}`) can be built without a second lookup.
+export const workspaceTaskSchema = boardTaskSchema
+  .omit({ externalLinks: true })
+  .extend({
+    projectName: z.string(),
+    projectSlug: z.string(),
+  })
+  .openapi("WorkspaceTask");
+
+export const workspaceTaskListSchema = z
+  .object({
+    tasks: z.array(workspaceTaskSchema),
+    pagination: z
+      .object({
+        total: z.number().openapi({
+          description:
+            "Total tasks matching the filters, across the workspace.",
+        }),
+        page: z.number(),
+        pageSize: z.number(),
+        totalPages: z.number(),
+      })
+      .openapi("WorkspaceTaskPagination"),
+  })
+  .openapi("WorkspaceTaskList");
 
 export const moveTaskResultSchema = z
   .object({

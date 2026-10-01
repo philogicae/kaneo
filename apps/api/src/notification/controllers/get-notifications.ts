@@ -7,9 +7,10 @@ import {
   workspaceTable,
 } from "../../database/schema";
 
-import { notificationResourceAccess } from "../resource-access";
-
-async function getNotifications(userId: string) {
+async function getNotifications(
+  userId: string,
+  paging: { limit?: number; offset?: number } = {},
+) {
   const rows = await db
     .select({
       notification: notificationTable,
@@ -26,18 +27,10 @@ async function getNotifications(userId: string) {
     )
     .leftJoin(projectTable, eq(taskTable.projectId, projectTable.id))
     .leftJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
-    .where(
-      and(
-        eq(notificationTable.userId, userId),
-        notificationResourceAccess(
-          userId,
-          notificationTable.resourceId,
-          notificationTable.resourceType,
-        ),
-      ),
-    )
+    .where(eq(notificationTable.userId, userId))
     .orderBy(desc(notificationTable.createdAt))
-    .limit(50);
+    .limit(paging.limit ?? 50)
+    .offset(paging.offset ?? 0);
 
   return rows.map(({ notification, projectId, workspaceId }) => {
     if (!projectId && !workspaceId) {

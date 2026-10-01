@@ -1,6 +1,9 @@
 import { z } from "../openapi";
+import { listPagingQuery } from "../utils/paging";
 
 export const taskIdParam = z.object({ taskId: z.string() });
+
+export const activityListQuery = listPagingQuery;
 
 export const createActivityBody = z.object({
   taskId: z.string(),

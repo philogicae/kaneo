@@ -14,3 +14,19 @@ export const workspaceMemberSchema = z
   .openapi("WorkspaceMember");
 
 export const workspaceMemberListSchema = z.array(workspaceMemberSchema);
+
+export const workspaceMemberAccessSchema = z
+  .object({
+    accessScope: z.string().openapi({
+      description:
+        'Membership scope: "full", "scoped", or "none" once the member was removed with their last grant.',
+    }),
+    allProjects: z.boolean().openapi({
+      description:
+        "Whether a direct grant covers every project of the workspace.",
+    }),
+    projectIds: z.array(z.string()).openapi({
+      description: "Projects granted directly to the member, outside teams.",
+    }),
+  })
+  .openapi("WorkspaceMemberAccess");

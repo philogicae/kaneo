@@ -1,8 +1,13 @@
 import { relations } from "drizzle-orm";
 import {
+  accessTeamMemberTable,
+  accessTeamProjectTable,
+  accessTeamTable,
+  accessTeamWorkspaceTable,
   accountTable,
   activityTable,
   apikeyTable,
+  appointmentTable,
   assetTable,
   columnTable,
   commentTable,
@@ -11,7 +16,10 @@ import {
   externalLinkTable,
   githubIntegrationTable,
   integrationTable,
+  invitationProjectGrantTable,
   invitationTable,
+  invitationTeamTable,
+  invitationWorkspaceGrantTable,
   labelTable,
   notificationTable,
   projectTable,
@@ -21,11 +29,16 @@ import {
   taskTable,
   teamMemberTable,
   teamTable,
+  telegramBotTable,
+  telegramChatTable,
+  telegramRuleTable,
   timeEntryTable,
   userNotificationPreferenceTable,
   userNotificationWorkspaceProjectTable,
   userNotificationWorkspaceRuleTable,
+  userProjectAccessTable,
   userTable,
+  userWorkspaceAccessTable,
   verificationTable,
   workflowRuleTable,
   workspaceRoleTable,
@@ -33,12 +46,27 @@ import {
   workspaceUserTable,
 } from "./schema";
 
+export const appointmentTableRelations = relations(
+  appointmentTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [appointmentTable.projectId],
+      references: [projectTable.id],
+    }),
+    assignee: one(userTable, {
+      fields: [appointmentTable.userId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
 export const userTableRelations = relations(userTable, ({ many, one }) => ({
   sessions: many(sessionTable),
   accounts: many(accountTable),
   teamMembers: many(teamMemberTable),
   workspaceMemberships: many(workspaceUserTable),
   assignedTasks: many(taskTable),
+  assignedAppointments: many(appointmentTable),
   timeEntries: many(timeEntryTable),
   activities: many(activityTable),
   comments: many(commentTable),
@@ -103,6 +131,7 @@ export const projectTableRelations = relations(
       references: [workspaceTable.id],
     }),
     tasks: many(taskTable),
+    appointments: many(appointmentTable),
     assets: many(assetTable),
     columns: many(columnTable),
     workflowRules: many(workflowRuleTable),
@@ -302,6 +331,128 @@ export const teamMemberTableRelations = relations(
   }),
 );
 
+export const accessTeamTableRelations = relations(
+  accessTeamTable,
+  ({ many }) => ({
+    members: many(accessTeamMemberTable),
+    workspaces: many(accessTeamWorkspaceTable),
+    projects: many(accessTeamProjectTable),
+    invitations: many(invitationTeamTable),
+  }),
+);
+
+export const accessTeamMemberTableRelations = relations(
+  accessTeamMemberTable,
+  ({ one }) => ({
+    team: one(accessTeamTable, {
+      fields: [accessTeamMemberTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+    user: one(userTable, {
+      fields: [accessTeamMemberTable.userId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
+export const accessTeamWorkspaceTableRelations = relations(
+  accessTeamWorkspaceTable,
+  ({ one }) => ({
+    team: one(accessTeamTable, {
+      fields: [accessTeamWorkspaceTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [accessTeamWorkspaceTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+  }),
+);
+
+export const accessTeamProjectTableRelations = relations(
+  accessTeamProjectTable,
+  ({ one }) => ({
+    team: one(accessTeamTable, {
+      fields: [accessTeamProjectTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [accessTeamProjectTable.projectId],
+      references: [projectTable.id],
+    }),
+  }),
+);
+
+export const userWorkspaceAccessTableRelations = relations(
+  userWorkspaceAccessTable,
+  ({ one }) => ({
+    user: one(userTable, {
+      fields: [userWorkspaceAccessTable.userId],
+      references: [userTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [userWorkspaceAccessTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+  }),
+);
+
+export const userProjectAccessTableRelations = relations(
+  userProjectAccessTable,
+  ({ one }) => ({
+    user: one(userTable, {
+      fields: [userProjectAccessTable.userId],
+      references: [userTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [userProjectAccessTable.projectId],
+      references: [projectTable.id],
+    }),
+  }),
+);
+
+export const invitationTeamTableRelations = relations(
+  invitationTeamTable,
+  ({ one }) => ({
+    invitation: one(invitationTable, {
+      fields: [invitationTeamTable.invitationId],
+      references: [invitationTable.id],
+    }),
+    team: one(accessTeamTable, {
+      fields: [invitationTeamTable.teamId],
+      references: [accessTeamTable.id],
+    }),
+  }),
+);
+
+export const invitationWorkspaceGrantTableRelations = relations(
+  invitationWorkspaceGrantTable,
+  ({ one }) => ({
+    invitation: one(invitationTable, {
+      fields: [invitationWorkspaceGrantTable.invitationId],
+      references: [invitationTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [invitationWorkspaceGrantTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+  }),
+);
+
+export const invitationProjectGrantTableRelations = relations(
+  invitationProjectGrantTable,
+  ({ one }) => ({
+    invitation: one(invitationTable, {
+      fields: [invitationProjectGrantTable.invitationId],
+      references: [invitationTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [invitationProjectGrantTable.projectId],
+      references: [projectTable.id],
+    }),
+  }),
+);
+
 export const invitationTableRelations = relations(
   invitationTable,
   ({ one }) => ({
@@ -341,6 +492,46 @@ export const integrationTableRelations = relations(
       references: [projectTable.id],
     }),
     externalLinks: many(externalLinkTable),
+  }),
+);
+
+export const telegramBotTableRelations = relations(
+  telegramBotTable,
+  ({ one, many }) => ({
+    user: one(userTable, {
+      fields: [telegramBotTable.userId],
+      references: [userTable.id],
+    }),
+    chats: many(telegramChatTable),
+  }),
+);
+
+export const telegramChatTableRelations = relations(
+  telegramChatTable,
+  ({ one, many }) => ({
+    bot: one(telegramBotTable, {
+      fields: [telegramChatTable.botId],
+      references: [telegramBotTable.id],
+    }),
+    rules: many(telegramRuleTable),
+  }),
+);
+
+export const telegramRuleTableRelations = relations(
+  telegramRuleTable,
+  ({ one }) => ({
+    chat: one(telegramChatTable, {
+      fields: [telegramRuleTable.chatId],
+      references: [telegramChatTable.id],
+    }),
+    workspace: one(workspaceTable, {
+      fields: [telegramRuleTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    project: one(projectTable, {
+      fields: [telegramRuleTable.projectId],
+      references: [projectTable.id],
+    }),
   }),
 );
 

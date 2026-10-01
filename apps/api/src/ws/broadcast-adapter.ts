@@ -5,6 +5,7 @@ export type ProjectBroadcastMessage = {
   tasks?: Array<{ id: string; position: number; status?: string }>;
   sourceTaskId?: string;
   targetTaskId?: string;
+  appointmentId?: string;
 };
 
 export type BroadcastMessage = {

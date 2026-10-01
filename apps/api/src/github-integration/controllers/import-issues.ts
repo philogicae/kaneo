@@ -195,8 +195,7 @@ export async function importIssues(projectId: string, runId?: string) {
         const [currentIntegration] = await tx
           .select()
           .from(integrationTable)
-          .where(eq(integrationTable.id, integration.id))
-          .for("update");
+          .where(eq(integrationTable.id, integration.id));
         if (
           !currentIntegration ||
           currentIntegration.config !== integration.config ||
@@ -361,8 +360,7 @@ async function applyPage(
         eq(externalLinkTable.externalId, String(current.number)),
         eq(externalLinkTable.taskId, current.taskId),
       ),
-    )
-    .for("update");
+    );
   if (!task || !linked) {
     state.skipped++;
     finishIssue(state);
@@ -473,8 +471,7 @@ async function importIssue(
     const [linked] = await tx
       .select({ id: externalLinkTable.id })
       .from(externalLinkTable)
-      .where(eq(externalLinkTable.id, link.id))
-      .for("update");
+      .where(eq(externalLinkTable.id, link.id));
     if (!linked) return null;
     const [updated] = await tx
       .update(taskTable)

@@ -1,5 +1,6 @@
-export { OTP_EXPIRY_SECONDS } from "./otp-expiry";
+export { isResendConfigured } from "./resend";
 export {
+  isEmailConfigured,
   sendMagicLinkEmail,
   sendNotificationEmail,
   sendOtpEmail,

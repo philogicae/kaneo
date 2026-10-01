@@ -15,8 +15,7 @@ export async function withLockedTask<T>(
     const [before] = await tx
       .select()
       .from(taskTable)
-      .where(eq(taskTable.id, id))
-      .for("update");
+      .where(eq(taskTable.id, id));
     if (!before) throw new HTTPException(404, { message: "Task not found" });
     return { before, after: await mutate(tx, before) };
   });

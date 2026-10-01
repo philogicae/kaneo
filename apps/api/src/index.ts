@@ -1,33 +1,26 @@
-import { syncWorkspaceAccess } from "./ws/workspace-access";
-import { drainPasswordResetDeliveries } from "./utils/password-reset-delivery";
-import "./instrument";
-
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/node";
+import { Scalar } from "@scalar/hono-api-reference";
 import type { Session, User } from "better-auth/types";
-import { eq, sql } from "drizzle-orm";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { eq } from "drizzle-orm";
+import { migrate } from "drizzle-orm/libsql/migrator";
 import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import accessTeam from "./access-team";
 import activity from "./activity";
-import admin from "./admin";
+import appointment from "./appointment";
 import { auth } from "./auth";
 import { organizationRoutes } from "./auth-openapi";
-import billing from "./billing";
-import calendarFeed, { publicCalendarFeed } from "./calendar-feed";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
 import customField from "./custom-field";
-import db, { getDatabase, schema } from "./database";
-import { prepareDatabaseStartup } from "./database/prepare-database-startup";
-import { waitForDatabase } from "./database/wait-for-database";
+import db, { applyDatabasePragmas, getDatabase, schema } from "./database";
 import discordIntegration from "./discord-integration";
 import { eventContext } from "./events";
 import externalLink from "./external-link";
@@ -36,57 +29,45 @@ import giteaIntegration, { handleGiteaWebhookRoute } from "./gitea-integration";
 import githubIntegration, {
   handleGithubWebhookRoute,
 } from "./github-integration";
-import gitlabIntegration, {
-  handleGitlabWebhookRoute,
-} from "./gitlab-integration";
 import getInstanceStatus from "./instance/controllers/get-instance-status";
 import invitation from "./invitation";
 import label from "./label";
 import mattermostIntegration from "./mattermost-integration";
 import mcpRoutes, { mcpWellKnownRoutes } from "./mcp";
 import { migrateColumns } from "./migrations/column-migration";
+import { migrateLabelColors } from "./migrations/label-color-migration";
+import milestone from "./milestone";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
-import { createRoute, errorResponse, jsonResponse, z } from "./openapi";
+import { createRoute, jsonResponse, z } from "./openapi";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
+import skills from "./skills";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
-import {
-  getDescriptionPage,
-  getPublicProjectDescriptionPage,
-} from "./task/description-pages";
-import { boardSchema, descriptionPageSchema } from "./task/response";
-import { descriptionPageQuery, listTasksQuery } from "./task/schema";
 import taskRelation from "./task-relation";
+import telegramConfig from "./telegram-config";
 import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
 import user from "./user";
 import getAvatar from "./user/controllers/get-avatar";
+import { canAccessProject } from "./utils/access-scope";
 import { authenticateApiRequest } from "./utils/authenticate-api-request";
-import {
-  authorizeAssetAccess,
-  isPublicAsset,
-} from "./utils/authorize-asset-access";
+import { authorizeAssetAccess } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
-import { clientIpMiddleware } from "./utils/client-ip";
-import { migrateApiKeyReferenceId } from "./utils/migrate-apikey-reference-id";
-import { migrateNotificationPreferencesSchema } from "./utils/migrate-notification-preferences-schema";
-import { migrateSessionColumn } from "./utils/migrate-session-column";
-import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
+import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
-import { drainSignInEmails } from "./utils/sign-in-email-tasks";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
-import { verifyApiKey } from "./utils/verify-api-key";
 import workflowRule from "./workflow-rule";
 import workspace from "./workspace";
+import workspaceSharing from "./workspace-sharing";
 import {
   addConnection,
   addUserConnection,
@@ -95,11 +76,6 @@ import {
   removeUserConnection,
   shutdownWebSocketAdapter,
 } from "./ws";
-import {
-  assertWebSocketOrigin,
-  handleWebSocketMessage,
-  MAX_WEBSOCKET_MESSAGE_BYTES,
-} from "./ws/security";
 
 type ApiKey = {
   id: string;
@@ -164,26 +140,16 @@ function buildContentDisposition(filename: string, inline: boolean) {
 
 export function createApp() {
   const app = new Hono<AppVariables>();
-  app.use("*", clientIpMiddleware());
 
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
-      // expected errors (401/404/...) are not reported; real failures are
-      if (err.status >= 500) {
-        Sentry.captureException(err);
-      }
       return err.getResponse();
     }
 
-    Sentry.captureException(err);
+    console.error(`Unhandled error on ${c.req.method} ${c.req.path}:`, err);
     return c.json({ message: "Internal Server Error" }, 500);
   });
   const nodeWs = createNodeWebSocket({ app });
-  // node-ws exposes its ws server, but does not accept constructor options.
-  // Set the receiver limit before any connection can upgrade, including
-  // fragmented messages, before node-ws converts text buffers to strings.
-  nodeWs.wss.options.maxPayload = MAX_WEBSOCKET_MESSAGE_BYTES;
-  nodeWs.wss.options.perMessageDeflate = false;
   const { upgradeWebSocket, injectWebSocket } = nodeWs;
   const corsOriginSource = [
     process.env.CORS_ORIGINS,
@@ -255,126 +221,12 @@ export function createApp() {
     async (c) => c.json(await getInstanceStatus(), 200),
   );
 
-  const publicProjectApi = api
-    .openapi(
-      createRoute({
-        method: "get",
-        operationId: "getPublicProject",
-        path: "/public-project/{id}",
-        tags: ["Projects"],
-        summary: "Get a public project board",
-        description:
-          "Read a public board in bounded task pages. Visibility is checked before loading tasks. Continue through pagination.totalPages for all tasks and through relatedPage/pagination.relatedTotalPages for their complete related records.",
-        security: [],
-        request: {
-          params: z.object({ id: z.string() }),
-          query: listTasksQuery,
-        },
-        responses: {
-          200: jsonResponse(
-            "A public board page",
-            boardSchema.shape.data
-              .extend({ pagination: boardSchema.shape.pagination })
-              .openapi("PublicBoardPage"),
-          ),
-          403: errorResponse("Project is not public"),
-          404: errorResponse("Project not found"),
-          400: errorResponse("Invalid pagination or filters"),
-          503: errorResponse("Task list request timed out"),
-        },
-      }),
-      async (c) => {
-        const { id } = c.req.valid("param");
-        const project = await getPublicProject(id, c.req.valid("query"));
-        return c.json(project, 200);
-      },
-      (result) => {
-        if (!result.success)
-          throw new HTTPException(400, {
-            message: "Invalid task pagination or filters",
-          });
-      },
-    )
-    .openapi(
-      createRoute({
-        method: "get",
-        operationId: "getPublicProjectDescriptionPage",
-        path: "/public-project/{id}/description",
-        tags: ["Projects"],
-        summary: "Read a public project description page",
-        security: [],
-        request: {
-          params: z.object({ id: z.string() }),
-          query: descriptionPageQuery,
-        },
-        responses: {
-          200: jsonResponse(
-            "Public project description page",
-            descriptionPageSchema,
-          ),
-          400: errorResponse("Invalid description cursor"),
-          404: errorResponse("Public project not found"),
-          409: errorResponse("Description changed or no longer public"),
-          503: errorResponse("Description request timed out"),
-        },
-      }),
-      async (c) =>
-        c.json(
-          await getPublicProjectDescriptionPage(
-            c.req.valid("param").id,
-            c.req.valid("query"),
-          ),
-          200,
-        ),
-      (result) => {
-        if (!result.success)
-          throw new HTTPException(400, {
-            message: "Invalid description cursor",
-          });
-      },
-    )
-    .openapi(
-      createRoute({
-        method: "get",
-        operationId: "getPublicTaskDescriptionPage",
-        path: "/public-project/{id}/task/{taskId}/description",
-        tags: ["Projects"],
-        summary: "Read a public task description page",
-        security: [],
-        request: {
-          params: z.object({ id: z.string(), taskId: z.string() }),
-          query: descriptionPageQuery,
-        },
-        responses: {
-          200: jsonResponse(
-            "Public task description page",
-            descriptionPageSchema,
-          ),
-          400: errorResponse("Invalid description cursor"),
-          404: errorResponse("Public task not found"),
-          409: errorResponse("Description changed or no longer public"),
-          503: errorResponse("Description request timed out"),
-        },
-      }),
-      async (c) => {
-        const { id, taskId } = c.req.valid("param");
-        return c.json(
-          await getDescriptionPage(taskId, {
-            ...c.req.valid("query"),
-            publicProjectId: id,
-          }),
-          200,
-        );
-      },
-      (result) => {
-        if (!result.success)
-          throw new HTTPException(400, {
-            message: "Invalid description cursor",
-          });
-      },
-    );
+  const publicProjectApi = api.get("/public-project/:id", async (c) => {
+    const { id } = c.req.param();
+    const project = await getPublicProject(id);
 
-  api.route("/calendar-feed", publicCalendarFeed);
+    return c.json(project);
+  });
 
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
@@ -383,26 +235,10 @@ export function createApp() {
     handleGiteaWebhookRoute,
   );
 
-  api.post(
-    "/gitlab-integration/webhook/:integrationId",
-    handleGitlabWebhookRoute,
-  );
-
   const invitationPublicApi = api.get("/invitation/public/:id", async (c) => {
     const { id } = c.req.param();
     const result = await getInvitationDetails(id);
     return c.json(result);
-  });
-
-  api.use("/auth/*", async (c, next) => {
-    const apiKeyHeader = c.req.header("x-api-key")?.trim();
-    if (
-      apiKeyHeader &&
-      !(await verifyApiKey(apiKeyHeader, { consume: false }))
-    ) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
-    return next();
   });
 
   api.openapi(
@@ -453,9 +289,8 @@ export function createApp() {
           objectKey: schema.assetTable.objectKey,
           mimeType: schema.assetTable.mimeType,
           filename: schema.assetTable.filename,
-          surface: schema.assetTable.surface,
-          createdBy: schema.assetTable.createdBy,
           workspaceId: schema.assetTable.workspaceId,
+          projectId: schema.assetTable.projectId,
           isPublic: schema.projectTable.isPublic,
         })
         .from(schema.assetTable)
@@ -483,7 +318,7 @@ export function createApp() {
 
         return new Response(object.body as BodyInit, {
           headers: {
-            "Cache-Control": isPublicAsset(asset)
+            "Cache-Control": asset.isPublic
               ? "public, max-age=300"
               : "private, max-age=120",
             "Content-Disposition": buildContentDisposition(
@@ -622,6 +457,16 @@ export function createApp() {
     return c.json(document);
   });
 
+  // Interactive API reference reading the public /openapi document above.
+  // Kept a plain route so it does not appear inside the spec it renders.
+  api.get(
+    "/docs",
+    Scalar({
+      url: "/api/openapi",
+      pageTitle: "Kaneo API Reference",
+    }),
+  );
+
   // Better Auth serves GET /auth/device as JSON. Browsers that open the API URL
   // directly expect a page, so redirect full document navigations to the web app.
   const authDeviceQuerySchema = z.object({
@@ -674,27 +519,29 @@ export function createApp() {
 
   api.on(["POST", "GET", "PUT", "PATCH", "DELETE"], "/auth/*", async (c) => {
     const authHeader = c.req.header("Authorization");
-    const apiKeyHeader = c.req.header("x-api-key")?.trim();
+    const apiKeyHeader = c.req.header("x-api-key");
     const bearerToken = authHeader?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
     if (bearerToken && !apiKeyHeader) {
-      const headers = new Headers(c.req.raw.headers);
-      headers.delete("cookie");
-      const session = await auth.api.getSession({ headers });
+      const session = await auth.api.getSession({
+        headers: c.req.raw.headers,
+      });
 
       // Preserve Better Auth bearer session tokens on auth routes.
       if (session?.session && session.user) {
-        return auth.handler(new Request(c.req.raw, { headers }));
+        return auth.handler(c.req.raw);
       }
 
-      if (!(await verifyApiKey(bearerToken, { consume: false }))) {
-        throw new HTTPException(401, { message: "Unauthorized" });
-      }
+      const headers = new Headers(c.req.raw.headers);
 
       // Better Auth API key plugin validates from x-api-key by default.
       headers.set("x-api-key", bearerToken);
 
-      return auth.handler(new Request(c.req.raw, { headers }));
+      return auth.handler(
+        new Request(c.req.raw, {
+          headers,
+        }),
+      );
     }
 
     return auth.handler(c.req.raw);
@@ -706,42 +553,44 @@ export function createApp() {
     const path = c.req.path;
     if (
       path.startsWith("/api/mcp") ||
+      path.startsWith("/api/skills") ||
       path.startsWith("/api/.well-known/") ||
-      path === "/api/billing/webhook"
+      // Public invite-link lookups are anonymous by design (the web fetcher
+      // sends no credentials for signed-out visitors). The accept route is
+      // POST, so it still goes through authentication below.
+      (c.req.method === "GET" &&
+        path.startsWith("/api/workspace-sharing/public/"))
     ) {
       return next();
     }
-    return Sentry.withIsolationScope(async () => {
-      Sentry.setUser(null);
-      try {
-        await authenticateApiRequest(c);
-        const windowId = c.req.header("X-Kaneo-Window-Id");
-        const userId = c.get("userId");
-        const initiatorId = windowId ? `${userId}:${windowId}` : userId;
-        return await eventContext.run({ initiatorId }, next);
-      } catch (error) {
-        if (!(error instanceof HTTPException)) {
-          console.error("API authentication failed:", error);
-          throw new HTTPException(500, { message: "Internal Server Error" });
-        }
-        throw error;
-      } finally {
-        Sentry.setUser(null);
+    try {
+      await authenticateApiRequest(c);
+      const windowId = c.req.header("X-Kaneo-Window-Id");
+      const userId = c.get("userId");
+      const initiatorId = windowId ? `${userId}:${windowId}` : userId;
+      return await eventContext.run({ initiatorId }, next);
+    } catch (error) {
+      if (!(error instanceof HTTPException)) {
+        console.error("API authentication failed:", error);
+        throw new HTTPException(500, { message: "Internal Server Error" });
       }
-    });
+      throw error;
+    }
   });
 
   const oauthApi = api.route("/oauth", oauth);
 
-  const billingApi = api.route("/billing", billing);
+  api.route("/skills", skills);
+
   const projectApi = api.route("/project", project);
-  const calendarFeedApi = api.route("/calendar-feed", calendarFeed);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
+  const appointmentApi = api.route("/appointment", appointment);
   const commentApi = api.route("/comment", comment);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
+  const milestoneApi = api.route("/milestone", milestone);
   const notificationApi = api.route("/notification", notification);
   const notificationPreferencesApi = api.route(
     "/notification-preferences",
@@ -753,10 +602,6 @@ export function createApp() {
     githubIntegration,
   );
   const giteaIntegrationApi = api.route("/gitea-integration", giteaIntegration);
-  const gitlabIntegrationApi = api.route(
-    "/gitlab-integration",
-    gitlabIntegration,
-  );
   const genericWebhookIntegrationApi = api.route(
     "/generic-webhook-integration",
     genericWebhookIntegration,
@@ -774,14 +619,16 @@ export function createApp() {
     "/telegram-integration",
     telegramIntegration,
   );
+  const telegramConfigApi = api.route("/telegram-config", telegramConfig);
   const taskRelationApi = api.route("/task-relation", taskRelation);
   const externalLinkApi = api.route("/external-link", externalLink);
   const workflowRuleApi = api.route("/workflow-rule", workflowRule);
   const invitationApi = api.route("/invitation", invitation);
+  const accessTeamApi = api.route("/access-team", accessTeam);
   const workspaceApi = api.route("/workspace", workspace);
+  const workspaceSharingApi = api.route("/workspace-sharing", workspaceSharing);
   const customFieldApi = api.route("/custom-field", customField);
   const userApi = api.route("/user", user);
-  const adminApi = api.route("/admin", admin);
 
   app.route(
     "/",
@@ -798,7 +645,15 @@ export function createApp() {
   api.get(
     "/ws/user",
     upgradeWebSocket(async (c) => {
-      assertWebSocketOrigin(c.req.raw.headers);
+      try {
+        await authenticateApiRequest(c);
+      } catch (error) {
+        if (error instanceof HTTPException) {
+          throw error;
+        }
+        console.error("API authentication failed:", error);
+        throw new HTTPException(500, { message: "Internal Server Error" });
+      }
 
       const userId = c.get("userId");
       let conn: ReturnType<typeof addUserConnection> | null = null;
@@ -807,10 +662,26 @@ export function createApp() {
         onOpen(_evt, ws) {
           if (userId) {
             conn = addUserConnection(userId, ws);
-            void syncWorkspaceAccess(userId, ws);
           }
         },
-        onMessage: handleWebSocketMessage,
+        onMessage(evt) {
+          try {
+            const raw =
+              typeof evt.data === "string"
+                ? evt.data
+                : Buffer.isBuffer(evt.data)
+                  ? evt.data.toString()
+                  : null;
+            if (raw) {
+              const msg = JSON.parse(raw) as { type?: string };
+              if (msg?.type === "ping") {
+                // keepalive, no-op
+              }
+            }
+          } catch {
+            // Ignore malformed messages
+          }
+        },
         onClose() {
           if (conn && userId) {
             removeUserConnection(userId, conn);
@@ -823,12 +694,20 @@ export function createApp() {
   api.get(
     "/ws/:projectId",
     upgradeWebSocket(async (c) => {
-      assertWebSocketOrigin(c.req.raw.headers);
       const projectId = c.req.param("projectId");
+
+      try {
+        await authenticateApiRequest(c);
+      } catch (error) {
+        if (error instanceof HTTPException) {
+          throw error;
+        }
+        console.error("API authentication failed:", error);
+        throw new HTTPException(500, { message: "Internal Server Error" });
+      }
 
       const userId = c.get("userId");
 
-      let workspaceId: string | undefined;
       if (projectId) {
         const [project] = await db
           .select({ workspaceId: schema.projectTable.workspaceId })
@@ -841,7 +720,14 @@ export function createApp() {
         }
 
         await validateWorkspaceAccess(userId, project.workspaceId);
-        workspaceId = project.workspaceId;
+
+        // A scoped member without a grant for this project must not hear its
+        // broadcasts, even though the workspace itself is reachable.
+        if (!(await canAccessProject(userId, projectId))) {
+          throw new HTTPException(403, {
+            message: "No access to this project",
+          });
+        }
       }
 
       const windowId = c.req.query("windowId");
@@ -850,17 +736,31 @@ export function createApp() {
 
       return {
         onOpen(_evt, ws) {
-          if (projectId && workspaceId) {
-            conn = addConnection(
-              projectId,
-              ws,
-              userId,
-              initiatorId,
-              workspaceId,
-            );
+          if (projectId) {
+            conn = addConnection(projectId, ws, userId, initiatorId);
           }
         },
-        onMessage: handleWebSocketMessage,
+        onMessage(evt) {
+          // Respond to client keepalive pings (sent every 30s to prevent
+          // Cloudflare from closing idle connections at 100s timeout)
+          try {
+            const raw =
+              typeof evt.data === "string"
+                ? evt.data
+                : Buffer.isBuffer(evt.data)
+                  ? evt.data.toString()
+                  : null;
+            if (raw) {
+              const msg = JSON.parse(raw) as { type?: string };
+              if (msg?.type === "ping") {
+                // No-op: receiving the ping is enough to satisfy Cloudflare.
+                // A pong response is optional but helps confirm liveness.
+              }
+            }
+          } catch {
+            // Ignore malformed messages
+          }
+        },
         onClose() {
           if (conn && projectId) {
             removeConnection(projectId, conn);
@@ -876,8 +776,9 @@ export function createApp() {
     app,
     api,
     injectWebSocket,
+    accessTeamApi,
     activityApi,
-    billingApi,
+    appointmentApi,
     columnApi,
     commentApi,
     configApi,
@@ -886,26 +787,26 @@ export function createApp() {
     genericWebhookIntegrationApi,
     githubIntegrationApi,
     giteaIntegrationApi,
-    gitlabIntegrationApi,
     invitationApi,
     invitationPublicApi,
     labelApi,
+    milestoneApi,
     notificationApi,
     notificationPreferencesApi,
     projectApi,
-    calendarFeedApi,
     publicProjectApi,
     searchApi,
     mattermostIntegrationApi,
     slackIntegrationApi,
     taskApi,
     taskRelationApi,
+    telegramConfigApi,
     telegramIntegrationApi,
     timeEntryApi,
     userApi,
-    adminApi,
     workflowRuleApi,
     workspaceApi,
+    workspaceSharingApi,
     customFieldApi,
     oauthApi,
   };
@@ -914,34 +815,19 @@ export function createApp() {
 export async function runStartupTasks() {
   const currentDir = dirname(fileURLToPath(import.meta.url));
 
-  await prepareDatabaseStartup({
-    waitForDatabase: async () => {
-      await waitForDatabase({
-        query: async () => {
-          await getDatabase().execute(sql`SELECT 1`);
-        },
-      });
-    },
-    runStartupMigrations: async () => {
-      await migrateWorkspaceUserEmail();
-      await migrateSessionColumn();
+  await applyDatabasePragmas();
 
-      console.log("🔄 Migrating database...");
-      await migrate(getDatabase(), {
-        migrationsFolder: `${currentDir}/../drizzle`,
-      });
-      console.log("✅ Database migrated successfully!");
-    },
+  console.log("🔄 Migrating database...");
+  await migrate(getDatabase(), {
+    migrationsFolder: `${currentDir}/../drizzle`,
   });
+  console.log("✅ Database migrated successfully!");
 
-  // After Drizzle migrations: apikey table must exist so we can align columns
-  // with Better Auth (reference_id + nullable user_id).
-  await migrateApiKeyReferenceId();
-
-  await migrateNotificationPreferencesSchema();
   await migrateGitHubIntegration();
   await migrateColumns();
+  await migrateLabelColors();
   await seedDefaultWorkspaceRoles();
+  await seedDefaultWorkspaceInviteLinks();
 
   initializePlugins();
   initializeScheduler();
@@ -983,13 +869,6 @@ export async function startServer(
     shutdownScheduler();
     await shutdownWebSocketAdapter();
     server.close();
-    const [, signInEmailsDrained] = await Promise.all([
-      drainPasswordResetDeliveries(),
-      drainSignInEmails(),
-    ]);
-    if (!signInEmailsDrained) {
-      console.warn("Timed out waiting for pending sign-in emails");
-    }
     process.exit(0);
   };
 
@@ -1006,8 +885,9 @@ const createdApp = createApp();
 const {
   app,
   injectWebSocket,
+  accessTeamApi,
   activityApi,
-  billingApi,
+  appointmentApi,
   columnApi,
   commentApi,
   configApi,
@@ -1016,26 +896,26 @@ const {
   genericWebhookIntegrationApi,
   githubIntegrationApi,
   giteaIntegrationApi,
-  gitlabIntegrationApi,
   invitationApi,
   invitationPublicApi,
   labelApi,
   mattermostIntegrationApi,
+  milestoneApi,
   notificationApi,
   notificationPreferencesApi,
   projectApi,
-  calendarFeedApi,
   publicProjectApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
   taskRelationApi,
+  telegramConfigApi,
   telegramIntegrationApi,
   timeEntryApi,
   userApi,
-  adminApi,
   workflowRuleApi,
   workspaceApi,
+  workspaceSharingApi,
   customFieldApi,
   oauthApi,
 } = createdApp;
@@ -1051,35 +931,36 @@ if (isMainModule) {
 }
 
 export type AppType =
-  | typeof billingApi
+  | typeof accessTeamApi
   | typeof configApi
   | typeof projectApi
-  | typeof calendarFeedApi
   | typeof taskApi
+  | typeof appointmentApi
   | typeof columnApi
   | typeof activityApi
   | typeof commentApi
   | typeof timeEntryApi
   | typeof labelApi
+  | typeof milestoneApi
   | typeof notificationApi
   | typeof notificationPreferencesApi
   | typeof searchApi
   | typeof githubIntegrationApi
   | typeof giteaIntegrationApi
-  | typeof gitlabIntegrationApi
   | typeof genericWebhookIntegrationApi
   | typeof discordIntegrationApi
   | typeof mattermostIntegrationApi
   | typeof slackIntegrationApi
+  | typeof telegramConfigApi
   | typeof telegramIntegrationApi
   | typeof taskRelationApi
   | typeof externalLinkApi
   | typeof workflowRuleApi
   | typeof invitationApi
   | typeof workspaceApi
+  | typeof workspaceSharingApi
   | typeof customFieldApi
   | typeof userApi
-  | typeof adminApi
   | typeof publicProjectApi
   | typeof invitationPublicApi
   | typeof oauthApi;

@@ -38,8 +38,7 @@ export default async function reorderTasks(
     const [project] = await tx
       .select({ id: projectTable.id })
       .from(projectTable)
-      .where(eq(projectTable.id, projectId))
-      .for("update");
+      .where(eq(projectTable.id, projectId));
     if (!project)
       throw new HTTPException(404, { message: "Project not found" });
     // Lock all affected cards together; a concurrent move cannot escape the
@@ -67,8 +66,7 @@ export default async function reorderTasks(
               ),
         ),
       )
-      .orderBy(asc(taskTable.id))
-      .for("update");
+      .orderBy(asc(taskTable.id));
     if (expectedTasks) {
       const expected = new Map(expectedTasks.map((task) => [task.id, task]));
       if (

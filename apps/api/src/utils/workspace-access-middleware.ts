@@ -2,6 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
 import db, { schema } from "../database";
+import { canAccessProject } from "./access-scope";
 import { validateWorkspaceAccess } from "./validate-workspace-access";
 
 type WorkspaceIdSource =
@@ -13,15 +14,19 @@ type WorkspaceIdSource =
       resource:
         | "project"
         | "task"
+        | "appointment"
+        | "milestone"
         | "label"
         | "timeEntry"
         | "activity"
         | "comment"
         | "column"
         | "workflowRule"
-        | "customField";
+        | "customField"
+        | "telegramRule";
       idKey: string;
     }
+  | { type: "lookupQuery"; resource: "project"; key: string }
   | {
       type: "lookupMany";
       resource: "task";
@@ -30,7 +35,20 @@ type WorkspaceIdSource =
 
 type WorkspaceAccessMiddlewareConfig = {
   sources: WorkspaceIdSource[];
+  // When true, a request that carries no workspace id skips the access check
+  // instead of failing; the handler must then scope by the user's own
+  // memberships. Never enable for handlers that trust the workspace id.
+  optional?: boolean;
 };
+
+type AccessTarget = {
+  workspaceId: string | null;
+  // Set when the addressed resource belongs to a single project, so scoped
+  // members can be checked against their project grants.
+  projectId: string | null;
+};
+
+const NO_TARGET: AccessTarget = { workspaceId: null, projectId: null };
 
 async function readJsonObjectBody(
   c: Context,
@@ -53,6 +71,8 @@ export function workspaceAccessMiddleware(
     }
 
     let workspaceId: string | null = null;
+    let projectId: string | null = null;
+    let bulkProjectIds: string[] | null = null;
 
     for (const source of config.sources) {
       if (source.type === "query") {
@@ -73,7 +93,16 @@ export function workspaceAccessMiddleware(
         // handler acted on another (`{"taskId": "<someone else's>"}`).
         const id = c.req.param(source.idKey) || idFromBody;
         if (id) {
-          workspaceId = await lookupWorkspaceId(source.resource, id);
+          const target = await resolveAccessTarget(source.resource, id);
+          workspaceId = target.workspaceId;
+          projectId = target.projectId;
+        }
+      } else if (source.type === "lookupQuery") {
+        const id = c.req.query(source.key);
+        if (id) {
+          const target = await resolveAccessTarget(source.resource, id);
+          workspaceId = target.workspaceId;
+          projectId = target.projectId;
         }
       } else if (source.type === "lookupMany") {
         const body = await readJsonObjectBody(c);
@@ -84,7 +113,10 @@ export function workspaceAccessMiddleware(
           );
           if (taskIds.length > 0) {
             const tasks = await db
-              .select({ workspaceId: schema.projectTable.workspaceId })
+              .select({
+                workspaceId: schema.projectTable.workspaceId,
+                projectId: schema.taskTable.projectId,
+              })
               .from(schema.taskTable)
               .innerJoin(
                 schema.projectTable,
@@ -103,6 +135,7 @@ export function workspaceAccessMiddleware(
               });
             }
             workspaceId = workspaceIds[0] ?? null;
+            bulkProjectIds = [...new Set(tasks.map((task) => task.projectId))];
           }
         }
       }
@@ -113,6 +146,9 @@ export function workspaceAccessMiddleware(
     }
 
     if (!workspaceId) {
+      if (config.optional) {
+        return next();
+      }
       throw new HTTPException(400, {
         message: "Workspace ID could not be determined",
       });
@@ -123,40 +159,68 @@ export function workspaceAccessMiddleware(
 
     await validateWorkspaceAccess(userId, workspaceId, apiKeyId);
 
+    if (projectId) {
+      await assertProjectAccess(userId, projectId);
+    }
+
+    if (bulkProjectIds) {
+      for (const id of bulkProjectIds) {
+        await assertProjectAccess(userId, id);
+      }
+    }
+
     c.set("workspaceId", workspaceId);
 
     return next();
   };
 }
 
-async function lookupWorkspaceId(
+async function assertProjectAccess(userId: string, projectId: string) {
+  if (!(await canAccessProject(userId, projectId))) {
+    throw new HTTPException(403, {
+      message: "No access to this project",
+    });
+  }
+}
+
+async function resolveAccessTarget(
   resource:
     | "project"
     | "task"
+    | "appointment"
+    | "milestone"
     | "label"
     | "timeEntry"
     | "activity"
     | "comment"
     | "column"
     | "workflowRule"
-    | "customField",
+    | "customField"
+    | "telegramRule",
   id: string,
-): Promise<string | null> {
+): Promise<AccessTarget> {
   try {
     switch (resource) {
       case "project": {
         const [project] = await db
-          .select({ workspaceId: schema.projectTable.workspaceId })
+          .select({
+            workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.projectTable.id,
+          })
           .from(schema.projectTable)
           .where(eq(schema.projectTable.id, id))
           .limit(1);
-        return project?.workspaceId || null;
+        return {
+          workspaceId: project?.workspaceId ?? null,
+          projectId: project?.projectId ?? null,
+        };
       }
 
       case "task": {
         const [task] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.taskTable.projectId,
           })
           .from(schema.taskTable)
           .innerJoin(
@@ -165,7 +229,48 @@ async function lookupWorkspaceId(
           )
           .where(eq(schema.taskTable.id, id))
           .limit(1);
-        return task?.workspaceId || null;
+        return {
+          workspaceId: task?.workspaceId ?? null,
+          projectId: task?.projectId ?? null,
+        };
+      }
+
+      case "appointment": {
+        const [appointment] = await db
+          .select({
+            workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.appointmentTable.projectId,
+          })
+          .from(schema.appointmentTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.appointmentTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.appointmentTable.id, id))
+          .limit(1);
+        return {
+          workspaceId: appointment?.workspaceId ?? null,
+          projectId: appointment?.projectId ?? null,
+        };
+      }
+
+      case "milestone": {
+        const [milestone] = await db
+          .select({
+            workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.milestoneTable.projectId,
+          })
+          .from(schema.milestoneTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.milestoneTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.milestoneTable.id, id))
+          .limit(1);
+        return {
+          workspaceId: milestone?.workspaceId ?? null,
+          projectId: milestone?.projectId ?? null,
+        };
       }
 
       case "label": {
@@ -173,31 +278,28 @@ async function lookupWorkspaceId(
           .select({
             workspaceId: schema.labelTable.workspaceId,
             taskId: schema.labelTable.taskId,
-            taskWorkspaceId: schema.projectTable.workspaceId,
           })
           .from(schema.labelTable)
-          .leftJoin(
-            schema.taskTable,
-            eq(schema.labelTable.taskId, schema.taskTable.id),
-          )
-          .leftJoin(
-            schema.projectTable,
-            eq(schema.taskTable.projectId, schema.projectTable.id),
-          )
           .where(eq(schema.labelTable.id, id))
           .limit(1);
-        // Older releases allowed inconsistent label/task references. Never use
-        // such a row to authorize reads, mutations or external provider sync.
-        if (label?.taskId && label.taskWorkspaceId !== label.workspaceId) {
-          return null;
+        if (!label) return NO_TARGET;
+        // Legacy task-scoped copies can carry a null workspaceId; resolve the
+        // project (and workspace) through the task they belong to.
+        if (label.taskId) {
+          const taskTarget = await resolveAccessTarget("task", label.taskId);
+          return {
+            workspaceId: label.workspaceId ?? taskTarget.workspaceId,
+            projectId: taskTarget.projectId,
+          };
         }
-        return label?.workspaceId || null;
+        return { workspaceId: label.workspaceId ?? null, projectId: null };
       }
 
       case "timeEntry": {
         const [timeEntry] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.taskTable.projectId,
           })
           .from(schema.timeEntryTable)
           .innerJoin(
@@ -210,13 +312,17 @@ async function lookupWorkspaceId(
           )
           .where(eq(schema.timeEntryTable.id, id))
           .limit(1);
-        return timeEntry?.workspaceId || null;
+        return {
+          workspaceId: timeEntry?.workspaceId ?? null,
+          projectId: timeEntry?.projectId ?? null,
+        };
       }
 
       case "activity": {
         const [activity] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.taskTable.projectId,
           })
           .from(schema.activityTable)
           .innerJoin(
@@ -229,13 +335,17 @@ async function lookupWorkspaceId(
           )
           .where(eq(schema.activityTable.id, id))
           .limit(1);
-        return activity?.workspaceId || null;
+        return {
+          workspaceId: activity?.workspaceId ?? null,
+          projectId: activity?.projectId ?? null,
+        };
       }
 
       case "comment": {
         const [comment] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.taskTable.projectId,
           })
           .from(schema.activityTable)
           .innerJoin(
@@ -253,13 +363,17 @@ async function lookupWorkspaceId(
             ),
           )
           .limit(1);
-        return comment?.workspaceId || null;
+        return {
+          workspaceId: comment?.workspaceId ?? null,
+          projectId: comment?.projectId ?? null,
+        };
       }
 
       case "column": {
         const [column] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.columnTable.projectId,
           })
           .from(schema.columnTable)
           .innerJoin(
@@ -268,13 +382,17 @@ async function lookupWorkspaceId(
           )
           .where(eq(schema.columnTable.id, id))
           .limit(1);
-        return column?.workspaceId || null;
+        return {
+          workspaceId: column?.workspaceId ?? null,
+          projectId: column?.projectId ?? null,
+        };
       }
 
       case "workflowRule": {
         const [workflowRule] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.workflowRuleTable.projectId,
           })
           .from(schema.workflowRuleTable)
           .innerJoin(
@@ -283,13 +401,17 @@ async function lookupWorkspaceId(
           )
           .where(eq(schema.workflowRuleTable.id, id))
           .limit(1);
-        return workflowRule?.workspaceId || null;
+        return {
+          workspaceId: workflowRule?.workspaceId ?? null,
+          projectId: workflowRule?.projectId ?? null,
+        };
       }
 
       case "customField": {
         const [field] = await db
           .select({
             workspaceId: schema.projectTable.workspaceId,
+            projectId: schema.customFieldDefinitionTable.projectId,
           })
           .from(schema.customFieldDefinitionTable)
           .innerJoin(
@@ -301,27 +423,59 @@ async function lookupWorkspaceId(
           )
           .where(eq(schema.customFieldDefinitionTable.id, id))
           .limit(1);
-        return field?.workspaceId || null;
+        return {
+          workspaceId: field?.workspaceId ?? null,
+          projectId: field?.projectId ?? null,
+        };
+      }
+      case "telegramRule": {
+        // A rule stores its own target workspace, which the bot owner must be
+        // allowed to manage.
+        const [telegramRule] = await db
+          .select({ workspaceId: schema.telegramRuleTable.workspaceId })
+          .from(schema.telegramRuleTable)
+          .where(eq(schema.telegramRuleTable.id, id))
+          .limit(1);
+        return {
+          workspaceId: telegramRule?.workspaceId ?? null,
+          projectId: null,
+        };
       }
 
       default:
-        return null;
+        return NO_TARGET;
     }
   } catch (error) {
     console.error(`Error looking up workspaceId for ${resource}:`, error);
-    return null;
+    return NO_TARGET;
   }
 }
 
 export const workspaceAccess = {
-  fromQuery: (key = "workspaceId") =>
-    workspaceAccessMiddleware({ sources: [{ type: "query", key }] }),
+  fromQuery: (key = "workspaceId", options?: { optional?: boolean }) =>
+    workspaceAccessMiddleware({
+      sources: [{ type: "query", key }],
+      optional: options?.optional,
+    }),
 
   fromBody: (key = "workspaceId") =>
     workspaceAccessMiddleware({ sources: [{ type: "body", key }] }),
 
   fromParam: (key = "workspaceId") =>
     workspaceAccessMiddleware({ sources: [{ type: "param", key }] }),
+
+  fromAppointment: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "appointment", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromProjectQuery: (key = "projectId") =>
+    workspaceAccessMiddleware({
+      sources: [{ type: "lookupQuery", resource: "project", key }],
+    }),
 
   fromProject: (idKey = "id") =>
     workspaceAccessMiddleware({
@@ -349,10 +503,22 @@ export const workspaceAccess = {
       sources: [{ type: "lookupMany", resource: "task", idKey }],
     }),
 
+  fromMilestone: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "milestone", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
   fromLabel: (idKey = "id") =>
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "label", idKey },
+        // Task-scoped labels can (in legacy data) carry a null workspaceId;
+        // resolving the described task's workspace keeps attach/detach
+        // working and authorizes against the task's workspace instead.
+        { type: "lookup", resource: "task", idKey: "taskId" },
         { type: "query", key: "workspaceId" },
       ],
     }),
@@ -400,6 +566,11 @@ export const workspaceAccess = {
   fromCustomField: (idKey = "id") =>
     workspaceAccessMiddleware({
       sources: [{ type: "lookup", resource: "customField", idKey }],
+    }),
+
+  fromTelegramRule: (idKey = "telegramRuleId") =>
+    workspaceAccessMiddleware({
+      sources: [{ type: "lookup", resource: "telegramRule", idKey }],
     }),
 
   fromProjectId: (idKey = "projectId") =>
