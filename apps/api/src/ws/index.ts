@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto";
+import { eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
+import db from "../database";
+import { userTable } from "../database/schema";
 import { subscribeToEvent } from "../events";
+import { hasInstanceAdminRole } from "../utils/instance-admin-role";
 import type {
   BroadcastAdapter,
   BroadcastMessage,
@@ -79,6 +83,40 @@ function deliverToLocalUserConnections(
   if (connections.size === 0) {
     userConnections.delete(userId);
   }
+}
+
+/**
+ * Tell a client that one of its workspaces is no longer reachable, so it can
+ * drop cached data for it.
+ *
+ * An instance admin keeps its connections: the role is global, so losing a
+ * workspace membership does not remove their access. `force` is for account
+ * deletion, where every session goes regardless of role.
+ */
+export async function revokeWorkspaceConnections(
+  userId: string,
+  workspaceId: string,
+  options: { force?: boolean; role?: string | null } = {},
+) {
+  if (!options.force) {
+    try {
+      const [user] =
+        "role" in options
+          ? [{ role: options.role }]
+          : await db
+              .select({ userId: userTable.id, role: userTable.role })
+              .from(userTable)
+              .where(eq(userTable.id, userId));
+      if (hasInstanceAdminRole(user?.role)) return;
+    } catch (error) {
+      console.error("Failed to read role after membership removal:", error);
+    }
+  }
+  broadcastToUser(userId, {
+    type: "WORKSPACE_ACCESS_REVOKED",
+    workspaceId,
+    ...(options.force ? { force: true } : {}),
+  });
 }
 
 /**
@@ -197,6 +235,40 @@ export function removeConnection(projectId: string, conn: ProjectConnection) {
     if (connections.size === 0) {
       projectConnections.delete(projectId);
     }
+  }
+}
+
+/**
+ * Drop every connection watching a project and tell the clients why.
+ *
+ * A project move changes its workspace, so connections opened under the old
+ * workspace are no longer authorized; the client reconnects (or gives up) after
+ * receiving PROJECT_MOVED.
+ */
+export async function closeProjectConnections(projectId: string) {
+  const connections = projectConnections.get(projectId);
+  if (connections) {
+    for (const conn of [...connections]) {
+      removeConnection(projectId, conn);
+      try {
+        conn.ws.close(1008, "Project moved to another workspace");
+      } catch {
+        // Already closed.
+      }
+    }
+  }
+
+  if (!adapter) {
+    return;
+  }
+
+  try {
+    await adapter.publish({
+      projectId,
+      message: { type: "PROJECT_MOVED", projectId },
+    });
+  } catch (error) {
+    console.error("Failed to publish project move:", error);
   }
 }
 

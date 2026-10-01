@@ -241,6 +241,64 @@ export async function getPrivateObject(key: string): Promise<AssetObject> {
   };
 }
 
+export class InvalidUploadedAssetError extends Error {}
+
+/**
+ * Check a staged upload before it is attached to a task.
+ *
+ * The local-disk backend has no object metadata to HEAD, so the declared size
+ * and content type are validated against the file on disk. Call only after
+ * checking the object's task/workspace key prefix.
+ */
+export async function verifyTaskAssetUpload(
+  key: string,
+  expected: { size: number; contentType: string },
+) {
+  const target = resolveStoragePath(key);
+  let stat: Awaited<ReturnType<typeof fs.stat>>;
+  try {
+    stat = await fs.stat(target);
+  } catch {
+    throw new InvalidUploadedAssetError("Uploaded object was not found.");
+  }
+
+  const size = stat.size;
+  if (size > getMaxImageUploadBytes()) {
+    // Also remove oversized objects staged with a still-valid older upload URL.
+    // Invalid client size claims never cause deletion of an in-limit object.
+    try {
+      await fs.rm(target, { force: true });
+    } catch {
+      throw new Error("Unable to remove oversized uploaded object.");
+    }
+    throw new InvalidUploadedAssetError(
+      "Uploaded object exceeds the maximum upload size.",
+    );
+  }
+
+  if (!size || size !== expected.size) {
+    throw new InvalidUploadedAssetError(
+      "Uploaded object does not match the declared size and content type.",
+    );
+  }
+
+  return { size, contentType: expected.contentType };
+}
+
+/** Duplicate a staged object so a duplicated task keeps its own attachment. */
+export async function copyTaskAssetObject({
+  fromKey,
+  toKey,
+}: {
+  fromKey: string;
+  toKey: string;
+}): Promise<void> {
+  const source = resolveStoragePath(fromKey);
+  const target = resolveStoragePath(toKey);
+  mkdirSync(dirname(target), { recursive: true });
+  await fs.copyFile(source, target);
+}
+
 export async function deleteS3Object(key: string): Promise<void> {
   await fs.rm(resolveStoragePath(key), { force: true });
 }

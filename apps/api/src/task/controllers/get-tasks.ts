@@ -11,7 +11,7 @@ import {
 } from "../../database/schema";
 import { buildTaskOrderBy, type TaskSortField } from "../task-order";
 
-type GetTasksOptions = {
+export type GetTasksOptions = {
   assigneeId?: string;
   dueAfter?: string;
   dueBefore?: string;
