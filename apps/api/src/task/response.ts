@@ -356,3 +356,9 @@ export const descriptionPageSchema = z
 export const descriptionMatchesSchema = z
   .object({ ids: z.array(z.string()), nextCursor: z.string().nullable() })
   .openapi("TaskDescriptionMatches");
+
+// The public board endpoint returns the board fields alongside its pagination
+// rather than the envelope the authenticated board route uses.
+export const publicBoardPageSchema = boardSchema.shape.data
+  .extend({ pagination: boardSchema.shape.pagination })
+  .openapi("PublicBoardPage");

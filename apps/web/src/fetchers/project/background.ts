@@ -1,35 +1,32 @@
 import { client } from "@kaneo/libs";
 
-export async function uploadProjectBackground(projectId: string, file: File) {
-  const uploadResponse = await client.project[":id"]["background-upload"].$put({
+/**
+ * Replace a project's board background.
+ *
+ * The API reserves a same-origin upload URL and then stores the bytes itself,
+ * so no storage provider is exposed to the browser. `version` is caller
+ * supplied so a client can tell a replaced background from the previous one.
+ */
+export async function uploadProjectBackground(
+  projectId: string,
+  file: File,
+  version: string,
+) {
+  const reserved = await client.project[":id"].background.$put({
     param: { id: projectId },
-    json: { contentType: file.type, size: file.size },
+    json: { contentType: file.type, size: file.size, version },
   });
+  if (!reserved.ok) throw new Error(await reserved.text());
+  const upload = await reserved.json();
 
-  if (!uploadResponse.ok) throw new Error(await uploadResponse.text());
-  const upload = await uploadResponse.json();
-
-  const storageResponse = await fetch(upload.uploadUrl, {
-    method: "PUT",
+  const stored = await fetch(upload.uploadUrl, {
+    method: "POST",
     headers: upload.headers,
     body: file,
   });
-  if (!storageResponse.ok) throw new Error();
+  if (!stored.ok) throw new Error(await stored.text());
 
-  const finalizeResponse = await client.project[":id"][
-    "background-upload"
-  ].finalize.$post({
-    param: { id: projectId },
-    json: {
-      key: upload.key,
-      contentType: file.type,
-      size: file.size,
-      version: upload.version,
-    },
-  });
-  if (!finalizeResponse.ok) throw new Error(await finalizeResponse.text());
-
-  return finalizeResponse.json();
+  return stored.json();
 }
 
 export async function removeProjectBackground(projectId: string) {

@@ -15,11 +15,14 @@ import {
   requireWorkspacePermission,
 } from "../utils/require-workspace-permission";
 import { publishEvent } from "../events";
+import { normalizeApiServerUrl } from "../utils/openapi-spec";
 import { validateWorkspaceAccess } from "../utils/validate-workspace-access";
 import {
   deleteS3Object,
   getPrivateObject,
   isImageContentType,
+  validateTaskAssetUploadInput,
+  writeAssetObject,
 } from "../storage/s3";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import archiveProjectCtrl from "./controllers/archive-project";
@@ -290,6 +293,90 @@ const archiveProjectRoute = createRoute({
   },
 });
 
+const requestProjectBackgroundUploadRoute = createRoute({
+  method: "put",
+  operationId: "requestProjectBackgroundUpload",
+  path: "/{id}/background",
+  tags: ["Projects"],
+  summary: "Request a project background upload",
+  description:
+    "Reserve a background upload and return the same-origin URL the browser should PUT the bytes to.",
+  middleware: [
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["update"] }),
+  ] as const,
+  request: {
+    params: projectParam,
+    body: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: z.object({
+            contentType: z.string().min(1),
+            size: z.number().int().positive(),
+            version: z.string().min(1),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: jsonResponse(
+      "The reserved upload",
+      z.object({
+        key: z.string(),
+        uploadUrl: z.string(),
+        headers: z.record(z.string(), z.string()),
+      }),
+    ),
+    400: errorResponse("Unsupported image type or oversized upload"),
+    403: errorResponse(
+      "No workspace access, or missing project:update permission",
+    ),
+    404: errorResponse("Project not found"),
+  },
+});
+
+const putProjectBackgroundBlobRoute = createRoute({
+  method: "post",
+  operationId: "uploadProjectBackground",
+  path: "/{id}/background/blob",
+  tags: ["Projects"],
+  summary: "Upload project background bytes",
+  description:
+    "Store the bytes for a background upload reserved by the request route, then point the project at them.",
+  middleware: [
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["update"] }),
+  ] as const,
+  request: {
+    params: projectParam,
+    query: z.object({ key: z.string().min(1) }),
+    body: {
+      required: true,
+      content: {
+        "application/octet-stream": {
+          schema: { type: "string", format: "binary" },
+        },
+      },
+    },
+  },
+  responses: {
+    200: jsonResponse(
+      "The stored background",
+      z.object({
+        backgroundVersion: z.string().nullable(),
+        contentType: z.string().nullable(),
+      }),
+    ),
+    400: errorResponse("Key mismatch or oversized upload"),
+    403: errorResponse(
+      "No workspace access, or missing project:update permission",
+    ),
+    404: errorResponse("Project not found"),
+  },
+});
+
 const getProjectBackgroundRoute = createRoute({
   method: "get",
   operationId: "getProjectBackground",
@@ -420,6 +507,115 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(getProjectMembersRoute, async (c) => {
     const { id } = c.req.valid("param");
     return c.json(await getProjectMembers(id), 200);
+  })
+  .openapi(requestProjectBackgroundUploadRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const { contentType, size, version } = c.req.valid("json");
+
+    // The stored object is served back to browsers, so only image types are
+    // accepted; the declared type is validated again when the bytes arrive.
+    if (!isImageContentType(contentType)) {
+      throw new HTTPException(400, { message: "Unsupported image type" });
+    }
+    try {
+      validateTaskAssetUploadInput(contentType, size);
+    } catch (error) {
+      throw new HTTPException(400, {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Invalid image upload request",
+      });
+    }
+
+    const [project] = await db
+      .select({ workspaceId: projectTable.workspaceId })
+      .from(projectTable)
+      .where(eq(projectTable.id, id))
+      .limit(1);
+    if (!project) {
+      throw new HTTPException(404, { message: "Project not found" });
+    }
+
+    // The key is derived server-side, so a caller cannot choose where its
+    // bytes land; it is echoed back only to be verified on upload.
+    const key = `projects/${project.workspaceId}/${id}/background`;
+    const apiBaseUrl = normalizeApiServerUrl(
+      process.env.KANEO_API_URL || new URL(c.req.url).origin,
+    );
+
+    return c.json(
+      {
+        key,
+        uploadUrl: `${apiBaseUrl}/project/${encodeURIComponent(id)}/background/blob?key=${encodeURIComponent(key)}`,
+        headers: {
+          "Content-Type": contentType,
+          "X-Background-Version": version,
+        },
+      },
+      200,
+    );
+  })
+  .openapi(putProjectBackgroundBlobRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const { key } = c.req.valid("query");
+    const version = c.req.header("X-Background-Version");
+    const contentType = c.req.header("Content-Type") || "";
+
+    if (!version) {
+      throw new HTTPException(400, { message: "Missing background version" });
+    }
+    if (!isImageContentType(contentType)) {
+      throw new HTTPException(400, { message: "Unsupported image type" });
+    }
+
+    const [project] = await db
+      .select({ workspaceId: projectTable.workspaceId })
+      .from(projectTable)
+      .where(eq(projectTable.id, id))
+      .limit(1);
+    if (!project) {
+      throw new HTTPException(404, { message: "Project not found" });
+    }
+
+    // Only the key this project would generate is accepted, so a caller cannot
+    // overwrite another project's background.
+    const expectedKey = `projects/${project.workspaceId}/${id}/background`;
+    if (key !== expectedKey) {
+      throw new HTTPException(400, { message: "Invalid background key" });
+    }
+
+    const bytes = new Uint8Array(await c.req.arrayBuffer());
+    try {
+      validateTaskAssetUploadInput(contentType, bytes.byteLength);
+    } catch (error) {
+      throw new HTTPException(400, {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Invalid image upload request",
+      });
+    }
+
+    await writeAssetObject(key, bytes);
+
+    const [updated] = await db
+      .update(projectTable)
+      .set({
+        backgroundObjectKey: key,
+        backgroundMimeType: contentType,
+        backgroundVersion: version,
+      })
+      .where(eq(projectTable.id, id))
+      .returning({ id: projectTable.id });
+
+    if (!updated) {
+      await deleteS3Object(key).catch(() => {});
+      throw new HTTPException(404, { message: "Project not found" });
+    }
+
+    await publishEvent("project.updated", { projectId: id });
+    return c.json({ backgroundVersion: version, contentType }, 200);
   })
   .openapi(getProjectBackgroundRoute, async (c) => {
     const { id } = c.req.valid("param");

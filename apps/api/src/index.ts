@@ -45,11 +45,17 @@ import milestone from "./milestone";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
-import { createRoute, jsonResponse, z } from "./openapi";
+import { createRoute, errorResponse, jsonResponse, z } from "./openapi";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
+import { descriptionPageSchema, publicBoardPageSchema } from "./task/response";
+import { descriptionPageQuery, listTasksQuery } from "./task/schema";
+import {
+  getDescriptionPage,
+  getPublicProjectDescriptionPage,
+} from "./task/description-pages";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import skills from "./skills";
@@ -226,12 +232,116 @@ export function createApp() {
     async (c) => c.json(await getInstanceStatus(), 200),
   );
 
-  const publicProjectApi = api.get("/public-project/:id", async (c) => {
-    const { id } = c.req.param();
-    const project = await getPublicProject(id);
-
-    return c.json(project);
-  });
+  const publicProjectApi = api
+    .openapi(
+      createRoute({
+        method: "get",
+        operationId: "getPublicProject",
+        path: "/public-project/{id}",
+        tags: ["Projects"],
+        summary: "Get a public project board",
+        description:
+          "Read a public board in bounded task pages. Visibility is checked before loading tasks.",
+        // No authentication: the board is public by definition here.
+        security: [],
+        request: {
+          params: z.object({ id: z.string() }),
+          query: listTasksQuery,
+        },
+        responses: {
+          200: jsonResponse("A public board page", publicBoardPageSchema),
+          400: errorResponse("Invalid pagination or filters"),
+          403: errorResponse("Project is not public"),
+          404: errorResponse("Project not found"),
+        },
+      }),
+      async (c) => {
+        const { id } = c.req.valid("param");
+        return c.json(await getPublicProject(id, c.req.valid("query")), 200);
+      },
+      (result) => {
+        if (!result.success)
+          throw new HTTPException(400, {
+            message: "Invalid task pagination or filters",
+          });
+      },
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        operationId: "getPublicProjectDescriptionPage",
+        path: "/public-project/{id}/description",
+        tags: ["Projects"],
+        summary: "Read a public project description page",
+        security: [],
+        request: {
+          params: z.object({ id: z.string() }),
+          query: descriptionPageQuery,
+        },
+        responses: {
+          200: jsonResponse(
+            "Public project description page",
+            descriptionPageSchema,
+          ),
+          400: errorResponse("Invalid description cursor"),
+          404: errorResponse("Public project not found"),
+          409: errorResponse("Description changed or no longer public"),
+        },
+      }),
+      async (c) =>
+        c.json(
+          await getPublicProjectDescriptionPage(
+            c.req.valid("param").id,
+            c.req.valid("query"),
+          ),
+          200,
+        ),
+      (result) => {
+        if (!result.success)
+          throw new HTTPException(400, {
+            message: "Invalid description cursor",
+          });
+      },
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        operationId: "getPublicTaskDescriptionPage",
+        path: "/public-project/{id}/task/{taskId}/description",
+        tags: ["Projects"],
+        summary: "Read a public task description page",
+        security: [],
+        request: {
+          params: z.object({ id: z.string(), taskId: z.string() }),
+          query: descriptionPageQuery,
+        },
+        responses: {
+          200: jsonResponse(
+            "Public task description page",
+            descriptionPageSchema,
+          ),
+          400: errorResponse("Invalid description cursor"),
+          404: errorResponse("Public task not found"),
+          409: errorResponse("Description changed or no longer public"),
+        },
+      }),
+      async (c) => {
+        const { id, taskId } = c.req.valid("param");
+        return c.json(
+          await getDescriptionPage(taskId, {
+            ...c.req.valid("query"),
+            publicProjectId: id,
+          }),
+          200,
+        );
+      },
+      (result) => {
+        if (!result.success)
+          throw new HTTPException(400, {
+            message: "Invalid description cursor",
+          });
+      },
+    );
 
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 

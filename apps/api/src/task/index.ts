@@ -447,7 +447,11 @@ const getTaskRoute = createRoute({
   summary: "Get task",
   description: "Get a single task by ID, with its assignee's name resolved.",
   middleware: [workspaceAccess.fromTask()] as const,
-  request: { params: taskParam },
+  request: {
+    params: taskParam,
+    // "board" omits large descriptions and includes subtask progress.
+    query: z.object({ view: z.enum(["detail", "board"]).optional() }),
+  },
   responses: {
     200: jsonResponse("Task details", taskWithAssigneeSchema),
     400: errorResponse(

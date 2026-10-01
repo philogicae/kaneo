@@ -108,6 +108,8 @@ export const reminderOffsets = z
   });
 
 export const createTaskBody = z.object({
+  // Assets staged before the task existed, finalized as part of this create.
+  draftAssetIds: z.array(z.string()).max(100).optional(),
   title: z.string(),
   description: z.string(),
   startDate: z.string().optional(),
@@ -130,7 +132,12 @@ export const qualifyTaskBody = z.object({
 
 export const updateTaskBody = z.object({
   title: z.string(),
-  description: z.string(),
+  // Omitted to preserve the existing description, e.g. when a board list only
+  // refreshes the summary of a description it did not load.
+  description: z.string().optional().openapi({
+    description:
+      "Omit to preserve the existing description when updating a list summary.",
+  }),
   startDate: z.string().optional(),
   dueDate: z.string().optional(),
   priority,

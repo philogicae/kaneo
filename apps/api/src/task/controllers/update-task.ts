@@ -18,7 +18,9 @@ async function updateTask(
   startDate: Date | undefined,
   dueDate: Date | undefined,
   projectId: string,
-  description: string,
+  // Omitted to preserve the stored description: a board list refreshes the
+  // summary of a description it never loaded.
+  description: string | undefined,
   priority: string,
   position: number,
   userId?: string,
@@ -76,7 +78,8 @@ async function updateTask(
       startDate: startDate || null,
       dueDate: dueDate || null,
       projectId,
-      description,
+      // An omitted description must not blank the stored one.
+      ...(description !== undefined ? { description } : {}),
       priority,
       position,
       userId: normalizedUserId ?? null,
@@ -138,9 +141,6 @@ async function updateTask(
     status: updatedTask.status,
     userId: currentUserId,
   });
-
-  if (existingTask.description !== description) {
-  }
 
   return updatedTask;
 }
