@@ -29,27 +29,31 @@ export async function queueStorageCleanup(
 }
 
 export async function retryStorageCleanup(): Promise<{ degraded: boolean }> {
-  const ranked = db
+  // Never-attempted rows first, then oldest attempt, then key, so a bounded
+  // batch is stable and fairly ordered. Ordering in SQL keeps the derived
+  // table out of the query, which the sqlite builder cannot type.
+  const pending = await db
     .select({
       objectKey: storageCleanupTable.objectKey,
       lastAttemptAt: storageCleanupTable.lastAttemptAt,
-      rank: sql<number>`row_number() over (partition by ${storageCleanupTable.lastAttemptAt} is null order by coalesce(${storageCleanupTable.lastAttemptAt}, ${storageCleanupTable.createdAt}), ${storageCleanupTable.objectKey})`.as(
-        "cleanup_rank",
-      ),
     })
     .from(storageCleanupTable)
-    .as("ranked_cleanup");
-  const pending = await db
-    .select()
-    .from(ranked)
-    .orderBy(ranked.rank, ranked.lastAttemptAt, ranked.objectKey)
+    .orderBy(
+      sql`${storageCleanupTable.lastAttemptAt} is null desc`,
+      sql`coalesce(${storageCleanupTable.lastAttemptAt}, ${storageCleanupTable.createdAt}) asc`,
+      sql`${storageCleanupTable.objectKey} asc`,
+    )
     .limit(100);
   let degraded = false;
   for (const item of pending) {
     await withStorageObject(item.objectKey, async (tx) => {
-      const queued = await tx.query.storageCleanupTable.findFirst({
-        where: eq(storageCleanupTable.objectKey, item.objectKey),
-      });
+      const queued = await tx
+        .select({ objectKey: storageCleanupTable.objectKey })
+        .from(storageCleanupTable)
+        .where(eq(storageCleanupTable.objectKey, item.objectKey))
+        .limit(1)
+        .then((rows) => rows[0]);
+      if (!queued) return;
       if (!queued) return;
       const verification = await tx.query.jobLeaseTable.findFirst({
         where: eq(jobLeaseTable.name, `storage-verification:${item.objectKey}`),
@@ -58,13 +62,11 @@ export async function retryStorageCleanup(): Promise<{ degraded: boolean }> {
       const [asset] = await tx
         .select({ id: assetTable.id })
         .from(assetTable)
-        .where(eq(assetTable.objectKey, item.objectKey))
-        .for("key share");
+        .where(eq(assetTable.objectKey, item.objectKey));
       const [background] = await tx
         .select({ id: projectTable.id })
         .from(projectTable)
-        .where(eq(projectTable.backgroundObjectKey, item.objectKey))
-        .for("key share");
+        .where(eq(projectTable.backgroundObjectKey, item.objectKey));
       if (asset || background) {
         await tx
           .delete(storageCleanupTable)

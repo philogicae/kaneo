@@ -654,9 +654,17 @@ export const projectTable = sqliteTable(
     archivedAt: integer("archived_at", { mode: "timestamp_ms" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
     position: integer("position").notNull().default(0),
+    // Project background image: the object key plus the version that produced
+    // it, so a replaced background can be cleaned up without a diff.
+    backgroundObjectKey: text("background_object_key"),
+    backgroundMimeType: text("background_mime_type"),
+    backgroundVersion: text("background_version"),
   },
   (table) => [
     unique("project_workspace_id_id_unique").on(table.workspaceId, table.id),
+    index("project_background_object_key_idx")
+      .on(table.backgroundObjectKey)
+      .where(sql`${table.backgroundObjectKey} is not null`),
     index("project_workspaceId_position_idx").on(
       table.workspaceId,
       table.position,

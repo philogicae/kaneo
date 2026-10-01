@@ -124,8 +124,7 @@ async function moveTask({
             eq(projectTable.id, projectId),
             eq(projectTable.workspaceId, sourceProject.workspaceId),
           ),
-        )
-        .for("key share");
+        );
       if (!project)
         throw new HTTPException(409, {
           message: "Project was moved to another workspace, please try again",

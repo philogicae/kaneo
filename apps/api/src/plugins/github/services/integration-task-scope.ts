@@ -69,8 +69,7 @@ export async function withIntegrationTask<T>(
               : eq(integrationTable.type, expectedBinding.type),
             eq(integrationTable.isActive, true),
           ),
-        )
-        .for("share");
+        );
       if (
         !binding ||
         (expectedBinding.validate && !expectedBinding.validate(binding))
@@ -86,8 +85,7 @@ export async function withIntegrationTask<T>(
             eq(taskTable.id, taskId),
             eq(taskTable.projectId, integration.projectId),
           ),
-        )
-        .for("no key update");
+        );
       if (!task) return undefined;
     }
     return apply(tx, (effect) => effects.push(effect));

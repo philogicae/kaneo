@@ -326,7 +326,6 @@ export async function lockExternalLink(id: string, database: DbOrTx) {
   const [link] = await database
     .select({ id: externalLinkTable.id, metadata: externalLinkTable.metadata })
     .from(externalLinkTable)
-    .where(eq(externalLinkTable.id, id))
-    .for("update");
+    .where(eq(externalLinkTable.id, id));
   return link;
 }

@@ -187,8 +187,7 @@ export async function importIssues(projectId: string, runId?: string) {
               eq(projectTable.id, project.id),
               eq(projectTable.workspaceId, project.workspaceId),
             ),
-          )
-          .for("key share");
+          );
         if (!currentProject) throw conflict();
         // Serialize against integration changes and webhook issue creation. No
         // provider request is made while this transaction holds row locks.
@@ -348,8 +347,7 @@ async function applyPage(
         eq(taskTable.id, current.taskId),
         eq(taskTable.projectId, project.id),
       ),
-    )
-    .for("no key update");
+    );
   const [linked] = await tx
     .select({ id: externalLinkTable.id })
     .from(externalLinkTable)
@@ -465,8 +463,7 @@ async function importIssue(
       .from(taskTable)
       .where(
         and(eq(taskTable.id, link.taskId), eq(taskTable.projectId, projectId)),
-      )
-      .for("no key update");
+      );
     if (!task) return null;
     const [linked] = await tx
       .select({ id: externalLinkTable.id })
@@ -601,8 +598,7 @@ async function linkPull(
   const [scopedTask] = await tx
     .select({ id: taskTable.id })
     .from(taskTable)
-    .where(and(eq(taskTable.id, task.id), eq(taskTable.projectId, project.id)))
-    .for("share");
+    .where(and(eq(taskTable.id, task.id), eq(taskTable.projectId, project.id)));
   if (!scopedTask) return;
   await tx.insert(externalLinkTable).values({
     taskId: task.id,
