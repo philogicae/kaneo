@@ -15,7 +15,9 @@ import accessTeam from "./access-team";
 import activity from "./activity";
 import appointment from "./appointment";
 import { auth } from "./auth";
+import admin from "./admin";
 import { organizationRoutes } from "./auth-openapi";
+import calendarFeed from "./calendar-feed";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
@@ -26,6 +28,9 @@ import { eventContext } from "./events";
 import externalLink from "./external-link";
 import genericWebhookIntegration from "./generic-webhook-integration";
 import giteaIntegration, { handleGiteaWebhookRoute } from "./gitea-integration";
+import gitlabIntegration, {
+  handleGitlabWebhookRoute,
+} from "./gitlab-integration";
 import githubIntegration, {
   handleGithubWebhookRoute,
 } from "./github-integration";
@@ -233,6 +238,11 @@ export function createApp() {
   api.post(
     "/gitea-integration/webhook/:integrationId",
     handleGiteaWebhookRoute,
+  );
+
+  api.post(
+    "/gitlab-integration/webhook/:integrationId",
+    handleGitlabWebhookRoute,
   );
 
   const invitationPublicApi = api.get("/invitation/public/:id", async (c) => {
@@ -583,6 +593,7 @@ export function createApp() {
   api.route("/skills", skills);
 
   const projectApi = api.route("/project", project);
+  const calendarFeedApi = api.route("/calendar-feed", calendarFeed);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
@@ -602,6 +613,11 @@ export function createApp() {
     githubIntegration,
   );
   const giteaIntegrationApi = api.route("/gitea-integration", giteaIntegration);
+  const gitlabIntegrationApi = api.route(
+    "/gitlab-integration",
+    gitlabIntegration,
+  );
+  const adminApi = api.route("/admin", admin);
   const genericWebhookIntegrationApi = api.route(
     "/generic-webhook-integration",
     genericWebhookIntegration,
@@ -778,6 +794,7 @@ export function createApp() {
     injectWebSocket,
     accessTeamApi,
     activityApi,
+    adminApi,
     appointmentApi,
     columnApi,
     commentApi,
@@ -787,6 +804,8 @@ export function createApp() {
     genericWebhookIntegrationApi,
     githubIntegrationApi,
     giteaIntegrationApi,
+    gitlabIntegrationApi,
+    calendarFeedApi,
     invitationApi,
     invitationPublicApi,
     labelApi,
@@ -887,6 +906,7 @@ const {
   injectWebSocket,
   accessTeamApi,
   activityApi,
+  adminApi,
   appointmentApi,
   columnApi,
   commentApi,
@@ -896,6 +916,8 @@ const {
   genericWebhookIntegrationApi,
   githubIntegrationApi,
   giteaIntegrationApi,
+  gitlabIntegrationApi,
+  calendarFeedApi,
   invitationApi,
   invitationPublicApi,
   labelApi,
@@ -947,6 +969,9 @@ export type AppType =
   | typeof searchApi
   | typeof githubIntegrationApi
   | typeof giteaIntegrationApi
+  | typeof gitlabIntegrationApi
+  | typeof calendarFeedApi
+  | typeof adminApi
   | typeof genericWebhookIntegrationApi
   | typeof discordIntegrationApi
   | typeof mattermostIntegrationApi

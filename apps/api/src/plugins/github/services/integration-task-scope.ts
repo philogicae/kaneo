@@ -48,8 +48,7 @@ export async function withIntegrationTask<T>(
             ? eq(projectTable.workspaceId, integration.project.workspaceId)
             : undefined,
         ),
-      )
-      .for("key share", { of: [projectTable, integrationTable] });
+      );
     if (!project) return undefined;
     if (expectedBinding) {
       const [binding] = await tx

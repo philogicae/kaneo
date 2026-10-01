@@ -87,3 +87,8 @@ export const projectMemberSchema = z
   .openapi("ProjectMember");
 
 export const projectMemberListSchema = z.array(projectMemberSchema);
+
+// A move also reports how many assignees lost access in the destination.
+export const movedProjectSchema = projectSchema
+  .extend({ unassignedTaskCount: z.number() })
+  .openapi("MovedProject");

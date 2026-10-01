@@ -1,5 +1,13 @@
 import { withLease } from "../database/lease";
 
+/** Signals that another holder owns the lease, so the caller can skip quietly. */
+class LeaseHeldError extends Error {
+  constructor(name: string) {
+    super(`Lease ${name} is held elsewhere`);
+    this.name = "LeaseHeldError";
+  }
+}
+
 /**
  * Run `run` while holding the named job lease, or return `whenHeldElsewhere`
  * when another holder has it.
@@ -14,8 +22,13 @@ export async function withJobLease<T>(
   whenHeldElsewhere: () => T,
   leaseMs?: number,
 ): Promise<T> {
-  return withLease(name, run, {
-    busy: whenHeldElsewhere,
-    ...(leaseMs ? { leaseMs } : {}),
-  });
+  try {
+    return await withLease(name, run, {
+      busy: () => new LeaseHeldError(name),
+      ...(leaseMs ? { leaseMs } : {}),
+    });
+  } catch (error) {
+    if (error instanceof LeaseHeldError) return whenHeldElsewhere();
+    throw error;
+  }
 }

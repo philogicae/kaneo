@@ -1542,12 +1542,15 @@ export const externalLinkTable = sqliteTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    integrationId: text("integration_id")
-      .notNull()
-      .references(() => integrationTable.id, {
+    // A manually added link has no owning integration; only links created by a
+    // forge webhook carry one.
+    integrationId: text("integration_id").references(
+      () => integrationTable.id,
+      {
         onDelete: "cascade",
         onUpdate: "cascade",
-      }),
+      },
+    ),
     resourceType: text("resource_type").notNull(),
     externalId: text("external_id").notNull(),
     url: text("url").notNull(),

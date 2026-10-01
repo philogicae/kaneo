@@ -1,5 +1,7 @@
 import { z } from "../openapi";
 import { pagingNumber } from "../utils/paging";
+import { MAX_TASK_POSITION } from "./controllers/next-task-position";
+import { TASK_SHORT_ID_PATTERN } from "../search/task-short-id";
 import { VALID_PRIORITIES } from "./validate-task-fields";
 
 export const taskParam = z.object({ id: z.string() });
@@ -192,4 +194,74 @@ export const finalizeImageUploadBody = z.object({
   contentType: z.string(),
   size: z.number(),
   surface,
+});
+
+export const ticketIdParam = z.object({
+  ticketId: z
+    .string()
+    .max(128)
+    .refine(
+      (value) => TASK_SHORT_ID_PATTERN.test(value),
+      "Invalid task ticket ID",
+    )
+    .openapi({
+      description: "Project key and task number, e.g. KAN-12.",
+    }),
+});
+
+export const ticketIdQuery = z.object({
+  workspaceId: z.string().min(1).optional().openapi({
+    description: "Select a workspace if the ticket ID exists in more than one.",
+  }),
+  projectId: z.string().min(1).optional().openapi({
+    description: "Select a project if the ticket ID exists more than once.",
+  }),
+});
+
+export const descriptionPageQuery = z.object({
+  offset: pagingNumber(0, 2_000_000_000, 0),
+  version: z
+    .string()
+    .regex(/^[0-9]{1,10}$/)
+    .optional(),
+});
+
+export const descriptionMatchesQuery = z.object({
+  query: z.string().trim().min(1).max(256),
+  after: z.string().min(1).max(128).optional(),
+});
+
+export const duplicateTaskBody = z.object({ title: z.string().optional() });
+
+export const stagedImageUploadBody = imageUploadBody.extend({
+  surface: z.literal("description"),
+});
+
+export const finalizeStagedImageUploadBody = finalizeImageUploadBody.extend({
+  surface: z.literal("description"),
+});
+
+export const reorderTasksBody = z.object({
+  projectId: z.string(),
+  expectedTasks: z
+    .array(
+      z.object({
+        id: z.string(),
+        position: z.number().int().min(0).max(MAX_TASK_POSITION).nullable(),
+        status: z.string(),
+      }),
+    )
+    .optional()
+    .describe(
+      "Previous complete contents of the affected columns; stale snapshots return 409",
+    ),
+  tasks: z
+    .array(
+      z.object({
+        id: z.string(),
+        position: z.number().int().min(0).max(MAX_TASK_POSITION),
+        status: z.string().optional(),
+      }),
+    )
+    .min(1),
 });

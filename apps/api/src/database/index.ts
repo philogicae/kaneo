@@ -84,6 +84,7 @@ import {
   notificationTable,
   projectTable,
   sessionTable,
+  storageCleanupTable,
   taskRelationTable,
   taskReminderSentTable,
   taskTable,

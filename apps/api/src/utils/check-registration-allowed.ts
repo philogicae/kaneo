@@ -27,6 +27,12 @@ export async function checkRegistrationAllowed(
   options?: {
     allowInvitationByEmail?: boolean;
     inviteLinkToken?: string;
+    /**
+     * Whether the address is already proven. Matching an invitation by email
+     * consumes it, so an unverified address must not be able to claim someone
+     * else's invite.
+     */
+    emailVerified?: boolean;
   },
 ): Promise<RegistrationCheckResult> {
   const isRegistrationDisabled = process.env.DISABLE_REGISTRATION === "true";
@@ -38,7 +44,11 @@ export async function checkRegistrationAllowed(
     };
   }
 
-  const canMatchByEmail = Boolean(options?.allowInvitationByEmail && email);
+  const canMatchByEmail = Boolean(
+    options?.allowInvitationByEmail &&
+    email &&
+    options?.emailVerified !== false,
+  );
 
   if (options?.inviteLinkToken) {
     const link = await findUsableInviteLink(options.inviteLinkToken);

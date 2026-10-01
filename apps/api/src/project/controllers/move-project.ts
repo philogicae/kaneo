@@ -96,7 +96,7 @@ async function moveProject(
          OR (target.project_id = ${id} AND source.project_id <> ${id})
       LIMIT 1
     `);
-        if (linked.length)
+        if (linked)
           throw new HTTPException(409, {
             message:
               "Remove task relationships to other projects before moving this project.",

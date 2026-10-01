@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, lte, max, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -9,9 +9,16 @@ import {
   taskTable,
   userTable,
 } from "../../database/schema";
+import { getSubtaskCounts } from "../get-subtask-counts";
 import { buildTaskOrderBy, type TaskSortField } from "../task-order";
 
 export type GetTasksOptions = {
+  /**
+   * Serve an anonymous public-project view. The rows are the same either way;
+   * the flag only adds the revision strings a shared cache needs to notice an
+   * edit to a card loaded on an earlier page.
+   */
+  publicOnly?: boolean;
   assigneeId?: string;
   dueAfter?: string;
   dueBefore?: string;
@@ -74,6 +81,26 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     .where(whereClause);
 
   const total = Number(taskCount?.count ?? 0);
+
+  // Public pages are cacheable, so they need a cheap signal that a card or a
+  // label/link on another page changed. The newest row timestamp across the
+  // project's related data is enough, and needs no Postgres hash aggregate.
+  let relatedRevision = "0";
+  if (options.publicOnly) {
+    const [labelRow] = await db
+      .select({ updatedAt: max(labelTable.updatedAt) })
+      .from(labelTable)
+      .innerJoin(taskTable, eq(labelTable.taskId, taskTable.id))
+      .where(eq(taskTable.projectId, projectId));
+    const [linkRow] = await db
+      .select({ updatedAt: max(externalLinkTable.updatedAt) })
+      .from(externalLinkTable)
+      .innerJoin(taskTable, eq(externalLinkTable.taskId, taskTable.id))
+      .where(eq(taskTable.projectId, projectId));
+    relatedRevision = `${labelRow?.updatedAt?.getTime() ?? 0}:${
+      linkRow?.updatedAt?.getTime() ?? 0
+    }`;
+  }
 
   const taskSelection = {
     id: taskTable.id,
@@ -153,7 +180,9 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     Array<{
       id: string;
       taskId: string;
-      integrationId: string;
+      // Null for a link a user added by hand rather than one a forge webhook
+      // created for an integration.
+      integrationId: string | null;
       resourceType: string;
       externalId: string;
       url: string;
@@ -181,6 +210,21 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     .where(eq(columnTable.projectId, projectId))
     .orderBy(asc(columnTable.position));
 
+  // Progress over direct children is board-filter independent, so it is loaded
+  // for the whole page rather than per column.
+  const subtaskCounts = await getSubtaskCounts(
+    db,
+    paginatedTasks.map((task) => task.id),
+    project.workspaceId,
+    options.publicOnly ?? false,
+  );
+  const withRelations = (task: (typeof paginatedTasks)[number]) => ({
+    ...task,
+    labels: taskLabelsMap.get(task.id) || [],
+    externalLinks: taskExternalLinksMap.get(task.id) || [],
+    subtaskCounts: subtaskCounts.get(task.id) ?? { completed: 0, total: 0 },
+  });
+
   const columns = projectColumns.map((column) => ({
     id: column.slug,
     slug: column.slug,
@@ -189,28 +233,16 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     isFinal: column.isFinal,
     tasks: paginatedTasks
       .filter((task) => task.status === column.slug)
-      .map((task) => ({
-        ...task,
-        labels: taskLabelsMap.get(task.id) || [],
-        externalLinks: taskExternalLinksMap.get(task.id) || [],
-      })),
+      .map(withRelations),
   }));
 
   const archivedTasks = paginatedTasks
     .filter((task) => task.status === "archived")
-    .map((task) => ({
-      ...task,
-      labels: taskLabelsMap.get(task.id) || [],
-      externalLinks: taskExternalLinksMap.get(task.id) || [],
-    }));
+    .map(withRelations);
 
   const plannedTasks = paginatedTasks
     .filter((task) => task.status === "planned")
-    .map((task) => ({
-      ...task,
-      labels: taskLabelsMap.get(task.id) || [],
-      externalLinks: taskExternalLinksMap.get(task.id) || [],
-    }));
+    .map(withRelations);
 
   return {
     data: {
@@ -221,23 +253,26 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       description: project.description,
       isPublic: project.isPublic,
       workspaceId: project.workspaceId,
+      backgroundVersion: project.backgroundVersion,
       columns,
       archivedTasks,
       plannedTasks,
     },
-    pagination: usePagination
-      ? {
-          total,
-          page,
-          pageSize,
-          totalPages: Math.max(1, Math.ceil(total / pageSize)),
-        }
-      : {
-          total,
-          page: 1,
-          pageSize: total,
-          totalPages: 1,
-        },
+    pagination: {
+      total,
+      // Anonymous public pages are cacheable, so they carry a revision that
+      // changes whenever a card on an earlier page could have changed. Built
+      // from the newest task/label/link timestamps rather than a Postgres hash
+      // aggregate, which libSQL has no equivalent for.
+      ...(options.publicOnly
+        ? {
+            revision: `${project.backgroundVersion ?? ""}:${project.createdAt.getTime()}:${total}:${relatedRevision}`,
+          }
+        : {}),
+      page: usePagination ? page : 1,
+      pageSize: usePagination ? pageSize : total,
+      totalPages: usePagination ? Math.max(1, Math.ceil(total / pageSize)) : 1,
+    },
   };
 }
 

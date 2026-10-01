@@ -287,16 +287,18 @@ export async function verifyTaskAssetUpload(
 
 /** Duplicate a staged object so a duplicated task keeps its own attachment. */
 export async function copyTaskAssetObject({
-  fromKey,
-  toKey,
+  sourceKey,
+  destination,
 }: {
-  fromKey: string;
-  toKey: string;
-}): Promise<void> {
-  const source = resolveStoragePath(fromKey);
-  const target = resolveStoragePath(toKey);
+  sourceKey: string;
+  destination: TaskImageUploadContext;
+}): Promise<string> {
+  const key = applyKeyPrefix(getKeyPrefix(), buildObjectKey(destination));
+  const source = resolveStoragePath(sourceKey);
+  const target = resolveStoragePath(key);
   mkdirSync(dirname(target), { recursive: true });
   await fs.copyFile(source, target);
+  return key;
 }
 
 export async function deleteS3Object(key: string): Promise<void> {

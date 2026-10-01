@@ -330,20 +330,22 @@ function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
                   </HoverCardContent>
                 </HoverCard>
               )}
-              {showTaskItemCounts && taskItemStats.total > 0 && (
-                <span
-                  className={cn(
-                    "flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-muted/50 text-muted-foreground h-5.5",
-                    {
-                      "bg-success/10 text-success-foreground":
-                        taskItemStats.completed === taskItemStats.total,
-                    },
-                  )}
-                >
-                  <SquareCheck className="h-3 w-3" />
-                  {taskItemStats.completed}/{taskItemStats.total}
-                </span>
-              )}
+              {showTaskItemCounts &&
+                taskItemStats &&
+                taskItemStats.total > 0 && (
+                  <span
+                    className={cn(
+                      "flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-muted/50 text-muted-foreground h-5.5",
+                      {
+                        "bg-success/10 text-success-foreground":
+                          taskItemStats.completed === taskItemStats.total,
+                      },
+                    )}
+                  >
+                    <SquareCheck className="h-3 w-3" />
+                    {taskItemStats.completed}/{taskItemStats.total}
+                  </span>
+                )}
 
               {showDueDates && task.dueDate && (
                 <div

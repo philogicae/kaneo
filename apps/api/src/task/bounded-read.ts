@@ -1,9 +1,9 @@
 import { HTTPException } from "hono/http-exception";
 import db from "../database";
 
-export type TaskReadDatabase = Parameters<
-  Parameters<typeof db.transaction>[0]
->[0];
+export type TaskReadDatabase =
+  | typeof db
+  | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /**
  * Run a task read inside a transaction and translate a timeout into a

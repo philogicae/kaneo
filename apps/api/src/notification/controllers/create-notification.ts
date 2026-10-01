@@ -16,22 +16,31 @@ export type CreateNotificationInput = {
   projectId?: string | null;
 };
 
+type NotificationDatabase =
+  | typeof db
+  | Parameters<Parameters<typeof db.transaction>[0]>[0];
+
 /**
  * Store the notification, or return null when the recipient must not have it.
  *
  * Split from dispatch so a caller inside a transaction can persist first and
  * publish once the surrounding work has committed.
  */
-export async function persistNotification({
-  userId,
-  title,
-  content,
-  type,
-  eventData,
-  resourceId,
-  resourceType,
-  projectId,
-}: CreateNotificationInput) {
+export async function persistNotification(
+  {
+    userId,
+    title,
+    content,
+    type,
+    eventData,
+    resourceId,
+    resourceType,
+    projectId,
+  }: CreateNotificationInput,
+  // A caller that already holds a transaction passes it, so the notification
+  // and its surrounding work commit or roll back together.
+  database: NotificationDatabase = db,
+) {
   // A project-scoped notification would deep-link to a surface the recipient
   // is refused on: drop it instead of storing a dead link.
   if (projectId && !(await canAccessProject(userId, projectId))) {
@@ -55,18 +64,17 @@ export async function persistNotification({
             : null;
 
   if (preferenceKey) {
-    const preference = await db.query.userNotificationPreferenceTable.findFirst(
-      {
+    const preference =
+      await database.query.userNotificationPreferenceTable.findFirst({
         where: (table, { eq }) => eq(table.userId, userId),
-      },
-    );
+      });
 
     if (preference?.[preferenceKey] === false) {
       return null;
     }
   }
 
-  const [notification] = await db
+  const [notification] = await database
     .insert(notificationTable)
     .values({
       id: createId(),

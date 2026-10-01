@@ -79,8 +79,7 @@ export async function createExternalLink(
         eq(taskTable.id, params.taskId),
         eq(integrationTable.id, params.integrationId),
       ),
-    )
-    .for("share", { of: taskTable });
+    );
   if (!task)
     throw new Error("Task no longer belongs to the integration project");
 

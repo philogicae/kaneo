@@ -1,3 +1,7 @@
+import { eq } from "drizzle-orm";
+import db from "../database";
+import { projectTable } from "../database/schema";
+import { HTTPException } from "hono/http-exception";
 import {
   apiRouter,
   type BaseVariables,
@@ -6,7 +10,17 @@ import {
   jsonResponse,
   z,
 } from "../openapi";
-import { requireWorkspacePermission } from "../utils/require-workspace-permission";
+import {
+  hasWorkspacePermission,
+  requireWorkspacePermission,
+} from "../utils/require-workspace-permission";
+import { publishEvent } from "../events";
+import { validateWorkspaceAccess } from "../utils/validate-workspace-access";
+import {
+  deleteS3Object,
+  getPrivateObject,
+  isImageContentType,
+} from "../storage/s3";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import archiveProjectCtrl from "./controllers/archive-project";
 import createProjectCtrl from "./controllers/create-project";
@@ -15,10 +29,12 @@ import getProjectCtrl from "./controllers/get-project";
 import getProjectCharts from "./controllers/get-project-charts";
 import getProjectMembers from "./controllers/get-project-members";
 import getProjectsCtrl from "./controllers/get-projects";
+import moveProjectCtrl from "./controllers/move-project";
 import reorderProjectsCtrl from "./controllers/reorder-projects";
 import unarchiveProjectCtrl from "./controllers/unarchive-project";
 import updateProjectCtrl from "./controllers/update-project";
 import {
+  movedProjectSchema,
   projectChartsSchema,
   projectListSchema,
   projectMemberListSchema,
@@ -28,12 +44,45 @@ import {
   createProjectBody,
   getProjectTasksQuery,
   listProjectsQuery,
+  moveProjectBody,
   projectChartsQuery,
   projectParam,
   reorderProjectsBody,
   updateProjectBody,
   workspaceIdQuery,
 } from "./schema";
+
+const moveProjectRoute = createRoute({
+  method: "put",
+  path: "/{id}/move",
+  operationId: "moveProject",
+  tags: ["Projects"],
+  summary: "Move a project to another workspace",
+  description:
+    "Move a project and its tasks. Requires update and delete permission in the source, plus project creation and workspace settings management permission in the destination. Remove cross-project task relationships before moving.",
+  middleware: [
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["update", "delete"] }),
+  ] as const,
+  request: {
+    params: projectParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: moveProjectBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("Project moved", movedProjectSchema),
+    400: errorResponse("Invalid destination or same workspace"),
+    401: errorResponse("Unauthorized"),
+    403: errorResponse("Missing workspace access or permission"),
+    404: errorResponse("Project not found in the source workspace"),
+    // A project is still being moved by another request.
+    409: errorResponse(
+      "Project key conflict or cross-project task relationships",
+    ),
+  },
+});
 
 const listProjectsRoute = createRoute({
   method: "get",
@@ -241,6 +290,47 @@ const archiveProjectRoute = createRoute({
   },
 });
 
+const getProjectBackgroundRoute = createRoute({
+  method: "get",
+  operationId: "getProjectBackground",
+  path: "/{id}/background",
+  tags: ["Projects"],
+  summary: "Download project background",
+  description: "Download the current project board background image.",
+  middleware: [workspaceAccess.fromProject()] as const,
+  request: { params: projectParam },
+  responses: {
+    200: {
+      description: "The project background image",
+      content: {
+        "image/*": { schema: { type: "string", format: "binary" } },
+      },
+    },
+    304: { description: "Not modified" },
+    404: errorResponse("Project background not found"),
+  },
+});
+
+const deleteProjectBackgroundRoute = createRoute({
+  method: "delete",
+  operationId: "deleteProjectBackground",
+  path: "/{id}/background",
+  tags: ["Projects"],
+  summary: "Delete project background",
+  description: "Remove the current project board background image.",
+  middleware: [
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["update"] }),
+  ] as const,
+  request: { params: projectParam },
+  responses: {
+    204: { description: "Project background removed" },
+    403: errorResponse(
+      "No workspace access, or missing project:update permission",
+    ),
+  },
+});
+
 const unarchiveProjectRoute = createRoute({
   method: "put",
   operationId: "unarchiveProject",
@@ -265,6 +355,29 @@ const unarchiveProjectRoute = createRoute({
 });
 
 const project = apiRouter<BaseVariables & { workspaceId: string }>()
+  .openapi(moveProjectRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const { workspaceId: targetWorkspaceId } = c.req.valid("json");
+    const sourceWorkspaceId = c.get("workspaceId");
+    const userId = c.get("userId");
+    // The request was authorized against the source workspace only, so the
+    // destination is checked separately before anything is rewritten.
+    await validateWorkspaceAccess(userId, targetWorkspaceId);
+    if (
+      !(await hasWorkspacePermission(
+        c,
+        { project: ["create"], workspace: ["manage_settings"] },
+        targetWorkspaceId,
+      ))
+    )
+      throw new HTTPException(403, {
+        message: "Insufficient permissions in the target workspace",
+      });
+    return c.json(
+      await moveProjectCtrl(id, sourceWorkspaceId, targetWorkspaceId, userId),
+      200,
+    );
+  })
   .openapi(listProjectsRoute, async (c) => {
     const workspaceId = c.get("workspaceId");
     const { includeArchived } = c.req.valid("query");
@@ -308,6 +421,73 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const { id } = c.req.valid("param");
     return c.json(await getProjectMembers(id), 200);
   })
+  .openapi(getProjectBackgroundRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const [projectData] = await db
+      .select({
+        backgroundObjectKey: projectTable.backgroundObjectKey,
+        backgroundMimeType: projectTable.backgroundMimeType,
+        backgroundVersion: projectTable.backgroundVersion,
+      })
+      .from(projectTable)
+      .where(eq(projectTable.id, id))
+      .limit(1);
+
+    if (!projectData?.backgroundObjectKey) {
+      throw new HTTPException(404, {
+        message: "Project background not found",
+      });
+    }
+
+    try {
+      const object = await getPrivateObject(projectData.backgroundObjectKey);
+      const contentType = (
+        object.contentType ||
+        projectData.backgroundMimeType ||
+        ""
+      )
+        .toLowerCase()
+        .split(";")[0]
+        ?.trim();
+
+      // The key is storage-internal, so an object that is not an image must
+      // not be served with a sniffed content type.
+      if (!contentType || !isImageContentType(contentType)) {
+        await (object.body as ReadableStream).cancel();
+        throw new HTTPException(404, {
+          message: "Project background not found",
+        });
+      }
+
+      const etag = object.etag || `"${projectData.backgroundVersion}"`;
+      const headers: Record<string, string> = {
+        "Cache-Control": "private, max-age=300, must-revalidate",
+        "Content-Type": contentType,
+        ETag: etag,
+        Vary: "Cookie, Authorization",
+        "X-Content-Type-Options": "nosniff",
+      };
+      if (object.contentLength !== undefined) {
+        headers["Content-Length"] = object.contentLength.toString();
+      }
+      if (object.lastModified) {
+        headers["Last-Modified"] = object.lastModified.toUTCString();
+      }
+
+      if (c.req.header("If-None-Match") === etag) {
+        await (object.body as ReadableStream).cancel();
+        return new Response(null, { status: 304, headers });
+      }
+
+      return new Response(object.body as BodyInit, { headers });
+    } catch (error) {
+      if (error instanceof HTTPException) throw error;
+      console.error("Failed to stream project background:", error);
+      throw new HTTPException(404, {
+        message: "Project background not found",
+      });
+    }
+  })
   .openapi(reorderProjectsRoute, async (c) => {
     const workspaceId = c.get("workspaceId");
     const { projects } = c.req.valid("json");
@@ -326,6 +506,8 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
       description,
       isPublic,
       workspaceId,
+      // Publishing a project is a separate capability from editing it.
+      await hasWorkspacePermission(c, { project: ["share"] }),
     );
     return c.json(updatedProject, 200);
   })
@@ -346,6 +528,36 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const workspaceId = c.get("workspaceId");
     const unarchivedProject = await unarchiveProjectCtrl(id, workspaceId);
     return c.json(unarchivedProject, 200);
+  })
+  .openapi(deleteProjectBackgroundRoute, async (c) => {
+    const { id } = c.req.valid("param");
+    const [currentProject] = await db
+      .select({ backgroundObjectKey: projectTable.backgroundObjectKey })
+      .from(projectTable)
+      .where(eq(projectTable.id, id))
+      .limit(1);
+
+    const [updatedProject] = await db
+      .update(projectTable)
+      .set({
+        backgroundObjectKey: null,
+        backgroundMimeType: null,
+        backgroundVersion: null,
+      })
+      .where(eq(projectTable.id, id))
+      .returning({ id: projectTable.id });
+
+    // The row is cleared first, so a failed unlink leaves an orphan object
+    // rather than a project pointing at a deleted one.
+    if (updatedProject && currentProject?.backgroundObjectKey) {
+      deleteS3Object(currentProject.backgroundObjectKey).catch(() => {});
+    }
+
+    if (updatedProject) {
+      await publishEvent("project.updated", { projectId: id });
+    }
+
+    return c.body(null, 204);
   });
 
 export default project;
