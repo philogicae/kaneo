@@ -1,5 +1,6 @@
 import { isEmailConfigured, isSmtpConfigured } from "@kaneo/email";
 import { config } from "dotenv-mono";
+import { resolveFileSecret } from "./file-secret";
 import { isGithubSsoConfigured } from "./github-sso-env";
 import { isCloud } from "./is-cloud";
 
@@ -25,7 +26,7 @@ function getSettings() {
       Boolean(process.env.DISCORD_CLIENT_SECRET),
     hasCustomOAuth:
       Boolean(process.env.CUSTOM_OAUTH_CLIENT_ID) &&
-      Boolean(process.env.CUSTOM_OAUTH_CLIENT_SECRET),
+      Boolean(resolveFileSecret("CUSTOM_OAUTH_CLIENT_SECRET")),
     hasGuestAccess: [
       "DISABLE_GUEST_ACCESS",
       "DISABLE_REGISTRATION",

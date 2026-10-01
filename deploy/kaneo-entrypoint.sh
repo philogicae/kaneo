@@ -1,6 +1,24 @@
 #!/bin/sh
 set -eu
 
+check_file_secret() {
+  node -e '
+    const fs = require("node:fs");
+    const [name, file] = process.argv.slice(1);
+    let value;
+    try {
+      value = fs.readFileSync(file, "utf8").replace(/(?:\r?\n)+$/, "");
+    } catch (error) {
+      process.stderr.write(`ERROR: ${name} could not be read (${error.code ?? "unknown"}): ${file}\n`);
+      process.exit(1);
+    }
+    if (!value) {
+      process.stderr.write(`ERROR: ${name} points to an empty file: ${file}\n`);
+      process.exit(1);
+    }
+  ' -- "$1" "$2"
+}
+
 api_pid=""
 nginx_pid=""
 
@@ -24,8 +42,11 @@ if [ -z "${KANEO_API_URL:-}" ] && [ -n "$client_url" ]; then
   echo "KANEO_API_URL not set — derived from KANEO_CLIENT_URL: $KANEO_API_URL"
 fi
 
-# Auto-generate AUTH_SECRET if not set
-if [ -z "${AUTH_SECRET:-}" ]; then
+# Auto-generate AUTH_SECRET if not set. This fork ships libSQL, so there is no
+# database password to source from a file here; AUTH_SECRET_FILE still works.
+if [ -z "${AUTH_SECRET:-}" ] && [ -n "${AUTH_SECRET_FILE:-}" ]; then
+  check_file_secret AUTH_SECRET_FILE "$AUTH_SECRET_FILE"
+elif [ -z "${AUTH_SECRET:-}" ]; then
   export AUTH_SECRET="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"
   echo "WARNING: AUTH_SECRET not set — generated a random secret for this session."
   echo "WARNING: Set AUTH_SECRET in your .env to persist sessions across restarts."

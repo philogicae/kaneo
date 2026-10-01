@@ -1,10 +1,30 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import { DndContext, KeyboardSensor } from "@dnd-kit/core";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 import type Task from "@/types/task";
+import useBulkSelectionStore from "@/store/bulk-selection";
+import BacklogTaskRow from "../backlog-list-view/backlog-task-row";
+import TaskCard from "../kanban-board/task-card";
+import { PublicTaskCard } from "../public-project/task-card";
+import { PublicTaskRow } from "../public-project/task-row";
 import TaskRow from "./task-row";
 
 const useExternalLinks = vi.fn((_taskId: string) => ({ data: [] }));
 const useGetLabelsByTask = vi.fn((_taskId: string) => ({ data: [] }));
+const { navigate } = vi.hoisted(() => ({
+  navigate: vi.fn(),
+}));
+
+beforeEach(() => {
+  useBulkSelectionStore.setState(useBulkSelectionStore.getInitialState());
+});
 
 afterEach(() => {
   cleanup();
@@ -12,7 +32,7 @@ afterEach(() => {
 });
 
 vi.mock("@tanstack/react-router", () => ({
-  useNavigate: () => vi.fn(),
+  useNavigate: () => navigate,
 }));
 
 vi.mock("@/hooks/queries/external-link/use-external-links", () => ({
@@ -47,16 +67,24 @@ vi.mock(
   () => ({ default: () => null }),
 );
 
-vi.mock("@/store/bulk-selection", () => ({
-  default: () => ({
-    toggleSelection: vi.fn(),
-    isSelected: () => false,
-    isFocused: () => false,
+vi.mock(
+  "@/hooks/queries/custom-field/use-get-custom-field-values-by-project",
+  () => ({
+    default: () => ({ data: [] }),
   }),
+);
+
+// Backlog rows can promote a task to an appointment, which needs a client.
+vi.mock("@/hooks/mutations/appointment/use-move-task-to-appointments", () => ({
+  default: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
+// Rows read the project through the selector form, so the mock has to
+// support both call shapes.
+const projectState = { project: { id: "project-1", slug: "kan" } };
 vi.mock("@/store/project", () => ({
-  default: () => ({ project: { id: "project-1", slug: "kan" } }),
+  default: (selector?: (state: typeof projectState) => unknown) =>
+    selector ? selector(projectState) : projectState,
 }));
 
 vi.mock("@/store/user-preferences", () => ({
@@ -65,11 +93,15 @@ vi.mock("@/store/user-preferences", () => ({
     showDueDates: true,
     showLabels: true,
     showTaskNumbers: true,
+    showTaskItemCounts: false,
   }),
 }));
 
 vi.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { language: "en-US", resolvedLanguage: "en-US" },
+  }),
   initReactI18next: { type: "3rdParty", init: vi.fn() },
 }));
 
@@ -89,6 +121,7 @@ const task: Task = {
   assigneeName: null,
   projectId: "project-1",
   labels: [{ id: "label-1", name: "Bug", color: "red" }],
+  subtaskCounts: { completed: 2, total: 5 },
   externalLinks: [
     {
       id: "link-1",
@@ -104,6 +137,125 @@ const task: Task = {
 };
 
 describe("TaskRow", () => {
+  it.each(["board", "list"])(
+    "selects a range with Shift+Enter in the %s view",
+    (view) => {
+      useBulkSelectionStore.getState().setAvailableTasks(["anchor", task.id]);
+      useBulkSelectionStore.getState().setSelectionAnchor("anchor");
+      const onDragStart = vi.fn();
+      render(
+        <DndContext
+          sensors={[{ sensor: KeyboardSensor, options: {} }]}
+          onDragStart={onDragStart}
+        >
+          {view === "board" ? (
+            <TaskCard task={task} />
+          ) : (
+            <TaskRow task={task} projectSlug="kan" />
+          )}
+        </DndContext>,
+      );
+
+      fireEvent.keyDown(
+        screen.getByRole("button", { name: /Row from payload/ }),
+        {
+          key: "Enter",
+          shiftKey: true,
+        },
+      );
+
+      expect(useBulkSelectionStore.getState().selectedTaskIds).toEqual(
+        new Set(["anchor", task.id]),
+      );
+      expect(navigate).not.toHaveBeenCalled();
+      expect(onDragStart).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(
+        screen.getByRole("button", { name: /Row from payload/ }),
+        { key: "Enter" },
+      );
+      expect(navigate).toHaveBeenCalled();
+      expect(onDragStart).not.toHaveBeenCalled();
+      fireEvent.keyDown(
+        screen.getByRole("button", { name: /Row from payload/ }),
+        { key: " ", code: "Space" },
+      );
+      expect(onDragStart).toHaveBeenCalledOnce();
+    },
+  );
+
+  it.each(["board", "list"])(
+    "selects a visible range with Shift+click and preserves Ctrl/Cmd toggling in the %s view",
+    (view) => {
+      const otherTask = { ...task, id: "task-2", title: "Second task" };
+      useBulkSelectionStore
+        .getState()
+        .setAvailableTasks([task.id, "middle", otherTask.id]);
+      render(
+        <>
+          {view === "board" ? (
+            <TaskCard task={task} />
+          ) : (
+            <TaskRow task={task} projectSlug="kan" />
+          )}
+          {view === "board" ? (
+            <TaskCard task={otherTask} />
+          ) : (
+            <TaskRow task={otherTask} projectSlug="kan" />
+          )}
+        </>,
+      );
+      fireEvent.click(screen.getByText(task.title));
+      expect(navigate).toHaveBeenCalled();
+      navigate.mockClear();
+      fireEvent.click(screen.getByText(otherTask.title), { shiftKey: true });
+      expect(useBulkSelectionStore.getState().selectedTaskIds).toEqual(
+        new Set([task.id, "middle", otherTask.id]),
+      );
+      expect(navigate).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByText(task.title), { ctrlKey: true });
+      fireEvent.click(screen.getByText(otherTask.title), { metaKey: true });
+      expect(useBulkSelectionStore.getState().selectedTaskIds).toEqual(
+        new Set(["middle"]),
+      );
+      expect(navigate).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([PublicTaskCard, PublicTaskRow])(
+    "renders public progress without nesting interactive controls",
+    (Component) => {
+      const onTaskClick = vi.fn();
+      const { container } = render(
+        <Component
+          task={{ ...task, externalLinks: [] }}
+          projectSlug="kan"
+          onTaskClick={onTaskClick}
+        />,
+      );
+      expect(screen.getByTitle("tasks:subtasks.progress")).toHaveTextContent(
+        "2/5",
+      );
+      expect(container.querySelector("button button")).toBeNull();
+      expect(screen.getAllByRole("button")).toHaveLength(1);
+      expect(useExternalLinks).not.toHaveBeenCalled();
+      expect(useGetLabelsByTask).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["planned", "archived"])(
+    "renders progress for %s backlog parents without per-row requests",
+    (status) => {
+      render(<BacklogTaskRow task={{ ...task, status }} />);
+
+      expect(
+        screen.getByRole("button", { name: "tasks:subtasks.progress" }),
+      ).toHaveTextContent("2/5");
+      expect(useExternalLinks).not.toHaveBeenCalled();
+      expect(useGetLabelsByTask).not.toHaveBeenCalled();
+    },
+  );
+
   it("renders labels and pull requests from the task payload without per-row requests", () => {
     render(<TaskRow task={task} projectSlug="kan" />);
 

@@ -45,13 +45,14 @@ function KanbanBoard({
   disableDragDrop = false,
 }: KanbanBoardProps) {
   const { setProject } = useProjectStore();
-  const {
-    setAvailableTasks,
-    focusNext,
-    focusPrevious,
-    focusedTaskId,
-    clearFocus,
-  } = useBulkSelectionStore();
+  const setAvailableTasks = useBulkSelectionStore(
+    (state) => state.setAvailableTasks,
+  );
+  const focusNext = useBulkSelectionStore((state) => state.focusNext);
+  const focusPrevious = useBulkSelectionStore((state) => state.focusPrevious);
+  const focusedTaskId = useBulkSelectionStore((state) => state.focusedTaskId);
+  const clearFocus = useBulkSelectionStore((state) => state.clearFocus);
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const { mutate: updateTask } = useUpdateTask();
   const navigate = useNavigate();
