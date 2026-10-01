@@ -1,10 +1,17 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import db from "../database";
-import { userTable } from "../database/schema";
+import {
+  projectTable,
+  userTable,
+  workspaceUserTable,
+} from "../database/schema";
 import { subscribeToEvent } from "../events";
-import { hasInstanceAdminRole } from "../utils/instance-admin-role";
+import {
+  hasInstanceAdminRole,
+  instanceAdminRoleSql,
+} from "../utils/instance-admin-role";
 import type {
   BroadcastAdapter,
   BroadcastMessage,
@@ -16,10 +23,21 @@ import { InMemoryBroadcastAdapter } from "./in-memory-broadcast-adapter";
 
 const INSTANCE_ID = randomUUID();
 
+/** In-flight workspace lookups, so one broadcast pass costs one query. */
+const workspaceLookups = new Map<string, Promise<string | null>>();
+/** In-flight membership lookups, keyed per broadcast batch. */
+const authorizationLookups = new Map<
+  string,
+  Promise<{ workspaceId: string | null; members: Set<string> } | null>
+>();
+
 type ProjectConnection = {
   ws: WSContext;
   userId: string;
   initiatorId: string;
+  // The workspace the project belonged to when the connection opened, so a
+  // later revocation of that workspace can close this connection.
+  workspaceId: string;
 };
 
 type UserConnection = {
@@ -86,6 +104,29 @@ function deliverToLocalUserConnections(
 }
 
 /**
+ * Close project connections a user can no longer reach through a workspace.
+ *
+ * A membership removal must not leave an open socket feeding a client data
+ * from a workspace it can no longer open.
+ */
+export function revokeLocalWorkspaceConnections(
+  userId: string,
+  workspaceId: string,
+) {
+  for (const [projectId, connections] of projectConnections) {
+    for (const conn of [...connections]) {
+      if (conn.userId !== userId || conn.workspaceId !== workspaceId) continue;
+      removeConnection(projectId, conn);
+      try {
+        conn.ws.close(1008, "Workspace access revoked");
+      } catch {
+        // Already closed.
+      }
+    }
+  }
+}
+
+/**
  * Tell a client that one of its workspaces is no longer reachable, so it can
  * drop cached data for it.
  *
@@ -112,6 +153,7 @@ export async function revokeWorkspaceConnections(
       console.error("Failed to read role after membership removal:", error);
     }
   }
+  revokeLocalWorkspaceConnections(userId, workspaceId);
   broadcastToUser(userId, {
     type: "WORKSPACE_ACCESS_REVOKED",
     workspaceId,
@@ -151,6 +193,7 @@ export async function initializeWebSocketAdapter() {
         msg.projectId,
         msg.message,
         msg.excludeInitiatorId,
+        msg.authorizationBatch,
       );
     });
     await nextAdapter.subscribeToUser((msg: UserBroadcast) => {
@@ -192,25 +235,169 @@ export async function shutdownWebSocketAdapter() {
   adapter = null;
 }
 
-function deliverToLocalConnections(
+/**
+ * A project's current workspace, coalesced across concurrent deliveries.
+ */
+function currentProjectWorkspace(projectId: string) {
+  let pending = workspaceLookups.get(projectId);
+  if (!pending) {
+    pending = db
+      .select({ workspaceId: projectTable.workspaceId })
+      .from(projectTable)
+      .where(eq(projectTable.id, projectId))
+      .limit(1)
+      .then(([project]) => project?.workspaceId ?? null)
+      .finally(() => workspaceLookups.delete(projectId));
+    workspaceLookups.set(projectId, pending);
+  }
+  return pending;
+}
+
+/**
+ * Who may still receive a project's broadcasts.
+ *
+ * Membership can be revoked, or the project moved, while a socket stays open,
+ * so every delivery re-checks the workspace and the recipients' membership
+ * instead of trusting the connection that was authorized at upgrade time.
+ * Lookups are keyed per broadcast so one pass over a queue costs one query.
+ */
+function currentBroadcastAccess(
+  projectId: string,
+  recipients: Array<{ userId: string }>,
+  authorizationBatch: string,
+) {
+  const userIds = [...new Set(recipients.map((conn) => conn.userId))].sort();
+  const key = JSON.stringify([projectId, authorizationBatch, userIds]);
+  let pending = authorizationLookups.get(key);
+  if (!pending) {
+    pending = (async () => {
+      let workspaceId: string | null;
+      try {
+        workspaceId = await currentProjectWorkspace(projectId);
+      } catch (error) {
+        console.error("Failed to validate project broadcast access:", error);
+        return null;
+      }
+
+      let members = new Set<string>();
+      if (workspaceId) {
+        try {
+          const rows = await db
+            .select({ userId: workspaceUserTable.userId })
+            .from(workspaceUserTable)
+            .where(
+              and(
+                eq(workspaceUserTable.workspaceId, workspaceId),
+                inArray(workspaceUserTable.userId, userIds),
+              ),
+            );
+          members = new Set(rows.map((row) => row.userId));
+
+          // An instance admin is not a workspace member but may still open the
+          // project, so they stay a valid recipient.
+          const nonmembers = userIds.filter((userId) => !members.has(userId));
+          if (nonmembers.length > 0) {
+            const admins = await db
+              .select({ userId: userTable.id, role: userTable.role })
+              .from(userTable)
+              .where(
+                and(
+                  inArray(userTable.id, nonmembers),
+                  instanceAdminRoleSql(userTable.role),
+                ),
+              );
+            for (const admin of admins) members.add(admin.userId);
+          }
+        } catch (error) {
+          console.error("Failed to validate broadcast membership:", error);
+          return null;
+        }
+      }
+      return { workspaceId, members };
+    })().finally(() => authorizationLookups.delete(key));
+    authorizationLookups.set(key, pending);
+  }
+  return pending;
+}
+
+async function deliverToLocalConnections(
   projectId: string,
   message: ProjectBroadcastMessage,
   excludeInitiatorId?: string,
+  authorizationBatch: string = randomUUID(),
 ) {
+  // A move invalidates every open connection for the project, so the notice
+  // replaces whatever was queued for it.
+  if (message.type === "PROJECT_MOVED") {
+    closeLocalProjectConnections(projectId);
+    return;
+  }
+
   const connections = projectConnections.get(projectId);
   if (!connections) return;
+  const recipients = [...connections];
+
+  const access = await currentBroadcastAccess(
+    projectId,
+    recipients,
+    authorizationBatch,
+  );
+  if (!access) return;
+  const { workspaceId, members } = access;
 
   const payload = JSON.stringify(message);
-  for (const conn of connections) {
+  for (const conn of recipients) {
+    // A revocation may have closed this connection while the lookup ran.
+    if (!projectConnections.get(projectId)?.has(conn)) continue;
+    if (conn.workspaceId !== workspaceId || !members.has(conn.userId)) {
+      removeConnection(projectId, conn);
+      try {
+        conn.ws.close(
+          1008,
+          conn.workspaceId !== workspaceId
+            ? "Project workspace changed"
+            : "Workspace access revoked",
+        );
+      } catch {
+        // Already closed.
+      }
+      continue;
+    }
     if (excludeInitiatorId && conn.initiatorId === excludeInitiatorId) continue;
     try {
       conn.ws.send(payload);
     } catch {
-      connections.delete(conn);
+      removeConnection(projectId, conn);
     }
   }
-  if (connections.size === 0) {
+  if (projectConnections.get(projectId)?.size === 0) {
     projectConnections.delete(projectId);
+  }
+}
+
+function closeLocalProjectConnections(projectId: string) {
+  // Anything still queued was addressed to the workspace the project just
+  // left, so it is dropped rather than delivered.
+  const timeout = projectBroadcastTimeouts.get(projectId);
+  if (timeout) clearTimeout(timeout);
+  projectBroadcastTimeouts.delete(projectId);
+  projectBroadcastQueues.delete(projectId);
+
+  const connections = projectConnections.get(projectId);
+  projectConnections.delete(projectId);
+  for (const conn of connections ?? []) {
+    // Tell the client why before closing, so it can drop its cached board
+    // instead of treating the close as a network fault.
+    try {
+      conn.ws.send(JSON.stringify({ type: "PROJECT_MOVED", projectId }));
+    } catch {
+      // The socket may already be closed.
+    }
+    try {
+      conn.ws.close(1008, "Project workspace changed");
+    } catch {
+      // Already closed.
+    }
   }
 }
 
@@ -219,11 +406,12 @@ export function addConnection(
   ws: WSContext,
   userId: string,
   initiatorId: string,
+  workspaceId: string,
 ) {
   if (!projectConnections.has(projectId)) {
     projectConnections.set(projectId, new Set());
   }
-  const conn: ProjectConnection = { ws, userId, initiatorId };
+  const conn: ProjectConnection = { ws, userId, initiatorId, workspaceId };
   projectConnections.get(projectId)?.add(conn);
   return conn;
 }
@@ -246,28 +434,15 @@ export function removeConnection(projectId: string, conn: ProjectConnection) {
  * receiving PROJECT_MOVED.
  */
 export async function closeProjectConnections(projectId: string) {
-  const connections = projectConnections.get(projectId);
-  if (connections) {
-    for (const conn of [...connections]) {
-      removeConnection(projectId, conn);
-      try {
-        conn.ws.close(1008, "Project moved to another workspace");
-      } catch {
-        // Already closed.
-      }
-    }
-  }
-
-  if (!adapter) {
-    return;
-  }
-
+  closeLocalProjectConnections(projectId);
   try {
-    await adapter.publish({
+    await adapter?.publish({
       projectId,
       message: { type: "PROJECT_MOVED", projectId },
     });
   } catch (error) {
+    // Delivery also re-checks the workspace, so a missed cross-instance notice
+    // cannot leave stale connections receiving future project updates.
     console.error("Failed to publish project move:", error);
   }
 }
@@ -302,6 +477,10 @@ export function broadcastToProject(
 
     if (!queue || !adapter) return;
 
+    // Only messages flushed together may share an authorization snapshot, so a
+    // later burst always re-checks membership.
+    const authorizationBatch = randomUUID();
+
     // Publish each queued message through the adapter
     for (const { message: msg, excludeInitiatorId: exId } of queue.values()) {
       void adapter
@@ -309,6 +488,7 @@ export function broadcastToProject(
           projectId,
           message: msg,
           excludeInitiatorId: exId,
+          authorizationBatch,
         })
         .catch((err) => {
           console.error(
@@ -410,6 +590,19 @@ subscribeToEvent<{
     initiatorId,
   );
 });
+
+// A project-level change (background, archive state) has no task id, so it is
+// broadcast on its own rather than through the task event list.
+subscribeToEvent<{ projectId: string; initiatorId?: string }>(
+  "project.updated",
+  async (data) => {
+    if (!data.projectId) return;
+    broadcastToProject(data.projectId, {
+      type: "PROJECT_UPDATED",
+      projectId: data.projectId,
+    });
+  },
+);
 
 subscribeToEvent<{ notificationId: string; userId: string }>(
   "notification.created",

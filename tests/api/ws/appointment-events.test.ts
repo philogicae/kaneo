@@ -6,6 +6,40 @@ import {
   it,
   vi,
 } from "vite-plus/test";
+
+// Every broadcast re-checks the project's workspace and the recipients'
+// membership before sending, so the database is stubbed to answer both reads.
+// Drizzle awaits its query builders, so the stub is a promise that also carries
+// the chainable methods: awaiting it yields the rows for whichever read was
+// built. The project read chains `.limit(1)`; the member read does not.
+vi.mock("../../../apps/api/src/database", () => {
+  const rows = (single: boolean) =>
+    single
+      ? [{ workspaceId: "ws-1" }]
+      : [{ userId: "user-1" }, { userId: "user-2" }];
+
+  return {
+    default: {
+      select: () => {
+        let single = false;
+        // A pending promise is already awaitable, so the builder only has to
+        // expose the chainable methods on it.
+        const pending = new Promise<unknown[]>((resolve) => {
+          queueMicrotask(() => resolve(rows(single)));
+        });
+        return Object.assign(pending, {
+          from: () => pending,
+          where: () => pending,
+          limit: () => {
+            single = true;
+            return pending;
+          },
+        });
+      },
+    },
+  };
+});
+
 import { eventContext, publishEvent } from "../../../apps/api/src/events";
 import {
   addConnection,
@@ -42,7 +76,7 @@ describe("appointment event broadcasts", () => {
     ["appointment.deleted", "APPOINTMENT_DELETED"],
   ])("maps %s to a %s project message", async (eventName, expectedType) => {
     const ws = makeFakeWs();
-    const conn = addConnection("proj-1", ws, "user-1", "init-1");
+    const conn = addConnection("proj-1", ws, "user-1", "init-1", "ws-1");
 
     await publishEvent(eventName, {
       appointmentId: "a1",
@@ -73,8 +107,14 @@ describe("appointment event broadcasts", () => {
   it("excludes the initiating window from appointment broadcasts", async () => {
     const ws1 = makeFakeWs();
     const ws2 = makeFakeWs();
-    const conn1 = addConnection("proj-1", ws1, "user-1", "init-excluded");
-    const conn2 = addConnection("proj-1", ws2, "user-2", "init-other");
+    const conn1 = addConnection(
+      "proj-1",
+      ws1,
+      "user-1",
+      "init-excluded",
+      "ws-1",
+    );
+    const conn2 = addConnection("proj-1", ws2, "user-2", "init-other", "ws-1");
 
     await eventContext.run({ initiatorId: "init-excluded" }, async () => {
       await publishEvent("appointment.created", {

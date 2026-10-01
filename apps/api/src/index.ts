@@ -833,6 +833,9 @@ export function createApp() {
       }
 
       const userId = c.get("userId");
+      // Carried on the connection so a later revocation of this workspace can
+      // close it.
+      let projectWorkspaceId = "";
 
       if (projectId) {
         const [project] = await db
@@ -845,6 +848,7 @@ export function createApp() {
           throw new HTTPException(401, { message: "Unauthorized" });
         }
 
+        projectWorkspaceId = project.workspaceId;
         await validateWorkspaceAccess(userId, project.workspaceId);
 
         // A scoped member without a grant for this project must not hear its
@@ -863,7 +867,13 @@ export function createApp() {
       return {
         onOpen(_evt, ws) {
           if (projectId) {
-            conn = addConnection(projectId, ws, userId, initiatorId);
+            conn = addConnection(
+              projectId,
+              ws,
+              userId,
+              initiatorId,
+              projectWorkspaceId,
+            );
           }
         },
         onMessage(evt) {

@@ -1,3 +1,7 @@
+import {
+  OutboundRequestError,
+  sendOutboundRequest,
+} from "../../utils/outbound-request";
 type TelegramMessage = {
   chat_id: string;
   text: string;
@@ -15,47 +19,24 @@ export async function postToTelegram(
   botToken: string,
   message: TelegramMessage,
 ): Promise<void> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TELEGRAM_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${botToken}/sendMessage`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(message),
-        signal: controller.signal,
-      },
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Telegram request failed (${response.status}): ${errorText}`,
-      );
-    }
-
-    const result = (await response.json()) as {
-      ok?: boolean;
-      description?: string;
-    };
-
-    if (!result.ok) {
-      throw new Error(result.description || "Telegram API request failed");
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      throw new Error(
-        `Telegram request timed out after ${TELEGRAM_TIMEOUT_MS}ms`,
-      );
-    }
-
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+  // Routed through the safe helper: the URL carries the bot token and the
+  // response body is Telegram-controlled, so neither may reach an error
+  // message or a log.
+  const result = await sendOutboundRequest(
+    `https://api.telegram.org/bot${botToken}/sendMessage`,
+    {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(message),
+    },
+    { readJson: true },
+  );
+  if (
+    !result ||
+    typeof result !== "object" ||
+    !("ok" in result) ||
+    result.ok !== true
+  ) {
+    throw new OutboundRequestError("response");
   }
 }
 

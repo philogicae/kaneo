@@ -9,6 +9,7 @@ import {
   taskTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
+import { isKaneoComment } from "../../plugins/gitea/utils/comment-origin";
 import type { GiteaConfig } from "../../plugins/gitea/config";
 import { extractTaskNumberGitea } from "../../plugins/gitea/utils/branch-matcher";
 import {
@@ -417,6 +418,11 @@ async function importCommentsForTask(
   for (const comment of allComments) {
     const username = comment.user?.login ?? comment.user?.username ?? "";
     if (username.endsWith("[bot]")) {
+      continue;
+    }
+    // A comment Kanea itself posted carries its origin marker; importing it
+    // back would duplicate every synced comment on the issue.
+    if (isKaneoComment(comment.body)) {
       continue;
     }
 
