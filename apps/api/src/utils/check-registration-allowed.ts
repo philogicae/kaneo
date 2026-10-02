@@ -27,6 +27,12 @@ export async function checkRegistrationAllowed(
   options?: {
     allowInvitationByEmail?: boolean;
     inviteLinkToken?: string;
+    /**
+     * Whether the address is already proven. Matching an invitation by email
+     * consumes it, so an unverified address must not be able to claim someone
+     * else's invite.
+     */
+    emailVerified?: boolean;
   },
 ): Promise<RegistrationCheckResult> {
   const isRegistrationDisabled = process.env.DISABLE_REGISTRATION === "true";
@@ -38,7 +44,11 @@ export async function checkRegistrationAllowed(
     };
   }
 
-  const canMatchByEmail = Boolean(options?.allowInvitationByEmail && email);
+  // `=== true`, not `!== false`: matching an invitation by email consumes it, so
+  // an address that has not been proven must never claim someone else's invite.
+  const canMatchByEmail = Boolean(
+    options?.allowInvitationByEmail && email && options?.emailVerified === true,
+  );
 
   if (options?.inviteLinkToken) {
     const link = await findUsableInviteLink(options.inviteLinkToken);
@@ -247,6 +257,25 @@ export async function getInvitationDetails(
     valid: true,
     invitation: baseInvitation,
   };
+}
+
+export async function userExistsByEmail(email: string): Promise<boolean> {
+  const [user] = await db
+    .select({ id: userTable.id })
+    .from(userTable)
+    .where(eq(userTable.email, email.toLowerCase()))
+    .limit(1);
+  return Boolean(user);
+}
+
+/**
+ * Whether a password-less sign-in email may be sent to this address. Mirrors
+ * `checkRegistrationAllowed`, so a closed instance never emails an address that
+ * could not complete the flow.
+ */
+export async function canSendSignInEmail(email: string): Promise<boolean> {
+  if (await userExistsByEmail(email)) return true;
+  return (await getUserPendingInvitations(email)).length > 0;
 }
 
 export async function getUserPendingInvitations(userEmail: string) {

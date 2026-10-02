@@ -1,4 +1,4 @@
-import { asc, desc, type SQL, sql } from "drizzle-orm";
+import { asc, desc, type SQL, type SQLWrapper, sql } from "drizzle-orm";
 import { taskTable } from "../database/schema";
 
 export type TaskSortField =
@@ -24,19 +24,23 @@ export function buildTaskOrderBy(
   sortOrder: "asc" | "desc" | undefined,
 ): SQL {
   const direction = sortOrder === "desc" ? desc : asc;
+  return direction(sortValue(sortBy));
+}
 
+/** The column a sort field orders by, for revisions that must track the sort. */
+export function sortValue(sortBy: TaskSortField | undefined): SQLWrapper {
   switch (sortBy) {
     case "createdAt":
-      return direction(taskTable.createdAt);
+      return taskTable.createdAt;
     case "priority":
-      return direction(priorityCaseExpr);
+      return priorityCaseExpr;
     case "dueDate":
-      return direction(taskTable.dueDate);
+      return taskTable.dueDate;
     case "title":
-      return direction(taskTable.title);
+      return taskTable.title;
     case "number":
-      return direction(taskTable.number);
+      return taskTable.number;
     default:
-      return direction(taskTable.position);
+      return taskTable.position;
   }
 }

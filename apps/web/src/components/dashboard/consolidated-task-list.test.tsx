@@ -14,6 +14,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
+    i18n: { language: "en-US", resolvedLanguage: "en-US" },
     t: (key: string, options?: Record<string, unknown>) => {
       if (key === "unified:consolidated.taskNumber") {
         return `#${options?.number}`;
@@ -27,6 +28,9 @@ vi.mock("react-i18next", () => ({
       return key;
     },
   }),
+  // format.ts reaches the shared i18n instance, which initialises itself
+  // through this plugin at import time.
+  initReactI18next: { type: "3rdParty", init: vi.fn() },
 }));
 
 vi.mock("@/fetchers/task/get-tasks", () => ({

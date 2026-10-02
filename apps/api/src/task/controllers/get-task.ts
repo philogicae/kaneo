@@ -1,5 +1,5 @@
 import { boundedTaskRead } from "../bounded-read";
-import { alias } from "drizzle-orm/pg-core";
+import { alias } from "drizzle-orm/sqlite-core";
 import { boardDescription, descriptionDeferred } from "../description-pages";
 import { getSubtaskCounts } from "../get-subtask-counts";
 import { and, eq, sql } from "drizzle-orm";

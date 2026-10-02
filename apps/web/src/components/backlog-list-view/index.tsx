@@ -25,6 +25,7 @@ import { getNextManualPosition } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
 import useBacklogBulkSelectionStore from "@/store/backlog-bulk-selection";
 import useProjectStore from "@/store/project";
+import type Task from "@/types/task";
 import type { ProjectWithTasks } from "@/types/project";
 import BacklogBulkToolbar from "../bulk-selection/backlog-bulk-toolbar";
 import CreateTaskModal from "../shared/modals/create-task-modal";

@@ -1,4 +1,11 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import {
+  type AnyColumn,
+  and,
+  eq,
+  inArray,
+  isNull,
+  type SQL,
+} from "drizzle-orm";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
@@ -23,6 +30,9 @@ import {
 } from "../../plugins/telegram/config";
 import { hasWorkspacePermission } from "../../utils/require-workspace-permission";
 import { describeTelegramFailure, evaluateChatMembership } from "../verify";
+
+/** Sort operators for a nested relational orderBy, whose parameters are not inferred. */
+type TelegramOrderBy = { asc: (column: AnyColumn) => SQL };
 
 function maskBotToken(value: string): string {
   const [prefix, suffix = ""] = value.split(":", 2);
@@ -157,15 +167,24 @@ async function assertCanManageWorkspace(
 }
 
 export async function getUserTelegramConfig(userId: string) {
+  // Callback parameters are typed explicitly because TypeScript does not infer
+  // them for a nested relational orderBy; the sort column comes from the table.
+  const byCreatedAt = (_row: unknown, operators: TelegramOrderBy) => [
+    operators.asc(telegramBotTable.createdAt),
+  ];
   const bots = await db.query.telegramBotTable.findMany({
     where: eq(telegramBotTable.userId, userId),
-    orderBy: (bot, { asc }) => [asc(bot.createdAt)],
+    orderBy: byCreatedAt,
     with: {
       chats: {
-        orderBy: (chat, { asc }) => [asc(chat.createdAt)],
+        orderBy: (_chat, operators: TelegramOrderBy) => [
+          operators.asc(telegramChatTable.createdAt),
+        ],
         with: {
           rules: {
-            orderBy: (rule, { asc }) => [asc(rule.createdAt)],
+            orderBy: (_rule, operators: TelegramOrderBy) => [
+              operators.asc(telegramRuleTable.createdAt),
+            ],
           },
         },
       },

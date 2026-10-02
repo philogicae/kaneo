@@ -1,5 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { alias } from "drizzle-orm/sqlite-core";
 import db from "../database";
 import { taskRelationTable, taskTable } from "../database/schema";
 

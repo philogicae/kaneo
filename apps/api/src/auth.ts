@@ -1,7 +1,10 @@
 import { apiKey } from "@better-auth/api-key";
 import {
+  isEmailConfigured,
+  OTP_EXPIRY_SECONDS,
   sendMagicLinkEmail,
   sendOtpEmail,
+  sendPasswordResetEmail,
   sendWorkspaceInvitationEmail,
 } from "@kaneo/email";
 import {
@@ -12,7 +15,6 @@ import {
 } from "@kaneo/permissions";
 import bcrypt from "bcryptjs";
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
   APIError,
   createAuthMiddleware,
@@ -33,17 +35,25 @@ import {
 import type { AccessControl } from "better-auth/plugins/access";
 import type { UserWithAnonymous } from "better-auth/plugins/anonymous";
 import { config } from "dotenv-mono";
-import { and, count, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import db, { schema } from "./database";
+import { authDatabaseAdapter } from "./database/auth-adapter";
 import { publishEvent } from "./events";
+import clearEmailVerificationOnAdminChange from "./user/controllers/clear-email-verification-on-admin-change";
 import deleteAccountData from "./user/controllers/delete-account-data";
+import prepareAdminUserRemoval from "./user/controllers/prepare-admin-user-removal";
 import {
   markWorkspaceMembershipScoped,
   materializeInvitationGrants,
 } from "./utils/access-grants";
-import { checkRegistrationAllowed } from "./utils/check-registration-allowed";
+import {
+  canSendSignInEmail,
+  checkRegistrationAllowed,
+  userExistsByEmail,
+} from "./utils/check-registration-allowed";
 import { checkWorkspaceName } from "./utils/check-workspace-name";
 import { mapCustomOAuthProfileToUser } from "./utils/custom-oauth-profile";
+import { resolveFileSecret } from "./utils/file-secret";
 import { generateDemoName } from "./utils/generate-demo-name";
 import { getDefaultCookieAttributes } from "./utils/get-default-cookie-attributes";
 import { getInvitationEmailSubject } from "./utils/get-invitation-email-subject";
@@ -52,8 +62,20 @@ import { getGithubSsoOAuthCredentials } from "./utils/github-sso-env";
 import { isCloud } from "./utils/is-cloud";
 import { isDisposableEmail } from "./utils/is-disposable-email";
 import { isLocalSignInPath } from "./utils/is-local-sign-in-path";
+import {
+  hasRegisteredUsers,
+  promoteInitialAdministrator,
+} from "./utils/instance-bootstrap";
+import {
+  hasInstanceAdminRole,
+  instanceAdminRoleSql,
+} from "./utils/instance-admin-role";
+import { revokeUserConnections, revokeWorkspaceConnections } from "./ws";
 import { createDefaultWorkspaceInviteLink } from "./utils/seed-default-workspace-invite-links";
-import { verifyTurnstile } from "./utils/verify-turnstile";
+import { assertGuestRegistrationAllowed } from "./utils/registration-policy";
+import { trackPasswordResetDelivery } from "./utils/password-reset-delivery";
+import { queueSignInEmail } from "./utils/sign-in-email-tasks";
+import { authCaptchaPaths, verifyTurnstile } from "./utils/verify-turnstile";
 
 config();
 
@@ -67,6 +89,15 @@ const isEmailOtpSignInDisabled =
   process.env.DISABLE_EMAIL_OTP_SIGN_IN === "true";
 const isWorkspaceCreationDisabled =
   process.env.DISABLE_WORKSPACE_CREATION === "true";
+
+/**
+ * Members of a workspace being deleted, keyed by the request context.
+ *
+ * Better Auth gives the `before` and `after` hooks of one deletion the same
+ * context object, so the roster the `before` hook read survives the delete that
+ * makes it unqueryable.
+ */
+const deletedWorkspaceMembers = new WeakMap<object, string[]>();
 
 function normalizeInvitationId(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
@@ -134,13 +165,28 @@ function getLocaleKey(locale?: string | null) {
   return "en";
 }
 
+// Reads env at call time (not module scope) so tests can stub it.
+async function shouldDeliverSignInEmail(email: string) {
+  if (process.env.DISABLE_PASSWORD_REGISTRATION === "true") {
+    return userExistsByEmail(email);
+  }
+  if (process.env.DISABLE_REGISTRATION === "true") {
+    // Mirror `assertUserRegistrationAllowed`: the first non-guest user can
+    // always complete initial instance setup.
+    if (!(await hasRegisteredUsers())) return true;
+    return canSendSignInEmail(email);
+  }
+  return true;
+}
+
 function getAuthEmailCopy(locale?: string | null) {
   const localeKey = getLocaleKey(locale);
 
   if (localeKey === "de") {
     return {
-      magicLinkSubject: "Anmeldelink fuer Kaneo",
-      otpSubject: "Bestaetigungscode fuer Kaneo",
+      magicLinkSubject: "Anmeldelink für Kaneo",
+      otpSubject: "Bestätigungscode für Kaneo",
+      passwordResetSubject: "Kaneo-Passwort zurücksetzen",
     };
   }
 
@@ -148,6 +194,7 @@ function getAuthEmailCopy(locale?: string | null) {
     return {
       magicLinkSubject: "Liên kết đăng nhập Kaneo",
       otpSubject: "Mã xác minh Kaneo",
+      passwordResetSubject: "Đặt lại mật khẩu Kaneo",
     };
   }
 
@@ -155,12 +202,14 @@ function getAuthEmailCopy(locale?: string | null) {
     return {
       magicLinkSubject: "Kaneo ログインリンク",
       otpSubject: "Kaneo 認証コード",
+      passwordResetSubject: "Kaneo のパスワードをリセット",
     };
   }
 
   return {
     magicLinkSubject: "Login for Kaneo",
     otpSubject: "Authentication code for Kaneo",
+    passwordResetSubject: "Reset your Kaneo password",
   };
 }
 
@@ -177,25 +226,6 @@ function getDeviceAuthClientIds(): Set<string> {
   return new Set(["kaneo-cli", "kaneo-mcp"]);
 }
 
-const DEFAULT_TRUSTED_PROXIES = [
-  "127.0.0.0/8",
-  "::1/128",
-  "10.0.0.0/8",
-  "172.16.0.0/12",
-  "192.168.0.0/16",
-];
-
-function trustedProxies(): string[] {
-  const raw = process.env.TRUSTED_PROXIES?.trim();
-  if (!raw) {
-    return DEFAULT_TRUSTED_PROXIES;
-  }
-  return raw
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-}
-
 function getDeviceAuthVerificationUri(): string {
   const base = clientUrl.replace(/\/$/, "");
   return `${base}/device`;
@@ -206,7 +236,10 @@ export const auth = betterAuth({
   trustedOrigins,
   secret: process.env.AUTH_SECRET || "",
   basePath: "/api/auth",
-  database: drizzleAdapter(db, {
+  // The adapter owns the "the instance must keep one administrator" rule: it
+  // is the only layer that sees the count and the write in one transaction, so
+  // two admins cannot demote each other concurrently.
+  database: authDatabaseAdapter({
     provider: "pg",
     schema: {
       ...schema,
@@ -256,6 +289,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
+    revokeSessionsOnPasswordReset: true,
+    resetPasswordTokenExpiresIn: 60 * 60,
+    sendResetPassword: async ({ user, url }) => {
+      // Keep mail latency out of the response so it cannot reveal accounts.
+      trackPasswordResetDelivery(
+        getUserLocale(user.email).then((locale) =>
+          sendPasswordResetEmail(
+            user.email,
+            getAuthEmailCopy(locale).passwordResetSubject,
+            { resetLink: url, userName: user.name, locale },
+          ),
+        ),
+      );
+    },
     password: {
       hash: async (password) => {
         return await bcrypt.hash(password, 10);
@@ -291,30 +338,37 @@ export const auth = betterAuth({
       : []),
     lastLoginMethod(),
     magicLink({
+      disableSignUp: isPasswordRegistrationDisabled,
       sendMagicLink: async ({ email, url }) => {
-        try {
+        // Eligibility is checked off the request path: SMTP latency must not
+        // tell a caller whether an address can complete the flow.
+        queueSignInEmail(async () => {
+          if (!(await shouldDeliverSignInEmail(email))) return;
           const locale = await getUserLocale(email);
           const copy = getAuthEmailCopy(locale);
           await sendMagicLinkEmail(email, copy.magicLinkSubject, {
             magicLink: url,
             locale,
           });
-        } catch (error) {
-          console.error(error);
-        }
+        });
       },
     }),
     ...(isEmailOtpSignInDisabled
       ? []
       : [
           emailOTP({
+            expiresIn: OTP_EXPIRY_SECONDS,
+            disableSignUp: isPasswordRegistrationDisabled,
             async sendVerificationOTP({ email, otp, type }) {
               if (type === "sign-in") {
-                const locale = await getUserLocale(email);
-                const copy = getAuthEmailCopy(locale);
-                await sendOtpEmail(email, copy.otpSubject, {
-                  otp,
-                  locale,
+                queueSignInEmail(async () => {
+                  if (!(await shouldDeliverSignInEmail(email))) return;
+                  const locale = await getUserLocale(email);
+                  const copy = getAuthEmailCopy(locale);
+                  await sendOtpEmail(email, copy.otpSubject, {
+                    otp,
+                    locale,
+                  });
                 });
               }
             },
@@ -520,6 +574,53 @@ export const auth = betterAuth({
             );
           }
         },
+        beforeDeleteOrganization: async ({ organization }, ctx) => {
+          // Deleting the workspace drops its memberships, so every member's
+          // sockets have to go with it. Snapshot the roster here: by the
+          // `after` hook the rows are gone. Instance admins are included
+          // because their access is global, not a membership.
+          if (ctx) {
+            const members = await db
+              .select({ userId: schema.workspaceUserTable.userId })
+              .from(schema.workspaceUserTable)
+              .where(
+                eq(schema.workspaceUserTable.workspaceId, organization.id),
+              );
+            const admins = await db
+              .select({ userId: schema.userTable.id })
+              .from(schema.userTable)
+              .where(instanceAdminRoleSql(schema.userTable.role));
+            deletedWorkspaceMembers.set(ctx.context, [
+              ...new Set(
+                [...members, ...admins].map((member) => member.userId),
+              ),
+            ]);
+          }
+        },
+        afterDeleteOrganization: async ({ organization }, ctx) => {
+          const userIds = ctx
+            ? (deletedWorkspaceMembers.get(ctx.context) ?? [])
+            : [];
+          if (ctx) deletedWorkspaceMembers.delete(ctx.context);
+          await Promise.all(
+            userIds.map((userId) =>
+              revokeWorkspaceConnections(userId, organization.id, {
+                force: true,
+              }),
+            ),
+          );
+        },
+        afterRemoveMember: async ({ member, user }) => {
+          if (member?.organizationId) {
+            if (!hasInstanceAdminRole(user.role)) {
+              await revokeWorkspaceConnections(
+                member.userId,
+                member.organizationId,
+                { role: user.role ?? null },
+              );
+            }
+          }
+        },
       },
       async sendInvitationEmail(data) {
         const inviteLink = `${process.env.KANEO_CLIENT_URL}/invitation/accept/${data.id}`;
@@ -559,7 +660,7 @@ export const auth = betterAuth({
         {
           providerId: "custom",
           clientId: process.env.CUSTOM_OAUTH_CLIENT_ID || "",
-          clientSecret: process.env.CUSTOM_OAUTH_CLIENT_SECRET,
+          clientSecret: resolveFileSecret("CUSTOM_OAUTH_CLIENT_SECRET"),
           authorizationUrl: process.env.CUSTOM_OAUTH_AUTHORIZATION_URL || "",
           tokenUrl: process.env.CUSTOM_OAUTH_TOKEN_URL || "",
           userInfoUrl: process.env.CUSTOM_OAUTH_USER_INFO_URL || "",
@@ -596,8 +697,9 @@ export const auth = betterAuth({
   ],
   session: {
     cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60,
+      // Consult the session store on every request so password recovery
+      // immediately rejects revoked cookies, including caches issued before upgrade.
+      enabled: false,
     },
   },
   rateLimit: {
@@ -609,11 +711,41 @@ export const auth = betterAuth({
     max: 100,
     customRules: {
       "/sign-up/email": { window: 60, max: 3 },
+      "/sign-in/anonymous": { window: 60, max: 3 },
       "/organization/invite-member": { window: 60, max: 5 },
     },
   },
   databaseHooks: {
     user: {
+      delete: {
+        after: async (user, ctx) => {
+          // Anonymous linking deletes the old identity after issuing a new
+          // session. The replacement account must retain its authentication.
+          if (
+            (user as Partial<UserWithAnonymous>).isAnonymous &&
+            ctx?.context.newSession &&
+            ctx.context.newSession.user.id !== user.id
+          )
+            return;
+          await revokeUserConnections(user.id);
+        },
+      },
+      update: {
+        before: async (user, ctx) => {
+          if (
+            (ctx?.path === "/admin/set-role" ||
+              ctx?.path === "/admin/update-user") &&
+            Object.hasOwn(user, "role") &&
+            ctx.body?.userId === ctx.context.session?.user.id
+          ) {
+            throw new APIError("BAD_REQUEST", {
+              code: "YOU_CANNOT_CHANGE_YOUR_OWN_ROLE",
+              message: "You cannot change your own role.",
+            });
+          }
+          return clearEmailVerificationOnAdminChange(user, ctx);
+        },
+      },
       create: {
         before: async (user, ctx) => {
           // The anonymous() plugin creates ephemeral users for guest
@@ -630,12 +762,10 @@ export const auth = betterAuth({
           // is disabled: that's the instance-admin bootstrap flow.
           // Otherwise a fresh instance with DISABLE_REGISTRATION=true
           // could never be set up because `checkRegistrationAllowed`
-          // would reject the first user (qodo bot #3).
-          const [userCountRow] = await db
-            .select({ value: count() })
-            .from(schema.userTable);
-          const existingUserCount = userCountRow?.value ?? 0;
-          if (existingUserCount === 0) {
+          // would reject the first user (qodo bot #3). Guest rows never
+          // count: an instance that only ever served a guest still needs
+          // its first real user.
+          if (!(await hasRegisteredUsers())) {
             return;
           }
 
@@ -655,6 +785,9 @@ export const auth = betterAuth({
             {
               allowInvitationByEmail: isOAuthCallbackPath(ctx?.path),
               inviteLinkToken,
+              // Matching an invitation by email consumes it, so only an address
+              // the provider has already proven may claim someone else's invite.
+              emailVerified: user.emailVerified === true,
             },
           );
           if (!result.allowed) {
@@ -674,54 +807,72 @@ export const auth = betterAuth({
             return;
           }
 
-          // Promote the first user to instance admin atomically.
-          //
-          // A previous version of this code checked the user count in
-          // the `before` hook and returned `role: "admin"`, but the
-          // count and the eventual INSERT happened in separate
-          // transactions, so two concurrent first-signups could both
-          // see count=0 and both become admins (qodo bot #5).
-          //
-          // We now run the check + promote inside a single immediate
-          // transaction. SQLite serializes writers, so whichever transaction
-          // commits first promotes its user; any concurrent transaction then
-          // sees totalUserCount > 1 and skips.
-          //
-          // Note: we count total users (not admins) so that upgrading
-          // an existing instance (where every existing user has
-          // role=NULL from the new column) doesn't promote the next
-          // signup to admin (qodo bot #4).
-          await db.transaction(
-            async (tx) => {
-              const totalRows = await tx
-                .select({ value: count() })
-                .from(schema.userTable);
-              const totalUserCount = totalRows[0]?.value ?? 0;
-
-              // This hook runs after the user row is inserted, so the
-              // just-created user is included in the count. If they are
-              // the only row in the table, this is a fresh-instance
-              // bootstrap and they get promoted to admin.
-              if (totalUserCount === 1) {
-                await tx
-                  .update(schema.userTable)
-                  .set({ role: "admin" })
-                  .where(eq(schema.userTable.id, user.id));
-              }
-            },
-            { behavior: "immediate" },
-          );
+          // Electing the earliest registered user inside one transaction keeps
+          // concurrent first signups to a single admin: whichever after-hook
+          // runs first promotes its user, and any later one finds an admin and
+          // stops. Counting rows instead would promote nobody once two signups
+          // were inserted before either hook ran.
+          await promoteInitialAdministrator(user.id);
         },
       },
     },
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
+      // Admin removal deletes the account's own rows first (workspaces it solely
+      // owns, memberships, invitations), so authorization and the workspace
+      // ownership rules have to run before Better Auth deletes the user.
+      if (ctx.path === "/admin/remove-user") {
+        await prepareAdminUserRemoval(ctx);
+      }
+
+      if (ctx.path === "/organization/invite-member") {
+        // Better Auth swallows email failures in runInBackgroundOrAwait.
+        // Invitation callers need the delivery result, including on resend.
+        ctx.context.runInBackgroundOrAwait = async (promise) => {
+          try {
+            await promise;
+          } catch {
+            throw new APIError("BAD_GATEWAY", {
+              code: "INVITATION_EMAIL_FAILED",
+              message:
+                "Invitation saved, but email delivery failed. Check email settings and resend the invitation.",
+            });
+          }
+        };
+      }
+
       if (isLoginFormDisabled && isLocalSignInPath(ctx.path)) {
         throw new APIError("FORBIDDEN", {
           message:
             "Local sign-in is disabled. Please use a configured social or OIDC sign-in method.",
         });
+      }
+
+      // Guests are only available on an initialised instance that still allows
+      // them; otherwise a fresh instance would hand out an ephemeral account
+      // before its first real user exists.
+      // Recovery links are useless without delivery, and Better Auth answers
+      // the same way for unknown accounts, so this leaks nothing about them.
+      if (ctx.path === "/request-password-reset" && !isEmailConfigured()) {
+        throw new APIError("FORBIDDEN", {
+          message: "Password reset requires email delivery to be configured.",
+        });
+      }
+
+      if (ctx.path === "/sign-in/anonymous") {
+        await assertGuestRegistrationAllowed();
+      }
+
+      // Every account-creation and password-less entry point is gated by
+      // CAPTCHA when one is configured, not just cloud sign-up. Self-hosted
+      // instances leave TURNSTILE_SECRET_KEY unset, so verifyTurnstile passes.
+      if (authCaptchaPaths.has(ctx.path)) {
+        const verdict = await verifyTurnstile(
+          ctx.headers?.get("x-turnstile-token") ?? ctx.body?.turnstileToken,
+        );
+        if (!verdict.ok)
+          throw new APIError("FORBIDDEN", { message: verdict.reason });
       }
 
       // Block invite-member calls on cloud from anonymous users or to
@@ -761,11 +912,9 @@ export const auth = betterAuth({
         return;
       }
 
-      const userCountRows = await db
-        .select({ value: count() })
-        .from(schema.userTable);
-      const existingUserCount = userCountRows[0]?.value ?? 0;
-      const isInstanceAdminSetup = existingUserCount === 0;
+      // Guest rows never count as an initialised instance, otherwise the first
+      // guest sign-up would consume the instance-admin bootstrap slot.
+      const isInstanceAdminSetup = !(await hasRegisteredUsers());
 
       if (ctx.path === "/sign-up/email") {
         if (isPasswordRegistrationDisabled && !isInstanceAdminSetup) {
@@ -775,8 +924,8 @@ export const auth = betterAuth({
           });
         }
 
-        // Cloud-only abuse gates on password signup. Self-hosted instances
-        // leave KANEO_CLOUD/TURNSTILE_SECRET_KEY unset and skip both.
+        // Cloud-only disposable-email gate. CAPTCHA is enforced above on every
+        // account-creation initiation when configured.
         if (isCloud() && !isInstanceAdminSetup) {
           const signupEmail = (ctx.body?.email as string | undefined) ?? "";
           if (signupEmail && isDisposableEmail(signupEmail)) {
@@ -784,19 +933,6 @@ export const auth = betterAuth({
               message:
                 "Sign-up with disposable email addresses is not allowed.",
             });
-          }
-
-          const turnstileToken =
-            (ctx.body?.turnstileToken as string | undefined) ??
-            ctx.headers?.get("x-turnstile-token") ??
-            null;
-          const remoteIp =
-            ctx.headers?.get("cf-connecting-ip") ??
-            ctx.headers?.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-            null;
-          const verdict = await verifyTurnstile(turnstileToken, remoteIp);
-          if (!verdict.ok) {
-            throw new APIError("FORBIDDEN", { message: verdict.reason });
           }
         }
       }
@@ -832,6 +968,25 @@ export const auth = betterAuth({
       }
     }),
     after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/organization/leave") {
+        // The endpoint returns the removed member. No post-delete query may
+        // prevent revocation after the membership has already committed.
+        const removed = ctx.context.returned as
+          | { userId?: string; organizationId?: string }
+          | undefined;
+        if (
+          typeof removed?.userId === "string" &&
+          typeof removed.organizationId === "string" &&
+          removed.organizationId === ctx.body?.organizationId
+        ) {
+          await revokeWorkspaceConnections(
+            removed.userId,
+            removed.organizationId,
+            { role: ctx.context.session?.user.role ?? null },
+          );
+        }
+      }
+
       if (ctx.path.startsWith("/sign-up") || ctx.path.startsWith("/sign-in")) {
         const newSession = ctx.context.newSession;
         if (newSession) {
@@ -855,8 +1010,9 @@ export const auth = betterAuth({
   },
   advanced: {
     ipAddress: {
-      ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"],
-      trustedProxies: trustedProxies(),
+      // Set only by the Node transport middleware, never accepted from clients.
+      ipAddressHeaders: ["x-kaneo-client-ip"],
+      trustedProxies: [],
     },
     defaultCookieAttributes: getDefaultCookieAttributes({
       apiUrl,

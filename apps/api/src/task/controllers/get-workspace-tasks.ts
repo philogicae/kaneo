@@ -19,6 +19,7 @@ import {
   userTable,
 } from "../../database/schema";
 import { getScopedProjectIds } from "../../utils/access-scope";
+import { getSubtaskCounts } from "../get-subtask-counts";
 import { buildTaskOrderBy, type TaskSortField } from "../task-order";
 
 export type WorkspaceTasksOptions = {
@@ -176,10 +177,15 @@ async function getWorkspaceTasks(
     labelsByTask.set(label.taskId, list);
   }
 
+  // Direct-child progress, loaded for the whole page so every listed task can
+  // show it regardless of the active filters.
+  const subtaskCounts = await getSubtaskCounts(db, taskIds, workspaceId, false);
+
   return {
     tasks: rows.map((row) => ({
       ...row,
       labels: labelsByTask.get(row.id) ?? [],
+      subtaskCounts: subtaskCounts.get(row.id) ?? { completed: 0, total: 0 },
     })),
     pagination: {
       total,

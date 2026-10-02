@@ -17,7 +17,8 @@ function assertTestDatabasePath() {
     return;
   }
 
-  if (!/_test(\.\w+)?$/i.test(path)) {
+  // The optional `_w<N>` segment is the per-worker file the suite splits into.
+  if (!/_test(_w\d+)?(\.\w+)?$/i.test(path)) {
     throw new Error(
       `Refusing to manage non-test database "${path}". DATABASE_PATH must point to a test database.`,
     );

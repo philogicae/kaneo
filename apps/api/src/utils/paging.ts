@@ -2,12 +2,18 @@ import { z } from "../openapi";
 
 // Query-string numeric parser: the value arrives as a string, so parse and
 // range-check it instead of letting Number()/NaN reach the SQL clause.
-export const pagingNumber = (min: number, max: number) =>
-  z
+export const pagingNumber = (min: number, max: number, fallback?: number) => {
+  const parsed = z
     .string()
     .regex(/^\d+$/, "Expected a positive integer")
     .transform(Number)
     .pipe(z.number().int().min(min).max(max));
+
+  // A caller that allows an omitted parameter gets the fallback back instead of
+  // a parse failure. `.default()` keeps the field present in the parsed output,
+  // so consumers do not have to treat it as optional.
+  return fallback === undefined ? parsed : parsed.default(fallback);
+};
 
 export const listPagingQuery = z.object({
   limit: pagingNumber(1, 200)

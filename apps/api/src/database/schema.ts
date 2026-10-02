@@ -654,9 +654,17 @@ export const projectTable = sqliteTable(
     archivedAt: integer("archived_at", { mode: "timestamp_ms" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
     position: integer("position").notNull().default(0),
+    // Project background image: the object key plus the version that produced
+    // it, so a replaced background can be cleaned up without a diff.
+    backgroundObjectKey: text("background_object_key"),
+    backgroundMimeType: text("background_mime_type"),
+    backgroundVersion: text("background_version"),
   },
   (table) => [
     unique("project_workspace_id_id_unique").on(table.workspaceId, table.id),
+    index("project_background_object_key_idx")
+      .on(table.backgroundObjectKey)
+      .where(sql`${table.backgroundObjectKey} is not null`),
     index("project_workspaceId_position_idx").on(
       table.workspaceId,
       table.position,
@@ -813,6 +821,11 @@ export const taskTable = sqliteTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    // Monotonic write counter, bumped by a trigger on every UPDATE. It stands
+    // in for Postgres' `xmin`: integration sync compares it to detect a local
+    // edit made while a provider request was in flight, which a timestamp
+    // cannot see when the edit is written and then reverted (ABA).
+    revision: integer("revision").default(0).notNull(),
   },
   (table) => [
     index("task_projectId_idx").on(table.projectId),
@@ -1534,12 +1547,15 @@ export const externalLinkTable = sqliteTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    integrationId: text("integration_id")
-      .notNull()
-      .references(() => integrationTable.id, {
+    // A manually added link has no owning integration; only links created by a
+    // forge webhook carry one.
+    integrationId: text("integration_id").references(
+      () => integrationTable.id,
+      {
         onDelete: "cascade",
         onUpdate: "cascade",
-      }),
+      },
+    ),
     resourceType: text("resource_type").notNull(),
     externalId: text("external_id").notNull(),
     url: text("url").notNull(),
@@ -1558,6 +1574,13 @@ export const externalLinkTable = sqliteTable(
     index("external_link_integrationId_idx").on(table.integrationId),
     index("external_link_externalId_idx").on(table.externalId),
     index("external_link_resourceType_idx").on(table.resourceType),
+    // Partial index for the deferred-edit replay sweep: it only ever reads
+    // issue links that still carry queued work, and `id` is its cursor.
+    index("external_link_deferred_issue_idx")
+      .on(table.id)
+      .where(
+        sql`${table.resourceType} = 'issue' AND ${table.metadata} LIKE '%"deferredIssueEdit":%'`,
+      ),
   ],
 );
 

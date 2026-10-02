@@ -153,14 +153,53 @@ export type GitHubWebhookSource = {
   repository: { id: number };
 };
 
-export async function findAllIntegrationsByRepo(source: GitHubWebhookSource) {
-  const installationId = source.installation?.id;
-  const repositoryId = source.repository.id;
+/**
+ * Identify an integration from a webhook payload.
+ *
+ * A payload that carries GitHub's numeric ids is matched on those, which is
+ * exact. A payload that only names the repository (older webhooks, and the
+ * self-hosted forge integrations) falls back to the stored owner/name pair.
+ */
+export function integrationMatchesSource(
+  integration: { config: string },
+  source: GitHubWebhookSource | { owner: string; repo: string },
+): boolean {
+  let config: GitHubConfig;
+  try {
+    config = JSON.parse(integration.config) as GitHubConfig;
+  } catch {
+    return false;
+  }
+
+  // A binding that was never verified must never receive webhook deliveries:
+  // matching on the repository name alone is not proof of ownership.
+  if (!hasVerifiedGitHubBinding(config)) return false;
+
+  if ("owner" in source) {
+    return (
+      config.repositoryOwner === source.owner &&
+      config.repositoryName === source.repo
+    );
+  }
+  return (
+    config.repositoryId === source.repository.id &&
+    (source.installation?.id === undefined ||
+      config.installationId === source.installation.id)
+  );
+}
+
+export async function findAllIntegrationsByRepo(
+  source: GitHubWebhookSource | { owner: string; repo: string },
+) {
+  // A payload without an installation id cannot identify a binding, so no
+  // tenant data is read for it.
   if (
-    !Number.isSafeInteger(installationId) ||
-    !Number.isSafeInteger(repositoryId)
-  )
+    "owner" in source === false &&
+    !Number.isSafeInteger(source.installation?.id)
+  ) {
     return [];
+  }
+
   const integrations = await db.query.integrationTable.findMany({
     where: and(
       eq(integrationTable.type, "github"),
@@ -168,16 +207,8 @@ export async function findAllIntegrationsByRepo(source: GitHubWebhookSource) {
     ),
     with: { project: true },
   });
-  return integrations.filter((integration) => {
-    try {
-      const config = JSON.parse(integration.config) as GitHubConfig;
-      return (
-        hasVerifiedGitHubBinding(config) &&
-        config.installationId === installationId &&
-        config.repositoryId === repositoryId
-      );
-    } catch {
-      return false;
-    }
-  });
+
+  return integrations.filter((integration) =>
+    integrationMatchesSource(integration, source),
+  );
 }

@@ -87,7 +87,11 @@ async function moveProject(
           });
         }
 
-        const linked = await tx.get<{ linked: number }>(sql`
+        // `all()` rather than `get()`: drizzle's libsql driver maps a raw
+        // statement through `Object.keys(row)`, which throws when the query
+        // returns nothing, and "no cross-project relationship" is the common
+        // answer here.
+        const [linked] = await tx.all<{ linked: number }>(sql`
       SELECT 1 AS linked
       FROM ${taskRelationTable} relation
       JOIN ${taskTable} source ON source.id = relation.source_task_id
@@ -96,7 +100,7 @@ async function moveProject(
          OR (target.project_id = ${id} AND source.project_id <> ${id})
       LIMIT 1
     `);
-        if (linked.length)
+        if (linked)
           throw new HTTPException(409, {
             message:
               "Remove task relationships to other projects before moving this project.",

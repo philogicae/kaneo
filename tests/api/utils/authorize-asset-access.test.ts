@@ -74,6 +74,7 @@ describe("authorizeAssetAccess", () => {
       authorizeAssetAccess(context, {
         workspaceId: "workspace-1",
         projectId: "project-1",
+        surface: "description",
         isPublic: true,
       }),
     );
@@ -89,6 +90,7 @@ describe("authorizeAssetAccess", () => {
       authorizeAssetAccess(context, {
         workspaceId: "workspace-1",
         projectId: "project-1",
+        surface: "comment",
         isPublic: false,
       }),
     );
@@ -103,6 +105,7 @@ describe("authorizeAssetAccess", () => {
       authorizeAssetAccess(context, {
         workspaceId: "workspace-1",
         projectId: "project-1",
+        surface: "comment",
         isPublic: null,
       }),
     );
@@ -117,6 +120,7 @@ describe("authorizeAssetAccess", () => {
       authorizeAssetAccess(context, {
         workspaceId: "workspace-1",
         projectId: "project-1",
+        surface: "comment",
         isPublic: false,
       }),
     );
@@ -130,6 +134,45 @@ describe("authorizeAssetAccess", () => {
     ]);
   });
 
+  it("keeps a staged upload private to whoever uploaded it", async () => {
+    state.caller = "member";
+
+    const mine = await statusOf(
+      authorizeAssetAccess(context, {
+        workspaceId: "workspace-1",
+        projectId: "project-1",
+        surface: "draft-description",
+        createdBy: "user-member",
+        isPublic: false,
+      }),
+    );
+    expect(mine).toBe(200);
+
+    const theirs = await statusOf(
+      authorizeAssetAccess(context, {
+        workspaceId: "workspace-1",
+        projectId: "project-1",
+        surface: "draft-description",
+        createdBy: "user-scoped-member",
+        isPublic: false,
+      }),
+    );
+    expect(theirs).toBe(403);
+  });
+
+  it("keeps a comment asset private on a public project", async () => {
+    const status = await statusOf(
+      authorizeAssetAccess(context, {
+        workspaceId: "workspace-1",
+        projectId: "project-1",
+        surface: "comment",
+        isPublic: true,
+      }),
+    );
+
+    expect(status).toBe(401);
+  });
+
   it("rejects a scoped member for an asset of a project they cannot reach", async () => {
     state.caller = "scoped-member";
 
@@ -137,6 +180,7 @@ describe("authorizeAssetAccess", () => {
       authorizeAssetAccess(context, {
         workspaceId: "workspace-1",
         projectId: "project-2",
+        surface: "comment",
         isPublic: false,
       }),
     );

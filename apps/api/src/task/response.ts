@@ -211,9 +211,9 @@ export const boardSchema = z
         page: z.number(),
         pageSize: z.number(),
         totalPages: z.number(),
-        relatedPage: z.number(),
-        relatedPageSize: z.number(),
-        relatedTotalPages: z.number(),
+        relatedPage: z.number().optional(),
+        relatedPageSize: z.number().optional(),
+        relatedTotalPages: z.number().optional(),
         relatedRevision: z.string().optional().openapi({
           description:
             "Public board labels and external links revision for this task page. Restart pagination if it changes during related-page continuations.",
@@ -225,7 +225,7 @@ export const boardSchema = z
       })
       .openapi({
         description:
-          "Always paginated: 50 tasks by default, at most 100 per page. Continue through totalPages to retrieve all tasks. For each task page, follow relatedPage through relatedTotalPages to retrieve all labels, external links and columns (100 related rows per kind per request, plus up to 100 columns needed to represent the tasks).",
+          "Always paginated: 50 tasks by default, at most 100 per page. Continue through totalPages to retrieve all tasks.",
       })
       .openapi("BoardPagination"),
   })
@@ -354,3 +354,9 @@ export const descriptionPageSchema = z
 export const descriptionMatchesSchema = z
   .object({ ids: z.array(z.string()), nextCursor: z.string().nullable() })
   .openapi("TaskDescriptionMatches");
+
+// The public board endpoint returns the board fields alongside its pagination
+// rather than the envelope the authenticated board route uses.
+export const publicBoardPageSchema = boardSchema.shape.data
+  .extend({ pagination: boardSchema.shape.pagination })
+  .openapi("PublicBoardPage");

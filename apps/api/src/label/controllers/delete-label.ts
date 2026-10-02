@@ -91,7 +91,9 @@ async function deleteLabel(
     const [root] = await db
       .update(labelTable)
       .set({
-        deletionStartedAt: sql`coalesce(${labelTable.deletionStartedAt}, clock_timestamp())`,
+        // Epoch milliseconds, the same expression drizzle uses for an
+        // integer timestamp column's default. SQLite has no `clock_timestamp`.
+        deletionStartedAt: sql`coalesce(${labelTable.deletionStartedAt}, (cast((julianday('now') - 2440587.5)*86400000 as integer)))`,
       })
       .where(eq(labelTable.id, id))
       .returning();

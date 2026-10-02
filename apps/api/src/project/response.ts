@@ -1,3 +1,4 @@
+import { HTTPException } from "hono/http-exception";
 import { nullableResponseTimestamp, responseTimestamp, z } from "../openapi";
 import { boardColumnSchema, boardTaskSchema } from "../task/response";
 
@@ -87,3 +88,28 @@ export const projectMemberSchema = z
   .openapi("ProjectMember");
 
 export const projectMemberListSchema = z.array(projectMemberSchema);
+
+// A move also reports how many assignees lost access in the destination.
+export const movedProjectSchema = projectSchema
+  .extend({ unassignedTaskCount: z.number() })
+  .openapi("MovedProject");
+
+// Storage coordinates are private implementation details, even on mutations
+// that return a full database row. Preserve each endpoint's other fields.
+export function toPublicProject<
+  T extends {
+    backgroundObjectKey: string | null;
+    backgroundMimeType: string | null;
+  },
+>(project: T | undefined) {
+  if (!project)
+    throw new HTTPException(500, {
+      message: "Project mutation returned no result",
+    });
+  const {
+    backgroundObjectKey: _key,
+    backgroundMimeType: _mime,
+    ...publicProject
+  } = project;
+  return publicProject;
+}

@@ -34,7 +34,7 @@ beforeEach(async () => {
   await resetTestDatabase();
   // Better Auth skips origin checks in test mode unless explicitly enabled.
   (await auth.$context).skipOriginCheck = false;
-  vi.spyOn(email, "isSmtpConfigured").mockReturnValue(true);
+  vi.spyOn(email, "isEmailConfigured").mockReturnValue(true);
   vi.spyOn(email, "sendPasswordResetEmail").mockResolvedValue();
   expect(
     (
@@ -199,7 +199,7 @@ describe("password reset with email OTP disabled", () => {
     );
   });
 
-  it("rejects untrusted redirects and requests without SMTP", async () => {
+  it("rejects untrusted redirects and requests without a mail transport", async () => {
     expect(
       (
         await post("/request-password-reset", {
@@ -208,7 +208,7 @@ describe("password reset with email OTP disabled", () => {
         })
       ).status,
     ).toBe(403);
-    vi.mocked(email.isSmtpConfigured).mockReturnValue(false);
+    vi.mocked(email.isEmailConfigured).mockReturnValue(false);
     expect(
       (await post("/request-password-reset", { email: address, redirectTo }))
         .status,

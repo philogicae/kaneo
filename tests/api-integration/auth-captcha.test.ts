@@ -59,7 +59,8 @@ function post(path: string, body: unknown, token?: string) {
 describe("server-side auth CAPTCHA enforcement", () => {
   beforeEach(async () => {
     await resetTestDatabase();
-    vi.spyOn(email, "isSmtpConfigured").mockReturnValue(true);
+    // The fork delivers through Resend or SMTP; recovery gating reads the combined helper.
+    vi.spyOn(email, "isEmailConfigured").mockReturnValue(true);
     await createWorkspaceMember();
     vi.stubEnv("TURNSTILE_SECRET_KEY", "test-only-secret");
   });

@@ -29,7 +29,7 @@ export async function withLease<T>(
     WHERE job_lease.expires_at <= ${now}
   `);
 
-  if (!claimed.changes) {
+  if (!claimed.rowsAffected) {
     throw options.busy();
   }
 

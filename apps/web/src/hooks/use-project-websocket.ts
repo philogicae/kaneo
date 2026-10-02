@@ -80,6 +80,18 @@ export function useProjectWebSocket(projectId: string) {
               queryKey: ["tasks", message.projectId],
             });
 
+            // A task edit can change its integration links, which are fetched
+            // per task rather than with the board.
+            if (
+              (message.type === "TASK_UPDATED" ||
+                message.type === "TASK_MOVED") &&
+              message.taskId
+            ) {
+              queryClient.invalidateQueries({
+                queryKey: ["external-links", message.taskId],
+              });
+            }
+
             if (message.type === "TASK_RELATION_UPDATED") {
               if (message.sourceTaskId) {
                 queryClient.invalidateQueries({

@@ -48,8 +48,7 @@ export async function withIntegrationTask<T>(
             ? eq(projectTable.workspaceId, integration.project.workspaceId)
             : undefined,
         ),
-      )
-      .for("key share", { of: [projectTable, integrationTable] });
+      );
     if (!project) return undefined;
     if (expectedBinding) {
       const [binding] = await tx
@@ -69,8 +68,7 @@ export async function withIntegrationTask<T>(
               : eq(integrationTable.type, expectedBinding.type),
             eq(integrationTable.isActive, true),
           ),
-        )
-        .for("share");
+        );
       if (
         !binding ||
         (expectedBinding.validate && !expectedBinding.validate(binding))
@@ -86,8 +84,7 @@ export async function withIntegrationTask<T>(
             eq(taskTable.id, taskId),
             eq(taskTable.projectId, integration.projectId),
           ),
-        )
-        .for("no key update");
+        );
       if (!task) return undefined;
     }
     return apply(tx, (effect) => effects.push(effect));
@@ -104,14 +101,21 @@ export function externalLinkScope() {
   return sql`exists (select 1 from ${taskTable} scoped_task join ${integrationTable} scoped_integration on scoped_integration.project_id = scoped_task.project_id where scoped_task.id = ${externalLinkTable.taskId} and scoped_integration.id = ${externalLinkTable.integrationId})`;
 }
 
+/**
+ * An opaque token that changes whenever the task row is written.
+ *
+ * Postgres used the row's `xmin`; libSQL has no row version, so the
+ * trigger-maintained `revision` counter plays that role. Callers only compare
+ * tokens for equality.
+ */
 export async function integrationTaskRevision(
   taskId: string,
   projectId: string,
   database: IntegrationDatabase = db,
 ) {
   const [task] = await database
-    .select({ revision: sql<string>`${taskTable}.xmin::text` })
+    .select({ revision: taskTable.revision })
     .from(taskTable)
     .where(linkedTaskScope(taskId, projectId));
-  return task?.revision;
+  return task ? String(task.revision) : undefined;
 }

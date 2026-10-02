@@ -1,6 +1,7 @@
 import { and, count, eq, gt, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../database";
+import { withLease } from "../database/lease";
 import { mcpOauthStateTable } from "../database/schema";
 
 export type OauthStateKind = "client" | "code" | "request";
@@ -12,6 +13,14 @@ export const OAUTH_STATE_LIMITS = {
 export const OAUTH_PAYLOAD_BYTES = 32 * 1024;
 export const EXPIRED_STATE_BATCH = 100;
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/** Signals that another request holds this OAuth issuance slot. */
+class OAuthSlotBusy extends Error {
+  constructor() {
+    super("OAuth state slot is busy");
+    this.name = "OAuthSlotBusy";
+  }
+}
 
 async function sweepExpired(dbOrTx: typeof db | Transaction) {
   // Never issue an unbounded delete or evict a live consent request. Fixed
@@ -47,92 +56,107 @@ export async function putState(
       ? payload.clientId
       : undefined;
   const limits = OAUTH_STATE_LIMITS[kind];
-  const denial = await db.transaction(async (tx) => {
-    // Separate fixed locks keep a registration flood from occupying the code
-    // issuance lock. Try-lock bounds the queue during concurrent floods.
-    const lock = await tx.execute<{ acquired: boolean; nowMs: number }>(
-      sql`SELECT pg_try_advisory_xact_lock(773621, ${limits.lock}) AS acquired, (extract(epoch FROM now()) * 1000)::double precision AS "nowMs"`,
-    );
-    if (!lock.rows[0]?.acquired) return "busy";
-    const now = new Date(Number(lock.rows[0].nowMs));
-    await sweepExpired(tx);
-    const [rate] = await tx
-      .select()
-      .from(mcpOauthStateTable)
-      .where(
-        and(
-          eq(mcpOauthStateTable.kind, "rate"),
-          eq(mcpOauthStateTable.key, kind),
-        ),
-      )
-      .limit(1);
-    const used =
-      rate && rate.expiresAt > now
-        ? Number((rate.payload as { count?: number }).count ?? 0)
-        : 0;
-    if (!Number.isSafeInteger(used) || used < 0 || used >= limits.perMinute)
-      return "rate";
-    const [total] = await tx
-      .select({ total: count() })
-      .from(
-        tx
-          .select({ id: mcpOauthStateTable.id })
-          .from(mcpOauthStateTable)
-          .where(eq(mcpOauthStateTable.kind, kind))
-          .limit(limits.rows)
-          .as("bounded_states"),
-      );
-    if ((total?.total ?? limits.rows) >= limits.rows) return "capacity";
-    if (limits.perClient && typeof clientId === "string") {
-      const [clientTotal] = await tx.select({ total: count() }).from(
-        tx
-          .select({ id: mcpOauthStateTable.id })
-          .from(mcpOauthStateTable)
-          .where(
-            and(
-              eq(mcpOauthStateTable.kind, kind),
-              sql`${mcpOauthStateTable.payload}->>'clientId' = ${clientId}`,
-            ),
+  // Separate fixed slots keep a registration flood from occupying the code
+  // issuance slot. A short lease bounds the queue during concurrent floods;
+  // SQLite serialises writers, so the transaction itself is the exclusion.
+  const now = new Date();
+  let denial: string | null = null;
+  try {
+    denial = await withLease(
+      `mcp-oauth-state:${limits.lock}`,
+      () =>
+        db.transaction(async (tx) => {
+          await sweepExpired(tx);
+          const [rate] = await tx
+            .select()
+            .from(mcpOauthStateTable)
+            .where(
+              and(
+                eq(mcpOauthStateTable.kind, "rate"),
+                eq(mcpOauthStateTable.key, kind),
+              ),
+            )
+            .limit(1);
+          const used =
+            rate && rate.expiresAt > now
+              ? Number((rate.payload as { count?: number }).count ?? 0)
+              : 0;
+          if (
+            !Number.isSafeInteger(used) ||
+            used < 0 ||
+            used >= limits.perMinute
           )
-          .limit(limits.perClient)
-          .as("bounded_client_states"),
-      );
-      if ((clientTotal?.total ?? limits.perClient) >= limits.perClient)
-        return "client";
-    }
-    if (consumeRequestId) {
-      const consumed = await tx
-        .delete(mcpOauthStateTable)
-        .where(
-          and(
-            eq(mcpOauthStateTable.kind, "request"),
-            eq(mcpOauthStateTable.key, consumeRequestId),
-            gt(mcpOauthStateTable.expiresAt, now),
-          ),
-        )
-        .returning({ id: mcpOauthStateTable.id });
-      if (!consumed.length) return "missing-request";
-    }
-    await tx
-      .insert(mcpOauthStateTable)
-      .values({ kind, key, payload, expiresAt });
-    const rateExpires = new Date(
-      (Math.floor(now.getTime() / 60_000) + 1) * 60_000,
+            return "rate";
+          const [total] = await tx
+            .select({ total: count() })
+            .from(
+              tx
+                .select({ id: mcpOauthStateTable.id })
+                .from(mcpOauthStateTable)
+                .where(eq(mcpOauthStateTable.kind, kind))
+                .limit(limits.rows)
+                .as("bounded_states"),
+            );
+          if ((total?.total ?? limits.rows) >= limits.rows) return "capacity";
+          if (limits.perClient && typeof clientId === "string") {
+            const [clientTotal] = await tx.select({ total: count() }).from(
+              tx
+                .select({ id: mcpOauthStateTable.id })
+                .from(mcpOauthStateTable)
+                .where(
+                  and(
+                    eq(mcpOauthStateTable.kind, kind),
+                    sql`json_extract(${mcpOauthStateTable.payload}, '$.clientId') = ${clientId}`,
+                  ),
+                )
+                .limit(limits.perClient)
+                .as("bounded_client_states"),
+            );
+            if ((clientTotal?.total ?? limits.perClient) >= limits.perClient)
+              return "client";
+          }
+          if (consumeRequestId) {
+            const consumed = await tx
+              .delete(mcpOauthStateTable)
+              .where(
+                and(
+                  eq(mcpOauthStateTable.kind, "request"),
+                  eq(mcpOauthStateTable.key, consumeRequestId),
+                  gt(mcpOauthStateTable.expiresAt, now),
+                ),
+              )
+              .returning({ id: mcpOauthStateTable.id });
+            if (!consumed.length) return "missing-request";
+          }
+          await tx
+            .insert(mcpOauthStateTable)
+            .values({ kind, key, payload, expiresAt });
+          const rateExpires = new Date(
+            (Math.floor(now.getTime() / 60_000) + 1) * 60_000,
+          );
+          await tx
+            .insert(mcpOauthStateTable)
+            .values({
+              kind: "rate",
+              key: kind,
+              payload: { count: used + 1 },
+              expiresAt: rateExpires,
+            })
+            .onConflictDoUpdate({
+              target: [mcpOauthStateTable.kind, mcpOauthStateTable.key],
+              set: { payload: { count: used + 1 }, expiresAt: rateExpires },
+            });
+          return null;
+        }),
+      // A held slot means a concurrent flood is already being bounded.
+      { busy: () => new OAuthSlotBusy(), leaseMs: 5_000 },
     );
-    await tx
-      .insert(mcpOauthStateTable)
-      .values({
-        kind: "rate",
-        key: kind,
-        payload: { count: used + 1 },
-        expiresAt: rateExpires,
-      })
-      .onConflictDoUpdate({
-        target: [mcpOauthStateTable.kind, mcpOauthStateTable.key],
-        set: { payload: { count: used + 1 }, expiresAt: rateExpires },
-      });
-    return null;
-  });
+  } catch (error) {
+    // A held slot is a denial, not a failure: report it so the caller can
+    // answer 429 instead of 500.
+    if (!(error instanceof OAuthSlotBusy)) throw error;
+    denial = "busy";
+  }
   // Return denials outside the transaction: expired-row cleanup must commit
   // even when a legacy over-cap table refuses this insert.
   if (denial === "missing-request")

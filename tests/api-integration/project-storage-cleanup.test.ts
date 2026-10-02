@@ -210,10 +210,10 @@ it("queues more than the PostgreSQL parameter limit without rolling back", async
     ),
   );
   const { sql } = await import("drizzle-orm");
-  const count = await db.execute(
-    sql`select count(*)::integer as total from ${schema.storageCleanupTable}`,
+  const count = await db.all<{ total: number }>(
+    sql`select count(*) as total from ${schema.storageCleanupTable}`,
   );
-  expect(count.rows[0].total).toBe(66_000);
+  expect(count[0].total).toBe(66_000);
 });
 
 it("keeps the pool available and protects objects during slow verification", async () => {
@@ -242,9 +242,9 @@ it("keeps the pool available and protects objects during slow verification", asy
   );
   try {
     await ready;
-    expect((await db.execute(sql`select 1 as healthy`)).rows[0].healthy).toBe(
-      1,
-    );
+    expect(
+      (await db.all<{ healthy: number }>(sql`select 1 as healthy`))[0].healthy,
+    ).toBe(1);
     await db.insert(schema.storageCleanupTable).values({ objectKey: "slow-0" });
     await retryStorageCleanup();
     expect(m.deleteS3Object).not.toHaveBeenCalled();

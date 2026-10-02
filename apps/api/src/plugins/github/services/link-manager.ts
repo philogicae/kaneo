@@ -79,8 +79,7 @@ export async function createExternalLink(
         eq(taskTable.id, params.taskId),
         eq(integrationTable.id, params.integrationId),
       ),
-    )
-    .for("share", { of: taskTable });
+    );
   if (!task)
     throw new Error("Task no longer belongs to the integration project");
 
@@ -326,7 +325,6 @@ export async function lockExternalLink(id: string, database: DbOrTx) {
   const [link] = await database
     .select({ id: externalLinkTable.id, metadata: externalLinkTable.metadata })
     .from(externalLinkTable)
-    .where(eq(externalLinkTable.id, id))
-    .for("update");
+    .where(eq(externalLinkTable.id, id));
   return link;
 }

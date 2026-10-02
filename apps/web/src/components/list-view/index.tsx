@@ -42,18 +42,27 @@ import TaskRow from "./task-row";
 type ListViewProps = {
   project: ProjectWithTasks;
   sortActive?: boolean;
+  // Caller-driven overrides, e.g. while a drop is handled elsewhere or a bulk
+  // action is in flight. Sorting uses its own guard.
+  disableDragDrop?: boolean;
+  disableCollectionActions?: boolean;
 };
 
-function ListView({ project, sortActive = false }: ListViewProps) {
+function ListView({
+  project,
+  sortActive = false,
+  disableDragDrop = false,
+  disableCollectionActions = false,
+}: ListViewProps) {
   const { t } = useTranslation();
   const { setProject } = useProjectStore();
-  const {
-    setAvailableTasks,
-    focusNext,
-    focusPrevious,
-    focusedTaskId,
-    clearFocus,
-  } = useBulkSelectionStore();
+  const setAvailableTasks = useBulkSelectionStore(
+    (state) => state.setAvailableTasks,
+  );
+  const focusNext = useBulkSelectionStore((state) => state.focusNext);
+  const focusPrevious = useBulkSelectionStore((state) => state.focusPrevious);
+  const focusedTaskId = useBulkSelectionStore((state) => state.focusedTaskId);
+  const clearFocus = useBulkSelectionStore((state) => state.clearFocus);
   const { mutate: updateTask } = useUpdateTask();
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -122,11 +131,11 @@ function ListView({ project, sortActive = false }: ListViewProps) {
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: 8 },
+      activationConstraint: { distance: disableDragDrop ? 999999 : 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,
+        delay: disableDragDrop ? 999999 : 200,
         tolerance: 8,
       },
     }),
@@ -166,7 +175,7 @@ function ListView({ project, sortActive = false }: ListViewProps) {
     setActiveId(null);
     setOverColumnId(null);
 
-    if (!over || !project?.columns) return;
+    if (disableDragDrop || !over || !project?.columns) return;
 
     const { project: updatedProject, updates } = applyTaskDrop({
       project,
@@ -192,7 +201,12 @@ function ListView({ project, sortActive = false }: ListViewProps) {
   };
 
   const handleArchiveClick = (column: ProjectWithTasks["columns"][number]) => {
-    if (!column.isFinal || column.tasks.length === 0) return;
+    if (
+      disableCollectionActions ||
+      !column.isFinal ||
+      column.tasks.length === 0
+    )
+      return;
     setColumnToArchive(column);
     setIsArchiveModalOpen(true);
   };

@@ -33,21 +33,26 @@ type KanbanBoardProps = {
   // Display-only label grouping: replaces the status columns with one column
   // per label and disables drag & drop.
   groupActive?: boolean;
+  // Caller-driven override, e.g. while a drop is being handled elsewhere or a
+  // fetch is in flight. Sorts and label grouping use their own guards.
+  disableDragDrop?: boolean;
 };
 
 function KanbanBoard({
   project,
   sortActive = false,
   groupActive = false,
+  disableDragDrop = false,
 }: KanbanBoardProps) {
   const { setProject } = useProjectStore();
-  const {
-    setAvailableTasks,
-    focusNext,
-    focusPrevious,
-    focusedTaskId,
-    clearFocus,
-  } = useBulkSelectionStore();
+  const setAvailableTasks = useBulkSelectionStore(
+    (state) => state.setAvailableTasks,
+  );
+  const focusNext = useBulkSelectionStore((state) => state.focusNext);
+  const focusPrevious = useBulkSelectionStore((state) => state.focusPrevious);
+  const focusedTaskId = useBulkSelectionStore((state) => state.focusedTaskId);
+  const clearFocus = useBulkSelectionStore((state) => state.clearFocus);
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const { mutate: updateTask } = useUpdateTask();
   const navigate = useNavigate();
@@ -139,7 +144,7 @@ function KanbanBoard({
     const { active, over } = event;
     setActiveId(null);
 
-    if (!over || !project?.columns) return;
+    if (disableDragDrop || !over || !project?.columns) return;
 
     const { project: updatedProject, updates } = applyTaskDrop({
       project,

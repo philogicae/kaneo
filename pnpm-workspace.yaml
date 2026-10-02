@@ -40,11 +40,9 @@ overrides:
   "nanoid@3": ">=3.3.18 <4"
   vite@*: "catalog:"
   vitest@*: "catalog:"
-onlyBuiltDependencies:
-  - bcrypt
-  - better-sqlite3
-  - esbuild
-  - msw
+allowBuilds:
+  esbuild: true
+  msw: true
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0-rc.1
   vitest: 5.0.1

@@ -122,14 +122,14 @@ describe("bounded task pages", () => {
       externalLinks: [{ externalId: "235", metadata: { state: "open" } }],
     });
   });
-  it("caps explicit pages at 100 and rejects invalid limits or offsets", async () => {
+  it("caps explicit pages at 200 and rejects invalid limits or offsets", async () => {
     const { project, app } = await fixture();
     const response = await app.request(
-      `/api/task/tasks/${project.id}?limit=100`,
+      `/api/task/tasks/${project.id}?limit=200`,
     );
-    expect(allTasks((await response.json()).data)).toHaveLength(100);
+    expect(allTasks((await response.json()).data)).toHaveLength(200);
     for (const query of [
-      "limit=101",
+      "limit=201",
       "limit=0",
       "page=0",
       "page=-1",
@@ -177,7 +177,7 @@ describe("bounded task pages", () => {
     const { project, app } = await fixture(1, true);
     mockAnonymousSession();
     const response = await app.request(
-      `/api/public-project/${project.id}?limit=101`,
+      `/api/public-project/${project.id}?limit=201`,
     );
     expect(response.status).toBe(400);
     expect(response.headers.get("Content-Type")).toContain("text/plain");

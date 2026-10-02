@@ -1,12 +1,12 @@
 import { and, eq } from "drizzle-orm";
 import db from "../../../database";
-import { publishEvent } from "../../../events";
 import {
   columnTable,
   integrationTable,
   projectTable,
   taskTable,
 } from "../../../database/schema";
+import { publishEvent } from "../../../events";
 import { claimTaskNumber } from "../../../task/controllers/claim-task-numbers";
 import type { GitHubConfig } from "../config";
 import { createExternalLink, findExternalLink } from "../services/link-manager";
@@ -30,9 +30,7 @@ type IssueOpenedPayload = {
     labels?: Array<string | { name?: string }>;
     user: { login: string } | null;
   };
-  installation?: { id: number };
   repository: {
-    id: number;
     owner: { login: string };
     name: string;
     full_name: string;
@@ -55,7 +53,10 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
     return;
   }
 
-  const integrations = await findAllIntegrationsByRepo(payload);
+  const integrations = await findAllIntegrationsByRepo({
+    owner: repository.owner.login,
+    repo: repository.name,
+  });
 
   if (integrations.length === 0) {
     return;
@@ -68,22 +69,26 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
     const priority = extractIssuePriority(issue.labels);
     const status = extractIssueStatus(issue.labels);
 
+    // One statement boundary for the link check and both writes. The webhook
+    // and a resumable import reach this point concurrently; without it both see
+    // no link and each create a task for the same issue.
     const createdTask = await db.transaction(async (tx) => {
-      // Use the same integration lock as resumable imports before checking the
-      // link. The task and link must either both commit or both roll back.
+      // The same integration row the import locks, so the two paths serialise.
       const [current] = await tx
         .select()
         .from(integrationTable)
         .where(eq(integrationTable.id, integration.id));
       if (!current?.isActive || current.config !== integration.config)
         return null;
+
       const existingLink = await findExternalLink(
         integration.id,
         "issue",
-        String(issue.number),
+        issue.number.toString(),
         tx,
       );
       if (existingLink) return null;
+
       const targetStatus = await resolveTargetStatus(
         projectId,
         "issue_opened",
@@ -97,6 +102,7 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
         ),
       });
       const number = await claimTaskNumber(projectId, tx);
+
       const [task] = await tx
         .insert(taskTable)
         .values({
@@ -111,12 +117,13 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
         })
         .returning();
       if (!task) throw new Error("Failed to create task from GitHub issue");
+
       await createExternalLink(
         {
           taskId: task.id,
           integrationId: integration.id,
           resourceType: "issue",
-          externalId: String(issue.number),
+          externalId: issue.number.toString(),
           url: issue.html_url,
           title: issue.title,
           metadata: {
@@ -129,7 +136,9 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
       );
       return task;
     });
+
     if (!createdTask) continue;
+
     await publishEvent("task.created", {
       ...createdTask,
       taskId: createdTask.id,

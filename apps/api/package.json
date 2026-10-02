@@ -19,7 +19,7 @@
     "lint": "vp check .",
     "typecheck": "vp run check:types",
     "test": "vp run test:run",
-    "test:coverage": "vp test run --config vitest.config.ts --coverage",
+    "test:coverage": "vp run test:coverage:run",
     "test:unit": "vp run test:run",
     "test:integration": "vp run test:integration:run",
     "test:watch": "vp test --config vitest.config.ts",

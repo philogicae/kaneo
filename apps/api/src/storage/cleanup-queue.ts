@@ -29,6 +29,11 @@ export async function queueStorageCleanup(
 }
 
 export async function retryStorageCleanup(): Promise<{ degraded: boolean }> {
+  // Ranking within each of the two cohorts — never attempted, and already
+  // attempted — and then interleaving them by rank, so a permanent-failure
+  // backlog can never starve new keys and a continuous stream of new keys can
+  // never starve a retry. A plain sort by attempt time would let whichever
+  // cohort is larger fill the whole batch.
   const ranked = db
     .select({
       objectKey: storageCleanupTable.objectKey,
@@ -42,7 +47,11 @@ export async function retryStorageCleanup(): Promise<{ degraded: boolean }> {
   const pending = await db
     .select()
     .from(ranked)
-    .orderBy(ranked.rank, ranked.lastAttemptAt, ranked.objectKey)
+    .orderBy(
+      sql`${ranked.rank} asc`,
+      sql`${ranked.lastAttemptAt} asc`,
+      sql`${ranked.objectKey} asc`,
+    )
     .limit(100);
   let degraded = false;
   for (const item of pending) {
@@ -55,16 +64,16 @@ export async function retryStorageCleanup(): Promise<{ degraded: boolean }> {
         where: eq(jobLeaseTable.name, `storage-verification:${item.objectKey}`),
       });
       if (verification && verification.expiresAt > new Date()) return;
+      // The lease above already excludes concurrent reference changes, so a
+      // plain read is enough to tell a live key from an orphaned one.
       const [asset] = await tx
         .select({ id: assetTable.id })
         .from(assetTable)
-        .where(eq(assetTable.objectKey, item.objectKey))
-        .for("key share");
+        .where(eq(assetTable.objectKey, item.objectKey));
       const [background] = await tx
         .select({ id: projectTable.id })
         .from(projectTable)
-        .where(eq(projectTable.backgroundObjectKey, item.objectKey))
-        .for("key share");
+        .where(eq(projectTable.backgroundObjectKey, item.objectKey));
       if (asset || background) {
         await tx
           .delete(storageCleanupTable)

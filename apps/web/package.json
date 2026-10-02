@@ -10,7 +10,7 @@
     "lint": "vp check .",
     "typecheck": "vp run check:types",
     "test": "vp run test:run",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "test:coverage": "vp run test:coverage:run",
     "test:watch": "vp test --config vitest.config.ts"
   },
   "dependencies": {
@@ -30,6 +30,7 @@
     "@tanstack/router-devtools": "^1.167.1",
     "@tanstack/router-plugin": "^1.168.26",
     "@tiptap/core": "^3.30.4",
+    "@tiptap/extension-hard-break": "^3.29.2",
     "@tiptap/extension-image": "^3.29.2",
     "@tiptap/extension-placeholder": "^3.29.2",
     "@tiptap/extension-table": "^3.29.2",

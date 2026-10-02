@@ -1,5 +1,7 @@
 import type { EmailResult } from "../../../packages/email/src/send-email";
 
+export { OTP_EXPIRY_SECONDS } from "../../../packages/email/src/otp-expiry";
+
 export async function sendMagicLinkEmail(
   _to: string,
   _subject: string,
@@ -36,4 +38,14 @@ export function isResendConfigured(): boolean {
 
 export function isEmailConfigured(): boolean {
   return isSmtpConfigured() || isResendConfigured();
+}
+
+// Password recovery goes through the same package, so the mock has to answer
+// for it too or the reset flow never delivers a link.
+export async function sendPasswordResetEmail(
+  _to: string,
+  _subject: string,
+  _data: unknown,
+): Promise<void> {
+  return undefined;
 }

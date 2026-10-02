@@ -1,29 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
-// The middleware makes at most two ordered lookups per source list; the label
-// lookup runs first, then the task fallback.
+// The label lookup joins its task and project, so one read resolves the
+// workspace of both a workspace-level label and a task-scoped copy.
 const mocks = vi.hoisted(() => {
   const labelRows: Record<string, unknown>[] = [];
-  const taskRows: Record<string, unknown>[] = [];
-  let callIndex = 0;
-  const resolveRows = () => (callIndex++ === 0 ? labelRows : taskRows);
   return {
     labelRows,
-    taskRows,
     reset: () => {
       labelRows.length = 0;
-      taskRows.length = 0;
-      callIndex = 0;
     },
     db: {
-      select: vi.fn(() => ({
-        from: () => {
-          const where = () => ({
-            limit: async () => resolveRows(),
-          });
-          return { where, innerJoin: () => ({ where }) };
-        },
-      })),
+      // Every join returns the same chain, so the two left joins the label
+      // lookup issues compose.
+      select: vi.fn(() => {
+        const chain: Record<string, unknown> = {};
+        chain.from = () => chain;
+        chain.innerJoin = () => chain;
+        chain.leftJoin = () => chain;
+        chain.where = () => chain;
+        chain.limit = async () => mocks.labelRows;
+        return chain;
+      }),
     },
     validatedWorkspaceId: new (class {
       value?: string;
@@ -46,21 +43,21 @@ vi.mock("../../../apps/api/src/utils/validate-workspace-access", () => ({
 
 import { workspaceAccess } from "../../../apps/api/src/utils/workspace-access-middleware";
 
-function makeContext(body: Record<string, unknown>) {
+function makeContext() {
   return {
     get: (key: string) => (key === "userId" ? "user-1" : undefined),
     set: vi.fn(),
     req: {
       param: (key: string) => (key === "id" ? "label-1" : undefined),
       query: () => undefined,
-      json: async () => body,
+      json: async () => ({}),
     },
   };
 }
 
-async function runFromLabel(body: Record<string, unknown>) {
+async function runFromLabel() {
   const next = vi.fn();
-  await workspaceAccess.fromLabel()(makeContext(body) as never, next);
+  await workspaceAccess.fromLabel()(makeContext() as never, next);
   return mocks.validatedWorkspaceId.value;
 }
 
@@ -70,17 +67,39 @@ describe("workspaceAccess.fromLabel", () => {
   });
 
   it("authorizes against the label's own workspace", async () => {
-    mocks.labelRows.push({ workspaceId: "ws-1" });
-    expect(await runFromLabel({ taskId: "task-1" })).toBe("ws-1");
+    mocks.labelRows.push({
+      workspaceId: "ws-1",
+      taskId: null,
+      taskWorkspaceId: null,
+      taskProjectId: null,
+    });
+    expect(await runFromLabel()).toBe("ws-1");
   });
 
-  it("falls back to the task's workspace when the label has none", async () => {
-    mocks.taskRows.push({ workspaceId: "ws-2" });
-    expect(await runFromLabel({ taskId: "task-1" })).toBe("ws-2");
+  it("resolves a task-scoped copy through its task when the label has none", async () => {
+    mocks.labelRows.push({
+      workspaceId: null,
+      taskId: "task-1",
+      taskWorkspaceId: "ws-2",
+      taskProjectId: "project-2",
+    });
+    expect(await runFromLabel()).toBe("ws-2");
   });
 
-  it("fails closed when neither label nor task resolves a workspace", async () => {
-    await expect(runFromLabel({ taskId: "task-1" })).rejects.toThrow(
+  it("fails closed on a label whose task is in another workspace", async () => {
+    mocks.labelRows.push({
+      workspaceId: "ws-1",
+      taskId: "task-1",
+      taskWorkspaceId: "ws-2",
+      taskProjectId: "project-2",
+    });
+    await expect(runFromLabel()).rejects.toThrow(
+      /Workspace ID could not be determined/,
+    );
+  });
+
+  it("fails closed when the label does not exist", async () => {
+    await expect(runFromLabel()).rejects.toThrow(
       /Workspace ID could not be determined/,
     );
   });

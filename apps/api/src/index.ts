@@ -15,7 +15,9 @@ import accessTeam from "./access-team";
 import activity from "./activity";
 import appointment from "./appointment";
 import { auth } from "./auth";
+import admin from "./admin";
 import { organizationRoutes } from "./auth-openapi";
+import calendarFeed, { publicCalendarFeed } from "./calendar-feed";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
@@ -26,6 +28,9 @@ import { eventContext } from "./events";
 import externalLink from "./external-link";
 import genericWebhookIntegration from "./generic-webhook-integration";
 import giteaIntegration, { handleGiteaWebhookRoute } from "./gitea-integration";
+import gitlabIntegration, {
+  handleGitlabWebhookRoute,
+} from "./gitlab-integration";
 import githubIntegration, {
   handleGithubWebhookRoute,
 } from "./github-integration";
@@ -40,11 +45,17 @@ import milestone from "./milestone";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
-import { createRoute, jsonResponse, z } from "./openapi";
+import { createRoute, errorResponse, jsonResponse, z } from "./openapi";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
+import { descriptionPageSchema, publicBoardPageSchema } from "./task/response";
+import { descriptionPageQuery, listTasksQuery } from "./task/schema";
+import {
+  getDescriptionPage,
+  getPublicProjectDescriptionPage,
+} from "./task/description-pages";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import skills from "./skills";
@@ -59,12 +70,19 @@ import user from "./user";
 import getAvatar from "./user/controllers/get-avatar";
 import { canAccessProject } from "./utils/access-scope";
 import { authenticateApiRequest } from "./utils/authenticate-api-request";
-import { authorizeAssetAccess } from "./utils/authorize-asset-access";
+import {
+  authorizeAssetAccess,
+  isPublicAsset,
+} from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
+import { clientIpMiddleware } from "./utils/client-ip";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
+import { drainPasswordResetDeliveries } from "./utils/password-reset-delivery";
 import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
+import { drainSignInEmails } from "./utils/sign-in-email-tasks";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
+import { verifyApiKey } from "./utils/verify-api-key";
 import workflowRule from "./workflow-rule";
 import workspace from "./workspace";
 import workspaceSharing from "./workspace-sharing";
@@ -76,6 +94,12 @@ import {
   removeUserConnection,
   shutdownWebSocketAdapter,
 } from "./ws";
+import {
+  assertWebSocketOrigin,
+  handleWebSocketMessage,
+  MAX_WEBSOCKET_MESSAGE_BYTES,
+} from "./ws/security";
+import { syncWorkspaceAccess } from "./ws/workspace-access";
 
 type ApiKey = {
   id: string;
@@ -141,6 +165,11 @@ function buildContentDisposition(filename: string, inline: boolean) {
 export function createApp() {
   const app = new Hono<AppVariables>();
 
+  // Resolves the client address once, from the transport peer and the hops a
+  // trusted proxy chain reports, and hands Better Auth a private header it is
+  // the only reader of.
+  app.use("*", clientIpMiddleware());
+
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
       return err.getResponse();
@@ -150,6 +179,11 @@ export function createApp() {
     return c.json({ message: "Internal Server Error" }, 500);
   });
   const nodeWs = createNodeWebSocket({ app });
+  // node-ws exposes its ws server, but does not accept constructor options.
+  // Set the receiver limit before any connection can upgrade, including
+  // fragmented messages, before node-ws converts text buffers to strings.
+  nodeWs.wss.options.maxPayload = MAX_WEBSOCKET_MESSAGE_BYTES;
+  nodeWs.wss.options.perMessageDeflate = false;
   const { upgradeWebSocket, injectWebSocket } = nodeWs;
   const corsOriginSource = [
     process.env.CORS_ORIGINS,
@@ -221,12 +255,116 @@ export function createApp() {
     async (c) => c.json(await getInstanceStatus(), 200),
   );
 
-  const publicProjectApi = api.get("/public-project/:id", async (c) => {
-    const { id } = c.req.param();
-    const project = await getPublicProject(id);
-
-    return c.json(project);
-  });
+  const publicProjectApi = api
+    .openapi(
+      createRoute({
+        method: "get",
+        operationId: "getPublicProject",
+        path: "/public-project/{id}",
+        tags: ["Projects"],
+        summary: "Get a public project board",
+        description:
+          "Read a public board in bounded task pages. Visibility is checked before loading tasks.",
+        // No authentication: the board is public by definition here.
+        security: [],
+        request: {
+          params: z.object({ id: z.string() }),
+          query: listTasksQuery,
+        },
+        responses: {
+          200: jsonResponse("A public board page", publicBoardPageSchema),
+          400: errorResponse("Invalid pagination or filters"),
+          403: errorResponse("Project is not public"),
+          404: errorResponse("Project not found"),
+        },
+      }),
+      async (c) => {
+        const { id } = c.req.valid("param");
+        return c.json(await getPublicProject(id, c.req.valid("query")), 200);
+      },
+      (result) => {
+        if (!result.success)
+          throw new HTTPException(400, {
+            message: "Invalid task pagination or filters",
+          });
+      },
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        operationId: "getPublicProjectDescriptionPage",
+        path: "/public-project/{id}/description",
+        tags: ["Projects"],
+        summary: "Read a public project description page",
+        security: [],
+        request: {
+          params: z.object({ id: z.string() }),
+          query: descriptionPageQuery,
+        },
+        responses: {
+          200: jsonResponse(
+            "Public project description page",
+            descriptionPageSchema,
+          ),
+          400: errorResponse("Invalid description cursor"),
+          404: errorResponse("Public project not found"),
+          409: errorResponse("Description changed or no longer public"),
+        },
+      }),
+      async (c) =>
+        c.json(
+          await getPublicProjectDescriptionPage(
+            c.req.valid("param").id,
+            c.req.valid("query"),
+          ),
+          200,
+        ),
+      (result) => {
+        if (!result.success)
+          throw new HTTPException(400, {
+            message: "Invalid description cursor",
+          });
+      },
+    )
+    .openapi(
+      createRoute({
+        method: "get",
+        operationId: "getPublicTaskDescriptionPage",
+        path: "/public-project/{id}/task/{taskId}/description",
+        tags: ["Projects"],
+        summary: "Read a public task description page",
+        security: [],
+        request: {
+          params: z.object({ id: z.string(), taskId: z.string() }),
+          query: descriptionPageQuery,
+        },
+        responses: {
+          200: jsonResponse(
+            "Public task description page",
+            descriptionPageSchema,
+          ),
+          400: errorResponse("Invalid description cursor"),
+          404: errorResponse("Public task not found"),
+          409: errorResponse("Description changed or no longer public"),
+        },
+      }),
+      async (c) => {
+        const { id, taskId } = c.req.valid("param");
+        return c.json(
+          await getDescriptionPage(taskId, {
+            ...c.req.valid("query"),
+            publicProjectId: id,
+          }),
+          200,
+        );
+      },
+      (result) => {
+        if (!result.success)
+          throw new HTTPException(400, {
+            message: "Invalid description cursor",
+          });
+      },
+    );
 
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
@@ -235,10 +373,33 @@ export function createApp() {
     handleGiteaWebhookRoute,
   );
 
+  api.post(
+    "/gitlab-integration/webhook/:integrationId",
+    handleGitlabWebhookRoute,
+  );
+
   const invitationPublicApi = api.get("/invitation/public/:id", async (c) => {
     const { id } = c.req.param();
     const result = await getInvitationDetails(id);
     return c.json(result);
+  });
+
+  // The feed link itself is the secret, so it is mounted before the
+  // authenticating `*` middleware below: a subscriber holds no session.
+  api.route("/calendar-feed", publicCalendarFeed);
+
+  // Better Auth's API-key plugin validates the key itself and never checks the
+  // owner's ban state, so a banned user would keep a working key. Reject such a
+  // key before any auth route — including /auth/get-session — sees it.
+  api.use("/auth/*", async (c, next) => {
+    const apiKeyHeader = c.req.header("x-api-key")?.trim();
+    if (
+      apiKeyHeader &&
+      !(await verifyApiKey(apiKeyHeader, { consume: false }))
+    ) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+    return next();
   });
 
   api.openapi(
@@ -289,6 +450,8 @@ export function createApp() {
           objectKey: schema.assetTable.objectKey,
           mimeType: schema.assetTable.mimeType,
           filename: schema.assetTable.filename,
+          surface: schema.assetTable.surface,
+          createdBy: schema.assetTable.createdBy,
           workspaceId: schema.assetTable.workspaceId,
           projectId: schema.assetTable.projectId,
           isPublic: schema.projectTable.isPublic,
@@ -318,7 +481,7 @@ export function createApp() {
 
         return new Response(object.body as BodyInit, {
           headers: {
-            "Cache-Control": asset.isPublic
+            "Cache-Control": isPublicAsset(asset)
               ? "public, max-age=300"
               : "private, max-age=120",
             "Content-Disposition": buildContentDisposition(
@@ -519,29 +682,29 @@ export function createApp() {
 
   api.on(["POST", "GET", "PUT", "PATCH", "DELETE"], "/auth/*", async (c) => {
     const authHeader = c.req.header("Authorization");
-    const apiKeyHeader = c.req.header("x-api-key");
+    const apiKeyHeader = c.req.header("x-api-key")?.trim();
     const bearerToken = authHeader?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
     if (bearerToken && !apiKeyHeader) {
-      const session = await auth.api.getSession({
-        headers: c.req.raw.headers,
-      });
+      // A bearer credential must not be able to fall back to a browser cookie,
+      // so the cookie never travels with it.
+      const headers = new Headers(c.req.raw.headers);
+      headers.delete("cookie");
+      const session = await auth.api.getSession({ headers });
 
       // Preserve Better Auth bearer session tokens on auth routes.
       if (session?.session && session.user) {
-        return auth.handler(c.req.raw);
+        return auth.handler(new Request(c.req.raw, { headers }));
       }
 
-      const headers = new Headers(c.req.raw.headers);
+      if (!(await verifyApiKey(bearerToken, { consume: false }))) {
+        throw new HTTPException(401, { message: "Unauthorized" });
+      }
 
       // Better Auth API key plugin validates from x-api-key by default.
       headers.set("x-api-key", bearerToken);
 
-      return auth.handler(
-        new Request(c.req.raw, {
-          headers,
-        }),
-      );
+      return auth.handler(new Request(c.req.raw, { headers }));
     }
 
     return auth.handler(c.req.raw);
@@ -583,6 +746,7 @@ export function createApp() {
   api.route("/skills", skills);
 
   const projectApi = api.route("/project", project);
+  const calendarFeedApi = api.route("/calendar-feed", calendarFeed);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
@@ -602,6 +766,11 @@ export function createApp() {
     githubIntegration,
   );
   const giteaIntegrationApi = api.route("/gitea-integration", giteaIntegration);
+  const gitlabIntegrationApi = api.route(
+    "/gitlab-integration",
+    gitlabIntegration,
+  );
+  const adminApi = api.route("/admin", admin);
   const genericWebhookIntegrationApi = api.route(
     "/generic-webhook-integration",
     genericWebhookIntegration,
@@ -645,15 +814,10 @@ export function createApp() {
   api.get(
     "/ws/user",
     upgradeWebSocket(async (c) => {
-      try {
-        await authenticateApiRequest(c);
-      } catch (error) {
-        if (error instanceof HTTPException) {
-          throw error;
-        }
-        console.error("API authentication failed:", error);
-        throw new HTTPException(500, { message: "Internal Server Error" });
-      }
+      // The `*` middleware above already authenticated the handshake, so the
+      // API key's single quota unit is spent once. Re-authenticating here would
+      // reject the very key that just opened the socket.
+      assertWebSocketOrigin(c.req.raw.headers);
 
       const userId = c.get("userId");
       let conn: ReturnType<typeof addUserConnection> | null = null;
@@ -662,26 +826,10 @@ export function createApp() {
         onOpen(_evt, ws) {
           if (userId) {
             conn = addUserConnection(userId, ws);
+            void syncWorkspaceAccess(userId, ws);
           }
         },
-        onMessage(evt) {
-          try {
-            const raw =
-              typeof evt.data === "string"
-                ? evt.data
-                : Buffer.isBuffer(evt.data)
-                  ? evt.data.toString()
-                  : null;
-            if (raw) {
-              const msg = JSON.parse(raw) as { type?: string };
-              if (msg?.type === "ping") {
-                // keepalive, no-op
-              }
-            }
-          } catch {
-            // Ignore malformed messages
-          }
-        },
+        onMessage: handleWebSocketMessage,
         onClose() {
           if (conn && userId) {
             removeUserConnection(userId, conn);
@@ -694,19 +842,14 @@ export function createApp() {
   api.get(
     "/ws/:projectId",
     upgradeWebSocket(async (c) => {
+      assertWebSocketOrigin(c.req.raw.headers);
       const projectId = c.req.param("projectId");
 
-      try {
-        await authenticateApiRequest(c);
-      } catch (error) {
-        if (error instanceof HTTPException) {
-          throw error;
-        }
-        console.error("API authentication failed:", error);
-        throw new HTTPException(500, { message: "Internal Server Error" });
-      }
-
       const userId = c.get("userId");
+
+      // Carried on the connection so a later revocation of this workspace can
+      // close it.
+      let projectWorkspaceId = "";
 
       if (projectId) {
         const [project] = await db
@@ -719,6 +862,7 @@ export function createApp() {
           throw new HTTPException(401, { message: "Unauthorized" });
         }
 
+        projectWorkspaceId = project.workspaceId;
         await validateWorkspaceAccess(userId, project.workspaceId);
 
         // A scoped member without a grant for this project must not hear its
@@ -737,30 +881,16 @@ export function createApp() {
       return {
         onOpen(_evt, ws) {
           if (projectId) {
-            conn = addConnection(projectId, ws, userId, initiatorId);
+            conn = addConnection(
+              projectId,
+              ws,
+              userId,
+              initiatorId,
+              projectWorkspaceId,
+            );
           }
         },
-        onMessage(evt) {
-          // Respond to client keepalive pings (sent every 30s to prevent
-          // Cloudflare from closing idle connections at 100s timeout)
-          try {
-            const raw =
-              typeof evt.data === "string"
-                ? evt.data
-                : Buffer.isBuffer(evt.data)
-                  ? evt.data.toString()
-                  : null;
-            if (raw) {
-              const msg = JSON.parse(raw) as { type?: string };
-              if (msg?.type === "ping") {
-                // No-op: receiving the ping is enough to satisfy Cloudflare.
-                // A pong response is optional but helps confirm liveness.
-              }
-            }
-          } catch {
-            // Ignore malformed messages
-          }
-        },
+        onMessage: handleWebSocketMessage,
         onClose() {
           if (conn && projectId) {
             removeConnection(projectId, conn);
@@ -778,6 +908,7 @@ export function createApp() {
     injectWebSocket,
     accessTeamApi,
     activityApi,
+    adminApi,
     appointmentApi,
     columnApi,
     commentApi,
@@ -787,6 +918,8 @@ export function createApp() {
     genericWebhookIntegrationApi,
     githubIntegrationApi,
     giteaIntegrationApi,
+    gitlabIntegrationApi,
+    calendarFeedApi,
     invitationApi,
     invitationPublicApi,
     labelApi,
@@ -869,6 +1002,14 @@ export async function startServer(
     shutdownScheduler();
     await shutdownWebSocketAdapter();
     server.close();
+    // Accepted recovery/sign-in requests must not lose their mail to the exit.
+    const [, signInEmailsDrained] = await Promise.all([
+      drainPasswordResetDeliveries(),
+      drainSignInEmails(),
+    ]);
+    if (!signInEmailsDrained) {
+      console.warn("Timed out waiting for pending sign-in emails");
+    }
     process.exit(0);
   };
 
@@ -887,6 +1028,7 @@ const {
   injectWebSocket,
   accessTeamApi,
   activityApi,
+  adminApi,
   appointmentApi,
   columnApi,
   commentApi,
@@ -896,6 +1038,8 @@ const {
   genericWebhookIntegrationApi,
   githubIntegrationApi,
   giteaIntegrationApi,
+  gitlabIntegrationApi,
+  calendarFeedApi,
   invitationApi,
   invitationPublicApi,
   labelApi,
@@ -947,6 +1091,9 @@ export type AppType =
   | typeof searchApi
   | typeof githubIntegrationApi
   | typeof giteaIntegrationApi
+  | typeof gitlabIntegrationApi
+  | typeof calendarFeedApi
+  | typeof adminApi
   | typeof genericWebhookIntegrationApi
   | typeof discordIntegrationApi
   | typeof mattermostIntegrationApi

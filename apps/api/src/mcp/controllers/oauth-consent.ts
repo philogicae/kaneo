@@ -1,5 +1,6 @@
 import { HTTPException } from "hono/http-exception";
 import { auth } from "../../auth";
+import { publishEvent } from "../../events";
 import type { z } from "../../openapi";
 import {
   consumeAuthorizationRequest,
@@ -116,7 +117,9 @@ export async function decideMcpAuthorizationRequest(params: {
   const session = await auth.api.getSession({ headers: params.headers });
   if (!session?.user?.id) throwOAuthError(401, "unauthorized");
 
-  const request = await consumeAuthorizationRequest(params.requestId);
+  // Read before consuming: issuance is rate limited, and a denial must not
+  // burn a consent request that a retry could still approve.
+  const request = await getAuthorizationRequest(params.requestId);
   if (!request) throwOAuthError(404, "invalid_or_expired_request");
 
   const client = await getClient(request.clientId);
@@ -125,13 +128,25 @@ export async function decideMcpAuthorizationRequest(params: {
   }
 
   if (!params.decision.approved) {
+    if (!(await consumeAuthorizationRequest(params.requestId)))
+      throwOAuthError(404, "invalid_or_expired_request");
     return buildAuthorizationRedirect(request, { error: "access_denied" });
   }
 
-  const code = await createAuthCode({
+  // createAuthCode consumes the request inside the issuance transaction, so a
+  // denied issuance (rate, capacity, busy slot) leaves it approvable again.
+  const code = await createAuthCode(
+    {
+      clientId: request.clientId,
+      userId: session.user.id,
+      codeChallenge: request.codeChallenge,
+      redirectUri: request.redirectUri,
+    },
+    params.requestId,
+  );
+  await publishEvent("mcp.authorization_code_issued", {
     clientId: request.clientId,
     userId: session.user.id,
-    codeChallenge: request.codeChallenge,
     redirectUri: request.redirectUri,
   });
   return buildAuthorizationRedirect(request, { code });

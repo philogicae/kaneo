@@ -66,6 +66,9 @@ export function useTaskFiltersWithLabelsSupport(
   project: ProjectWithTasks | null | undefined,
   projectId?: string,
   textQuery?: string,
+  // Task ids whose full description matched a server-side search, for
+  // descriptions too large to ship with the board.
+  descriptionMatches?: ReadonlySet<string>,
 ) {
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
   const storageKey = projectId ? `kaneo:board-filters:${projectId}` : null;
@@ -107,6 +110,7 @@ export function useTaskFiltersWithLabelsSupport(
       return tasks.filter((task) => {
         if (
           normalizedTextQuery &&
+          !descriptionMatches?.has(task.id) &&
           !taskMatchesTextQuery(task, normalizedTextQuery, project?.slug)
         ) {
           return false;
@@ -226,7 +230,14 @@ export function useTaskFiltersWithLabelsSupport(
         return true;
       });
     },
-    [filters, project?.slug, textQuery, weekStartsOn, getValuesForTask],
+    [
+      filters,
+      project?.slug,
+      textQuery,
+      weekStartsOn,
+      getValuesForTask,
+      descriptionMatches,
+    ],
   );
 
   const filteredProject = useMemo(() => {

@@ -6,6 +6,11 @@ export default defineConfig({
   resolve: { tsconfigPaths: true },
   test: {
     environment: "jsdom",
+    // jsdom is expensive to build and the suite is dominated by environment
+    // setup (59% of the run). `vmThreads` builds one jsdom per worker instead
+    // of one per file, and still isolates each file from the next, which
+    // `isolate: false` would not.
+    pool: "vmThreads",
     // Every workspace runs at once under turbo; keep one suite from occupying the whole CPU.
     maxWorkers: 3,
     // Tests are normally sub-second, but loaded CI runners flakily push the same tests past

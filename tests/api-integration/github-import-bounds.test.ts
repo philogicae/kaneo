@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
-import db, { getDatabasePool, schema } from "../../apps/api/src/database";
+import db, { schema } from "../../apps/api/src/database";
 import { importIssues } from "../../apps/api/src/github-integration/controllers/import-issues";
 import { withGithubImportLock } from "../../apps/api/src/github-integration/import-lock";
 import { IMPORT_PAGES_PER_REQUEST } from "../../apps/api/src/github-integration/import-pages";
@@ -393,15 +393,11 @@ describe("bounded resumable GitHub import", () => {
   it("rolls back task, link, comments, number allocation and cursor together when saving progress fails", async () => {
     const { project } = await setup();
     serveIssues(1);
-    await db.execute(
-      sql.raw(
-        `CREATE FUNCTION fail_import_progress() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'test failure'; END $$`,
-      ),
-    );
-    await db.execute(
-      sql.raw(
-        "CREATE TRIGGER fail_import_progress BEFORE UPDATE ON github_import FOR EACH ROW EXECUTE FUNCTION fail_import_progress()",
-      ),
+    // RAISE(ABORT, ...) rolls back the enclosing transaction in SQLite, which
+    // is the failure the import must not survive.
+    await db.run(
+      sql`CREATE TRIGGER fail_import_progress BEFORE UPDATE ON github_import
+        BEGIN SELECT RAISE(ABORT, 'test failure'); END`,
     );
     try {
       await expect(importIssues(project.id)).rejects.toThrow();
@@ -416,10 +412,7 @@ describe("bounded resumable GitHub import", () => {
         lastTaskNumber: 0,
       });
     } finally {
-      await db.execute(
-        sql.raw("DROP TRIGGER fail_import_progress ON github_import"),
-      );
-      await db.execute(sql.raw("DROP FUNCTION fail_import_progress()"));
+      await db.run(sql`DROP TRIGGER fail_import_progress`);
     }
     expect(await importIssues(project.id)).toMatchObject({
       imported: 1,
@@ -568,10 +561,12 @@ describe("bounded resumable GitHub import", () => {
   });
 
   it("limits simultaneous imports across processes and releases slots after failure", async () => {
-    const client = await getDatabasePool().connect();
-    await client.query(
-      "SELECT pg_advisory_lock(773623, 0), pg_advisory_lock(773623, 1)",
-    );
+    // A lease held by another session is this deployment's cross-process lock.
+    await db.insert(schema.jobLeaseTable).values({
+      name: "github-import:any",
+      owner: "another-session",
+      expiresAt: new Date(Date.now() + 60_000),
+    });
     try {
       await expect(
         withGithubImportLock("any", async () => {}),
@@ -579,8 +574,9 @@ describe("bounded resumable GitHub import", () => {
         status: 429,
       });
     } finally {
-      await client.query("SELECT pg_advisory_unlock_all()");
-      client.release();
+      await db
+        .delete(schema.jobLeaseTable)
+        .where(eq(schema.jobLeaseTable.name, "github-import:any"));
     }
     await expect(
       withGithubImportLock("any", async () => {

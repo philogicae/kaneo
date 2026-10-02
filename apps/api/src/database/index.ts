@@ -49,6 +49,7 @@ import {
   workspaceUserTableRelations,
 } from "./relations";
 import { resolveDatabaseConfig } from "./resolve-database-config";
+import { serialiseClientWrites } from "./write-queue";
 import {
   accessTeamMemberTable,
   accessTeamProjectTable,
@@ -84,6 +85,7 @@ import {
   notificationTable,
   projectTable,
   sessionTable,
+  storageCleanupTable,
   taskRelationTable,
   taskReminderSentTable,
   taskTable,
@@ -231,7 +233,7 @@ export function getDatabaseClient(): Client {
       mkdirSync(dirname(config.path), { recursive: true });
     }
 
-    client = createClient({ url: config.url });
+    client = serialiseClientWrites(createClient({ url: config.url }));
   }
 
   return client;
@@ -239,9 +241,12 @@ export function getDatabaseClient(): Client {
 
 /**
  * Applies the connection PRAGMAs. SQLite runs in WAL mode so readers never
- * block the single writer, `busy_timeout` absorbs short writer contention and
- * `foreign_keys` restores the constraint enforcement Postgres gave us.
- * Idempotent: safe to call on every startup.
+ * block the single writer and `foreign_keys` restores the constraint
+ * enforcement Postgres gave us. Idempotent: safe to call on every startup.
+ *
+ * There is no `busy_timeout` here: libSQL's busy handler does not retry, so a
+ * timeout would only delay the SQLITE_BUSY. Writes are serialised in-process
+ * instead; see database/write-queue.ts.
  */
 export async function applyDatabasePragmas(): Promise<void> {
   if (pragmasApplied) {
@@ -250,7 +255,6 @@ export async function applyDatabasePragmas(): Promise<void> {
 
   const database = getDatabaseClient();
   await database.execute("PRAGMA journal_mode = WAL");
-  await database.execute("PRAGMA busy_timeout = 5000");
   await database.execute("PRAGMA synchronous = NORMAL");
   await database.execute("PRAGMA foreign_keys = ON");
   pragmasApplied = true;
