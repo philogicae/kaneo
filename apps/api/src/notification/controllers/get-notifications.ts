@@ -6,11 +6,13 @@ import {
   taskTable,
   workspaceTable,
 } from "../../database/schema";
-
 import { notificationResourceAccess } from "../resource-access";
 import { notificationWorkspaceFilter } from "../workspace-filter";
 
-async function getNotifications(userId: string, workspaceId?: string) {
+async function getNotifications(
+  userId: string,
+  paging: { limit?: number; offset?: number; workspaceId?: string } = {},
+) {
   const rows = await db
     .select({
       notification: notificationTable,
@@ -27,10 +29,12 @@ async function getNotifications(userId: string, workspaceId?: string) {
     )
     .leftJoin(projectTable, eq(taskTable.projectId, projectTable.id))
     .leftJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
+    // Historical rows are filtered at read time too: a forged or stale
+    // reference must not be enriched now that creation is guarded.
     .where(
       and(
         eq(notificationTable.userId, userId),
-        notificationWorkspaceFilter(workspaceId),
+        notificationWorkspaceFilter(paging.workspaceId),
         notificationResourceAccess(
           userId,
           notificationTable.resourceId,
@@ -39,7 +43,8 @@ async function getNotifications(userId: string, workspaceId?: string) {
       ),
     )
     .orderBy(desc(notificationTable.createdAt))
-    .limit(50);
+    .limit(paging.limit ?? 50)
+    .offset(paging.offset ?? 0);
 
   return rows.map(({ notification, projectId, workspaceId }) => {
     if (!projectId && !workspaceId) {

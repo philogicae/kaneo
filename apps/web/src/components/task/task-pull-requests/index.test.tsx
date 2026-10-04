@@ -14,6 +14,17 @@ import type { ExternalLink } from "@/types/external-link";
 import type Task from "@/types/task";
 import { TaskPullRequests } from ".";
 
+// Without an initialised i18next instance `useTranslation` renders nothing, so
+// the badge never reaches the DOM.
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) =>
+      key === "tasks:pr.count" ? `${options?.count} PRs` : key,
+    i18n: { language: "en-US", resolvedLanguage: "en-US" },
+  }),
+  initReactI18next: { type: "3rdParty", init: vi.fn() },
+}));
+
 const onParentClick = vi.fn();
 
 beforeAll(() => document.body.addEventListener("click", onParentClick));

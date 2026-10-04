@@ -5,7 +5,7 @@ import {
   drizzleAdapter,
 } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
-import { count, sql } from "drizzle-orm";
+import { count } from "drizzle-orm";
 import {
   hasInstanceAdminRole,
   instanceAdminRoleSql,
@@ -29,7 +29,7 @@ export function authDatabaseAdapter(config: DrizzleAdapterConfig) {
         return db.transaction(async (tx) => {
           // Serialize role removals across API instances, keeping the count
           // and write in the same transaction so cross-demotions cannot race.
-          await tx.execute(sql`SELECT pg_advisory_xact_lock(2026, 1732)`);
+          // libSQL serialises writers, so no advisory lock is needed here.
           const transactionAdapter = drizzleAdapter(tx, config)(options);
           const user = await transactionAdapter.findOne<{ role?: string }>({
             model: data.model,

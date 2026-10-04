@@ -1,61 +1,60 @@
 ---
-title: "Files and uploads"
-description: "Choose where task images and attachments are stored."
+title: Image uploads and asset storage
+description: Upload images and attachments in task descriptions and comments; files are stored on local disk under the data volume.
 ---
 
-File storage is optional. Kaneo works without it, but people cannot upload files into task descriptions or comments until you configure an S3-compatible backend.
+## Overview
 
-Use [Silo](/core/installation/silo) to host storage yourself. If you already use a managed service, follow [AWS S3 or Cloudflare R2](/core/installation/storage-backends).
+Kaneo supports private uploads in task descriptions and task comments:
 
-## How an upload works
+- images render inline in the editor and in task views
+- other files such as CSV, PDF, or ZIP appear as attachment cards and links
+- every file is private and served back through the API (`/api/asset/{id}`), never from a public URL — except for assets that belong to a [public project](/core/functional/collaborate-with-team), which the download route serves without a session
 
-```mermaid
-sequenceDiagram
-  participant B as Browser
-  participant K as Kaneo API
-  participant S as S3 storage
-  B->>K: Request an upload URL
-  K-->>B: Signed URL with size and file type
-  B->>S: Upload the file directly
-  B->>K: Finish the upload
-  K->>S: Check the stored file
-  K-->>B: Private attachment
+No object-storage service is required: files are written to the local disk.
+
+## Where files live
+
+By default uploads go to `assets/`, next to the database file:
+
+| Deployment | Location |
+| --- | --- |
+| Docker Compose | `/app/data/assets` inside the container, on the `${KANEO_DATA_PATH:-./data}` bind mount |
+| Local `pnpm dev` | `<repo>/data/assets` |
+
+The directory is created automatically. Override it with `STORAGE_PATH` — if you point it outside the data volume, mount that path too or uploads disappear when the container is recreated. `STORAGE_KEY_PREFIX` optionally prefixes every stored key.
+
+Object keys are structured per workspace, project, task, and surface:
+
+```
+workspace/<workspace-id>/project/<project-id>/task/<task-id>/descriptions|comments/<name>-<timestamp>-<id>.<ext>
 ```
 
-The browser and the Kaneo API must both reach `S3_ENDPOINT`. Use a hostname such as `https://files.example.com`. An internal Docker name such as `http://silo:9000` will not work in a normal browser, even if the containers can reach one another.
+Because the files sit on the same volume as the database, one backup of the data directory covers both.
 
-The storage bucket stays private. Kaneo checks access and serves files through its own API. Images appear inline; PDFs, ZIPs, and other files appear as attachments.
+## How uploads work
 
-## Required configuration
+1. The editor asks the API for an upload slot for a task and a surface (`description` or `comment`).
+2. The browser PUTs the bytes to the API's own upload endpoint.
+3. The API records a private asset row and the editor inserts `/api/asset/{id}` into the text.
+4. Kaneo serves the file back through the API with the requester's access rights; an upload key only works for the task and surface it was issued for.
 
-```env
-S3_ENDPOINT=https://files.example.com
-S3_BUCKET=kaneo-uploads
-S3_ACCESS_KEY_ID=your-bucket-access-key
-S3_SECRET_ACCESS_KEY=your-bucket-secret-key
-S3_REGION=us-east-1
-S3_FORCE_PATH_STYLE=true
+Uploads are capped by `STORAGE_MAX_IMAGE_UPLOAD_BYTES` (default 10 MB). See [environment variables](/core/installation/environment-variables) for the full list.
+
+## Backups
+
+Uploaded files are part of the data directory. Stop the container (or checkpoint the database) before copying:
+
+```
+data/
+├── kaneo.db
+├── kaneo.db-wal
+├── kaneo.db-shm
+└── assets/
 ```
 
-Use a dedicated credential with read, write, and delete access to this bucket. Kaneo uses `GetObject`, including HEAD requests, to check uploads and read files. It also needs `PutObject` and `DeleteObject`.
+## Related
 
-On AWS you can [use an IAM role](/core/installation/storage-backends#aws-s3) instead of static keys. Set both key variables or leave both unset.
-
-## Limits and browser access
-
-The default upload limit is 10 MiB. Change `S3_MAX_IMAGE_UPLOAD_BYTES` to set another limit in bytes; despite its name, it also covers non-image attachments. Signed upload URLs expire after 300 seconds by default, controlled by `S3_PRESIGN_TTL_SECONDS`.
-
-Configure storage CORS to allow your exact Kaneo origin and `PUT` requests with `Content-Type`. Both the storage endpoint and Kaneo should use HTTPS for a public deployment.
-
-Custom upload clients must send the exact declared `Content-Length` and the returned `Content-Type`. Kaneo checks the stored object before finalizing it. Do not remove signed-header checks to work around an incompatible provider.
-
-## Check it works
-
-1. Open a task and attach a small image to its description.
-2. Confirm the image appears, then reload the page.
-3. Add a PDF or text file to a comment and open the attachment.
-4. Check that a person without access cannot retrieve the private file.
-
-Repeat this check after storage or proxy upgrades. If it fails, use [upload troubleshooting](/core/operations/troubleshooting#uploads-fail).
-
-Back up the [database and the files together](/core/operations/backups). A database backup contains attachment records, not their file contents.
+- [The compose.yml file](/core/installation/docker-compose)
+- [Environment variables](/core/installation/environment-variables)
+- [Plan and execute tasks](/core/functional/plan-and-execute-tasks)

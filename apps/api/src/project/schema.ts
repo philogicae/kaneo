@@ -1,6 +1,38 @@
 import { z } from "../openapi";
+import { pagingNumber } from "../utils/paging";
 
 export const projectParam = z.object({ id: z.string() });
+
+export const getProjectTasksQuery = z.object({
+  tasksLimit: pagingNumber(1, 200)
+    .optional()
+    .openapi({ description: "Maximum number of tasks to embed." }),
+  tasksOffset: pagingNumber(0, 1_000_000)
+    .optional()
+    .openapi({ description: "Number of tasks to skip; use with tasksLimit." }),
+});
+
+export const PROJECT_CHART_RANGES = [
+  "1w",
+  "1m",
+  "3m",
+  "6m",
+  "12m",
+  "all",
+] as const;
+
+export const PROJECT_CHART_UNITS = ["hour", "day", "week", "month"] as const;
+
+export const projectChartsQuery = z.object({
+  range: z.enum(PROJECT_CHART_RANGES).optional().openapi({
+    description:
+      'Window of the chart: "1w", "1m", "3m", "6m", "12m" or "all" (default "1m").',
+  }),
+  unit: z.enum(PROJECT_CHART_UNITS).optional().openapi({
+    description:
+      'Time unit of the series, independent from the window: "hour", "day", "week" or "month". Defaults to "day", or "week" for ranges without a daily reading ("all"). Fine units are only supported on narrow windows: hour for "1w"; day for "1w" through "12m"; week and month for every window.',
+  }),
+});
 
 export const workspaceIdQuery = z.object({ workspaceId: z.string() });
 
@@ -16,6 +48,7 @@ export const createProjectBody = z.object({
   workspaceId: z.string(),
   icon: z.string(),
   slug: z.string(),
+  description: z.string().optional(),
 });
 
 export const updateProjectBody = z.object({

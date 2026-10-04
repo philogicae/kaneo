@@ -11,6 +11,7 @@ function build(
     workspaceName: "Acme",
     billingEnabled: false,
     hasAdminAccess: false,
+    canInviteUsers: false,
     projects: [],
     ...overrides,
   });

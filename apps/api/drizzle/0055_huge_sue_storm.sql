@@ -1,1 +1,0 @@
-CREATE INDEX "external_link_deferred_issue_idx" ON "external_link" USING btree ("id") WHERE "external_link"."resource_type" = 'issue' AND "external_link"."metadata" LIKE '%"deferredIssueEdit":%';

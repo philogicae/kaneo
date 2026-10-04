@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { WSContext } from "hono/ws";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import db, { schema } from "../../apps/api/src/database";
@@ -687,20 +687,19 @@ describe("project move concurrency and realtime access", () => {
     const gate = new Promise<void>((resolve) => {
       release = resolve;
     });
+    // SQLite has one writer and this deployment serialises writes in-process,
+    // so an open write transaction is the row lock: the relation creation below
+    // queues behind the move and must re-check the workspace afterwards.
     const move = db.transaction(async (tx) => {
-      await tx
-        .select()
-        .from(schema.projectTable)
-        .where(eq(schema.projectTable.id, project.id))
-        .for("update");
-      locked();
-      await gate;
       await tx
         .update(schema.projectTable)
         .set({ workspaceId: target.id })
         .where(eq(schema.projectTable.id, project.id));
+      locked();
+      await gate;
     });
     await ready;
+    let settled = false;
     const relation = createTaskRelation({
       sourceTaskId: tasks[0].id,
       targetTaskId: tasks[1].id,
@@ -708,19 +707,18 @@ describe("project move concurrency and realtime access", () => {
       userId: owner.user.id,
       workspaceId: owner.workspace.id,
     }).then(
-      () => null,
-      (error: unknown) => error,
+      (value) => {
+        settled = true;
+        return value;
+      },
+      (error: unknown) => {
+        settled = true;
+        return error;
+      },
     );
-    try {
-      await vi.waitFor(async () => {
-        const waiting = await db.execute(
-          sql`SELECT 1 FROM pg_stat_activity WHERE datname = current_database() AND wait_event_type = 'Lock' AND query LIKE '%for share%'`,
-        );
-        expect(waiting.rows.length).toBeGreaterThan(0);
-      });
-    } finally {
-      release();
-    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(settled).toBe(false);
+    release();
     await move;
     expect(await relation).toMatchObject({ status: 404 });
     expect(await db.select().from(schema.taskRelationTable)).toHaveLength(0);

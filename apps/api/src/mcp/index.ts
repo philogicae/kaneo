@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { McpServer as LegacyMcpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
@@ -28,6 +29,7 @@ import {
   clientRegistrationSchema,
   oauthErrorSchema,
 } from "./schemas";
+import { McpSessionStore } from "./sessions";
 import { registerMcpTools, toMcpToolRegistrar } from "./tools";
 
 const publicApiUrl = (process.env.KANEO_API_URL || "http://localhost:1337")
@@ -39,6 +41,9 @@ const internalApiUrl = (
   .replace(/\/api\/?$/, "")
   .replace(/\/+$/, "");
 
+const sessions =
+  new McpSessionStore<WebStandardStreamableHTTPServerTransport>();
+
 function createMcpServerForUser(token: string): LegacyMcpServer {
   const server = new LegacyMcpServer({
     name: "kaneo-mcp",
@@ -48,25 +53,60 @@ function createMcpServerForUser(token: string): LegacyMcpServer {
   return server;
 }
 
+// verify-api-key pulls in the database client, so it is only loaded when a
+// credential actually needs to be checked as an API key.
+type VerifyApiKey = typeof import("../utils/verify-api-key").verifyApiKey;
+let verifyApiKeyLoader: Promise<VerifyApiKey> | null = null;
+
+function loadVerifyApiKey(): Promise<VerifyApiKey> {
+  verifyApiKeyLoader ??= import("../utils/verify-api-key").then(
+    (module) => module.verifyApiKey,
+  );
+  return verifyApiKeyLoader;
+}
+
+async function getSessionFromBearerToken(token: string) {
+  const headers = new Headers();
+  headers.set("authorization", `Bearer ${token}`);
+  return auth.api.getSession({ headers });
+}
+
+// Mirrors authenticateApiRequest's credential contract for bearer-only
+// requests so MCP HTTP accepts the same credentials as the REST API: a
+// session token, or an API key either as Bearer or via x-api-key when no
+// Authorization header is present. A token cannot be valid as both, so the
+// lookup order only decides which store is queried first.
 async function validateBearerToken(
   req: Request,
 ): Promise<{ userId: string; token: string } | null> {
   const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const match = authHeader.match(/^Bearer\s+(\S+)$/i);
-  if (!match?.[1]) return null;
-  const token = match[1];
+  const match = authHeader?.match(/^Bearer\s+(\S+)$/i);
+  if (authHeader && !match?.[1]) return null;
+  const bearerToken = match?.[1];
 
-  const headers = new Headers();
-  headers.set("authorization", `Bearer ${token}`);
-  const session = await auth.api.getSession({ headers });
+  if (bearerToken) {
+    const session = await getSessionFromBearerToken(bearerToken);
+    if (session?.user?.id && !isBanActive(session.user as BanState)) {
+      return { userId: session.user.id, token: bearerToken };
+    }
+  }
 
-  if (!session?.user?.id) return null;
-  if (isBanActive(session.user as BanState)) return null;
-  return { userId: session.user.id, token };
+  const apiKeyHeader = req.headers.get("x-api-key")?.trim();
+  const apiKeyToken = bearerToken ?? (apiKeyHeader || null);
+  if (apiKeyToken) {
+    const verifyApiKey = await loadVerifyApiKey();
+    const apiKeyResult = await verifyApiKey(apiKeyToken);
+    if (apiKeyResult?.valid && apiKeyResult.key) {
+      return { userId: apiKeyResult.key.userId, token: apiKeyToken };
+    }
+  }
+
+  return null;
 }
 
 const mcp = apiRouter();
+// Every OAuth endpoint is public and internet-facing, so the body, URL and
+// in-flight bounds apply before any validation or database work happens.
 for (const path of [
   "/mcp/register",
   "/mcp/authorize",
@@ -227,82 +267,6 @@ mcp
     oauthValidationHook("invalid_request"),
   );
 
-mcp.post("/mcp/token", async (c) => {
-  const contentType = c.req.header("content-type") || "";
-  let params: Record<string, unknown>;
-
-  try {
-    if (contentType.includes("application/x-www-form-urlencoded")) {
-      params = Object.fromEntries(new URLSearchParams(await c.req.text()));
-    } else {
-      const input: unknown = await c.req.json();
-      if (!input || typeof input !== "object" || Array.isArray(input))
-        return c.json({ error: "invalid_request" }, 400);
-      params = input as Record<string, unknown>;
-    }
-  } catch {
-    return c.json({ error: "invalid_request" }, 400);
-  }
-
-  const { grant_type, code, client_id, code_verifier, redirect_uri } = params;
-
-  if (grant_type !== "authorization_code") {
-    return c.json({ error: "unsupported_grant_type" }, 400);
-  }
-  if (
-    typeof code !== "string" ||
-    !code ||
-    code.length > 128 ||
-    typeof client_id !== "string" ||
-    !client_id ||
-    client_id.length > 128 ||
-    typeof code_verifier !== "string" ||
-    !code_verifier ||
-    code_verifier.length > 128 ||
-    typeof redirect_uri !== "string" ||
-    !redirect_uri ||
-    redirect_uri.length > 2048
-  ) {
-    return c.json({ error: "invalid_request" }, 400);
-  }
-
-  const result = await exchangeCode(
-    code,
-    client_id,
-    code_verifier,
-    redirect_uri,
-  );
-  if (!result) {
-    return c.json({ error: "invalid_grant" }, 400);
-  }
-
-  return c.json({
-    access_token: result.accessToken,
-    token_type: "bearer",
-    expires_in: result.expiresIn,
-  });
-});
-
-mcp.get("/.well-known/oauth-protected-resource/api/mcp", (c) =>
-  c.json({
-    resource: `${publicApiUrl}/api/mcp`,
-    authorization_servers: [`${publicApiUrl}/api`],
-  }),
-);
-
-mcp.get("/.well-known/oauth-authorization-server/api", (c) =>
-  c.json({
-    issuer: `${publicApiUrl}/api`,
-    authorization_endpoint: `${publicApiUrl}/api/mcp/authorize`,
-    token_endpoint: `${publicApiUrl}/api/mcp/token`,
-    registration_endpoint: `${publicApiUrl}/api/mcp/register`,
-    response_types_supported: ["code"],
-    grant_types_supported: ["authorization_code"],
-    code_challenge_methods_supported: ["S256"],
-    token_endpoint_auth_methods_supported: ["none"],
-  }),
-);
-
 mcp.all("/mcp", async (c) => {
   const authResult = await validateBearerToken(c.req.raw);
   if (!authResult) {
@@ -315,6 +279,16 @@ mcp.all("/mcp", async (c) => {
       },
       401,
     );
+  }
+
+  const sessionId = c.req.header("mcp-session-id");
+
+  if (sessionId) {
+    const transport = sessions.get(sessionId, authResult.userId);
+    if (transport) {
+      return transport.handleRequest(c.req.raw);
+    }
+    return c.json({ error: "Session not found" }, 404);
   }
 
   if (c.req.method !== "POST") {
@@ -330,15 +304,163 @@ mcp.all("/mcp", async (c) => {
     return modern.fetch(c.req.raw);
   }
 
-  // A fresh stateless transport lets legacy POSTs reach any replica. It also
-  // accepts session IDs issued before this change after their owner is gone.
   const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
+    sessionIdGenerator: () => randomUUID(),
   });
+
+  transport.onclose = () => {
+    if (transport.sessionId) {
+      sessions.delete(transport.sessionId);
+    }
+  };
+
   const server = createMcpServerForUser(authResult.token);
   await server.connect(transport);
-  return transport.handleRequest(c.req.raw);
+  const response = await transport.handleRequest(c.req.raw);
+
+  if (transport.sessionId) {
+    sessions.set(transport.sessionId, authResult.userId, transport);
+  }
+
+  return response;
 });
+
+// Public clients disagree on how credentials travel: some put client_id in
+// the body, others send client_secret_basic (RFC 6749 §2.3.1) with an empty
+// secret. The Basic payload is form-encoded per parameter.
+function basicAuthClientId(header: string | undefined): string | undefined {
+  const match = header?.match(/^Basic\s+(.+)$/i);
+  if (!match?.[1]) return undefined;
+  try {
+    const decoded = Buffer.from(match[1], "base64").toString("utf8");
+    const sep = decoded.indexOf(":");
+    return decodeURIComponent(sep === -1 ? decoded : decoded.slice(0, sep));
+  } catch {
+    return undefined;
+  }
+}
+
+mcp.post("/mcp/token", async (c) => {
+  const contentType = c.req.header("content-type") || "";
+  let params: Record<string, unknown>;
+
+  // Treat a missing or incorrect media type as form data when the body is
+  // form-shaped. Unreadable input is a protocol error, never a server error.
+  try {
+    const body = await c.req.text();
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      params = Object.fromEntries(new URLSearchParams(body));
+    } else if (body.trimStart().startsWith("{")) {
+      const parsed: unknown = JSON.parse(body);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        return c.json({ error: "invalid_request" }, 400);
+      }
+      params = parsed as Record<string, unknown>;
+    } else {
+      params = Object.fromEntries(new URLSearchParams(body));
+    }
+  } catch {
+    return c.json({ error: "invalid_request" }, 400);
+  }
+
+  // Some clients put the parameters in the query string instead of the body;
+  // body values win when both are present.
+  for (const [key, value] of new URL(c.req.url).searchParams) {
+    params[key] ??= value;
+  }
+
+  const { grant_type, code, code_verifier, redirect_uri } = params;
+  const client_id =
+    params.client_id ?? basicAuthClientId(c.req.header("authorization"));
+
+  if (grant_type !== "authorization_code") {
+    return c.json({ error: "unsupported_grant_type" }, 400);
+  }
+
+  const required: Array<[string, unknown]> = [
+    ["code", code],
+    ["client_id", client_id],
+    ["code_verifier", code_verifier],
+  ];
+  for (const [name, value] of required) {
+    if (typeof value !== "string" || !value) {
+      return c.json(
+        {
+          error: "invalid_request",
+          error_description: `${name} is required`,
+        },
+        400,
+      );
+    }
+  }
+  if (
+    redirect_uri !== undefined &&
+    (typeof redirect_uri !== "string" || !redirect_uri)
+  ) {
+    return c.json(
+      {
+        error: "invalid_request",
+        error_description: "redirect_uri must be a non-empty string",
+      },
+      400,
+    );
+  }
+
+  const result = await exchangeCode(
+    code as string,
+    client_id as string,
+    code_verifier as string,
+    redirect_uri as string | undefined,
+  );
+  if (result === null) {
+    return c.json({ error: "invalid_grant" }, 400);
+  }
+  if ("failure" in result) {
+    return c.json(
+      {
+        error: "invalid_grant",
+        error_description: `${result.failure} does not match the authorization request`,
+      },
+      400,
+    );
+  }
+
+  return c.json({
+    access_token: result.accessToken,
+    token_type: "Bearer",
+    expires_in: result.expiresIn,
+  });
+});
+
+// One source for the discovery documents: the router mounts them under /api
+// and `mcpWellKnownRoutes` mounts the same payloads at the server root.
+function protectedResourceMetadata(baseUrl: string) {
+  return {
+    resource: `${baseUrl}/api/mcp`,
+    authorization_servers: [`${baseUrl}/api`],
+  };
+}
+
+function authorizationServerMetadata(baseUrl: string) {
+  return {
+    issuer: `${baseUrl}/api`,
+    authorization_endpoint: `${baseUrl}/api/mcp/authorize`,
+    token_endpoint: `${baseUrl}/api/mcp/token`,
+    registration_endpoint: `${baseUrl}/api/mcp/register`,
+    response_types_supported: ["code"],
+    grant_types_supported: ["authorization_code"],
+    code_challenge_methods_supported: ["S256"],
+    token_endpoint_auth_methods_supported: ["none"],
+  };
+}
+
+mcp.get("/.well-known/oauth-protected-resource/api/mcp", (c) =>
+  c.json(protectedResourceMetadata(publicApiUrl)),
+);
+
+mcp.get("/.well-known/oauth-authorization-server/api", (c) =>
+  c.json(authorizationServerMetadata(publicApiUrl)),
+);
 
 export default mcp;
 
@@ -346,23 +468,11 @@ export function mcpWellKnownRoutes(baseUrl: string) {
   const wellKnown = new Hono();
 
   wellKnown.get("/.well-known/oauth-protected-resource/api/mcp", (c) =>
-    c.json({
-      resource: `${baseUrl}/api/mcp`,
-      authorization_servers: [`${baseUrl}/api`],
-    }),
+    c.json(protectedResourceMetadata(baseUrl)),
   );
 
   wellKnown.get("/.well-known/oauth-authorization-server/api", (c) =>
-    c.json({
-      issuer: `${baseUrl}/api`,
-      authorization_endpoint: `${baseUrl}/api/mcp/authorize`,
-      token_endpoint: `${baseUrl}/api/mcp/token`,
-      registration_endpoint: `${baseUrl}/api/mcp/register`,
-      response_types_supported: ["code"],
-      grant_types_supported: ["authorization_code"],
-      code_challenge_methods_supported: ["S256"],
-      token_endpoint_auth_methods_supported: ["none"],
-    }),
+    c.json(authorizationServerMetadata(baseUrl)),
   );
 
   return wellKnown;

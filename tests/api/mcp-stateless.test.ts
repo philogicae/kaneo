@@ -120,33 +120,6 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
     ).toBe(true);
   });
 
-  it("gets one task by ticket ID through the HTTP MCP server", async () => {
-    const apiFetch = vi.fn(async (input: RequestInfo | URL) => {
-      expect(String(input)).toBe(
-        "http://api.test/api/task/by-ticket-id/KAN-12?workspaceId=workspace+1&projectId=project+1",
-      );
-      return Response.json({ id: "task-1", title: "Direct match" });
-    });
-    vi.stubGlobal("fetch", apiFetch);
-    const handler = createModernMcpHandler("test-token", "http://api.test");
-
-    const response = await handler.fetch(
-      modernRequest("tools/call", 1, {
-        name: "get_task_by_ticket_id",
-        arguments: {
-          ticketId: "KAN-12",
-          workspaceId: "workspace 1",
-          projectId: "project 1",
-        },
-      }),
-    );
-    const body = await rpcBody(response);
-
-    expect(response.status).toBe(200);
-    expect(body.result.content[0].text).toContain("Direct match");
-    expect(apiFetch).toHaveBeenCalledTimes(1);
-  });
-
   it("validates bearer authentication on every modern POST", async () => {
     const responses = await Promise.all(
       [1, 2].map((id) =>
@@ -249,11 +222,10 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
     expect(clone).not.toHaveBeenCalled();
   });
 
-  it("handles a legacy request carrying an old session ID", async () => {
+  it("routes an existing session ID before cloning for classification", async () => {
     const request = new Request("http://mcp.test/mcp", {
       method: "POST",
       headers: {
-        accept: "application/json, text/event-stream",
         authorization: "Bearer test-token",
         "content-type": "application/json",
         "mcp-session-id": "missing-session",
@@ -269,29 +241,12 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
 
     const response = await mcpRoutes.request(request);
 
-    expect(response.status).toBe(200);
-    expect((await rpcBody(response)).result.tools).toContainEqual(
-      expect.objectContaining({ name: "whoami" }),
-    );
-    expect(clone).toHaveBeenCalledOnce();
-
-    const unauthenticated = new Request("http://mcp.test/mcp", {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/event-stream",
-        "content-type": "application/json",
-        "mcp-session-id": "missing-session",
-      },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
-    });
-    expect((await mcpRoutes.request(unauthenticated)).status).toBe(401);
+    expect(response.status).toBe(404);
+    expect(clone).not.toHaveBeenCalled();
   });
 
-  it("serves legacy requests across replicas without a session ID", async () => {
-    const replicaA = await import("../../apps/api/src/mcp");
-    vi.resetModules();
-    const replicaB = await import("../../apps/api/src/mcp");
-    const initialize = await replicaA.default.request("/mcp", {
+  it("preserves the legacy session ID across separate requests", async () => {
+    const initialize = await mcpRoutes.request("/mcp", {
       method: "POST",
       headers: {
         accept: "application/json, text/event-stream",
@@ -309,27 +264,31 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
         },
       }),
     });
-    expect(initialize.status).toBe(200);
-    expect(initialize.headers.has("mcp-session-id")).toBe(false);
+    const sessionId = initialize.headers.get("mcp-session-id");
 
-    const initialized = await replicaB.default.request("/mcp", {
+    expect(initialize.status).toBe(200);
+    expect(sessionId).toBeTruthy();
+
+    const initialized = await mcpRoutes.request("/mcp", {
       method: "POST",
       headers: {
         accept: "application/json, text/event-stream",
         authorization: "Bearer test-token",
         "content-type": "application/json",
+        "mcp-session-id": sessionId ?? "",
       },
       body: JSON.stringify({
         jsonrpc: "2.0",
         method: "notifications/initialized",
       }),
     });
-    const tools = await replicaB.default.request("/mcp", {
+    const tools = await mcpRoutes.request("/mcp", {
       method: "POST",
       headers: {
         accept: "application/json, text/event-stream",
         authorization: "Bearer test-token",
         "content-type": "application/json",
+        "mcp-session-id": sessionId ?? "",
       },
       body: JSON.stringify({
         jsonrpc: "2.0",
@@ -339,36 +298,13 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
       }),
     });
     const toolsBody = await rpcBody(tools);
-    const apiFetch = vi.fn(async () =>
-      Response.json({ user: { id: "test-user" } }),
-    );
-    vi.stubGlobal("fetch", apiFetch);
-    const call = await replicaB.default.request("/mcp", {
-      method: "POST",
-      headers: {
-        accept: "application/json, text/event-stream",
-        authorization: "Bearer test-token",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 3,
-        method: "tools/call",
-        params: { name: "whoami", arguments: {} },
-      }),
-    });
-    const callBody = await rpcBody(call);
 
     expect(initialized.status).toBe(202);
     expect(tools.status).toBe(200);
-    expect(call.status).toBe(200);
-    expect(tools.headers.has("mcp-session-id")).toBe(false);
     expect(toolsBody.result.tools).toContainEqual(
       expect.objectContaining({ name: "whoami" }),
     );
-    expect(callBody.result.content[0].text).toContain("test-user");
-    expect(apiFetch).toHaveBeenCalledOnce();
-    expect(authMocks.getSession).toHaveBeenCalledTimes(4);
+    expect(authMocks.getSession).toHaveBeenCalledTimes(3);
   });
 
   it.each([

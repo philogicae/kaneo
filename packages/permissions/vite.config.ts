@@ -24,6 +24,13 @@ export default defineConfig({
         ],
         cache: false,
       },
+      "test:coverage:run": {
+        command: "vitest run --config vitest.config.ts --coverage",
+        dependsOn: [
+          { task: "build", from: ["dependencies", "devDependencies"] },
+        ],
+        cache: false,
+      },
     },
   },
 });

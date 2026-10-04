@@ -11,6 +11,12 @@ export const integrationEventToggles = z.object({
   taskCommentCreated: z.boolean().optional(),
 });
 
+// Discord, Slack and the per-project Telegram integration add a separate
+// mention toggle on top of the shared comment event.
+export const mentionIntegrationEventToggles = integrationEventToggles.extend({
+  taskMentionCreated: z.boolean().optional(),
+});
+
 export const genericWebhookEventToggles = integrationEventToggles.extend({
   taskDeleted: z.boolean().optional(),
   taskMoved: z.boolean().optional(),

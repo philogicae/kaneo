@@ -81,7 +81,14 @@ function SidebarProvider({
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen);
+  // The layout remounts on navigation, so the last toggle is restored from
+  // the cookie; without it every route change would re-expand the sidebar.
+  const [_open, _setOpen] = React.useState(() => {
+    const match = document.cookie.match(
+      new RegExp(`(?:^|; )${SIDEBAR_COOKIE_NAME}=([^;]*)`),
+    );
+    return match ? match[1] === "true" : defaultOpen;
+  });
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     async (value: boolean | ((value: boolean) => boolean)) => {

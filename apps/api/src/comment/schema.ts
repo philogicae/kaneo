@@ -1,6 +1,9 @@
 import { z } from "../openapi";
+import { listPagingQuery } from "../utils/paging";
 
 export const taskIdParam = z.object({ taskId: z.string() });
+
+export const commentListQuery = listPagingQuery;
 
 export const commentParam = z.object({ id: z.string() });
 

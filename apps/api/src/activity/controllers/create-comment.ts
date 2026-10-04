@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -77,6 +77,28 @@ async function createComment(
       },
       resourceId: taskId,
       resourceType: "task",
+      projectId: task?.projectId ?? null,
+    });
+  }
+
+  // Channel integrations (Telegram/Discord/Slack) get a dedicated mention
+  // event so "comments" and "mentions" stay independently subscribable.
+  if (task && mentionedIds.length > 0) {
+    const mentionedUsers = await db
+      .select({ name: userTable.name })
+      .from(userTable)
+      .where(inArray(userTable.id, mentionedIds));
+
+    await publishEvent("task.mentioned", {
+      taskId,
+      projectId: task.projectId,
+      userId,
+      title: task.title,
+      source: "comment",
+      mentionedUserIds: mentionedIds,
+      mentionedUserNames: mentionedUsers
+        .map((mentioned) => mentioned.name)
+        .filter((name): name is string => Boolean(name)),
     });
   }
 
@@ -97,6 +119,7 @@ async function createComment(
       },
       resourceId: taskId,
       resourceType: "task",
+      projectId: task.projectId,
     });
   }
 

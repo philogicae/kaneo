@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -12,6 +12,10 @@ import {
   isSameProjectKey,
   mayMatchProjectKey,
 } from "../../project/project-key";
+import {
+  caseInsensitiveLike,
+  escapeLikePattern,
+} from "../../search/like-pattern";
 import { TICKET_ID_PATTERN } from "../ticket-id";
 import { hasInstanceAdminRole } from "../../utils/instance-admin-role";
 import getTask from "./get-task";
@@ -53,18 +57,36 @@ export default async function getTaskByTicketId(
     const slugMatches = await db
       .select({ id: workspaceTable.id, slug: workspaceTable.slug })
       .from(workspaceTable)
-      .where(sql`lower(${workspaceTable.slug}) = lower(${workspaceSlug})`);
+      .where(
+        and(
+          caseInsensitiveLike(
+            workspaceTable.slug,
+            escapeLikePattern(workspaceSlug),
+          ),
+          hasInstanceAdminRole(user?.role)
+            ? undefined
+            : inArray(workspaceTable.id, memberWorkspaces),
+        ),
+      );
+
+    // Two workspaces can differ only by slug case. The caller's exact spelling
+    // wins; otherwise every case-insensitive match stays a candidate and the
+    // ticket ranking below decides.
     const exactMatch = slugMatches.find(
       (workspace) => workspace.slug === workspaceSlug,
     );
     slugWorkspaceIds = exactMatch
       ? [exactMatch.id]
       : slugMatches.map((workspace) => workspace.id);
+
     if (slugWorkspaceIds.length === 0) {
       throw new HTTPException(404, { message: "Task not found" });
     }
   }
 
+  // The project key is matched case-insensitively; mayMatchProjectKey also
+  // admits rows whose stored key holds characters SQLite's lower() leaves
+  // alone, and isSameProjectKey confirms the candidate in JS.
   const candidates = await db
     .select({
       id: taskTable.id,
@@ -89,6 +111,8 @@ export default async function getTaskByTicketId(
       ),
     );
 
+  // Several workspaces can hold the same project key, so a live project wins
+  // over an archived one and only a tie is ambiguous.
   const rank = (candidate: { archivedAt: Date | null }) =>
     candidate.archivedAt?.getTime() ?? Number.POSITIVE_INFINITY;
   const [matchedTask, nextMatch] = candidates

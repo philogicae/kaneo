@@ -8,9 +8,8 @@ export async function getAuthorizedSyncProject(
   projectId: string,
   authorizedWorkspaceId: string,
   database: IntegrationDatabase = db,
-  lock = false,
 ) {
-  const query = database
+  const [project] = await database
     .select()
     .from(projectTable)
     .where(
@@ -19,7 +18,6 @@ export async function getAuthorizedSyncProject(
         eq(projectTable.workspaceId, authorizedWorkspaceId),
       ),
     );
-  const [project] = await (lock ? query.for("share") : query);
   if (!project)
     throw new HTTPException(403, {
       message: "Project no longer belongs to the authorized workspace",

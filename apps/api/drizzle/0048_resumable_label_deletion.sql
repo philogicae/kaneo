@@ -1,1 +1,0 @@
-ALTER TABLE "label" ADD COLUMN "deletion_started_at" timestamp;

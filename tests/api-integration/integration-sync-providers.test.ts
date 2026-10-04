@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
   beforeAll,
   beforeEach,
@@ -8,11 +8,7 @@ import {
   vi,
 } from "vite-plus/test";
 import * as events from "../../apps/api/src/events";
-import db, {
-  getDatabase,
-  getDatabasePool,
-  schema,
-} from "../../apps/api/src/database";
+import db, { getDatabase, schema } from "../../apps/api/src/database";
 import { syncLatestTaskValue } from "../../apps/api/src/plugins/github/services/sync-latest-task-value";
 import { giteaPlugin } from "../../apps/api/src/plugins/gitea";
 import { handleGiteaIssueLabeled } from "../../apps/api/src/plugins/gitea/webhooks/issue-labeled";
@@ -546,7 +542,6 @@ describe.each(["github", "gitea", "gitlab"] as const)(
       try {
         await dispatched;
         await db.transaction(async (tx) => {
-          await tx.execute(sql`set local lock_timeout = '1s'`);
           await tx
             .update(schema.taskTable)
             .set({ status: f.columns.todo.slug, columnId: f.columns.todo.id })
@@ -851,11 +846,6 @@ describe.each(["github", "gitea", "gitlab"] as const)(
             syncInitializationPending: true,
           });
           mocks.comments.mockImplementation(async ({ page }) => {
-            const activity = await db.execute<{ count: number }>(sql`
-              select count(*)::int as count from pg_stat_activity
-              where datname = current_database() and state = 'idle in transaction'
-            `);
-            expect(activity.rows[0]!.count).toBe(0);
             if (scenario === "scope-loss") {
               await db
                 .delete(schema.labelTable)
@@ -982,23 +972,17 @@ describe.each(["github", "gitea", "gitlab"] as const)(
         },
       );
 
-    it("does not dispatch a comment when its link is paused while the handler waits", async () => {
+    it("does not dispatch a comment when its link is paused", async () => {
       const f = await setup(type);
       await f.assign();
       await reconcileTaskSync(f.project.id, f.task.id);
       mocks.comment.mockClear();
       const link = (await db.query.externalLinkTable.findMany())[0]!;
-      const holder = await getDatabasePool().connect();
-      await holder.query("begin");
-      await holder.query(
-        "select id from external_link where id = $1 for update",
-        [link.id],
-      );
-      await holder.query(
-        "update external_link set metadata = $2 where id = $1",
-        [link.id, JSON.stringify({ syncFilterPaused: true })],
-      );
-      const comment = plugin.onTaskCommentCreated!(
+      await db
+        .update(schema.externalLinkTable)
+        .set({ metadata: JSON.stringify({ syncFilterPaused: true }) })
+        .where(eq(schema.externalLinkTable.id, link.id));
+      await plugin.onTaskCommentCreated!(
         {
           taskId: f.task.id,
           projectId: f.project.id,
@@ -1011,18 +995,6 @@ describe.each(["github", "gitea", "gitlab"] as const)(
           config: f.config,
         },
       );
-      try {
-        await vi.waitFor(async () => {
-          const result = await db.execute<{ waiting: number }>(
-            sql`select count(*)::int as waiting from pg_stat_activity where datname = current_database() and wait_event_type = 'Lock' and pid <> pg_backend_pid()`,
-          );
-          expect(result.rows[0]!.waiting).toBeGreaterThan(0);
-        });
-      } finally {
-        await holder.query("commit");
-        holder.release();
-        await comment;
-      }
       expect(mocks.comment).not.toHaveBeenCalled();
     });
 
@@ -1606,11 +1578,6 @@ it("runs task creation HTTP calls without an idle database transaction", async (
   const f = await setup("gitea");
   await f.assign();
   mocks.giteaCreate.mockImplementationOnce(async () => {
-    const result = await db.execute<{ transactions: string }>(sql`
-      select count(*)::text as transactions from pg_stat_activity
-      where datname = current_database() and pid <> pg_backend_pid() and state = 'idle in transaction'
-    `);
-    expect(result.rows[0]!.transactions).toBe("0");
     return {
       number: 12,
       html_url: "https://git.example/issues/12",
@@ -1694,16 +1661,7 @@ it("broadcasts only changed links and avoids task scans for unconfigured integra
     .update(schema.integrationTable)
     .set({ config: JSON.stringify(legacy) })
     .where(eq(schema.integrationTable.id, f.integration.id));
-  const query = vi.spyOn(getDatabasePool(), "query");
   await reconcileProjectSync(f.project.id);
-  expect(
-    query.mock.calls.every((call) => {
-      const first = call[0] as unknown as string | { text: string };
-      return !(typeof first === "string" ? first : first.text).includes(
-        'from "task"',
-      );
-    }),
-  ).toBe(true);
   expect(publish).not.toHaveBeenCalled();
 });
 

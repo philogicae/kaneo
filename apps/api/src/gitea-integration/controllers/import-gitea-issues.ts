@@ -238,8 +238,7 @@ async function importSingleIssue(
               eq(externalLinkTable.taskId, existingLink.taskId),
               eq(externalLinkTable.integrationId, integrationId),
             ),
-          )
-          .for("update");
+          );
         if (
           !linked ||
           !(await canSyncTask(existingLink.taskId, integrationId, database))

@@ -268,7 +268,7 @@ describe("notification recipient boundaries", () => {
           { success: true },
           {
             success: false,
-            error: "Assignee is not a member of this workspace",
+            error: "Assignee does not have access to this project",
           },
         ],
       },

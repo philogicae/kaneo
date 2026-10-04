@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Search } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import BoardToolbar from "@/components/board/board-toolbar";
 import ProjectLayout from "@/components/common/project-layout";
@@ -10,20 +9,17 @@ import PageTitle from "@/components/page-title";
 import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
-import { Input } from "@/components/ui/input";
 import { shortcuts } from "@/constants/shortcuts";
 import useGetCustomFieldFilterValues from "@/hooks/queries/custom-field/use-get-custom-field-filter-values";
 import useGetCustomFieldsByProject from "@/hooks/queries/custom-field/use-get-custom-fields-by-project";
 import useGetLabelsByWorkspace from "@/hooks/queries/label/use-get-labels-by-workspace";
-import { useDescriptionMatches } from "@/hooks/queries/task/use-description-matches";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
+import { useBoardGrouping } from "@/hooks/use-board-grouping";
 import { useBoardSort } from "@/hooks/use-board-sort";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useTaskFiltersWithLabelsSupport } from "@/hooks/use-task-filters-with-labels-support";
-import { cn } from "@/lib/cn";
 import { sortTasks } from "@/lib/sort-tasks";
-import { useBackgroundStore } from "@/store/background";
 import useProjectStore from "@/store/project";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
@@ -85,22 +81,14 @@ function RouteComponent() {
   const { projectId, workspaceId } = Route.useParams();
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
-  const {
-    data,
-    isError: boardError,
-    isFetching: boardFetching,
-    refetch: retryBoard,
-  } = useGetTasks(projectId);
+  const { data } = useGetTasks(projectId);
   const { project, setProject } = useProjectStore();
   const { viewMode, setViewMode } = useUserPreferencesStore();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [boardSearchQuery, setBoardSearchQuery] = useState("");
-  const [isBoardSearchMounted, setIsBoardSearchMounted] = useState(false);
-  const [isBoardSearchVisible, setIsBoardSearchVisible] = useState(false);
-  const [boardSearchInput, setBoardSearchInput] =
-    useState<HTMLInputElement | null>(null);
+  const boardSearchInput = useRef<HTMLInputElement | null>(null);
   const { sort, setSort } = useBoardSort(projectId);
-  const { background } = useBackgroundStore();
+  const { groupBy, setGroupBy } = useBoardGrouping(projectId);
 
   const { data: users } = useGetActiveWorkspaceUsers(workspaceId);
   const { data: workspaceLabels = [] } = useGetLabelsByWorkspace(workspaceId);
@@ -165,16 +153,6 @@ function RouteComponent() {
     }
   }, [data, setProject]);
 
-  const openBoardSearch = useCallback(() => {
-    setIsBoardSearchMounted(true);
-    window.requestAnimationFrame(() => setIsBoardSearchVisible(true));
-  }, []);
-
-  const closeBoardSearch = useCallback(() => {
-    setIsBoardSearchVisible(false);
-    window.setTimeout(() => setIsBoardSearchMounted(false), 180);
-  }, []);
-
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const isFindShortcut =
@@ -183,23 +161,12 @@ function RouteComponent() {
       if (!isFindShortcut) return;
 
       event.preventDefault();
-      openBoardSearch();
+      boardSearchInput.current?.focus();
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [openBoardSearch]);
-
-  useEffect(() => {
-    if (!isBoardSearchMounted) return;
-    window.requestAnimationFrame(() => boardSearchInput?.focus());
-  }, [isBoardSearchMounted, boardSearchInput]);
-
-  const descriptionSearch = useDescriptionMatches(
-    projectId,
-    project,
-    boardSearchQuery,
-  );
+  }, []);
 
   const {
     filters,
@@ -209,12 +176,7 @@ function RouteComponent() {
     filteredProject,
     hasActiveFilters,
     clearFilters,
-  } = useTaskFiltersWithLabelsSupport(
-    project,
-    projectId,
-    boardSearchQuery,
-    descriptionSearch.ids,
-  );
+  } = useTaskFiltersWithLabelsSupport(project, projectId, boardSearchQuery);
 
   const sortedProject = useMemo(() => {
     if (!filteredProject || sort.field === "position") return filteredProject;
@@ -227,42 +189,11 @@ function RouteComponent() {
     };
   }, [filteredProject, sort]);
 
-  const boardHeaderSearch = isBoardSearchMounted ? (
-    <div
-      className={`relative w-[240px] origin-top transition-[translate,scale,opacity] duration-180 ease-out ${
-        isBoardSearchVisible
-          ? "translate-y-0 scale-y-100 opacity-100"
-          : "pointer-events-none -translate-y-1 scale-y-95 opacity-0"
-      }`}
-    >
-      <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 text-muted-foreground" />
-      <Input
-        ref={setBoardSearchInput}
-        value={boardSearchQuery}
-        maxLength={256}
-        onChange={(event) => setBoardSearchQuery(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && !boardSearchQuery.trim()) {
-            closeBoardSearch();
-          }
-        }}
-        onBlur={() => {
-          if (!boardSearchQuery.trim()) {
-            closeBoardSearch();
-          }
-        }}
-        placeholder={t("tasks:boardSearchPlaceholder")}
-        className="h-7.5 [&_[data-slot=input]]:h-7 [&_[data-slot=input]]:leading-7 [&_[data-slot=input]]:pl-8 [&_[data-slot=input]]:text-xs [&_[data-slot=input]]:placeholder:text-xs [&_[data-slot=input]]:placeholder:leading-7"
-      />
-    </div>
-  ) : null;
-
   return (
     <ProjectLayout
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="board"
-      headerActions={boardHeaderSearch}
     >
       <PageTitle
         title={`${project?.name} · ${viewMode === "board" ? t("tasks:view.board") : t("tasks:view.list")}`}
@@ -283,67 +214,30 @@ function RouteComponent() {
           setViewMode={setViewMode}
           sort={sort}
           onSortChange={setSort}
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
           customFieldDefinitions={customFieldDefinitions}
           usedCustomFieldValues={usedCustomFieldValues}
+          searchQuery={boardSearchQuery}
+          onSearchChange={setBoardSearchQuery}
+          searchInputRef={boardSearchInput}
         />
 
-        {descriptionSearch.isLoading && (
-          <p role="status" className="px-4 py-2 text-sm text-muted-foreground">
-            {t("tasks:descriptionSearchLoading")}
-          </p>
-        )}
-        {descriptionSearch.isError && (
-          <p role="alert" className="px-4 py-2 text-sm text-destructive">
-            {t("tasks:descriptionSearchError")}{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={() => void descriptionSearch.retry()}
-            >
-              {t("tasks:descriptionRetry")}
-            </button>
-          </p>
-        )}
-
-        {boardError && (
-          <p role="alert" className="p-4 text-destructive">
-            {t("tasks:calendar.loadError")}{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={() => void retryBoard()}
-            >
-              {t("tasks:descriptionRetry")}
-            </button>
-          </p>
-        )}
-        <div
-          className={cn("flex h-full flex-1 overflow-hidden", {
-            "bg-background": !background,
-          })}
-        >
+        <div className="flex h-full flex-1 overflow-hidden bg-background">
           {sortedProject ? (
             viewMode === "board" ? (
               <KanbanBoard
                 project={sortedProject}
-                disableCollectionActions={boardFetching || boardError}
-                disableDragDrop={
-                  boardFetching ||
-                  boardError ||
-                  (sort.field !== "position" && sort.field !== "number")
-                }
-                sortedByNumber={sort.field === "number"}
+                sortActive={sort.field !== "position"}
+                groupActive={groupBy === "labels"}
               />
             ) : (
               <ListView
                 project={sortedProject}
-                disableCollectionActions={boardFetching || boardError}
-                disableDragDrop={
-                  boardFetching || boardError || sort.field !== "position"
-                }
+                sortActive={sort.field !== "position"}
               />
             )
-          ) : boardError ? null : (
+          ) : (
             <BoardSkeleton />
           )}
         </div>

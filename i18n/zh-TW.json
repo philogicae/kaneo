@@ -11,7 +11,8 @@
 			"remove": "移除",
 			"reset": "重設",
 			"filter": "篩選",
-			"clearAllFilters": "清除所有篩選"
+			"clearAllFilters": "清除所有篩選",
+			"save": "Save"
 		},
 		"a11y": {
 			"toggleSidebar": "切換側邊欄"
@@ -152,7 +153,14 @@
 					"amber": "琥珀黃",
 					"terracotta": "赤陶紅",
 					"rose": "玫瑰紅",
-					"crimson": "緋紅"
+					"crimson": "緋紅",
+					"cyan": "Cyan",
+					"emerald": "Emerald",
+					"fuchsia": "Fuchsia",
+					"indigo": "Indigo",
+					"lime": "Lime",
+					"ocean": "Ocean",
+					"sky": "Sky"
 				},
 				"statusLoadError": "無法載入專案狀態。"
 			}
@@ -162,6 +170,11 @@
 			"notSet": "未設定",
 			"true": "是",
 			"undefined": "未定義"
+		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
 		}
 	},
 	"auth": {
@@ -419,6 +432,23 @@
 			"resetError": "無法重設密碼，請再試一次。",
 			"success": "你的密碼已重設，請使用新密碼登入。",
 			"backToSignIn": "返回登入"
+		},
+		"inviteLink": {
+			"errors": {
+				"accept": "Failed to join the workspace",
+				"load": "Failed to load the invite link details."
+			},
+			"errorTitle": "Invite Link Error",
+			"invalidTitle": "Invalid Invite Link",
+			"joinPrompt": "You have an invite link to join <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Invite Link Expired",
+			"loading": "Loading invite link...",
+			"pageTitleAccept": "Join Workspace",
+			"pageTitleError": "Invite Link Error",
+			"pageTitleInvalid": "Invite Link Invalid",
+			"signedInAs": "Signed in as <email>{{email}}</email>",
+			"signedOutPrompt": "Create an account or sign in to join the workspace.",
+			"title": "Join the workspace!"
 		}
 	},
 	"settings": {
@@ -571,7 +601,17 @@
 			"toastPreferencesSaveFailed": "儲存通知偏好設定失敗",
 			"toastRuleSavedGeneric": "工作區通知規則已儲存",
 			"toastRuleRemovedGeneric": "工作區通知規則已移除",
-			"recipientHint": "指派給你的任務有新留言或狀態變更時會通知你。提及則會通知被提及的成員。你自己的留言、提及與狀態變更不會通知你。"
+			"recipientHint": "指派給你的任務有新留言或狀態變更時會通知你。提及則會通知被提及的成員。你自己的留言、提及與狀態變更不會通知你。",
+			"integrationNotConfigured": "Not configured",
+			"integrationsDiscordDescription": "Each project posts its task updates to its own Discord webhook. Expand a project to edit its channel and events.",
+			"integrationsDiscordTitle": "Discord integrations",
+			"integrationsSlackDescription": "Each project posts its task updates to its own Slack incoming webhook. Expand a project to edit its channel and events.",
+			"integrationsSlackTitle": "Slack integrations",
+			"projectCount_other": "{{count}} projects",
+			"tabDiscord": "Discord",
+			"tabGeneral": "General",
+			"tabSlack": "Slack",
+			"tabTelegram": "Telegram"
 		},
 		"preferencesPage": {
 			"title": "偏好設定",
@@ -614,7 +654,11 @@
 			"priority": "優先順序",
 			"priorityDescription": "顯示優先順序指標",
 			"projectBackgrounds": "專案背景",
-			"projectBackgroundsDescription": "在看板上顯示專案背景圖片"
+			"projectBackgroundsDescription": "在看板上顯示專案背景圖片",
+			"interfaceSize": "Interface size",
+			"interfaceSizeDecrease": "Decrease interface size",
+			"interfaceSizeIncrease": "Increase interface size",
+			"themeVolt": "Volt"
 		},
 		"developerPage": {
 			"pageTitle": "開發者設定",
@@ -1272,7 +1316,8 @@
 				"taskPriorityChanged": "優先順序變更",
 				"taskTitleChanged": "標題變更",
 				"taskDescriptionChanged": "說明變更",
-				"taskCommentCreated": "新留言"
+				"taskCommentCreated": "新留言",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"connect": "連線 Slack",
 			"saveChanges": "儲存變更",
@@ -1310,7 +1355,8 @@
 				"taskPriorityChanged": "優先順序變更",
 				"taskTitleChanged": "標題變更",
 				"taskDescriptionChanged": "說明變更",
-				"taskCommentCreated": "新留言"
+				"taskCommentCreated": "新留言",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"connect": "連線 Discord",
 			"saveChanges": "儲存變更",
@@ -1440,7 +1486,10 @@
 				"taskPriorityChanged": "優先順序變更",
 				"taskTitleChanged": "標題變更",
 				"taskDescriptionChanged": "說明變更",
-				"taskCommentCreated": "新留言"
+				"taskCommentCreated": "新留言",
+				"appointmentCreated": "New appointments",
+				"appointmentUpdated": "Appointment changes",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"connect": "連線 Telegram",
 			"saveChanges": "儲存變更",
@@ -1924,6 +1973,107 @@
 			"useKaneo": "保留 Kaneo 的內容",
 			"exportPending": "匯出符合條件的任務",
 			"inactiveHint": "此整合已暫停。重新啟用前，不會匯出任何任務。"
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "Create an API key first, then replace the <YOUR_API_KEY> placeholder with it.",
+			"authModeApiKey": "API key",
+			"authModeOauth": "OAuth",
+			"cardDescription": "Pick an authentication mode, then run the install command or paste the configuration into your agent.",
+			"cardTitle": "Connect an agent",
+			"copied": "Copied",
+			"copy": "Copy",
+			"createApiKey": "Create an API key",
+			"followUpLabel": "Then authenticate",
+			"installCommandLabel": "Install command",
+			"manualConfigLabel": "Manual configuration",
+			"oauthNote": "OAuth is the default: the first connection opens Kaneo in your browser to authorize the agent, and the token is then managed by the agent itself.",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "built-in HTTP MCP endpoint of this instance",
+			"serverUrlLabel": "Server URL",
+			"subtitle": "Connect AI agents such as Claude, Codex, Gemini or OpenCode to this Kaneo instance through the built-in HTTP MCP server.",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"skills": "Skills",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Run these commands from the root of your Kaneo checkout, then restart your agent.",
+			"cardTitle": "Install the Kaneo skill",
+			"copied": "Copied",
+			"copy": "Copy",
+			"destinationLabel": "Destination",
+			"installCommandLabel": "Install command",
+			"mcpRequirement": "The skill builds on the MCP connection: configure that first.",
+			"openMcpSettings": "Open MCP settings",
+			"pageTitle": "Skills",
+			"projectScope": "project",
+			"skillUrlDescription": "served by this instance for agents",
+			"skillUrlLabel": "Skill URL",
+			"subtitle": "Install the Kaneo skill so AI agents follow this instance's conventions and use the MCP tools correctly.",
+			"title": "Agent skills",
+			"updateDescription": "Skills are read from disk: re-copy the folder after updating Kaneo to pick up changes.",
+			"userScope": "user",
+			"verifyLabel": "Verify"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopics_other": "{{count}} topics detected",
+			"detectedTopicsLabel": "Detected topics",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"topicHint": "Topics are detected live while this dialog is open: send a message inside a topic and it appears in the list above. You can also type the id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -1946,7 +2096,8 @@
 				"navigate": "移動",
 				"open": "開啟",
 				"close": "關閉"
-			}
+			},
+			"voltTheme": "Volt theme"
 		},
 		"sidebar": {
 			"projects": "專案",
@@ -1968,7 +2119,12 @@
 			"deleteConfirmTitle": "要刪除專案嗎？",
 			"deleteConfirmDescription": "這會永久移除專案及其所有資料，此操作無法復原。",
 			"deletedToast": "專案已刪除",
-			"deleteProject": "刪除專案"
+			"deleteProject": "刪除專案",
+			"sortCompletion": "Completion",
+			"sortCustom": "Custom order",
+			"sortDate": "Date created",
+			"sortName": "Name",
+			"sortProjects": "Sort projects"
 		},
 		"search": {
 			"inputPlaceholder": "搜尋任務、專案、留言...",
@@ -1979,7 +2135,8 @@
 				"workspace": "工作區",
 				"comment": "留言",
 				"activity": "活動",
-				"fallback": "結果"
+				"fallback": "結果",
+				"appointment": "Appointments"
 			}
 		},
 		"settingsLayout": {
@@ -1998,7 +2155,8 @@
 			"workspaces": "工作區",
 			"switching": "切換中...",
 			"addWorkspace": "新增工作區",
-			"selectWorkspace": "選擇工作區"
+			"selectWorkspace": "選擇工作區",
+			"sortWorkspaces": "Sort workspaces"
 		},
 		"page": {
 			"projectsTitle": "專案",
@@ -2039,7 +2197,8 @@
 				"openTask": "開啟選取的任務",
 				"quickSelectNumber": "依數字選取選項"
 			}
-		}
+		},
+		"notifications": "Notifications"
 	},
 	"notifications": {
 		"newCount_other": "{{count}} 則新通知",
@@ -2090,6 +2249,15 @@
 				"title": "已開始計時",
 				"contentWithTask": "已開始為任務 {{taskTitle}} 計時",
 				"contentWithoutTask": "已開始為某個任務計時"
+			},
+			"appointment_created": {
+				"content": "You were assigned to the appointment: {{appointmentTitle}}",
+				"title": "Appointment assigned to you"
+			},
+			"appointment_updated": {
+				"contentAssignee": "You were assigned to the appointment: {{appointmentTitle}}",
+				"contentRescheduled": "The appointment \"{{appointmentTitle}}\" was rescheduled.",
+				"title": "Appointment updated"
 			}
 		},
 		"inbox": {
@@ -2111,7 +2279,11 @@
 			"recentActivity": "最近動態",
 			"taskUnavailable": "這個任務已無法存取。",
 			"taskLoadError": "無法載入這個任務。"
-		}
+		},
+		"shortcuts": {
+			"open": "Open notifications"
+		},
+		"title": "Notifications"
 	},
 	"activity": {
 		"assignedToSelf": "將任務指派給自己",
@@ -2224,7 +2396,9 @@
 			},
 			"importedFrom": "匯入自 {{source}}",
 			"importedBy": "由 {{name}} 匯入",
-			"commentedOnForge": "在 {{forge}} 上留言"
+			"commentedOnForge": "在 {{forge}} 上留言",
+			"commentedOnGithub": "commented on GitHub",
+			"github": "GitHub"
 		}
 	},
 	"tasks": {
@@ -2425,7 +2599,8 @@
 			"taskBranchCopied": "已複製分支名稱",
 			"start": "開始",
 			"startDate": "開始日期",
-			"noDate": "無日期"
+			"noDate": "無日期",
+			"end": "End"
 		},
 		"move": {
 			"title": "移動任務",
@@ -2452,12 +2627,18 @@
 			"dueDate": {
 				"updateSuccess": "任務截止日期已更新",
 				"updateError": "更新任務截止日期失敗",
-				"clear": "清除日期"
+				"clear": "清除日期",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "End time"
 			},
 			"startDate": {
 				"updateSuccess": "任務開始日期已更新",
 				"updateError": "更新任務開始日期失敗",
-				"clear": "清除開始日期"
+				"clear": "清除開始日期",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time"
 			},
 			"labels": {
 				"searchPlaceholder": "搜尋標籤…",
@@ -2695,6 +2876,51 @@
 		},
 		"board": {
 			"reorderFailed": "無法移動任務，請再試一次。"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "Labels",
+			"noLabel": "No label",
+			"none": "No grouping"
+		},
+		"recurrence": {
+			"daily": "Daily",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders fire before the start date and are delivered via the unified Telegram configuration.",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_other": "days",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_other": "minutes",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -2863,7 +3089,13 @@
 			"error": "無法邀請團隊成員",
 			"createdTitle": "邀請已建立",
 			"shareLinkDescription": "將此連結分享給 {{email}}，對方即可加入工作區。",
-			"done": "完成"
+			"done": "完成",
+			"noTeams": "No team covers this workspace yet.",
+			"scopeHint": "Limit the invitation to specific workspaces and projects. Untick everything to rely on teams only.",
+			"scopeLabel": "Workspaces and projects",
+			"scopeRequired": "Select at least one team, workspace or project.",
+			"teamsHint": "Teams keep applying after acceptance: editing a team updates its members' access.",
+			"teamsLabel": "Teams"
 		},
 		"membersTable": {
 			"emptyTitle": "還沒有團隊成員",
@@ -2889,7 +3121,85 @@
 			"cancelInviteSuccess": "邀請已取消",
 			"cancelInviteError": "無法取消邀請",
 			"roleUpdateSuccess": "角色已更新",
-			"roleUpdateError": "無法更新角色"
+			"roleUpdateError": "無法更新角色",
+			"ariaMemberActions": "Member actions"
+		},
+		"accessScope": {
+			"allProjects": "All projects",
+			"noProjects": "No projects in this workspace.",
+			"noWorkspaces": "You don't administer any workspace yet."
+		},
+		"accessTeams": {
+			"addMember": "Add",
+			"addMemberPlaceholder": "Add a workspace member",
+			"allProjects": "All projects",
+			"created": "Team created",
+			"createTitle": "New team",
+			"delete": "Delete",
+			"deleted": "Team deleted",
+			"deleteDialogDescription": "Delete the team \"{{name}}\"? Members lose the access this team was the only source of. This action cannot be undone.",
+			"deleteDialogTitle": "Delete this team?",
+			"deleteError": "Failed to delete the team",
+			"description": "Reusable access bundles: pick workspaces and projects, then assign the team to members or invitations.",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this team for?",
+			"edit": "Edit",
+			"editTitle": "Edit team",
+			"empty": "No teams yet",
+			"emptyDescription": "Create a team to grant scoped access at invitation time.",
+			"memberAdded": "Member added to the team",
+			"memberCount_other": "{{count}} members",
+			"memberError": "Failed to update the team member",
+			"memberRemoved": "Member removed from the team",
+			"membersLabel": "Members",
+			"nameLabel": "Name",
+			"namePlaceholder": "Design team",
+			"newTeam": "New team",
+			"noMembers": "No members yet.",
+			"pageTitle": "Teams",
+			"projectCount_other": "{{count}} projects",
+			"removeMember": "Remove from the team",
+			"saveError": "Failed to save the team",
+			"scopeHint": "Projects selected here define everything the team can reach, including future invitations.",
+			"scopeLabel": "Access scope",
+			"title": "Teams",
+			"updated": "Team updated"
+		},
+		"inviteLinks": {
+			"copyFailed": "Couldn't copy automatically. Select the link and press Ctrl+C.",
+			"copyIconAria": "Copy the invite link",
+			"create": "Create link",
+			"createError": "Failed to create the invite link",
+			"createSuccess": "Invite link created",
+			"deleteError": "Failed to revoke the invite link",
+			"deleteSuccess": "Invite link revoked",
+			"description": "Anyone with the link can join this workspace as a member — no email required.",
+			"empty": "No shareable invite links yet.",
+			"expiry24h": "24 hours",
+			"expiry30d": "30 days",
+			"expiry7d": "7 days",
+			"expiryLabel": "Expiry",
+			"expiryNever": "Never expires",
+			"join": "Join {{workspaceName}}",
+			"linkCopied": "Invite link copied",
+			"maxUsesLabel": "Max uses",
+			"maxUsesUnlimited": "Unlimited",
+			"never": "Never expires",
+			"revokeIconAria": "Revoke the invite link",
+			"title": "Shareable invite links",
+			"uses": "{{used}}/{{max}} uses",
+			"usesUnlimited": "{{used}} uses",
+			"workspace": "Workspace: {{workspaceName}}"
+		},
+		"memberAccess": {
+			"description": "Direct project access for {{name}} in this workspace.",
+			"fullAccess": "This member already has full workspace access.",
+			"hint": "Untick everything to remove the direct grants. The member leaves the workspace when no team or other grant remains.",
+			"menuItem": "Manage access",
+			"save": "Save access",
+			"saveError": "Failed to update member access",
+			"saveSuccess": "Member access updated",
+			"title": "Manage access"
 		}
 	},
 	"publicProject": {
@@ -3138,6 +3448,173 @@
 			"composeLinkDescription": "維護中的 compose.yml，包含持久化儲存與健康檢查。",
 			"startLink": "啟動並驗證服務",
 			"startLinkDescription": "啟動整個堆疊、檢視狀態，並確認應用程式可用。"
+		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Assignee",
+			"create": "Create",
+			"createTitle": "New appointment",
+			"delete": "Delete",
+			"description": "Appointments are scheduled like tasks but never appear on the board or backlog.",
+			"descriptionLabel": "Description",
+			"editTitle": "Edit appointment",
+			"endLabel": "Ends",
+			"priorityLabel": "Priority",
+			"rangeError": "The end must be after the start.",
+			"save": "Save",
+			"startLabel": "Starts",
+			"titleLabel": "Title",
+			"titlePlaceholder": "e.g. Design review",
+			"unassigned": "Unassigned"
+		},
+		"empty": {
+			"description": "Appointments live here, not on the board or backlog.",
+			"title": "No appointments yet"
+		},
+		"loadError": "Could not load appointments.",
+		"moveFromBacklog": "Move to appointments",
+		"newAppointment": "New appointment",
+		"nextWeek": "Next week",
+		"pageTitle": "Appointments · {{name}}",
+		"previousWeek": "Previous week",
+		"tab": "Appointments",
+		"toast": {
+			"created": "Appointment created",
+			"deleted": "Appointment deleted",
+			"error": "Something went wrong",
+			"moved": "Moved to appointments",
+			"updated": "Appointment updated"
+		},
+		"today": "Today",
+		"unscheduled": "Unscheduled",
+		"weekHint": "Click an empty slot to add an appointment; click one to edit it."
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
+	},
+	"unified": {
+		"appointments": {
+			"count_other": "{{count}} appointments",
+			"emptyDescription": "Appointments from all your projects will show up here as soon as they are scheduled.",
+			"emptyTitle": "No appointments yet",
+			"unscheduled": "Unscheduled"
+		},
+		"charts": {
+			"average": "Average",
+			"backlog": "Backlog",
+			"byProject": "By project",
+			"completed": "Completed",
+			"created": "Created",
+			"empty": "No task activity in this period.",
+			"noTasks": "No tasks to distribute.",
+			"other": "Other",
+			"period": "Period",
+			"periodSummary": "{{created}} created · {{completed}} completed",
+			"perUnit": "{{value}}/{{unit}}",
+			"range_other": "{{count}} months",
+			"rangeAll": "All time",
+			"rangeWeek": "1 week",
+			"statusDescription": "Where the tasks of all projects currently sit.",
+			"statusTitle": "Status breakdown",
+			"tasks": "Tasks",
+			"unassigned": "Unassigned",
+			"unit": "Unit",
+			"unitDay": "day",
+			"unitHint": "Finer units narrow the period to one that supports them.",
+			"unitHour": "hour",
+			"unitLabelDay": "Day",
+			"unitLabelHour": "Hour",
+			"unitLabelMonth": "Month",
+			"unitLabelWeek": "Week",
+			"unitMonth": "month",
+			"unitWeek": "week",
+			"velocityDescription": "Tasks created and completed per {{unit}} across all projects.",
+			"velocityTitle": "Velocity",
+			"workloadDescription": "Open board tasks per assignee, across all projects.",
+			"workloadEmpty": "No open work assigned.",
+			"workloadTitle": "Workload"
+		},
+		"consolidated": {
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_other": "{{count}} active tasks"
+		},
+		"empty": {
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"description": "Projects from all your workspaces will show up here as soon as you create one.",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet",
+			"title": "No projects yet"
+		},
+		"links": {
+			"mcp": "MCP",
+			"skills": "Skills"
+		},
+		"pageTitle": "All projects",
+		"section": {
+			"projectCount_other": "{{count}} projects"
+		},
+		"stats": {
+			"completion": "Completion",
+			"projects": "Projects",
+			"tasks": "Tasks"
+		},
+		"table": {
+			"progress": "Progress",
+			"tasks": "Tasks"
+		},
+		"tabs": {
+			"appointments": "Appointments",
+			"backlog": "Backlog",
+			"calendar": "Calendar",
+			"charts": "Charts",
+			"gantt": "Gantt",
+			"overview": "Overview",
+			"tasks": "Tasks"
 		}
 	}
 }

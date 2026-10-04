@@ -1,0 +1,119 @@
+import { describe, expect, it } from "vite-plus/test";
+import { buildTelegramAction } from "../../apps/api/src/plugins/telegram/events";
+
+describe("buildTelegramAction", () => {
+  it("describes task creation", () => {
+    expect(buildTelegramAction({ kind: "created" })).toBe("Task created");
+  });
+
+  it("describes appointment events", () => {
+    expect(buildTelegramAction({ kind: "appointmentCreated" })).toBe(
+      "Appointment created",
+    );
+    expect(buildTelegramAction({ kind: "appointmentRescheduled" })).toBe(
+      "Appointment rescheduled",
+    );
+    expect(buildTelegramAction({ kind: "appointmentReassigned" })).toBe(
+      "Appointment reassigned",
+    );
+  });
+
+  it("describes a mention separately from a comment", () => {
+    expect(
+      buildTelegramAction({
+        kind: "mentioned",
+        mentionedUserNames: ["Dana"],
+        source: "comment",
+      }),
+    ).toBe("Mention: Dana in a comment");
+    expect(
+      buildTelegramAction({
+        kind: "mentioned",
+        mentionedUserNames: ["Dana", "Sam"],
+        source: "description",
+      }),
+    ).toBe("Mention: Dana, Sam in the task description");
+    expect(
+      buildTelegramAction({
+        kind: "mentioned",
+        mentionedUserNames: [],
+        source: "description",
+      }),
+    ).toBe("Mention: A member in the task description");
+  });
+
+  it("describes a status transition", () => {
+    expect(
+      buildTelegramAction({
+        kind: "statusChanged",
+        oldStatus: "to-do",
+        newStatus: "in-progress",
+      }),
+    ).toBe("To Do → In Progress");
+  });
+
+  it("falls back when the old status is missing (bulk updates)", () => {
+    expect(
+      buildTelegramAction({
+        kind: "statusChanged",
+        oldStatus: null,
+        newStatus: "done",
+      }),
+    ).toBe("Status → Done");
+  });
+
+  it("falls back when the old priority is missing", () => {
+    expect(
+      buildTelegramAction({
+        kind: "priorityChanged",
+        oldPriority: null,
+        newPriority: "high",
+      }),
+    ).toBe("Priority → High");
+  });
+
+  it("truncates long titles in a rename", () => {
+    const longTitle = "a".repeat(100);
+    const action = buildTelegramAction({
+      kind: "titleChanged",
+      oldTitle: "old",
+      newTitle: longTitle,
+    });
+    expect(action.startsWith('Title: "old" → "')).toBe(true);
+    expect(action.length).toBeLessThan(120);
+    expect(action.endsWith('…"')).toBe(true);
+  });
+
+  it("summarizes description updates and clears", () => {
+    expect(
+      buildTelegramAction({
+        kind: "descriptionChanged",
+        newDescription: null,
+      }),
+    ).toBe("Description updated");
+    expect(
+      buildTelegramAction({
+        kind: "descriptionChanged",
+        newDescription: "Line one\nLine two",
+      }),
+    ).toBe("Description: Line one Line two");
+  });
+
+  it("strips the comment markdown prefix and keeps the content", () => {
+    expect(
+      buildTelegramAction({
+        kind: "commentCreated",
+        comment: "**Arnaud** commented:\n> Looks good to me",
+      }),
+    ).toBe("Comment: Looks good to me");
+  });
+
+  it("keeps a comment that does not match the prefix format", () => {
+    expect(
+      buildTelegramAction({
+        kind: "commentCreated",
+        comment: "plain text",
+      }),
+    ).toBe("Comment: plain text");
+  });
+});

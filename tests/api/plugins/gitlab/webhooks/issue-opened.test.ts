@@ -21,7 +21,15 @@ const mocks = vi.hoisted(() => {
       transaction: async (run: (tx: unknown) => Promise<unknown>) =>
         run(mocks.db),
       select: () => ({
-        from: () => ({ where: () => ({ for: mocks.lockedIntegration }) }),
+        from: () => ({
+          where: () => ({
+            // oxlint-disable-next-line unicorn/no-thenable -- the webhook awaits the select chain directly.
+            then: (onFulfilled: (rows: unknown) => unknown) =>
+              Promise.resolve(mocks.lockedIntegration()).then((rows) =>
+                onFulfilled(rows),
+              ),
+          }),
+        }),
       }),
       insert: () => ({
         values: (values: Record<string, unknown>) => {

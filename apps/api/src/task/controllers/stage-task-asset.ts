@@ -51,8 +51,7 @@ export async function stageTaskAssetUpload(
     const [currentProject] = await tx
       .select({ workspaceId: projectTable.workspaceId })
       .from(projectTable)
-      .where(eq(projectTable.id, projectId))
-      .for("share");
+      .where(eq(projectTable.id, projectId));
     if (!currentProject)
       throw new HTTPException(404, { message: "Project not found" });
     await tx.insert(assetTable).values({

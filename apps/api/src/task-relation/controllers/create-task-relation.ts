@@ -42,8 +42,7 @@ async function createTaskRelation({
             .where(inArray(taskTable.id, [sourceTaskId, targetTaskId])),
         ),
       )
-      .orderBy(projectTable.id)
-      .for("share");
+      .orderBy(projectTable.id);
     const [sourceTask] = await tx
       .select({
         id: taskTable.id,

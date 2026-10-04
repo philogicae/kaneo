@@ -1,12 +1,11 @@
-import { and, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, ne } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { labelTable, projectTable, taskTable } from "../../database/schema";
-
 import { publishEvent } from "../../events";
 import { notifySyncWorkspaceLabelChanged } from "../../plugins/sync/workspace-label-changed";
 
-async function updateLabel(id: string, name: string, color: string) {
+async function updateLabel(id: string, name: string, requestedColor: string) {
   const result = await db.transaction(async (tx) => {
     const label = await tx.query.labelTable.findFirst({
       where: (label, { eq }) => eq(label.id, id),
@@ -18,10 +17,56 @@ async function updateLabel(id: string, name: string, color: string) {
       });
     }
 
-    if (label.deletionStartedAt)
+    // A label pending removal is a snapshot of what is being torn down, not an
+    // editable record: renaming or recolouring it would either be lost or
+    // resurrect copies the cascade is about to detach.
+    if (label.deletionStartedAt) {
       throw new HTTPException(409, {
         message: "This label is being deleted; resume its deletion instead",
       });
+    }
+
+    let color = requestedColor;
+
+    if (label.taskId && label.workspaceId) {
+      // A label name identifies one label per workspace: renaming a task-level
+      // copy onto an existing workspace definition turns it into a mirror of
+      // that definition, so it inherits the definition's color instead of
+      // creating a same-name label with a diverging color.
+      const [definition] = await tx
+        .select({ color: labelTable.color })
+        .from(labelTable)
+        .where(
+          and(
+            eq(labelTable.workspaceId, label.workspaceId),
+            eq(labelTable.name, name),
+            isNull(labelTable.taskId),
+          ),
+        )
+        .limit(1);
+      color = definition?.color ?? requestedColor;
+    } else if (label.workspaceId) {
+      // Names must stay unique per workspace at the definition level: fail
+      // with a clear error instead of the raw unique-index violation.
+      const [duplicate] = await tx
+        .select({ id: labelTable.id })
+        .from(labelTable)
+        .where(
+          and(
+            eq(labelTable.workspaceId, label.workspaceId),
+            eq(labelTable.name, name),
+            isNull(labelTable.taskId),
+            ne(labelTable.id, label.id),
+          ),
+        )
+        .limit(1);
+
+      if (duplicate) {
+        throw new HTTPException(400, {
+          message: "A label with this name already exists in this workspace",
+        });
+      }
+    }
 
     const [updatedLabel] = await tx
       .update(labelTable)
@@ -29,8 +74,9 @@ async function updateLabel(id: string, name: string, color: string) {
       .where(and(eq(labelTable.id, id), isNull(labelTable.deletionStartedAt)))
       .returning();
 
-    if (!updatedLabel)
+    if (!updatedLabel) {
       throw new HTTPException(409, { message: "This label is being deleted" });
+    }
 
     // If this is a workspace-level label, cascade the changes to all
     // task-level copies so existing label assignments reflect the new color/name

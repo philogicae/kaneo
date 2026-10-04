@@ -1,7 +1,9 @@
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  CalendarClock,
   CalendarDays,
   CalendarRange,
+  Milestone as MilestoneIcon,
   SquareKanban,
   SquircleDashed,
 } from "lucide-react";
@@ -33,7 +35,13 @@ type ProjectLayoutProps = {
   headerActions?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
-  activeView?: "backlog" | "board" | "calendar" | "gantt";
+  activeView?:
+    | "backlog"
+    | "board"
+    | "calendar"
+    | "gantt"
+    | "appointments"
+    | "roadmap";
 };
 
 export default function ProjectLayout({
@@ -58,11 +66,15 @@ export default function ProjectLayout({
     activeView ??
     (location.pathname.includes("/backlog")
       ? "backlog"
-      : location.pathname.includes("/calendar")
-        ? "calendar"
-        : location.pathname.includes("/gantt")
-          ? "gantt"
-          : "board");
+      : location.pathname.includes("/appointments")
+        ? "appointments"
+        : location.pathname.includes("/calendar")
+          ? "calendar"
+          : location.pathname.includes("/gantt")
+            ? "gantt"
+            : location.pathname.includes("/roadmap")
+              ? "roadmap"
+              : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -74,6 +86,13 @@ export default function ProjectLayout({
   const handleNavigateToBoard = () => {
     navigate({
       to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
+      params: { workspaceId, projectId },
+    });
+  };
+
+  const handleNavigateToAppointments = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/appointments",
       params: { workspaceId, projectId },
     });
   };
@@ -92,16 +111,27 @@ export default function ProjectLayout({
     });
   };
 
+  const handleNavigateToRoadmap = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/roadmap",
+      params: { workspaceId, projectId },
+    });
+  };
+
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
       to:
         resolvedView === "backlog"
           ? "/dashboard/workspace/$workspaceId/project/$projectId/backlog"
-          : resolvedView === "calendar"
-            ? "/dashboard/workspace/$workspaceId/project/$projectId/calendar"
-            : resolvedView === "gantt"
-              ? "/dashboard/workspace/$workspaceId/project/$projectId/gantt"
-              : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+          : resolvedView === "appointments"
+            ? "/dashboard/workspace/$workspaceId/project/$projectId/appointments"
+            : resolvedView === "calendar"
+              ? "/dashboard/workspace/$workspaceId/project/$projectId/calendar"
+              : resolvedView === "gantt"
+                ? "/dashboard/workspace/$workspaceId/project/$projectId/gantt"
+                : resolvedView === "roadmap"
+                  ? "/dashboard/workspace/$workspaceId/project/$projectId/roadmap"
+                  : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -158,8 +188,10 @@ export default function ProjectLayout({
                 activeView={resolvedView}
                 onSelectBacklog={handleNavigateToBacklog}
                 onSelectBoard={handleNavigateToBoard}
+                onSelectAppointments={handleNavigateToAppointments}
                 onSelectCalendar={handleNavigateToCalendar}
                 onSelectGantt={handleNavigateToGantt}
+                onSelectRoadmap={handleNavigateToRoadmap}
                 onSelectProject={handleProjectSwitch}
                 onAddProject={() => setIsCreateProjectModalOpen(true)}
               />
@@ -192,6 +224,20 @@ export default function ProjectLayout({
                   {t("tasks:title")}
                 </Button>
                 <Button
+                  variant={
+                    resolvedView === "appointments" ? "secondary" : "ghost"
+                  }
+                  size="xs"
+                  onClick={handleNavigateToAppointments}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "appointments" && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarClock className="size-3.5" />
+                  {t("appointments:tab")}
+                </Button>
+                <Button
                   variant={resolvedView === "calendar" ? "secondary" : "ghost"}
                   size="xs"
                   onClick={handleNavigateToCalendar}
@@ -214,6 +260,18 @@ export default function ProjectLayout({
                 >
                   <CalendarDays className="size-3.5" />
                   Gantt
+                </Button>
+                <Button
+                  variant={resolvedView === "roadmap" ? "secondary" : "ghost"}
+                  size="xs"
+                  onClick={handleNavigateToRoadmap}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "roadmap" && "text-muted-foreground",
+                  )}
+                >
+                  <MilestoneIcon className="size-3.5" />
+                  {t("roadmap:tab")}
                 </Button>
               </div>
             )}

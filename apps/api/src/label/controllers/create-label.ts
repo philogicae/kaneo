@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { labelTable, projectTable, taskTable } from "../../database/schema";
@@ -48,9 +48,30 @@ async function createLabel(
       });
     }
 
+    // A label name identifies one label per workspace: when a workspace-level
+    // definition exists, the task copy mirrors its canonical color so the two
+    // never drift apart (grouping and filters treat copies as one label).
+    const [definition] = await db
+      .select({ color: labelTable.color })
+      .from(labelTable)
+      .where(
+        and(
+          eq(labelTable.workspaceId, task.workspaceId),
+          eq(labelTable.name, name),
+          isNull(labelTable.taskId),
+        ),
+      )
+      .limit(1);
+    const resolvedColor = definition?.color ?? color;
+
     const [inserted] = await db
       .insert(labelTable)
-      .values({ name, color, taskId, workspaceId: task.workspaceId })
+      .values({
+        name,
+        color: resolvedColor,
+        taskId,
+        workspaceId: task.workspaceId,
+      })
       .onConflictDoNothing({
         target: [labelTable.taskId, labelTable.name],
       })
@@ -67,10 +88,10 @@ async function createLabel(
     }
 
     if (inserted) {
-      syncLabelToGitHub(taskId, name, color).catch((error) => {
+      syncLabelToGitHub(taskId, name, resolvedColor).catch((error) => {
         console.error("Failed to sync label to GitHub:", error);
       });
-      syncLabelToGitea(taskId, name, color).catch((error) => {
+      syncLabelToGitea(taskId, name, resolvedColor).catch((error) => {
         console.error("Failed to sync label to Gitea:", error);
       });
       syncLabelToGitlab(taskId, name, color).catch((error) => {
@@ -90,10 +111,7 @@ async function createLabel(
   const [inserted] = await db
     .insert(labelTable)
     .values({ name, color, taskId: null, workspaceId })
-    .onConflictDoNothing({
-      target: [labelTable.workspaceId, labelTable.name],
-      where: sql`${labelTable.taskId} is null`,
-    })
+    .onConflictDoNothing()
     .returning();
 
   const label =

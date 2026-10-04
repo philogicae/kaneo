@@ -6,7 +6,6 @@ export const projectSchema = z
   .object({
     id: z.string(),
     workspaceId: z.string(),
-    backgroundVersion: z.string().nullable(),
     slug: z.string().openapi({
       description: "Short prefix used in task identifiers, e.g. KAN-12.",
     }),
@@ -34,11 +33,29 @@ export const projectStatisticsSchema = z
   .object({
     completionPercentage: z.number(),
     totalTasks: z.number(),
+    plannedTasks: z.number().openapi({
+      description: "Number of tasks sitting in the backlog (planned).",
+    }),
     dueDate: nullableResponseTimestamp.openapi({
       description: "The soonest due date among the project's open tasks.",
     }),
   })
   .openapi("ProjectStatistics");
+
+export const projectChartsSchema = z
+  .object({
+    bucketStart: z.string().openapi({
+      description:
+        "ISO 8601 start of the bucket (UTC), truncated to the requested unit.",
+    }),
+    created: z.number().openapi({
+      description: "Tasks created during that bucket.",
+    }),
+    completed: z.number().openapi({
+      description: "Tasks moved into a final status during that bucket.",
+    }),
+  })
+  .openapi("ProjectChartsBucket");
 
 export const projectListItemSchema = projectSchema
   .extend({
@@ -58,18 +75,21 @@ export const projectListItemSchema = projectSchema
 
 export const projectListSchema = z.array(projectListItemSchema);
 
-export const projectBackgroundUploadSchema = z
+export const projectMemberSchema = z
   .object({
-    key: z.string(),
-    uploadUrl: z.string(),
-    version: z.string(),
-    headers: z.record(z.string(), z.string()),
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    image: z.string().nullable(),
+    role: z.string().openapi({
+      description: "The member's workspace role.",
+    }),
   })
-  .openapi("ProjectBackgroundUpload");
+  .openapi("ProjectMember");
 
-export const projectBackgroundFinalizeSchema = z
-  .object({ url: z.string() })
-  .openapi("ProjectBackgroundFinalize");
+export const projectMemberListSchema = z.array(projectMemberSchema);
+
+// A move also reports how many assignees lost access in the destination.
 export const movedProjectSchema = projectSchema
   .extend({ unassignedTaskCount: z.number() })
   .openapi("MovedProject");

@@ -26,6 +26,7 @@ export type SignUpFormValues = {
 
 type SignUpFormProps = {
   invitationId?: string;
+  inviteLinkToken?: string;
   defaultEmail?: string;
   /**
    * Captcha token lifted from the page level. When the page renders Turnstile
@@ -39,6 +40,7 @@ type SignUpFormProps = {
 
 export function SignUpForm({
   invitationId,
+  inviteLinkToken,
   defaultEmail,
   turnstileToken,
   onAttemptComplete,
@@ -87,7 +89,10 @@ export function SignUpForm({
           email: data.email,
           name: data.name,
           password: data.password,
-        },
+          // Extra field forwarded to the server's user-create hook, which
+          // gates registration on a valid shareable invite link.
+          ...(inviteLinkToken ? { inviteLinkToken } : {}),
+        } as Parameters<typeof authClient.signUp.email>[0],
         Object.keys(headers).length > 0 ? { headers } : undefined,
       );
 
@@ -100,6 +105,8 @@ export function SignUpForm({
 
       if (invitationId) {
         history.push(`/invitation/accept/${invitationId}`);
+      } else if (inviteLinkToken) {
+        history.push(`/invitation/link/${inviteLinkToken}`);
       } else {
         history.push("/dashboard");
       }

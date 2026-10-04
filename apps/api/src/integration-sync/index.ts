@@ -138,12 +138,7 @@ export default apiRouter<BaseVariables & { workspaceId: string }>()
     const { projectId, provider } = c.req.valid("param");
     return c.json(
       await db.transaction(async (tx) => {
-        await getAuthorizedSyncProject(
-          projectId,
-          c.get("workspaceId"),
-          tx,
-          true,
-        );
+        await getAuthorizedSyncProject(projectId, c.get("workspaceId"), tx);
         const integration = await getSyncIntegration(projectId, provider, tx);
         return previewSyncRules(
           integration,
@@ -159,12 +154,7 @@ export default apiRouter<BaseVariables & { workspaceId: string }>()
     const { projectId, provider } = c.req.valid("param");
     return c.json(
       await db.transaction(async (tx) => {
-        await getAuthorizedSyncProject(
-          projectId,
-          c.get("workspaceId"),
-          tx,
-          true,
-        );
+        await getAuthorizedSyncProject(projectId, c.get("workspaceId"), tx);
         return previewSyncRules(
           await getSyncIntegration(projectId, provider, tx),
           c.req.valid("json").rules,
