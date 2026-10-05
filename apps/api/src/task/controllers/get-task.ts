@@ -1,5 +1,5 @@
 import { boundedTaskRead } from "../bounded-read";
-import { alias } from "drizzle-orm/pg-core";
+import { alias } from "drizzle-orm/sqlite-core";
 import { boardDescription, descriptionDeferred } from "../description-pages";
 import { getSubtaskCounts } from "../get-subtask-counts";
 import { and, eq, sql } from "drizzle-orm";
@@ -26,9 +26,12 @@ async function getTask(taskId: string, board = false) {
         : {}),
       status: taskTable.status,
       columnId: taskTable.columnId,
+      milestoneId: taskTable.milestoneId,
       priority: taskTable.priority,
       startDate: taskTable.startDate,
       dueDate: taskTable.dueDate,
+      reminderOffsets: taskTable.reminderOffsets,
+      recurrence: taskTable.recurrence,
       position: taskTable.position,
       createdAt: taskTable.createdAt,
       userId: taskTable.userId,

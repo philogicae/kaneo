@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { buildSettingsNav } from "@/components/settings/nav/build-settings-nav";
 import useAdminAccess from "@/hooks/queries/admin/use-admin-access";
-import useGetConfig from "@/hooks/queries/config/use-get-config";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
+import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 
 export function useSettingsNav() {
   const { t } = useTranslation();
@@ -12,18 +12,21 @@ export function useSettingsNav() {
   const { data: projects } = useGetProjects({
     workspaceId: workspace?.id ?? "",
   });
-  const { data: config } = useGetConfig();
   const { data: hasAdminAccess } = useAdminAccess();
+  const { canInviteUsers } = useWorkspacePermission();
+  const canInvite = canInviteUsers();
 
   return useMemo(
     () =>
       buildSettingsNav({
         t,
         workspaceName: workspace?.name,
-        billingEnabled: Boolean(config?.billingEnabled),
+        // Billing is upstream cloud-only; this fork has no billing surface.
+        billingEnabled: false,
         hasAdminAccess: Boolean(hasAdminAccess),
+        canInviteUsers: canInvite,
         projects: projects ?? [],
       }),
-    [t, workspace?.name, config?.billingEnabled, hasAdminAccess, projects],
+    [t, workspace?.name, hasAdminAccess, canInvite, projects],
   );
 }

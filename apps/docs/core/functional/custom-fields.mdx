@@ -1,0 +1,37 @@
+---
+title: Custom fields
+description: Add project-specific fields to tasks and filter the board by their values.
+---
+
+Custom fields capture the structured data a project needs beyond the fixed task model — an environment, a cost center, a review date. Definitions belong to a project; values belong to each task.
+
+## Manage definitions
+
+Open **Project settings → Workflow → Custom fields**. For each field you set:
+
+| Setting | Notes |
+| --- | --- |
+| Name | Shown on the task form, detail page, and filters. |
+| Type | `Text`, `Number`, `Date`, `Dropdown`, or `Boolean`. |
+| Options | Dropdown only: comma-separated values. |
+| Required | The task cannot be created without a value unless a default is set. |
+| Default | Pre-filled on creation; used to satisfy required fields automatically. |
+
+Definitions can be reordered and deleted; deleting a definition removes its values.
+
+## Values on tasks
+
+- The create-task modal renders the project's fields, including defaults.
+- Values are edited from the task detail page; optional dropdown, date, and boolean fields can be unset again.
+- Fields appear on task cards and backlog rows, and the board toolbar can filter on them.
+- Value validation follows the type: numbers must be finite, booleans `true`/`false`, dates `YYYY-MM-DD` or ISO 8601, and dropdown values must be one of the configured options.
+
+## API
+
+Custom fields are part of the REST task payloads: create and update tasks with a `customFields` array of `{ fieldId, value }` pairs, and manage definitions through the project's custom-field routes. The MCP tool catalog does not expose custom fields yet, so agents working through MCP leave them empty unless a default applies.
+
+## Related
+
+- [Plan and execute tasks](/core/functional/plan-and-execute-tasks)
+- [Configure workflows](/core/functional/configure-workflows)
+- [API reference](/api-reference/introduction)

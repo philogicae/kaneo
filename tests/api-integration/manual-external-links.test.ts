@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
@@ -62,40 +60,6 @@ async function link(
 }
 
 describe("manual external resource links", () => {
-  it("upgrades an existing integration link without changing it", async () => {
-    const own = await context();
-    const [integration] = await db
-      .insert(schema.integrationTable)
-      .values({ projectId: own.project.id, type: "github", config: "{}" })
-      .returning();
-    const existing = await link(own.task.id, integration.id, "issue");
-    const migration = readFileSync(
-      new URL(
-        "../../apps/api/drizzle/0051_modern_corsair.sql",
-        import.meta.url,
-      ),
-      "utf8",
-    );
-    await db.transaction(async (tx) => {
-      await tx.execute(
-        sql`ALTER TABLE external_link ALTER COLUMN integration_id SET NOT NULL`,
-      );
-      await tx.execute(sql.raw(migration));
-      expect(await tx.query.externalLinkTable.findMany()).toEqual([existing]);
-      const [manual] = await tx
-        .insert(schema.externalLinkTable)
-        .values({
-          taskId: own.task.id,
-          integrationId: null,
-          resourceType: "url",
-          externalId: "manual",
-          url: "https://example.com/manual",
-        })
-        .returning();
-      expect(manual.integrationId).toBeNull();
-    });
-  });
-
   it("creates, lists and removes a manual link and publishes both updates", async () => {
     const own = await context();
     mockAuthenticatedSession(own.user);

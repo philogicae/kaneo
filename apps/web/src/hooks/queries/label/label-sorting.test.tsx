@@ -30,7 +30,7 @@ const { getTaskLabels, getWorkspaceLabels } = vi.hoisted(() => ({
 vi.mock("@/fetchers/label/get-labels-by-task", () => ({
   default: getTaskLabels,
 }));
-vi.mock("@/fetchers/label/get-label-by-workspace", () => ({
+vi.mock("@/fetchers/label/get-labels-by-workspace", () => ({
   default: getWorkspaceLabels,
 }));
 vi.mock("@/lib/i18n", async () => {

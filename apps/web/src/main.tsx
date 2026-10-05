@@ -1,7 +1,6 @@
-import "./instrument";
-
 import { QueryClientProvider } from "@tanstack/react-query";
-import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { createRouter, Link, RouterProvider } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
@@ -13,13 +12,8 @@ import AuthProvider from "./components/providers/auth-provider";
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { ErrorBoundary } from "./components/ui/error-boundary";
 import { KeyboardShortcutsProvider } from "./hooks/use-keyboard-shortcuts";
-import { captureCheckoutIntent } from "./lib/checkout-intent";
 import { AppI18nProvider } from "./lib/i18n/provider";
 import { routeTree } from "./routeTree.gen";
-
-// Capture a pricing-page `?checkout=<plan>-<interval>` deep link before the
-// router runs and strips it across the sign-up → onboarding redirect chain.
-captureCheckoutIntent();
 
 console.log(`
                      ////////  
@@ -46,6 +40,7 @@ const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
+  defaultNotFoundComponent: NotFoundFallback,
   context: {
     user: null,
     queryClient,
@@ -56,6 +51,35 @@ function App() {
   const { user } = useAuth();
 
   return <RouterProvider router={router} context={{ user }} />;
+}
+
+// Unmatched paths used to render a bare "Not Found" in the corner; give the
+// 404 the same shell as the crash fallback and a way back into the app.
+function NotFoundFallback() {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-background p-6">
+      <div className="max-w-md text-center">
+        <p className="text-5xl font-semibold tracking-tight text-foreground">
+          404
+        </p>
+        <h1 className="mt-3 text-xl font-semibold text-foreground">
+          {t("common:notFound.title")}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t("common:notFound.description")}
+        </p>
+        <Link
+          to="/dashboard"
+          className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          <ArrowLeft className="size-4" />
+          {t("common:notFound.backToDashboard")}
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 // Root boundary fallback: shows a generic message and a refresh button,

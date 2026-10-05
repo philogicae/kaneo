@@ -6,8 +6,13 @@ export default defineConfig({
     environment: "node",
     include: ["../../tests/api-integration/**/*.test.ts"],
     setupFiles: ["../../tests/api-integration/setup.ts"],
-    fileParallelism: false,
-    maxWorkers: 1,
+    // Each worker migrates and truncates its own `*_test_w<N>.db` (see
+    // tests/api-integration/setup.ts), so files run in parallel instead of
+    // queueing behind one writer. Half the cores, so a 4-core CI runner stays
+    // at 2 and a workstation still gets several workers; each one holds its own
+    // SQLite connection and its own server sockets.
+    fileParallelism: true,
+    maxWorkers: "50%",
     minWorkers: 1,
     hookTimeout: 60_000,
     testTimeout: 60_000,
@@ -15,13 +20,10 @@ export default defineConfig({
       enabled: false,
     },
   },
-  oxc: {
-    target: "node18",
-  },
   resolve: {
     alias: {
       "@kaneo/email": resolve(
-        __dirname,
+        import.meta.dirname,
         "../../tests/api-integration/mocks/email.ts",
       ),
     },

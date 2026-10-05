@@ -1,83 +1,119 @@
 ---
-title: "Install with Docker Compose"
-description: "Run Kaneo and PostgreSQL, then sign in to your new instance."
+title: The compose.yml file
+description: The fork's single-container Docker Compose file, built locally or pulled from GHCR.
 ---
 
-This guide starts a local instance at `http://localhost:5173`. You need Docker with Compose V2 and a terminal. No repository clone is required.
+## The compose file
 
-## 1. Create a directory
+This fork ships as one container: the bundled API and web app, with the libSQL (Turso) database stored on a local file. There is no PostgreSQL service.
 
-```bash
-mkdir kaneo
-cd kaneo
-```
-
-Save the following as `compose.yml`:
+`compose.yml` builds the image from `Dockerfile.kaneo`:
 
 ```yaml
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-kaneo}
-      POSTGRES_DB: ${POSTGRES_DB:-kaneo}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+name: kaneo
 
+services:
   kaneo:
-    image: ghcr.io/usekaneo/kaneo:${KANEO_IMAGE_TAG:-2.28.3}
+    container_name: kaneo
+    build:
+      context: .
+      dockerfile: Dockerfile.kaneo
+    image: kaneo-custom
+    init: true
+    restart: unless-stopped
     ports:
-      - "127.0.0.1:5173:5173"
+      - "5173:5173"
     env_file:
       - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
+    volumes:
+      - ${KANEO_DATA_PATH:-./data}:/app/data
     healthcheck:
-      test: ["CMD", "wget", "-Y", "off", "--quiet", "--spider", "http://127.0.0.1:5173/api/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:5173/api/health",
+        ]
       interval: 30s
       timeout: 5s
       start_period: 60s
       retries: 3
-
-volumes:
-  postgres_data:
 ```
 
-This example pins Kaneo to a release so a pull does not unexpectedly upgrade it. See the [release notes](https://github.com/usekaneo/kaneo/releases) when choosing another version.
-
-## 2. Add configuration
-
-Run this twice to generate two different secrets:
+Start it with:
 
 ```bash
-openssl rand -hex 32
+cp .env.sample .env
+# Set KANEO_CLIENT_URL and AUTH_SECRET at minimum
+mkdir -p ./data && chown -R 1001:1001 ./data
+docker compose up -d --build
 ```
 
-Create `.env` beside `compose.yml`. Replace both placeholders with the generated values:
+## Prebuilt image
+
+`compose.remote.yml` runs the image published by `.github/workflows/publish.yml` instead of building locally:
+
+```yaml
+name: kaneo
+
+services:
+  kaneo:
+    container_name: kaneo
+    image: ghcr.io/philogicae/kaneo:latest
+    init: true
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    volumes:
+      - ${KANEO_DATA_PATH:-./data}:/app/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:5173/api/health",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+```
+
+```bash
+cp .env.sample .env
+mkdir -p ./data && chown -R 1001:1001 ./data
+docker compose -f compose.remote.yml up -d
+```
+
+## Services and volumes
+
+- `kaneo`: the API and web app in one container, exposed on port 5173.
+- `${KANEO_DATA_PATH:-./data}` bind-mounted at `/app/data`: holds the libSQL database file (`kaneo.db`) and its WAL/SHM sidecars. The directory must be writable by the container user (uid 1001).
+
+## Required configuration
+
+Copy `.env.sample` to `.env` and set:
 
 ```env
-KANEO_IMAGE_TAG=2.28.3
 KANEO_CLIENT_URL=http://localhost:5173
-POSTGRES_DB=kaneo
-POSTGRES_USER=kaneo
-POSTGRES_PASSWORD=replace-with-the-first-generated-secret
-AUTH_SECRET=replace-with-the-second-generated-secret
+AUTH_SECRET=                             # generate: openssl rand -hex 32
 ```
 
-Keep this file private. On Linux or macOS, run `chmod 600 .env`.
+`KANEO_API_URL` defaults to `KANEO_CLIENT_URL/api`. This keeps the browser on one origin while the container proxies `/api` requests to the internal API process.
 
-The bundled image derives its database connection from `POSTGRES_*` and its API URL from `KANEO_CLIENT_URL`. You do not need to set `DATABASE_URL` or `KANEO_API_URL` for this setup.
+## Assets and uploads
 
-## 3. Start and check the services
+Image and file uploads in task descriptions and comments are stored on local disk under the data volume (`/app/data/assets` by default) — no object-storage service is required. The directory is created automatically; override it with `STORAGE_PATH` (keep it inside a mounted path) or cap sizes with `STORAGE_MAX_IMAGE_UPLOAD_BYTES`. See [Image uploads and asset storage](/core/installation/object-storage-and-image-uploads).
+
+## 3. Start the container
 
 ```bash
 docker compose up -d
@@ -85,10 +121,10 @@ docker compose ps
 curl --fail http://localhost:5173/api/health
 ```
 
-Allow time for the first database initialization and migrations. Both services should become healthy. If they do not, check:
+Allow time for the first database initialization and migrations. The service should become healthy. If it does not, check:
 
 ```bash
-docker compose logs --tail=100 kaneo postgres
+docker compose logs --tail=100 kaneo
 ```
 
 Open [localhost:5173](http://localhost:5173), create the initial account, and follow [Your first project](/core/index).
@@ -109,59 +145,9 @@ docker compose up -d --force-recreate kaneo
 
 A plain restart keeps the old environment. If you use a proxy in another container, connect it to Kaneo's Docker network and proxy to `kaneo:5173` instead of the host's loopback address.
 
-## Keep secrets in files
-
-Instead of putting `POSTGRES_PASSWORD` and `AUTH_SECRET` in `.env`, you can mount them as Docker secret files. This requires a Kaneo release that includes `_FILE` support, so raise `KANEO_IMAGE_TAG` past `2.28.3` first.
-
-Move the values you already use from `.env` into their own files:
-
-```bash
-mkdir -p secrets
-sed -n 's/^POSTGRES_PASSWORD=//p' .env > secrets/postgres_password
-sed -n 's/^AUTH_SECRET=//p' .env > secrets/auth_secret
-chmod 700 secrets
-chmod 644 secrets/*
-```
-
-Keep the current values. PostgreSQL sets its password only when it first initializes the `postgres_data` volume, so a new value in the file would no longer match the database. A new `AUTH_SECRET` would also sign everyone out. Generate fresh values with `openssl rand -hex 32` only for a new installation that has not started yet.
-
-Compose mounts these files with their host ownership, and the containers read them as non-root users (UID 1001 for Kaneo, `postgres` for PostgreSQL). The files therefore need to be readable by other users, while the `700` directory keeps other accounts on the host from reaching them.
-
-Remove `POSTGRES_PASSWORD` and `AUTH_SECRET` from `.env`. In `compose.yml`, replace the `POSTGRES_PASSWORD` line of the `postgres` service and add the secrets to both services:
-
-```yaml
-services:
-  postgres:
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-kaneo}
-      POSTGRES_DB: ${POSTGRES_DB:-kaneo}
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    secrets:
-      - postgres_password
-
-  kaneo:
-    environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-      AUTH_SECRET_FILE: /run/secrets/auth_secret
-    secrets:
-      - postgres_password
-      - auth_secret
-
-secrets:
-  postgres_password:
-    file: ./secrets/postgres_password
-  auth_secret:
-    file: ./secrets/auth_secret
-```
-
-Keep the other keys of each service as they are. For [custom OAuth](/core/social-providers/custom-oauth), mount the client secret the same way and set `CUSTOM_OAUTH_CLIENT_SECRET_FILE`. A direct value in `.env` takes precedence over its `_FILE` variable, so leave the direct variable unset. See the [environment variable reference](/core/installation/environment-variables#authentication) for how files are read and what happens when one is missing.
-
 ## Optional features
 
-- [Silo](/core/installation/silo) stores images and attachments.
 - [SMTP](/core/installation/environment-variables#smtp-configuration) delivers sign-in codes, invitations, and notifications.
 - [Sign-in providers](/core/social-providers/custom-oauth) connect your identity provider.
 
-PostgreSQL stays inside the Compose network. Do not publish its port for this deployment.
-
-Before storing work you care about, set up [backups](/core/operations/backups). Use the [upgrade guide](/core/operations/upgrades) when changing versions.
+The database file lives in the data volume, not in an external service. Back up the `${KANEO_DATA_PATH:-./data}` directory before storing work you care about; see [backups](/core/operations/backups) and the [upgrade guide](/core/operations/upgrades).

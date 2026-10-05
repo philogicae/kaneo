@@ -117,6 +117,8 @@ export async function decideMcpAuthorizationRequest(params: {
   const session = await auth.api.getSession({ headers: params.headers });
   if (!session?.user?.id) throwOAuthError(401, "unauthorized");
 
+  // Read before consuming: issuance is rate limited, and a denial must not
+  // burn a consent request that a retry could still approve.
   const request = await getAuthorizationRequest(params.requestId);
   if (!request) throwOAuthError(404, "invalid_or_expired_request");
 
@@ -131,6 +133,8 @@ export async function decideMcpAuthorizationRequest(params: {
     return buildAuthorizationRedirect(request, { error: "access_denied" });
   }
 
+  // createAuthCode consumes the request inside the issuance transaction, so a
+  // denied issuance (rate, capacity, busy slot) leaves it approvable again.
   const code = await createAuthCode(
     {
       clientId: request.clientId,

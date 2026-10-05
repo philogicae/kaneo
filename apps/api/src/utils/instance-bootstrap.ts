@@ -16,7 +16,7 @@ export async function promoteInitialAdministrator(
   userId: string,
 ): Promise<void> {
   await db.transaction(async (tx) => {
-    await tx.execute(sql`SELECT pg_advisory_xact_lock(2026)`);
+    // libSQL serialises writers, so no advisory lock is needed here.
     const [admin] = await tx
       .select({ id: schema.userTable.id })
       .from(schema.userTable)

@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
-import db, { getDatabasePool, schema } from "../../apps/api/src/database";
+import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
 import {
   BOARD_DESCRIPTION_MAX_BYTES,
@@ -310,21 +310,34 @@ describe("large task descriptions", () => {
       .where(eq(schema.projectTable.id, project.id));
     expect((await app.request(url)).status).toBe(404);
   });
-  it("bounds description database work and returns a retryable error after a statement timeout", async () => {
+  it("bounds description database work and returns a retryable error after its deadline", async () => {
     const { task } = await fixture("body");
-    const lock = await getDatabasePool().connect();
+    // SQLite serialises writers and this deployment queues them in-process, so
+    // an open write transaction is what a bounded read has to wait behind.
+    let release!: () => void;
+    let ready!: () => void;
+    const held = new Promise<void>((resolve) => {
+      ready = resolve;
+    });
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const holder = db.transaction(async (tx) => {
+      await tx.run(sql`update ${schema.taskTable} set title = title`);
+      ready();
+      await hold;
+    });
+    await held;
     try {
-      await lock.query("BEGIN");
-      await lock.query('LOCK TABLE "task" IN ACCESS EXCLUSIVE MODE');
       await expect(
-        getDescriptionPage(task.id, { offset: 0 }),
+        getDescriptionPage(task.id, { offset: 0 }, 100),
       ).rejects.toMatchObject({
         status: 503,
         message: "Description request took too long; retry later",
       });
     } finally {
-      await lock.query("ROLLBACK");
-      lock.release();
+      release();
+      await holder;
     }
   });
   it("validates offsets, versions and search length, including the public route", async () => {

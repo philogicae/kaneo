@@ -1,31 +1,10 @@
-import { pagingNumber, z } from "../openapi";
+import { z } from "../openapi";
+import { pagingNumber } from "../utils/paging";
 import { MAX_TASK_POSITION } from "./controllers/next-task-position";
 import { TICKET_ID_PATTERN } from "./ticket-id";
 import { VALID_PRIORITIES } from "./validate-task-fields";
 
 export const taskParam = z.object({ id: z.string() });
-
-export const ticketIdParam = z.object({
-  ticketId: z
-    .string()
-    .max(128)
-    .refine((value) => TICKET_ID_PATTERN.test(value), "Invalid task ticket ID")
-    .openapi({
-      description: "Project key and task number, e.g. KAN-12.",
-    }),
-});
-
-export const ticketIdQuery = z.object({
-  workspaceId: z.string().min(1).optional().openapi({
-    description: "Select a workspace if the ticket ID exists in more than one.",
-  }),
-  workspaceSlug: z.string().min(1).max(128).optional().openapi({
-    description: "Select a workspace by its slug instead of its ID.",
-  }),
-  projectId: z.string().min(1).optional().openapi({
-    description: "Select a project if the ticket ID exists more than once.",
-  }),
-});
 
 export const projectIdParam = z.object({ projectId: z.string() });
 
@@ -37,6 +16,8 @@ export const assignedTasksQuery = z.object({
   }),
 });
 
+export const workspaceIdParam = z.object({ workspaceId: z.string() });
+
 const priority = z.enum(VALID_PRIORITIES);
 
 // Required object of optional filters: a RouteParameter cannot itself be optional.
@@ -47,13 +28,45 @@ export const listTasksQuery = z.object({
   // Number("abc") is NaN, which used to reach the limit/offset clause unchecked.
   page: pagingNumber(1, 1_000_000).optional(),
   relatedPage: pagingNumber(1, 1_000_000).optional(),
-  limit: pagingNumber(1, 100).optional(),
+  limit: pagingNumber(1, 200).optional(),
   sortBy: z
     .enum(["createdAt", "priority", "dueDate", "position", "title", "number"])
     .optional(),
   sortOrder: z.enum(["asc", "desc"]).optional(),
   dueBefore: z.string().optional(),
   dueAfter: z.string().optional(),
+});
+
+// Cross-project task listing for one workspace: the flat, filterable read an
+// agent needs to answer "my open tasks", "what is urgent" or "tasks with
+// label X" without iterating every project board.
+export const workspaceTasksQuery = z.object({
+  status: z.string().optional().openapi({
+    description: "Column slug, or `planned` for the backlog or `archived`.",
+  }),
+  priority: priority.optional(),
+  assigneeId: z.string().optional().openapi({
+    description:
+      "Assignee user id, or `unassigned` for tasks with no assignee.",
+  }),
+  label: z.string().optional().openapi({
+    description: "Exact label name, case-insensitive.",
+  }),
+  q: z.string().optional().openapi({
+    description: "Case-insensitive text match on title and description.",
+  }),
+  dueBefore: z.string().optional().openapi({
+    description: "Only tasks due at or before this ISO date-time.",
+  }),
+  dueAfter: z.string().optional().openapi({
+    description: "Only tasks due at or after this ISO date-time.",
+  }),
+  page: pagingNumber(1, 1_000_000).optional(),
+  limit: pagingNumber(1, 200).optional(),
+  sortBy: z
+    .enum(["createdAt", "priority", "dueDate", "position", "title", "number"])
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
 });
 
 export const bulkUpdateBody = z.object({
@@ -73,7 +86,39 @@ export const bulkUpdateBody = z.object({
   }),
 });
 
+// Calendar-like recurrence; the next occurrence is spawned when the task is
+// completed (moved to a final column).
+export const recurrenceRule = z
+  .object({
+    frequency: z.enum(["daily", "weekly", "monthly"]),
+    interval: z.number().int().min(1).max(365),
+  })
+  .nullable()
+  .optional()
+  .openapi({
+    description:
+      "Recurrence of the task. The next occurrence is created automatically when the task completes.",
+  });
+
+export const reminderOffsets = z
+  .array(
+    z
+      .number()
+      .int()
+      .min(1)
+      .max(60 * 24 * 30),
+  )
+  .max(10)
+  .nullable()
+  .optional()
+  .openapi({
+    description:
+      "Reminder offsets in minutes before the task's start date (e.g. 1440 = 24h, 120 = 2h; Telegram reminders). Null clears all reminders; reminders never fire from the due date.",
+  });
+
 export const createTaskBody = z.object({
+  // Assets staged before the task existed, finalized as part of this create.
+  draftAssetIds: z.array(z.string()).max(100).optional(),
   title: z.string(),
   description: z.string(),
   startDate: z.string().optional(),
@@ -81,14 +126,23 @@ export const createTaskBody = z.object({
   priority,
   status: z.string().openapi({ description: "The target column's slug." }),
   userId: z.string().optional().openapi({ description: "Assignee, if any." }),
-  draftAssetIds: z.array(z.string()).max(100).optional(),
   customFields: z
     .array(z.object({ fieldId: z.string(), value: z.string() }))
     .optional(),
+  reminderOffsets,
+  recurrence: recurrenceRule,
+});
+
+export const qualifyTaskBody = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  priority: priority.optional(),
 });
 
 export const updateTaskBody = z.object({
   title: z.string(),
+  // Omitted to preserve the existing description, e.g. when a board list only
+  // refreshes the summary of a description it did not load.
   description: z.string().optional().openapi({
     description:
       "Omit to preserve the existing description when updating a list summary.",
@@ -100,6 +154,8 @@ export const updateTaskBody = z.object({
   projectId: z.string(),
   position: z.number().int().min(0).max(MAX_TASK_POSITION),
   userId: z.string().optional(),
+  reminderOffsets,
+  recurrence: recurrenceRule,
 });
 
 export const moveTaskBody = z.object({
@@ -128,7 +184,10 @@ export const updatePriorityBody = z.object({ priority });
 export const updateAssigneeBody = z.object({
   userId: z.string().nullable().openapi({ description: "Null unassigns." }),
 });
-export const updateDueDateBody = z.object({ dueDate: z.string().optional() });
+export const updateDueDateBody = z.object({
+  dueDate: z.string().optional(),
+  reminderOffsets,
+});
 export const updateTitleBody = z.object({ title: z.string() });
 export const updateDescriptionBody = z.object({ description: z.string() });
 
@@ -153,13 +212,38 @@ export const finalizeImageUploadBody = z.object({
   surface,
 });
 
+export const ticketIdParam = z.object({
+  ticketId: z
+    .string()
+    .max(128)
+    .refine((value) => TICKET_ID_PATTERN.test(value), "Invalid task ticket ID")
+    .openapi({
+      description: "Project key and task number, e.g. KAN-12.",
+    }),
+});
+
+export const ticketIdQuery = z.object({
+  workspaceId: z.string().min(1).optional().openapi({
+    description: "Select a workspace if the ticket ID exists in more than one.",
+  }),
+  workspaceSlug: z.string().min(1).max(128).optional().openapi({
+    description: "Select a workspace by its slug instead of its ID.",
+  }),
+  projectId: z.string().min(1).optional().openapi({
+    description: "Select a project if the ticket ID exists more than once.",
+  }),
+});
+
 export const descriptionPageQuery = z.object({
   offset: pagingNumber(0, 2_000_000_000, 0),
+  // The page version is the SHA3 hex of the paged text, so it is exactly the
+  // 64 characters that digest renders as.
   version: z
     .string()
-    .regex(/^[0-9]{1,10}$/)
+    .regex(/^[0-9a-f]{64}$/)
     .optional(),
 });
+
 export const descriptionMatchesQuery = z.object({
   query: z.string().trim().min(1).max(256),
   after: z.string().min(1).max(128).optional(),
@@ -170,6 +254,7 @@ export const duplicateTaskBody = z.object({ title: z.string().optional() });
 export const stagedImageUploadBody = imageUploadBody.extend({
   surface: z.literal("description"),
 });
+
 export const finalizeStagedImageUploadBody = finalizeImageUploadBody.extend({
   surface: z.literal("description"),
 });

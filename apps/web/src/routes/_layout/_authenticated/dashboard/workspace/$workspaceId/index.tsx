@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TrialExpiredCallout } from "@/components/billing/trial-expired-callout";
 import WorkspaceLayout from "@/components/common/workspace-layout";
 import { ActivityFeed } from "@/components/home/activity-feed";
 import { getDayPart } from "@/components/home/day-part";
@@ -46,7 +45,6 @@ function RouteComponent() {
       <PageTitle title={t("workspace:home.pageTitle")} />
       <WorkspaceLayout title={t("workspace:home.pageTitle")}>
         <div className="h-full overflow-y-auto">
-          <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
           <div className="mx-auto flex w-full max-w-5xl flex-col gap-9 px-6 py-10 lg:px-10">
             <header className="flex items-end justify-between gap-4">
               <div className="flex flex-col gap-1.5">

@@ -11,7 +11,10 @@ export function isSameProjectKey(a: string, b: string) {
 export function mayMatchProjectKey(key: string) {
   return or(
     sql`lower(${projectTable.slug}) = lower(${key.normalize("NFKC")})`,
-    sql`octet_length(${projectTable.slug}) <> char_length(${projectTable.slug})`,
+    // A stored key whose byte length differs from its character length holds
+    // multi-byte characters, which SQLite's lower() leaves alone; the caller
+    // still has to compare those in JS.
+    sql`length(CAST(${projectTable.slug} AS BLOB)) <> length(${projectTable.slug})`,
   );
 }
 

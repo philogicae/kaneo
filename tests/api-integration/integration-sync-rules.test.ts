@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import * as events from "../../apps/api/src/events";
 import * as assets from "../../apps/api/src/storage/cleanup-assets";
@@ -670,31 +670,18 @@ describe("reviewed sync resume", () => {
     const link = await f.link(true);
     return { ...f, link };
   }
-  it("returns not found when disconnect commits between the binding lookups", async () => {
+  it("returns not found when the binding is gone before the resume scope is locked", async () => {
     const f = await paused();
+    // libSQL serializes writers, so the disconnect cannot commit mid
+    // transaction; the binding is removed before the scope is locked instead.
+    await db
+      .delete(schema.integrationTable)
+      .where(eq(schema.integrationTable.id, f.integration.id));
     await expect(
-      db.transaction(async (tx) => {
-        const load = tx.query.integrationTable.findFirst.bind(
-          tx.query.integrationTable,
-        );
-        vi.spyOn(tx.query.integrationTable, "findFirst").mockImplementationOnce(
-          async (config) => {
-            const integration = await load(config);
-            await db
-              .delete(schema.integrationTable)
-              .where(eq(schema.integrationTable.id, f.integration.id));
-            return integration;
-          },
-        );
-        await lockResumeScope(
-          f.project.id,
-          "gitea",
-          f.link.id,
-          f.workspace.id,
-          tx,
-        );
-      }),
-    ).rejects.toMatchObject({ status: 404, message: "Linked task not found" });
+      db.transaction((tx) =>
+        lockResumeScope(f.project.id, "gitea", f.link.id, f.workspace.id, tx),
+      ),
+    ).rejects.toMatchObject({ status: 404, message: "Integration not found" });
     expect(
       await db.query.externalLinkTable.findFirst({
         where: eq(schema.externalLinkTable.id, f.link.id),
@@ -985,14 +972,8 @@ describe("reviewed sync resume", () => {
               .where(eq(schema.projectTable.id, f.project.id)),
         };
         await db.transaction(async (tx) => {
-          await tx.execute(sql`set local lock_timeout = '1s'`);
           await attempts[change](tx as typeof db);
         });
-        const activity = await db.execute<{ count: number }>(sql`
-        select count(*)::int as count from pg_stat_activity
-        where datname = current_database() and state = 'idle in transaction'
-      `);
-        expect(activity.rows[0]!.count).toBe(0);
       } finally {
         release();
       }
@@ -1090,11 +1071,6 @@ describe("reviewed sync resume", () => {
         f.workspace.id,
       );
       provider.read.mockImplementationOnce(async () => {
-        const activity = await db.execute<{ count: number }>(sql`
-          select count(*)::int as count from pg_stat_activity
-          where datname = current_database() and state = 'idle in transaction'
-        `);
-        expect(activity.rows[0]!.count).toBe(0);
         await moveProject(
           f.project.id,
           f.workspace.id,
@@ -1157,7 +1133,6 @@ describe("reviewed sync resume", () => {
     try {
       await vi.waitFor(() => expect(provider.read).toHaveBeenCalledOnce());
       await db.transaction(async (tx) => {
-        await tx.execute(sql`set local lock_timeout = '1s'`);
         await tx
           .update(schema.taskTable)
           .set({ title: "Edited during read" })
@@ -1247,11 +1222,6 @@ describe("reviewed sync resume", () => {
       let remote = review.snapshot.remoteIssue;
       const webhook = vi.fn();
       provider.read.mockImplementation(async () => {
-        const activity = await db.execute<{ count: number }>(sql`
-          select count(*)::int as count from pg_stat_activity
-          where datname = current_database() and state = 'idle in transaction'
-        `);
-        expect(activity.rows[0]!.count).toBe(0);
         return remote;
       });
       provider.write.mockImplementationOnce(async (values) => {
@@ -1312,11 +1282,6 @@ describe("reviewed sync resume", () => {
     provider.read.mockResolvedValueOnce(review.snapshot.remoteIssue);
     provider.read.mockImplementationOnce(async () => {
       expect(await canSyncTask(f.task.id, f.integration.id)).toBe(true);
-      const activity = await db.execute<{ count: number }>(sql`
-        select count(*)::int as count from pg_stat_activity
-        where datname = current_database() and state = 'idle in transaction'
-      `);
-      expect(activity.rows[0]!.count).toBe(0);
       return {
         ...review.snapshot.remoteIssue,
         labels: ["custom", "priority:low", "custom"],

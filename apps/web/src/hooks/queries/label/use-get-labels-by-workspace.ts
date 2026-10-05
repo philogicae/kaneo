@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import getLabelsByWorkspace from "@/fetchers/label/get-label-by-workspace";
+import getLabelsByWorkspace from "@/fetchers/label/get-labels-by-workspace";
 import { localeCompareSort } from "@/lib/format";
 
 function useGetLabelsByWorkspace(workspaceId: string) {

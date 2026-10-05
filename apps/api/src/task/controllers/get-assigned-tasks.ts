@@ -57,26 +57,6 @@ async function getAssignedTasks(
     return { tasks: [], total: Number(totals?.total ?? 0) };
   }
 
-  // Existing databases may contain duplicate slugs from concurrent column
-  // creation. A lateral lookup must return at most one decoration per task.
-  const statusColumn = db
-    .select({ name: columnTable.name, icon: columnTable.icon })
-    .from(columnTable)
-    .where(
-      and(
-        eq(columnTable.projectId, taskTable.projectId),
-        eq(columnTable.slug, taskTable.status),
-      ),
-    )
-    .orderBy(
-      sql`case when ${columnTable.id} = ${taskTable.columnId} then 0 else 1 end`,
-      asc(columnTable.position),
-      asc(columnTable.createdAt),
-      asc(columnTable.id),
-    )
-    .limit(1)
-    .as("assigned_status_column");
-
   const [tasks, [totals]] = await Promise.all([
     db
       .select({
@@ -85,8 +65,7 @@ async function getAssignedTasks(
         number: taskTable.number,
         title: taskTable.title,
         status: taskTable.status,
-        statusName: statusColumn.name,
-        statusIcon: statusColumn.icon,
+        columnId: taskTable.columnId,
         priority: taskTable.priority,
         dueDate: taskTable.dueDate,
         projectName: projectTable.name,
@@ -95,7 +74,6 @@ async function getAssignedTasks(
       })
       .from(taskTable)
       .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
-      .leftJoinLateral(statusColumn, sql`true`)
       .where(openAndMine)
       .orderBy(
         sql`${taskTable.dueDate} asc nulls last`,
@@ -107,7 +85,74 @@ async function getAssignedTasks(
     totalsQuery,
   ]);
 
-  const labels = tasks.length
+  const taskIds = tasks.map((task) => task.id);
+
+  // SQLite has no LATERAL, so the column name and icon are stitched in from a
+  // second query. Existing databases can hold duplicate slugs from concurrent
+  // column creation, so prefer the task's own column and fall back to the
+  // earliest one matching the slug.
+  const columns = taskIds.length
+    ? await db
+        .select({
+          projectId: columnTable.projectId,
+          slug: columnTable.slug,
+          name: columnTable.name,
+          icon: columnTable.icon,
+          id: columnTable.id,
+          position: columnTable.position,
+          createdAt: columnTable.createdAt,
+        })
+        .from(columnTable)
+        .where(
+          and(
+            inArray(columnTable.projectId, [
+              ...new Set(tasks.map((task) => task.projectId)),
+            ]),
+          ),
+        )
+    : [];
+
+  // Existing databases can hold duplicate slugs from concurrent column
+  // creation, so prefer the task's own column over the earliest match.
+  const columnsByProject = new Map<
+    string,
+    Array<{
+      slug: string;
+      name: string;
+      icon: string | null;
+      id: string;
+      position: number;
+      createdAt: number;
+    }>
+  >();
+  for (const column of columns) {
+    const list = columnsByProject.get(column.projectId) ?? [];
+    list.push({
+      slug: column.slug,
+      name: column.name,
+      icon: column.icon,
+      id: column.id,
+      position: column.position,
+      createdAt: column.createdAt.getTime(),
+    });
+    columnsByProject.set(column.projectId, list);
+  }
+
+  const columnByTask = new Map<string, { name: string; icon: string | null }>();
+  for (const task of tasks) {
+    const candidates = (columnsByProject.get(task.projectId) ?? [])
+      .filter((column) => column.slug === task.status)
+      .sort((a, b) => {
+        if (a.id === task.columnId) return -1;
+        if (b.id === task.columnId) return 1;
+        return a.position - b.position || a.createdAt - b.createdAt;
+      });
+    const column = candidates[0];
+    if (column)
+      columnByTask.set(task.id, { name: column.name, icon: column.icon });
+  }
+
+  const labels = taskIds.length
     ? await db
         .select({
           id: labelTable.id,
@@ -116,12 +161,7 @@ async function getAssignedTasks(
           taskId: labelTable.taskId,
         })
         .from(labelTable)
-        .where(
-          inArray(
-            labelTable.taskId,
-            tasks.map((task) => task.id),
-          ),
-        )
+        .where(inArray(labelTable.taskId, taskIds))
         .orderBy(asc(labelTable.name), asc(labelTable.id))
     : [];
 
@@ -139,6 +179,8 @@ async function getAssignedTasks(
   return {
     tasks: tasks.map((task) => ({
       ...task,
+      statusName: columnByTask.get(task.id)?.name ?? null,
+      statusIcon: columnByTask.get(task.id)?.icon ?? null,
       labels: labelsByTask.get(task.id) ?? [],
     })),
     total: Number(totals?.total ?? 0),

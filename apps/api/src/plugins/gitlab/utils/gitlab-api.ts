@@ -1,5 +1,4 @@
 import { setTimeout as delay } from "node:timers/promises";
-import * as Sentry from "@sentry/node";
 import { assertPublicDestination } from "../../../utils/assert-public-destination";
 import type { GitlabConfig, GitlabTokenType } from "../config";
 import {
@@ -140,11 +139,6 @@ export async function gitlabFetch<T>(
   }
 
   try {
-    Sentry.addBreadcrumb({
-      category: "integration",
-      level: "info",
-      data: { integration: "gitlab" },
-    });
     const res = await fetch(url, {
       ...init,
       signal: controller.signal,

@@ -512,7 +512,8 @@ function SignIn() {
             </>
           )}
           {!config?.disableLoginForm &&
-            (config?.hasSmtp && !config?.disableEmailOtpSignIn ? (
+            ((config?.hasEmail ?? config?.hasSmtp) &&
+            !config?.disableEmailOtpSignIn ? (
               <OtpSignInForm
                 turnstileToken={captchaConfigured ? turnstileToken : undefined}
                 onAttemptComplete={resetCaptcha}

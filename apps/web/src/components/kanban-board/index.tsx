@@ -1,11 +1,8 @@
-import { invalidateMyWork } from "@/lib/invalidate-my-work";
-import { markBoardCacheChanged } from "@/lib/board-cache-version";
-import { selectReorderBoard } from "./select-reorder-board";
 import {
+  closestCorners,
   DndContext,
   type DragEndEvent,
   DragOverlay,
-  type DragOverEvent,
   type DragStartEvent,
   type DropAnimation,
   defaultDropAnimationSideEffects,
@@ -16,47 +13,38 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
-import reorderTasks, { type TaskReorder } from "@/fetchers/task/reorder-tasks";
-import { toast } from "@/lib/toast";
-import { useTranslation } from "react-i18next";
-import { rollbackBoardReorder } from "./apply-reorder";
-import { boardCollisionDetection } from "./board-collision-detection";
-import { findTaskColumn } from "./drag-preview/find-task-column";
-import { moveBoardTask } from "./move-task";
-import { useDragPreview } from "./drag-preview/use-drag-preview";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { useProjectBackground } from "@/hooks/use-project-background";
-import { cn } from "@/lib/cn";
-import { useBackgroundStore } from "@/store/background";
+import { applyTaskDrop } from "@/lib/apply-task-drop";
+import { buildLabelGroups } from "@/lib/group-tasks";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
 import type { ProjectWithTasks } from "@/types/project";
 import BulkToolbar from "../bulk-selection/bulk-toolbar";
 import Column from "./column";
+import GroupColumn from "./group-column";
 import TaskCard from "./task-card";
 
 type KanbanBoardProps = {
   project: ProjectWithTasks;
+  sortActive?: boolean;
+  // Display-only label grouping: replaces the status columns with one column
+  // per label and disables drag & drop.
+  groupActive?: boolean;
+  // Caller-driven override, e.g. while a drop is being handled elsewhere or a
+  // fetch is in flight. Sorts and label grouping use their own guards.
   disableDragDrop?: boolean;
-  disableCollectionActions?: boolean;
-  sortedByNumber?: boolean;
-  sortedByPriority?: boolean;
 };
 
 function KanbanBoard({
   project,
+  sortActive = false,
+  groupActive = false,
   disableDragDrop = false,
-  disableCollectionActions = false,
-  sortedByNumber = false,
-  sortedByPriority = false,
 }: KanbanBoardProps) {
-  const isAutomaticallySorted = sortedByNumber || sortedByPriority;
-  const queryClient = useQueryClient();
-  const { project: storedProject, setProject } = useProjectStore();
+  const { setProject } = useProjectStore();
   const setAvailableTasks = useBulkSelectionStore(
     (state) => state.setAvailableTasks,
   );
@@ -66,71 +54,27 @@ function KanbanBoard({
   const clearFocus = useBulkSelectionStore((state) => state.clearFocus);
   const [activeIsFinal, setActiveIsFinal] = useState<boolean | undefined>();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [sortHintColumnId, setSortHintColumnId] = useState<string | null>(null);
-  const dragPreview = useDragPreview(project);
-  const { t } = useTranslation();
-  const { mutate: reorder, isPending: isReordering } = useMutation({
-    mutationFn: ({
-      previousBoard: _previousBoard,
-      ...request
-    }: TaskReorder & { previousBoard: ProjectWithTasks }) =>
-      reorderTasks(request),
-    onMutate: (variables) => ({ previousBoard: variables.previousBoard }),
-    onSuccess: (_result, variables) => {
-      if (variables.tasks.some((task) => task.status !== undefined)) {
-        invalidateMyWork(queryClient);
-        void queryClient.invalidateQueries({ queryKey: ["projects"] });
-      }
-      void queryClient.invalidateQueries({
-        queryKey: ["tasks", variables.projectId],
-      });
-      for (const task of variables.tasks)
-        void queryClient.invalidateQueries({ queryKey: ["task", task.id] });
-    },
-    onError: (_error, variables, context) => {
-      const previous = context?.previousBoard;
-      if (previous) {
-        const current = queryClient.getQueryData<ProjectWithTasks>([
-          "tasks",
-          variables.projectId,
-        ]);
-        const restored = current
-          ? rollbackBoardReorder(current, previous, variables.tasks)
-          : null;
-        if (restored) {
-          queryClient.setQueryData(["tasks", variables.projectId], restored);
-          if (useProjectStore.getState().project?.id === variables.projectId)
-            setProject(restored);
-        }
-      }
-      toast.error(t("tasks:board.reorderFailed"));
-      void queryClient.invalidateQueries({ queryKey: ["tasks", project.id] });
-    },
-  });
-  const background = useProjectBackground({
-    backgroundVersion: project.backgroundVersion,
-    projectId: project.id,
-    viewMode: "board",
-  });
-  const { setBackground } = useBackgroundStore();
+  const { mutate: updateTask } = useUpdateTask();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setBackground(background);
-  }, [background, setBackground]);
-
-  useEffect(() => {
-    return () => setBackground(null);
-  }, [setBackground]);
+  const groups = useMemo(
+    () =>
+      groupActive && project.columns ? buildLabelGroups(project.columns) : null,
+    [groupActive, project.columns],
+  );
 
   useEffect(() => {
     if (project?.columns) {
-      const allTaskIds = project.columns.flatMap((column) =>
-        column.tasks.map((task) => task.id),
-      );
+      // Keep keyboard selection in sync with what is on screen: grouped
+      // columns reorder tasks by label, so the focus list follows the groups.
+      const allTaskIds = groups
+        ? groups.flatMap((group) => group.tasks.map((task) => task.id))
+        : project.columns.flatMap((column) =>
+            column.tasks.map((task) => task.id),
+          );
       setAvailableTasks(allTaskIds);
     }
-  }, [project, setAvailableTasks]);
+  }, [project, groups, setAvailableTasks]);
 
   useEffect(() => {
     clearFocus();
@@ -169,11 +113,11 @@ function KanbanBoard({
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: disableDragDrop ? 999999 : 8 },
+      activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: disableDragDrop ? 999999 : 250,
+        delay: 250,
         tolerance: 10,
       },
     }),
@@ -198,71 +142,26 @@ function KanbanBoard({
     setActiveIsFinal(typeof isFinal === "boolean" ? isFinal : undefined);
   };
 
-  const resetDrag = () => {
-    setActiveId(null);
-    setSortHintColumnId(null);
-    dragPreview.clear();
-  };
-
-  const isDropBlocked = () =>
-    disableDragDrop ||
-    isReordering ||
-    queryClient.getQueryState(["tasks", project.id])?.fetchStatus ===
-      "fetching";
-
-  const handleDragOver = ({ active, over }: DragOverEvent) => {
-    if (!over || isDropBlocked()) {
-      setSortHintColumnId(null);
-      dragPreview.clear();
-      return;
-    }
-    if (!isAutomaticallySorted) {
-      dragPreview.hover(active, over);
-      return;
-    }
-    setSortHintColumnId(
-      findTaskColumn(project, over.id.toString())?.id ?? null,
-    );
-  };
-
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    const activeId = active.id.toString();
-    const overId = over?.id.toString();
-    const placement = overId
-      ? dragPreview.getDropPlacement(activeId, overId)
-      : null;
-    resetDrag();
+    setActiveId(null);
 
-    if (!overId || !project?.columns || isDropBlocked()) return;
-    const canonical = selectReorderBoard(
-      project.id,
-      activeId,
-      queryClient.getQueryData<ProjectWithTasks>(["tasks", project.id]),
-      storedProject,
-    );
-    if (!canonical) return;
+    if (disableDragDrop || !over || !project?.columns) return;
 
-    const moved = placement
-      ? moveBoardTask(
-          canonical,
-          activeId,
-          placement.overId,
-          false,
-          placement.insertAfterTarget,
-        )
-      : moveBoardTask(canonical, activeId, overId, isAutomaticallySorted);
-    if (!moved || !moved.tasks.length) return;
-    for (const task of moved.tasks)
-      markBoardCacheChanged(queryClient, project.id, task.id);
-    setProject(moved.project);
-    queryClient.setQueryData(["tasks", project.id], moved.project);
-    reorder({
-      projectId: project.id,
-      tasks: moved.tasks,
-      expectedTasks: moved.expectedTasks,
-      previousBoard: canonical,
+    const { project: updatedProject, updates } = applyTaskDrop({
+      project,
+      activeTaskId: active.id.toString(),
+      overId: over.id.toString(),
+      sortActive,
     });
+
+    for (const task of updates) {
+      updateTask(task);
+    }
+
+    if (updates.length > 0) {
+      setProject(updatedProject);
+    }
   };
 
   if (!project?.columns) {
@@ -276,8 +175,9 @@ function KanbanBoard({
 
         <div className="relative min-h-0 flex-1">
           <div className="flex h-full flex-1 gap-4 overflow-x-auto px-4 pb-4 md:px-5">
-            {[0, 1, 2, 3].map((i) => (
+            {[...Array(4)].map((_, i) => (
               <div
+                // eslint-disable-next-line react/no-array-index-key -- a fixed skeleton list has no stable identity
                 key={`kanban-column-skeleton-${i}`}
                 className="h-full min-w-80 w-full flex-1 rounded-xl border border-border/70 bg-card"
               >
@@ -287,8 +187,9 @@ function KanbanBoard({
                 </div>
 
                 <div className="px-2 pb-4 flex flex-col gap-3 flex-1">
-                  {[0, 1, 2].map((j) => (
+                  {[...Array(3)].map((_, j) => (
                     <div
+                      // eslint-disable-next-line react/no-array-index-key -- a fixed skeleton list has no stable identity
                       key={`kanban-task-skeleton-${j}`}
                       className="p-4 bg-card rounded-lg border border-border/50 animate-pulse"
                     >
@@ -313,46 +214,43 @@ function KanbanBoard({
         .find((task) => task.id === activeId)
     : null;
 
+  if (groupActive) {
+    return (
+      <div className="flex h-full w-full flex-col bg-linear-to-b from-muted/20 to-background">
+        <div className="min-h-0 flex-1 overflow-x-auto [-webkit-overflow-scrolling:touch]">
+          <div className="flex h-full min-w-max gap-4 px-4 py-4 md:px-5">
+            {(groups ?? []).map((group) => (
+              <div
+                key={group.id}
+                className="h-full max-w-96 min-w-80 shrink-0 flex-1"
+              >
+                <GroupColumn group={group} projectId={project.id} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={boardCollisionDetection}
+      collisionDetection={closestCorners}
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-      onDragCancel={resetDrag}
     >
-      <div
-        className={cn("flex h-full w-full flex-col", {
-          "bg-linear-to-b from-muted/20 to-background": !background,
-        })}
-      >
+      <div className="flex h-full w-full flex-col bg-linear-to-b from-muted/20 to-background">
         <div className="min-h-0 flex-1 overflow-x-auto [-webkit-overflow-scrolling:touch]">
           <div className="flex h-full min-w-max gap-4 px-4 py-4 md:px-5">
-            {(dragPreview.preview ?? project).columns.map((column) => (
+            {project.columns?.map((column) => (
               <div
                 key={column.id}
-                className={cn("h-full max-w-96 min-w-80 shrink-0 flex-1", {
-                  "h-fit": !!background,
-                })}
+                className="h-full max-w-96 min-w-80 shrink-0 flex-1"
               >
                 <Column
                   column={column}
                   activeTaskId={activeId?.toString() ?? null}
-                  sortHint={
-                    column.id === sortHintColumnId
-                      ? t("tasks:kanban.automaticallySortedHint", {
-                          sort: t(
-                            sortedByNumber
-                              ? "tasks:sort.fields.number"
-                              : "tasks:sort.fields.priority",
-                          ),
-                        })
-                      : undefined
-                  }
-                  disableDragDrop={disableDragDrop}
-                  disableSorting={isAutomaticallySorted}
-                  disableCollectionActions={disableCollectionActions}
                 />
               </div>
             ))}

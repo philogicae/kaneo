@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
-import { and, asc, desc, eq, gt, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import db from "../../database";
 import { externalLinkTable, taskTable } from "../../database/schema";
 import type { IntegrationDatabase } from "../../plugins/github/services/integration-task-scope";
-import { outgoingPredicate } from "../../plugins/sync/task-predicate";
 import { readSyncRules, type SyncRules } from "../../plugins/sync/rules";
+import { outgoingPredicate } from "../../plugins/sync/task-predicate";
 import type { getSyncIntegration } from "./get-integration";
 
 export async function previewSyncRules(
@@ -24,78 +24,109 @@ export async function previewSyncRules(
     readSyncRules(integration.config)!.outgoing,
     database,
   );
-  const paused = sql<boolean>`coalesce(${externalLinkTable.metadata} ~ '"syncFilterPaused"[[:space:]]*:[[:space:]]*true', false)`;
-  const initializing = sql<boolean>`coalesce(${externalLinkTable.metadata} ~ '"syncInitializationPending"[[:space:]]*:[[:space:]]*true', false)`;
-  const scope = database.$with("sync_scope").as(
-    database
-      .selectDistinctOn([taskTable.id], {
-        id: taskTable.id,
-        eligible: proposed.predicate.as("eligible"),
-        current: current.predicate.as("current"),
-        linkId: sql<string | null>`${externalLinkTable.id}`.as("link_id"),
-        url: externalLinkTable.url,
-        paused: paused.as("paused"),
-        initializing: initializing.as("initializing"),
-      })
-      .from(taskTable)
-      .leftJoin(
-        externalLinkTable,
-        and(
-          eq(externalLinkTable.taskId, taskTable.id),
-          eq(externalLinkTable.integrationId, integration.id),
-          eq(externalLinkTable.resourceType, "issue"),
-        ),
-      )
-      .where(eq(taskTable.projectId, integration.projectId))
-      .orderBy(asc(taskTable.id), desc(paused), asc(externalLinkTable.id)),
-  );
-  const [impact] = await database
-    .with(scope)
-    .select({
-      total: sql<number>`count(*)::int`,
-      matching: sql<number>`count(*) filter (where ${scope.eligible})::int`,
-      willCreate: sql<number>`count(*) filter (where ${scope.eligible} and (${scope.linkId} is null or (${scope.initializing} and not ${scope.paused})))::int`,
-      willPause: sql<number>`count(*) filter (where ${scope.linkId} is not null and not ${scope.eligible} and not ${scope.paused})::int`,
-      needsReview: sql<number>`count(*) filter (where ${scope.linkId} is not null and ${scope.eligible} and (${scope.paused} or not ${scope.current}))::int`,
-      paused: sql<number>`count(*) filter (where ${scope.linkId} is not null and (not ${scope.eligible} or ${scope.paused}))::int`,
-      // Build the ordered scope revision in PostgreSQL instead of transferring
-      // every task/link to the API just to hash it. Page cursors do not affect it.
-      revision: sql<string>`md5(coalesce(string_agg(jsonb_build_array(${scope.id}, ${scope.eligible}, ${scope.current}, ${scope.linkId}, ${scope.url}, ${scope.paused}, ${scope.initializing})::text, ',' order by ${scope.id}), ''))`,
-    })
-    .from(scope);
-  const matchingTasks = await database
-    .with(scope)
+  const paused = sql<boolean>`coalesce(json_extract(case when json_valid(${externalLinkTable.metadata}) then ${externalLinkTable.metadata} end, '$.syncFilterPaused'), 0) = 1`;
+  const initializing = sql<boolean>`coalesce(json_extract(case when json_valid(${externalLinkTable.metadata}) then ${externalLinkTable.metadata} end, '$.syncInitializationPending'), 0) = 1`;
+  // libSQL has no DISTINCT ON, md5 or ordered string_agg: the scope rows are
+  // deduplicated, counted and hashed here from one ordered read instead.
+  const rawRows = await database
     .select({
       id: taskTable.id,
       number: taskTable.number,
       title: taskTable.title,
+      eligible: proposed.predicate.as("eligible"),
+      current: current.predicate.as("current"),
+      linkId: sql<string | null>`${externalLinkTable.id}`.as("link_id"),
+      url: externalLinkTable.url,
+      paused: paused.as("paused"),
+      initializing: initializing.as("initializing"),
     })
-    .from(scope)
-    .innerJoin(taskTable, eq(taskTable.id, scope.id))
-    .where(sql`${scope.eligible}`)
-    .orderBy(asc(scope.id))
-    .limit(10);
-  const pausedPage = await database
-    .with(scope)
-    .select({
-      id: taskTable.id,
-      number: taskTable.number,
-      title: taskTable.title,
-      linkId: scope.linkId,
-      url: scope.url,
-      eligible: scope.eligible,
-    })
-    .from(scope)
-    .innerJoin(taskTable, eq(taskTable.id, scope.id))
-    .where(
+    .from(taskTable)
+    .leftJoin(
+      externalLinkTable,
       and(
-        sql`${scope.linkId} is not null`,
-        or(sql`not ${scope.eligible}`, scope.paused),
-        after ? gt(scope.id, after) : undefined,
+        eq(externalLinkTable.taskId, taskTable.id),
+        eq(externalLinkTable.integrationId, integration.id),
+        eq(externalLinkTable.resourceType, "issue"),
       ),
     )
-    .orderBy(asc(scope.id))
-    .limit(26);
+    .where(eq(taskTable.projectId, integration.projectId))
+    .orderBy(asc(taskTable.id), desc(paused), asc(externalLinkTable.id));
+
+  // Keep the preferred link row per task: the first row in this order, i.e.
+  // the earliest non-paused link, falling back to the earliest link.
+  const scopeRows: typeof rawRows = [];
+  const seenTasks = new Set<string>();
+  for (const row of rawRows) {
+    if (seenTasks.has(row.id)) continue;
+    seenTasks.add(row.id);
+    scopeRows.push(row);
+  }
+
+  let matching = 0;
+  let willCreate = 0;
+  let willPause = 0;
+  let needsReview = 0;
+  let pausedCount = 0;
+  const revisionRows: Array<
+    [string, boolean, boolean, string | null, string | null, boolean, boolean]
+  > = [];
+  const matchingTasks: Array<{
+    id: string;
+    number: number | null;
+    title: string;
+  }> = [];
+  const pausedTasks: Array<{
+    id: string;
+    number: number | null;
+    title: string;
+    linkId: string;
+    url: string;
+    eligible: boolean;
+  }> = [];
+  for (const row of scopeRows) {
+    const eligible = Boolean(row.eligible);
+    const isCurrent = Boolean(row.current);
+    const isPaused = Boolean(row.paused);
+    const isInitializing = Boolean(row.initializing);
+    if (eligible) matching++;
+    if (eligible && (row.linkId === null || (isInitializing && !isPaused)))
+      willCreate++;
+    if (row.linkId !== null && !eligible && !isPaused) willPause++;
+    if (row.linkId !== null && eligible && (isPaused || !isCurrent))
+      needsReview++;
+    if (row.linkId !== null && (!eligible || isPaused)) pausedCount++;
+    revisionRows.push([
+      row.id,
+      eligible,
+      isCurrent,
+      row.linkId,
+      row.url,
+      isPaused,
+      isInitializing,
+    ]);
+    if (eligible && matchingTasks.length < 10)
+      matchingTasks.push({ id: row.id, number: row.number, title: row.title });
+    const linkId = row.linkId;
+    if (
+      linkId !== null &&
+      (!eligible || isPaused) &&
+      (!after || row.id > after) &&
+      pausedTasks.length < 26
+    )
+      pausedTasks.push({
+        id: row.id,
+        number: row.number,
+        title: row.title,
+        linkId,
+        url: row.url ?? "",
+        eligible,
+      });
+  }
+  // Order-independent because the rows are read in id order above.
+  const revision = createHash("sha256")
+    .update(JSON.stringify(revisionRows))
+    .digest("hex");
+
   const selectedLabelIds =
     rules.outgoing.mode === "labels" ? rules.outgoing.labels : [];
   const previewToken = createHash("sha256")
@@ -106,26 +137,25 @@ export async function previewSyncRules(
         labels: proposed.labels
           .filter((label) => selectedLabelIds.includes(label.id))
           .map(({ id, name }) => [id, name]),
-        revision: impact!.revision,
+        revision,
       }),
     )
     .digest("hex");
-  const { revision: _, ...counts } = impact!;
+
   return {
     isActive: integration.isActive === true,
     rules,
     labels: proposed.labels,
     missingLabels: proposed.missing,
-    ...counts,
+    total: scopeRows.length,
+    matching,
+    willCreate,
+    willPause,
+    needsReview,
+    paused: pausedCount,
     matchingTasks,
-    pausedNextCursor: pausedPage.length > 25 ? pausedPage[24]!.id : null,
-    pausedTasks: pausedPage
-      .slice(0, 25)
-      .flatMap((task) =>
-        task.linkId && task.url
-          ? [{ ...task, linkId: task.linkId, url: task.url }]
-          : [],
-      ),
+    pausedNextCursor: pausedTasks.length > 25 ? pausedTasks[24]!.id : null,
+    pausedTasks: pausedTasks.slice(0, 25),
     previewToken,
   };
 }

@@ -28,7 +28,6 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { TrialExpiredCallout } from "@/components/billing/trial-expired-callout";
 import WorkspaceLayout from "@/components/common/workspace-layout";
 import PageTitle from "@/components/page-title";
 import CreateProjectModal from "@/components/shared/modals/create-project-modal";
@@ -310,7 +309,6 @@ function RouteComponent() {
             ) : null
           }
         >
-          <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
           <Empty className="min-h-[60vh]">
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -361,7 +359,6 @@ function RouteComponent() {
           ) : null
         }
       >
-        <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}

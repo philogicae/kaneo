@@ -21,9 +21,11 @@ import { useTranslation } from "react-i18next";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { getNextManualPosition } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
 import useBacklogBulkSelectionStore from "@/store/backlog-bulk-selection";
 import useProjectStore from "@/store/project";
+import type Task from "@/types/task";
 import type { ProjectWithTasks } from "@/types/project";
 import BacklogBulkToolbar from "../bulk-selection/backlog-bulk-toolbar";
 import CreateTaskModal from "../shared/modals/create-task-modal";
@@ -31,12 +33,12 @@ import BacklogSection from "./backlog-section";
 
 type BacklogListViewProps = {
   project?: ProjectWithTasks;
-  disableDragDrop?: boolean;
+  sortActive?: boolean;
 };
 
 function BacklogListView({
   project,
-  disableDragDrop = false,
+  sortActive = false,
 }: BacklogListViewProps) {
   const { t } = useTranslation();
   const { mutate: updateTask } = useUpdateTask();
@@ -120,11 +122,11 @@ function BacklogListView({
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: disableDragDrop ? 999999 : 8 },
+      activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: disableDragDrop ? 999999 : 200,
+        delay: 200,
         tolerance: 8,
       },
     }),
@@ -189,6 +191,8 @@ function BacklogListView({
       }
     }
 
+    const updates: Task[] = [];
+
     const updatedProject = produce(project, (draft) => {
       const sourceSection =
         activeTask.status === "planned"
@@ -202,15 +206,19 @@ function BacklogListView({
 
       if (!task) return;
 
-      if (activeTask.status === "planned") {
-        draft.plannedTasks =
-          draft.plannedTasks?.filter((t) => t.id !== activeTaskId) || [];
-      } else {
-        draft.archivedTasks =
-          draft.archivedTasks?.filter((t) => t.id !== activeTaskId) || [];
-      }
-
       if (activeTask.status === targetSection) {
+        // A sort defines the visible order, so a same-section drop has no
+        // manual position to write — the row returns to its sorted spot.
+        if (sortActive) return;
+
+        if (activeTask.status === "planned") {
+          draft.plannedTasks =
+            draft.plannedTasks?.filter((t) => t.id !== activeTaskId) || [];
+        } else {
+          draft.archivedTasks =
+            draft.archivedTasks?.filter((t) => t.id !== activeTaskId) || [];
+        }
+
         const targetSectionTasks =
           activeTask.status === "planned"
             ? draft.plannedTasks || []
@@ -236,13 +244,28 @@ function BacklogListView({
             : draft.archivedTasks || [];
 
         finalTasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            position: index,
-          });
+          t.position = index;
+          updates.push({ ...t });
         });
+        return;
+      }
+
+      if (activeTask.status === "planned") {
+        draft.plannedTasks =
+          draft.plannedTasks?.filter((t) => t.id !== activeTaskId) || [];
       } else {
-        task.status = targetSection;
+        draft.archivedTasks =
+          draft.archivedTasks?.filter((t) => t.id !== activeTaskId) || [];
+      }
+
+      task.status = targetSection;
+
+      if (sortActive) {
+        const targetSectionTasks =
+          targetSection === "planned"
+            ? draft.plannedTasks || []
+            : draft.archivedTasks || [];
+        task.position = getNextManualPosition(targetSectionTasks);
 
         if (targetSection === "planned") {
           draft.plannedTasks = [...(draft.plannedTasks || []), task];
@@ -250,34 +273,44 @@ function BacklogListView({
           draft.archivedTasks = [...(draft.archivedTasks || []), task];
         }
 
-        const updatedTasks =
-          targetSection === "planned"
-            ? draft.plannedTasks || []
-            : draft.archivedTasks || [];
-
-        updatedTasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            status: targetSection,
-            position: index,
-          });
-        });
-
-        const sourceTasks =
-          activeTask.status === "planned"
-            ? draft.plannedTasks || []
-            : draft.archivedTasks || [];
-
-        sourceTasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            position: index,
-          });
-        });
+        updates.push({ ...task });
+        return;
       }
+
+      if (targetSection === "planned") {
+        draft.plannedTasks = [...(draft.plannedTasks || []), task];
+      } else {
+        draft.archivedTasks = [...(draft.archivedTasks || []), task];
+      }
+
+      const updatedTasks =
+        targetSection === "planned"
+          ? draft.plannedTasks || []
+          : draft.archivedTasks || [];
+
+      updatedTasks.forEach((t, index) => {
+        t.position = index;
+        updates.push({ ...t, status: targetSection });
+      });
+
+      const sourceTasks =
+        activeTask.status === "planned"
+          ? draft.plannedTasks || []
+          : draft.archivedTasks || [];
+
+      sourceTasks.forEach((t, index) => {
+        t.position = index;
+        updates.push({ ...t });
+      });
     });
 
-    setProject(updatedProject);
+    for (const task of updates) {
+      updateTask(task);
+    }
+
+    if (updates.length > 0) {
+      setProject(updatedProject);
+    }
   };
 
   const toggleSection = useCallback((sectionId: string) => {

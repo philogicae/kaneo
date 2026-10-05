@@ -65,7 +65,7 @@ vi.mock("./task-card-context-menu/task-card-context-menu-content", () => ({
 }));
 
 afterEach(cleanup);
-it("keeps details in the rendered open column despite a final column sharing its slug", () => {
+it("keeps labels visible on a card whose column slug is shared with a final column", () => {
   const task: Task = {
     id: "task",
     title: "Open work",
@@ -86,6 +86,7 @@ it("keeps details in the rendered open column despite a final column sharing its
   const view = render(<TaskCard task={task} isFinalColumn={false} />);
   expect(screen.getByText("Regression label")).toBeVisible();
   view.rerender(<TaskCard task={task} isFinalColumn />);
-  expect(screen.queryByText("Regression label")).not.toBeInTheDocument();
+  // The fork shows labels on completed cards too.
+  expect(screen.getByText("Regression label")).toBeVisible();
   expect(screen.getByText("Open work")).toBeVisible();
 });

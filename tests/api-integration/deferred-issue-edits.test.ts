@@ -1693,8 +1693,11 @@ it("durably queues an uncertain standalone writer and later settles it", async (
 it("skips provider reads and writes while another replica holds the worker lease", async () => {
   const { link, integration } = await seed();
   await deferTaskSync(link, integration, ["title"]);
-  await db.execute(sql`INSERT INTO job_lease (name, owner, expires_at)
-    VALUES ('deferred-issue-edits', 'other-replica', now() + interval '10 minutes')`);
+  await db.insert(schema.jobLeaseTable).values({
+    name: "deferred-issue-edits",
+    owner: "other-replica",
+    expiresAt: new Date(Date.now() + 10 * 60_000),
+  });
   expect(await replayDeferredIssueEdits()).toEqual({});
   expect(m.read).not.toHaveBeenCalled();
   expect(m.write).not.toHaveBeenCalled();
@@ -1715,34 +1718,34 @@ it("recovers a crashed replica lease and releases it after processing", async ()
     outbound: { field: "title", value: "B" },
   });
   await deferTaskSync(link, integration, ["title"]);
-  await db.execute(sql`INSERT INTO job_lease (name, owner, expires_at)
-    VALUES ('deferred-issue-edits', 'crashed-replica', now() - interval '1 minute')`);
+  await db.insert(schema.jobLeaseTable).values({
+    name: "deferred-issue-edits",
+    owner: "crashed-replica",
+    expiresAt: new Date(Date.now() - 60_000),
+  });
   await replayDeferredIssueEdits();
   expect(m.read).toHaveBeenCalledTimes(1);
   expect(m.write).toHaveBeenCalledTimes(1);
   expect((await metadata(link.id)).deferredIssueEdit).toBeUndefined();
   expect(
-    (
-      await db.execute(
-        sql`SELECT name FROM job_lease WHERE name = 'deferred-issue-edits'`,
-      )
-    ).rows,
+    await db.query.jobLeaseTable.findMany({
+      where: eq(schema.jobLeaseTable.name, "deferred-issue-edits"),
+    }),
   ).toEqual([]);
 });
 
 it("uses the queued-link partial index without inspecting historical issue metadata", async () => {
   const { link, integration } = await seed();
   await deferTaskSync(link, integration, ["title"]);
-  await db.transaction(async (tx) => {
-    await tx.execute(sql`SET LOCAL enable_seqscan = off`);
-    const result = await tx.execute<{ "QUERY PLAN": string }>(sql`
-      EXPLAIN SELECT id FROM external_link
-      WHERE resource_type = 'issue' AND metadata LIKE '%"deferredIssueEdit":%'
-      ORDER BY id LIMIT 20`);
-    expect(result.rows.map((row) => row["QUERY PLAN"]).join("\n")).toContain(
-      "external_link_deferred_issue_idx",
-    );
-  });
+  // INDEXED BY is SQLite's equivalent of Postgres' `SET enable_seqscan = off`:
+  // it fails outright unless this exact index can serve the sweep's filter.
+  const plan = await db.all<{ detail: string }>(sql`
+    EXPLAIN QUERY PLAN SELECT id FROM external_link INDEXED BY external_link_deferred_issue_idx
+    WHERE resource_type = 'issue' AND metadata LIKE '%"deferredIssueEdit":%'
+    ORDER BY id LIMIT 20`);
+  expect(plan.map((row) => row.detail).join("\n")).toContain(
+    "external_link_deferred_issue_idx",
+  );
 });
 
 it.each(providerFields)(

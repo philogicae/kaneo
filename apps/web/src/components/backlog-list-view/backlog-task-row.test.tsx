@@ -32,6 +32,9 @@ const { useSortable } = vi.hoisted(() => ({
 }));
 vi.mock("@dnd-kit/sortable", () => ({ useSortable }));
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => vi.fn() }));
+vi.mock("@/hooks/mutations/appointment/use-move-task-to-appointments", () => ({
+  default: () => ({ mutate: vi.fn(), isPending: false }),
+}));
 vi.mock("@/hooks/mutations/task/use-delete-task", () => ({
   useDeleteTask: () => ({ mutateAsync: vi.fn() }),
 }));

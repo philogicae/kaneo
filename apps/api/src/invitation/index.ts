@@ -1,11 +1,18 @@
-import { apiRouter, createRoute, jsonResponse } from "../openapi";
+import {
+  apiRouter,
+  createRoute,
+  errorResponse,
+  jsonResponse,
+} from "../openapi";
+import createInvitation from "./controllers/create-invitation";
 import getInvitationDetailsController from "./controllers/get-invitation-details";
 import getUserPendingInvitations from "./controllers/get-user-pending-invitations";
 import {
+  createdInvitationSchema,
   invitationDetailsSchema,
   pendingInvitationListSchema,
 } from "./response";
-import { invitationParam } from "./schema";
+import { createInvitationBody, invitationParam } from "./schema";
 
 const getPendingRoute = createRoute({
   method: "get",
@@ -37,7 +44,44 @@ const getInvitationRoute = createRoute({
   },
 });
 
+const createInvitationRoute = createRoute({
+  method: "post",
+  operationId: "createInvitation",
+  path: "/",
+  tags: ["Invitations"],
+  summary: "Invite a member with a scoped access bundle",
+  description:
+    "Invites an email with a scope: manual workspace/project grants and/or access teams. The caller must administer every workspace in the resulting scope. Acceptance materialises the scoped memberships and direct grants; teams stay live.",
+  request: {
+    body: {
+      required: true,
+      content: { "application/json": { schema: createInvitationBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("Created invitation", createdInvitationSchema),
+    400: errorResponse("Invalid email, scope or teams"),
+    403: errorResponse("Not allowed to manage one of the workspaces"),
+  },
+});
+
 const invitation = apiRouter()
+  .openapi(createInvitationRoute, async (c) => {
+    const body = c.req.valid("json");
+    return c.json(
+      await createInvitation(
+        c.get("userId") as string,
+        {
+          email: body.email,
+          role: body.role,
+          workspaces: body.workspaces ?? [],
+          teamIds: body.teamIds ?? [],
+        },
+        c.req.raw.headers,
+      ),
+      200,
+    );
+  })
   .openapi(getPendingRoute, async (c) => {
     const user = c.get("user");
     if (!user?.emailVerified) {

@@ -44,10 +44,7 @@ async function importTasks(
     ),
   ];
 
-  const assignableIds = await filterAssignableUsers(
-    assigneeIds,
-    project.workspaceId,
-  );
+  const assignableIds = await filterAssignableUsers(assigneeIds, projectId);
 
   const validStatuses = await getValidTaskStatuses(projectId);
 
@@ -59,7 +56,7 @@ async function importTasks(
     if (assigneeId && !assignableIds.has(assigneeId)) {
       results.push({
         success: false,
-        error: "Assignee is not a member of this workspace",
+        error: "Assignee does not have access to this project",
         task: taskData,
       });
       continue;

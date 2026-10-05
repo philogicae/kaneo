@@ -2,6 +2,7 @@ import { DEFAULT_ROLE_NAMES } from "@kaneo/permissions";
 import {
   CopyIcon,
   EllipsisIcon,
+  KeyRoundIcon,
   MailIcon,
   ShieldIcon,
   TrashIcon,
@@ -51,6 +52,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import MemberAccessDialog from "./member-access-dialog";
 
 type Props = {
   workspaceId: string;
@@ -97,6 +99,8 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
   );
   const [invitationToCancel, setInvitationToCancel] =
     useState<WorkspaceUserInvitation | null>(null);
+  const [memberToEditAccess, setMemberToEditAccess] =
+    useState<WorkspaceUser | null>(null);
 
   const { user: currentUser } = useAuth();
   const { mutateAsync: deleteWorkspaceUser, isPending: isDeleting } =
@@ -293,7 +297,7 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
                   {member.createdAt ? formatDateMedium(member.createdAt) : "–"}
                 </TableCell>
                 <TableCell className="pe-6 py-3 text-right">
-                  {!isSelf && canRemove ? (
+                  {!isSelf && (canInvite || canRemove) ? (
                     <Menu>
                       <MenuTrigger
                         render={
@@ -301,17 +305,29 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-muted-foreground"
-                            aria-label={t("team:membersTable.ariaRemoveMember")}
+                            aria-label={t(
+                              "team:membersTable.ariaMemberActions",
+                            )}
                           />
                         }
                       >
                         <EllipsisIcon className="size-4" />
                       </MenuTrigger>
                       <MenuPopup align="end">
-                        <MenuItem onClick={() => setMemberToDelete(member)}>
-                          <TrashIcon className="size-4" />
-                          {t("team:membersTable.removeMember")}
-                        </MenuItem>
+                        {canInvite ? (
+                          <MenuItem
+                            onClick={() => setMemberToEditAccess(member)}
+                          >
+                            <KeyRoundIcon className="size-4" />
+                            {t("team:memberAccess.menuItem")}
+                          </MenuItem>
+                        ) : null}
+                        {canRemove ? (
+                          <MenuItem onClick={() => setMemberToDelete(member)}>
+                            <TrashIcon className="size-4" />
+                            {t("team:membersTable.removeMember")}
+                          </MenuItem>
+                        ) : null}
                       </MenuPopup>
                     </Menu>
                   ) : null}
@@ -497,6 +513,19 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {memberToEditAccess ? (
+        <MemberAccessDialog
+          open
+          onOpenChange={(open) => !open && setMemberToEditAccess(null)}
+          workspaceId={workspaceId}
+          member={{
+            id: memberToEditAccess.userId,
+            name: memberToEditAccess.user.name ?? "",
+            email: memberToEditAccess.user.email,
+          }}
+        />
+      ) : null}
     </>
   );
 }

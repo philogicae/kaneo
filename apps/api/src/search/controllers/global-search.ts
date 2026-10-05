@@ -1,13 +1,21 @@
-import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, like, or, sql } from "drizzle-orm";
 import db from "../../database";
 import {
   activityTable,
+  appointmentTable,
   projectTable,
   taskTable,
   userTable,
   workspaceTable,
   workspaceUserTable,
 } from "../../database/schema";
+import { isJevEnabled } from "../../jev/client";
+import { CANDIDATE_CAP } from "../../jev/rerank";
+import {
+  getExplicitProjectGrantIds,
+  getFullAccessWorkspaceIds,
+} from "../../utils/access-scope";
+import { rerankSearchResults } from "../jev-search";
 import { escapeLikePattern } from "../like-pattern";
 import { TASK_SHORT_ID_PATTERN } from "../task-short-id";
 
@@ -18,6 +26,7 @@ type SearchParams = {
   type?:
     | "all"
     | "tasks"
+    | "appointments"
     | "projects"
     | "workspaces"
     | "comments"
@@ -29,7 +38,13 @@ type SearchParams = {
 
 type SearchResult = {
   id: string;
-  type: "task" | "project" | "workspace" | "comment" | "activity";
+  type:
+    | "task"
+    | "appointment"
+    | "project"
+    | "workspace"
+    | "comment"
+    | "activity";
   title: string;
   description?: string;
   content?: string;
@@ -55,6 +70,10 @@ function toDisplayCase(value: string) {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(" ");
 }
+
+// A multi-word query matches every token across the searched column.
+const MAX_SEARCH_TOKENS = 6;
+type LikeTarget = Parameters<typeof like>[0];
 
 function getActivitySearchContent(
   type: string,
@@ -143,10 +162,61 @@ async function globalSearch(params: SearchParams): Promise<{
 
   const results: SearchResult[] = [];
   const searchPattern = `%${query.toLowerCase()}%`;
+  // With Jev enabled the SQL pass over-fetches candidates that the reranker
+  // then filters down to the requested limit.
+  const fetchLimit = isJevEnabled() ? CANDIDATE_CAP : limit;
+  // Multi-word queries match token-by-token (AND): a phrase-only LIKE misses
+  // "redirect loop in login" for the query "login redirect". Tokens shorter
+  // than 2 characters are dropped when longer ones exist, and the full query
+  // still drives relevance ordering.
+  const tokens = (() => {
+    const parts = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, MAX_SEARCH_TOKENS);
+    const meaningful = parts.filter((token) => token.length >= 2);
+    return meaningful.length > 0 ? meaningful : parts;
+  })();
+  const allTokensLike = (column: LikeTarget) =>
+    tokens.length === 0
+      ? like(column, searchPattern)
+      : and(...tokens.map((token) => like(column, `%${token}%`)));
 
+  // Project-level scope: the user sees every project of their full-access
+  // workspaces, plus the projects explicitly granted through access teams or
+  // direct grants. Scoped members therefore never match the rest of a shared
+  // workspace.
+  const [fullWorkspaceIds, explicitProjectIds] = await Promise.all([
+    getFullAccessWorkspaceIds(resolvedUserId),
+    getExplicitProjectGrantIds(resolvedUserId),
+  ]);
+
+  const accessConditions = [];
+  if (fullWorkspaceIds.length > 0) {
+    accessConditions.push(inArray(projectTable.workspaceId, fullWorkspaceIds));
+  }
+  if (explicitProjectIds.length > 0) {
+    accessConditions.push(inArray(projectTable.id, explicitProjectIds));
+  }
+  if (accessConditions.length === 0) {
+    return { results: [], totalCount: 0, searchQuery: query };
+  }
+  const projectAccessFilter = or(...accessConditions);
+
+  // An explicit workspace id is always intersected with that project scope so
+  // a foreign id can never widen the search; the middleware's optional mode no
+  // longer guarantees that check upstream.
   const workspaceFilter = workspaceId
-    ? eq(projectTable.workspaceId, workspaceId)
-    : inArray(projectTable.workspaceId, accessibleWorkspaceIds);
+    ? and(
+        projectAccessFilter,
+        eq(projectTable.workspaceId, workspaceId),
+        inArray(projectTable.workspaceId, accessibleWorkspaceIds),
+      )
+    : and(
+        projectAccessFilter,
+        inArray(projectTable.workspaceId, accessibleWorkspaceIds),
+      );
 
   // Check if query matches short-id pattern (e.g. "DEP-23"). `generateProjectSlug`
   // normalizes to NFKC before it stores a key, so the query is normalized too,
@@ -196,11 +266,13 @@ async function globalSearch(params: SearchParams): Promise<{
           and(
             workspaceFilter,
             projectId ? eq(taskTable.projectId, projectId) : undefined,
-            // A project key may hold `_`, which `ilike` reads as "any one
+            // A project key may hold `_`, which `LIKE` reads as "any one
             // character", so `DE_-23` would also match a task in `DEP` and the
             // `limit(1)` below would pick whichever came back first. Escaping
-            // keeps the case-insensitive comparison and drops the wildcards.
-            ilike(projectTable.slug, escapeLikePattern(slug)),
+            // plus an explicit ESCAPE clause keeps the case-insensitive
+            // comparison and drops the wildcards (SQLite has no default escape
+            // character, unlike Postgres).
+            sql`${projectTable.slug} LIKE ${escapeLikePattern(slug)} ESCAPE '\\'`,
             eq(taskTable.number, taskNumber),
           ),
         )
@@ -265,13 +337,13 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(taskTable.projectId, projectId) : undefined,
           or(
-            ilike(taskTable.title, searchPattern),
-            ilike(taskTable.description, searchPattern),
+            allTokensLike(taskTable.title),
+            allTokensLike(taskTable.description),
           ),
         ),
       )
       .orderBy(desc(taskRelevanceScore), desc(taskTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const tasks = await taskQuery;
 
@@ -294,6 +366,71 @@ async function globalSearch(params: SearchParams): Promise<{
         taskNumber: task.taskNumber || undefined,
         priority: task.priority || undefined,
         status: task.status,
+      });
+    }
+  }
+
+  if (type === "all" || type === "appointments") {
+    const appointmentRelevanceScore = sql<number>`
+      CASE
+        WHEN LOWER(${appointmentTable.title}) LIKE ${searchPattern} THEN 3
+        WHEN LOWER(${appointmentTable.description}) LIKE ${searchPattern} THEN 2
+        ELSE 1
+      END
+    `;
+
+    const appointments = await db
+      .select({
+        id: appointmentTable.id,
+        title: appointmentTable.title,
+        description: appointmentTable.description,
+        projectId: appointmentTable.projectId,
+        projectName: projectTable.name,
+        projectSlug: projectTable.slug,
+        workspaceId: projectTable.workspaceId,
+        workspaceName: workspaceTable.name,
+        userId: appointmentTable.userId,
+        userName: userTable.name,
+        createdAt: appointmentTable.createdAt,
+        priority: appointmentTable.priority,
+        relevanceScore: appointmentRelevanceScore.as("relevanceScore"),
+      })
+      .from(appointmentTable)
+      .leftJoin(projectTable, eq(appointmentTable.projectId, projectTable.id))
+      .leftJoin(workspaceTable, eq(projectTable.workspaceId, workspaceTable.id))
+      .leftJoin(userTable, eq(appointmentTable.userId, userTable.id))
+      .where(
+        and(
+          workspaceFilter,
+          projectId ? eq(appointmentTable.projectId, projectId) : undefined,
+          or(
+            allTokensLike(appointmentTable.title),
+            allTokensLike(appointmentTable.description),
+          ),
+        ),
+      )
+      .orderBy(
+        desc(appointmentRelevanceScore),
+        desc(appointmentTable.createdAt),
+      )
+      .limit(fetchLimit);
+
+    for (const appointment of appointments) {
+      results.push({
+        id: appointment.id,
+        type: "appointment",
+        title: appointment.title,
+        description: appointment.description || undefined,
+        projectId: appointment.projectId,
+        projectName: appointment.projectName || undefined,
+        projectSlug: appointment.projectSlug || undefined,
+        workspaceId: appointment.workspaceId || undefined,
+        workspaceName: appointment.workspaceName || undefined,
+        userId: appointment.userId || undefined,
+        userName: appointment.userName || undefined,
+        createdAt: appointment.createdAt,
+        relevanceScore: appointment.relevanceScore,
+        priority: appointment.priority || undefined,
       });
     }
   }
@@ -324,13 +461,13 @@ async function globalSearch(params: SearchParams): Promise<{
         and(
           workspaceFilter,
           or(
-            ilike(projectTable.name, searchPattern),
-            ilike(projectTable.description, searchPattern),
+            allTokensLike(projectTable.name),
+            allTokensLike(projectTable.description),
           ),
         ),
       )
       .orderBy(desc(projectRelevanceScore), desc(projectTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const projects = await projectQuery;
 
@@ -376,13 +513,13 @@ async function globalSearch(params: SearchParams): Promise<{
         and(
           inArray(workspaceTable.id, accessibleWorkspaceIds),
           or(
-            ilike(workspaceTable.name, searchPattern),
-            ilike(workspaceTable.description, searchPattern),
+            allTokensLike(workspaceTable.name),
+            allTokensLike(workspaceTable.description),
           ),
         ),
       )
       .orderBy(desc(workspaceRelevanceScore), desc(workspaceTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const workspaces = await workspaceQuery;
 
@@ -439,14 +576,14 @@ async function globalSearch(params: SearchParams): Promise<{
           workspaceFilter,
           projectId ? eq(taskTable.projectId, projectId) : undefined,
           or(
-            ilike(searchableActivityText, searchPattern),
-            ilike(taskTable.title, searchPattern),
+            allTokensLike(searchableActivityText),
+            allTokensLike(taskTable.title),
           ),
           type === "comments" ? eq(activityTable.type, "comment") : undefined,
         ),
       )
       .orderBy(desc(activityRelevanceScore), desc(activityTable.createdAt))
-      .limit(limit);
+      .limit(fetchLimit);
 
     const activities = await activityQuery;
 
@@ -485,11 +622,15 @@ async function globalSearch(params: SearchParams): Promise<{
     return b.createdAt.getTime() - a.createdAt.getTime();
   });
 
-  const finalResults = results.slice(0, limit);
+  const { results: finalResults, totalCount } = await rerankSearchResults(
+    results,
+    query,
+    limit,
+  );
 
   return {
     results: finalResults,
-    totalCount: results.length,
+    totalCount,
     searchQuery: query,
   };
 }

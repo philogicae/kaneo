@@ -1,0 +1,37 @@
+---
+title: Search and command palette
+description: Find tasks fast from the palette, the workspace search page, or the API.
+---
+
+Kaneo has three ways to find work: the command palette for keyboard-driven navigation, a per-workspace search page for focused task lookup, and a global search API (also exposed to agents through MCP).
+
+## Command palette
+
+Press **⌘K** (macOS) or **Ctrl+K** from anywhere.
+
+- Type to search across tasks, projects, members, and workspaces.
+- Run actions: create a task, project, or workspace; switch theme (light/dark/system/volt).
+- `p` then `c` creates a project, `w` then `c` a workspace, `t` then `c` a task; `/` opens search directly.
+- `?` opens the keyboard shortcut reference; view shortcuts switch Board (`v` `b`), Calendar (`v` `c`), Gantt (`v` `g`), List (`v` `l`), and Backlog (`v` `k`).
+
+## Workspace search page
+
+Each workspace has a search page (sidebar → Search). It searches **tasks only**, scoped to the active workspace:
+
+- The query is debounced; results keep their priority and status.
+- Short identifiers such as `KAN-42` resolve exactly.
+- Quick suggestions cover common intents like high priority, bugs, features, in progress, and completed.
+
+## Global search API and MCP
+
+`GET /api/search` (and the MCP `search` tool) searches across **tasks, appointments, projects, workspaces, comments, and activities** in one ranked list.
+
+- Scope: every workspace you are a member of, or a single `workspaceId`/`projectId`. Results never leave projects you can access.
+- `limit` defaults to 20 and is capped at 50; the response reports `totalCount` and the query that ran.
+- Ranking is relevance-based, with exact short-id matches on top. On instances with TypeSafe/Jev configured, results are additionally filtered and re-ranked by relevance — see [Environment variables](/core/installation/environment-variables).
+
+## Related
+
+- [Plan and execute tasks](/core/functional/plan-and-execute-tasks)
+- [Backlog planning](/core/functional/backlog-planning)
+- [MCP integration](/core/integrations/mcp)

@@ -1,66 +1,63 @@
 ---
-title: "Members and roles"
-description: "Invite teammates, manage pending invitations, and choose who can change what."
+title: Collaborate with Your Team
+description: Invite members, assign ownership, and keep team execution aligned
 ---
 
-Membership belongs to a workspace. Make sure the workspace name at the top of the sidebar is the one you want before inviting someone or changing their role.
+Good collaboration in Kaneo comes from clear ownership and consistent project conventions.
 
-## Invite a teammate
+## 1. Invite members
 
-1. Open **Members** in the workspace sidebar.
-2. Choose **Invite member** and enter their email address.
-3. Create the invitation, then copy the link shown in the dialog.
-4. Share the link with that person. With SMTP configured, the instance can also send an invitation email.
+In your workspace:
 
-The person must sign in or sign up with the invited email address and accept the invitation. New invitations created from this dialog use the **Member** role. You can change the role after the person joins.
+1. Open **Members**.
+2. Click **Invite member**.
+3. Send invitations to teammates.
+4. Track active and pending members in the members table.
 
-<Frame caption="The Members page shows workspace members, their roles, and invitation controls.">
-  <img className="block dark:hidden" src="/images/product/members-light.png" alt="The Members page shows workspace members, their roles, and invitation controls." />
-  <img className="hidden dark:block" src="/images/product/members-dark.png" alt="The Members page shows workspace members, their roles, and invitation controls." />
-</Frame>
+To limit a member to specific projects, set a scope on the invitation (projects or access teams). See [Teams and scoped project access](/core/functional/teams-and-scoped-access).
 
-## Find or cancel a pending invitation
+## 2. Assign clear ownership
 
-Pending invitations appear in the members table. Use the invitation's menu to copy its link again or cancel it.
+For each active task:
 
-Cancel an invitation sent to the wrong address. If it has expired, create a new invitation. If someone sees an email mismatch, ask them to sign in with the address you invited.
+- Assign one primary owner
+- Use due dates for time-sensitive work
+- Set priority to support tradeoff decisions
 
-On an instance without email delivery, share the invitation link yourself. If email delivery reports an error, check the pending invitation before retrying; the operator may need to fix SMTP.
+## 3. Standardize labels
 
-## Choose a role
+Use labels to create a shared language across the team. Manage them at the workspace level in **Settings -> Workspace -> Labels** (see [Manage workspace labels](/core/functional/manage-workspace-labels)).
 
-Use the role selector next to a member in **Members**. You need permission to change roles; you cannot change your own role through that selector.
+Examples:
 
-These are the starting permissions. An administrator can edit the **Viewer**, **Member**, and **Admin** roles, so your workspace may differ.
+- Work type: `bug`, `feature`, `chore`
+- Domain: `api`, `web`, `infra`
+- Risk/impact: `critical`, `customer-impact`
 
-| Role | Default access |
-| --- | --- |
-| Viewer | Read projects, tasks, labels, and workspace details |
-| Member | Create projects; create and update tasks; manage labels |
-| Admin | Manage projects, tasks, members, and workspace settings |
-| Owner | Full workspace control, including deleting the workspace |
+## 4. Use views intentionally
 
-Task assignment and deletion are separate permissions. A member who can edit a task may still be unable to assign or delete it.
+- **Board** for daily execution
+- **List** for compact review and cleanup
+- **Backlog** for planning and grooming
 
-## Edit roles or create a custom role
+Switch views depending on the meeting or decision you are making.
 
-Open **Settings → Workspace → Roles** to inspect the permissions behind a role. If you have role-management permission, you can change the editable roles or create a custom one.
+## 5. Keep communication in the task
 
-Give people the access their work needs. For example, a reviewer may only need to read tasks, while a project lead may need to assign and delete them. The owner role is fixed.
+When scope, ownership, or timing changes, update the task directly so project history remains visible.
 
-## Remove a member or transfer ownership
+## 6. Share a read-only public link
 
-In **Members**, use the member's menu to remove them and confirm the action. They lose membership in this workspace, but their Kaneo account is not deleted.
+For a client, a stakeholder, or a public audience that should follow a project without a Kaneo account:
 
-To change the owner, use **Settings → Workspace → General → Transfer ownership**. Transfer ownership before leaving or deleting your account if you are the only owner of a shared workspace.
+1. Open **Project settings → Visibility**.
+2. Turn on **Public access** — anyone with the URL can view the project.
+3. Copy the **Public URL** (`https://<your-instance>/public-project/<projectId>`) and share it.
 
-## Keep the conversation with the work
+The public page is read-only: visitors see the board, task cards, and a task detail panel (title, description, dates, priority, labels, external links) with no editing, comments, or sign-in. Turning **Public access** off revokes the link immediately.
 
-Open a task to leave a comment, update its description, or choose the next assignee.
+## Next
 
-<Frame caption="Comments stay alongside the task description and properties.">
-  <img className="block dark:hidden" src="/images/product/task-light.png" alt="Comments stay alongside the task description and properties." />
-  <img className="hidden dark:block" src="/images/product/task-dark.png" alt="Comments stay alongside the task description and properties." />
-</Frame>
-
-Each person can choose their own [notification settings](/core/functional/account-notifications). For updates sent to a team channel, use a [project integration](/core/integrations/index).
+- [Configure project workflows](/core/functional/configure-workflows)
+- [Teams and scoped project access](/core/functional/teams-and-scoped-access)
+- [Personalize your workspace](/core/functional/personalize-your-workspace)

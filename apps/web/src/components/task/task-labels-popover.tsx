@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import labelColors, { type LabelColorValue } from "@/constants/label-colors";
 import useAttachLabelToTask from "@/hooks/mutations/label/use-attach-label-to-task";
 import useCreateLabel from "@/hooks/mutations/label/use-create-label";
 import useDetachLabelFromTask from "@/hooks/mutations/label/use-detach-label-from-task";
@@ -19,29 +20,6 @@ import { getTaskLabelOptions } from "@/lib/get-task-label-options";
 import { resolveLabelColor } from "@/lib/label-color";
 import { toast } from "@/lib/toast";
 import type Task from "@/types/task";
-
-const labelColors = [
-  { value: "gray", key: "stone", color: "var(--color-stone-500)" },
-  { value: "dark-gray", key: "slate", color: "var(--color-slate-500)" },
-  { value: "purple", key: "lavender", color: "var(--color-violet-500)" },
-  { value: "teal", key: "sage", color: "var(--color-emerald-600)" },
-  { value: "green", key: "forest", color: "var(--color-green-600)" },
-  { value: "yellow", key: "amber", color: "var(--color-amber-600)" },
-  { value: "orange", key: "terracotta", color: "var(--color-orange-600)" },
-  { value: "pink", key: "rose", color: "var(--color-rose-600)" },
-  { value: "red", key: "crimson", color: "var(--color-red-600)" },
-];
-
-type LabelColor =
-  | "gray"
-  | "dark-gray"
-  | "purple"
-  | "teal"
-  | "green"
-  | "yellow"
-  | "orange"
-  | "pink"
-  | "red";
 
 type TaskLabelsPopoverProps = {
   task: Task;
@@ -62,7 +40,7 @@ export default function TaskLabelsPopover({
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<PopoverStep>("select");
   const [searchValue, setSearchValue] = useState("");
-  const [selectedColor, setSelectedColor] = useState<LabelColor>("gray");
+  const [selectedColor, setSelectedColor] = useState<LabelColorValue>("gray");
   const [newLabelName, setNewLabelName] = useState("");
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -164,7 +142,7 @@ export default function TaskLabelsPopover({
     setStep("color");
   };
 
-  const handleColorSelect = async (color: LabelColor) => {
+  const handleColorSelect = async (color: LabelColorValue) => {
     setSelectedColor(color);
 
     // Create the label immediately
@@ -292,14 +270,14 @@ export default function TaskLabelsPopover({
               "w-full flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-accent/50 text-left",
               selectedColor === color.value && "bg-accent/30",
             )}
-            onClick={() => handleColorSelect(color.value as LabelColor)}
+            onClick={() => handleColorSelect(color.value)}
           >
             <span
               className="w-2 h-2 rounded-full flex-shrink-0"
               style={{ backgroundColor: color.color }}
             />
             <span className="truncate">
-              {t(`tasks:popover.labels.colors.${color.key}`)}
+              {t(`common:modals.createTask.labelColors.${color.key}`)}
             </span>
             {selectedColor === color.value && (
               <Check className="w-3 h-3 ml-auto" />

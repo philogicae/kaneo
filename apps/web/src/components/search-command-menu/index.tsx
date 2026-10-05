@@ -1,8 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
+  CalendarDays,
   FileText,
   FolderKanban,
   Hash,
+  Loader2,
   MessageSquare,
   Search,
   Users,
@@ -34,7 +36,13 @@ type SearchResultItem = {
   title: string;
   description?: string;
   content?: string;
-  type: "task" | "project" | "workspace" | "comment" | "activity";
+  type:
+    | "task"
+    | "appointment"
+    | "project"
+    | "workspace"
+    | "comment"
+    | "activity";
   projectId?: string;
   workspaceId?: string;
   taskNumber?: number;
@@ -57,17 +65,44 @@ type SearchCommandMenuProps = {
 function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
+  // Requests are debounced and only start at the same 3-character threshold
+  // the result list uses: one Jev-reranked search per keystroke is slow and
+  // bills a request for text the menu would not show yet.
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const { data: workspace } = useActiveWorkspace();
   const navigate = useNavigate();
 
   const searchEnabled = query.trim().length >= 3;
 
-  const { data: searchResults } = useGlobalSearch({
-    q: query,
+  useEffect(() => {
+    const value = query.trim();
+    if (value.length < 3) {
+      setDebouncedQuery("");
+      return;
+    }
+    const timer = setTimeout(() => setDebouncedQuery(value), 250);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const {
+    data: searchResults,
+    isLoading,
+    isFetching,
+  } = useGlobalSearch({
+    q: debouncedQuery,
     type: "all",
-    workspaceId: workspace?.id,
+    // No workspaceId: search every workspace the user belongs to.
     limit: 20,
   });
+
+  // The Jev pass takes seconds on a cold query; without this the menu shows
+  // "No results found" for the whole wait (and for the debounce window before
+  // the request even starts), which reads as a broken search.
+  const isDebouncing = searchEnabled && debouncedQuery !== query.trim();
+  const isSearching =
+    searchEnabled &&
+    (isDebouncing || isLoading || isFetching) &&
+    !searchResults;
 
   useRegisterShortcuts({
     shortcuts: {
@@ -80,6 +115,7 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   useEffect(() => {
     if (!open) {
       setQuery("");
+      setDebouncedQuery("");
     }
   }, [open]);
 
@@ -87,25 +123,40 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
     setOpen(false);
     setQuery("");
 
+    // Results can come from any workspace the user belongs to, so navigate
+    // by the item's own workspace when present.
+    const targetWorkspaceId = item.workspaceId ?? workspace?.id;
+
     switch (item.type) {
       case "task":
-        if (item.projectId && item.id && workspace?.id) {
+        if (item.projectId && item.id && targetWorkspaceId) {
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
             params: {
-              workspaceId: workspace.id,
+              workspaceId: targetWorkspaceId,
               projectId: item.projectId,
               taskId: item.id,
             },
           });
         }
         break;
+      case "appointment":
+        if (item.projectId && targetWorkspaceId) {
+          navigate({
+            to: "/dashboard/workspace/$workspaceId/project/$projectId/appointments",
+            params: {
+              workspaceId: targetWorkspaceId,
+              projectId: item.projectId,
+            },
+          });
+        }
+        break;
       case "project":
-        if (item.id && workspace?.id) {
+        if (item.id && targetWorkspaceId) {
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
             params: {
-              workspaceId: workspace.id,
+              workspaceId: targetWorkspaceId,
               projectId: item.id,
             },
           });
@@ -123,11 +174,11 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
         break;
       case "comment":
       case "activity":
-        if (item.projectId && item.id && workspace?.id) {
+        if (item.projectId && item.id && targetWorkspaceId) {
           navigate({
             to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
             params: {
-              workspaceId: workspace.id,
+              workspaceId: targetWorkspaceId,
               projectId: item.projectId,
               taskId: item.id,
             },
@@ -141,6 +192,8 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
     switch (type) {
       case "task":
         return Hash;
+      case "appointment":
+        return CalendarDays;
       case "project":
         return FolderKanban;
       case "workspace":
@@ -170,6 +223,8 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
       switch (type as SearchResultItem["type"]) {
         case "task":
           return t("navigation:search.groups.task");
+        case "appointment":
+          return t("navigation:search.groups.appointment");
         case "project":
           return t("navigation:search.groups.project");
         case "workspace":
@@ -193,7 +248,10 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandDialogPopup instant>
-        <Command items={groupedItems}>
+        {/* Filtering happens server-side; the client filter would drop
+            results whose title does not contain the raw query, e.g. the
+            short-id match for "AL-1". */}
+        <Command items={groupedItems} filter={null}>
           <CommandInput
             placeholder={t("navigation:search.inputPlaceholder")}
             value={query}
@@ -202,12 +260,23 @@ function SearchCommandMenu({ open, setOpen }: SearchCommandMenuProps) {
           <CommandPanel>
             <CommandEmpty>
               <div className="text-center py-6">
-                <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  {searchEnabled
-                    ? t("navigation:commandPalette.empty")
-                    : t("navigation:search.minCharsHint")}
-                </p>
+                {isSearching ? (
+                  <>
+                    <Loader2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground animate-spin" />
+                    <p className="text-sm text-muted-foreground">
+                      {t("workspace:search.searching")}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      {searchEnabled
+                        ? t("navigation:commandPalette.empty")
+                        : t("navigation:search.minCharsHint")}
+                    </p>
+                  </>
+                )}
               </div>
             </CommandEmpty>
             <CommandList>

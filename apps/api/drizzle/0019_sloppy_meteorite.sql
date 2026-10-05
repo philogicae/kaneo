@@ -1,1 +1,0 @@
-ALTER TABLE "integration" ADD CONSTRAINT "integration_project_type_unique" UNIQUE("project_id","type");

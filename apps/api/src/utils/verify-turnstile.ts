@@ -18,6 +18,7 @@ export const authCaptchaPaths = new Set([
 // OTP redemption. Better Auth verifies the corresponding state/code there.
 export async function verifyTurnstile(
   token: unknown,
+  remoteIp?: string | null,
 ): Promise<TurnstileResult> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return { ok: true };
@@ -39,7 +40,13 @@ export async function verifyTurnstile(
     const data = await sendOutboundRequest(
       TURNSTILE_VERIFY_URL,
       {
-        body: new URLSearchParams({ secret, response: token }),
+        body: new URLSearchParams({
+          secret,
+          response: token,
+          // Only forwarded when a proxy supplied it; never derived from a
+          // header a client could set directly.
+          ...(remoteIp ? { remoteip: remoteIp } : {}),
+        }),
       },
       { readJson: true },
     );

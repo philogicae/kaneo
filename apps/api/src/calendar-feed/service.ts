@@ -28,10 +28,11 @@ export const CALENDAR_TASK_BATCH_SIZE = 50;
 export const CALENDAR_DESCRIPTION_CHARACTERS = 4096;
 const CALENDAR_TITLE_CHARACTERS = 1024;
 
-// Limit text in PostgreSQL so oversized descriptions never enter API memory.
+// Limit text in SQL so oversized descriptions never enter API memory. SQLite
+// spells the Postgres `char_length`/`left` pair `length`/`substr`.
 function excerpt(column: SQLWrapper, characters: number) {
-  return sql<string>`case when char_length(${column}) > ${characters}
-    then left(${column}, ${characters}) || '…'
+  return sql<string>`case when length(${column}) > ${characters}
+    then substr(${column}, 1, ${characters}) || '…'
     else ${column} end`;
 }
 
@@ -69,20 +70,38 @@ export async function createCalendarFeed(
       ...new Map(labels.map((label) => [label.name, label])).values(),
     ].sort((a, b) => a.name.localeCompare(b.name));
     if (canCreateLabels) {
-      await tx
-        .insert(labelTable)
-        .values(
-          definitions.map(({ name, color }) => ({
-            name,
-            color,
-            workspaceId,
-            taskId: null,
-          })),
-        )
-        .onConflictDoNothing({
-          target: [labelTable.workspaceId, labelTable.name],
-          where: isNull(labelTable.taskId),
-        });
+      // `onConflictDoNothing` cannot target the partial
+      // `label_workspace_name_unique` index here: SQLite requires the index
+      // predicate between the conflict target and `DO NOTHING`, and drizzle
+      // emits it after, so the statement is a syntax error. Insert the names
+      // that have no definition yet instead, and let a bare `do nothing` cover
+      // the race with a concurrent insert.
+      const names = definitions.map((label) => label.name);
+      const existing = await tx
+        .select({ name: labelTable.name })
+        .from(labelTable)
+        .where(
+          and(
+            eq(labelTable.workspaceId, workspaceId),
+            inArray(labelTable.name, names),
+            isNull(labelTable.taskId),
+          ),
+        );
+      const defined = new Set(existing.map((row) => row.name));
+      const missing = definitions.filter(({ name }) => !defined.has(name));
+      if (missing.length > 0) {
+        await tx
+          .insert(labelTable)
+          .values(
+            missing.map(({ name, color }) => ({
+              name,
+              color,
+              workspaceId,
+              taskId: null,
+            })),
+          )
+          .onConflictDoNothing();
+      }
     }
     const roots = await tx
       .select({ id: labelTable.id })

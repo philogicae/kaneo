@@ -1,5 +1,4 @@
-import { queueStorageCleanup } from "../../storage/cleanup-queue";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, notLike } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -7,22 +6,23 @@ import {
   columnTable,
   labelTable,
   projectTable,
+  taskReminderSentTable,
   taskTable,
   userTable,
-  taskReminderSentTable,
   workspaceUserTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
+import { queueStorageCleanup } from "../../storage/cleanup-queue";
 import { removeLabelFromGitea } from "../../plugins/gitea/utils/sync-label-to-gitea";
 import { removeLabelFromGitHub } from "../../plugins/github/utils/sync-label-to-github";
 import { removeLabelFromGitlab } from "../../plugins/gitlab/utils/sync-label-to-gitlab";
 import { assertAssignableUser } from "../../utils/assert-assignable-user";
-import { publishTaskMutation } from "./task-mutation-effects";
-import { getSubtaskParentProjects } from "../get-subtask-parent-projects";
 import {
   assertValidPriority,
   assertValidTaskStatus,
 } from "../validate-task-fields";
+import { getSubtaskParentProjects } from "../get-subtask-parent-projects";
+import { publishTaskMutation } from "./task-mutation-effects";
 
 type BulkOperation =
   | "updateStatus"
@@ -48,8 +48,6 @@ async function bulkUpdateTasks({
     .select({
       id: taskTable.id,
       title: taskTable.title,
-      status: taskTable.status,
-      priority: taskTable.priority,
       projectId: taskTable.projectId,
       userId: taskTable.userId,
       dueDate: taskTable.dueDate,
@@ -108,7 +106,8 @@ async function bulkUpdateTasks({
       }
       const projectIds = [...new Set(tasks.map((t) => t.projectId))];
 
-      // Validate every project's destination before the first write.
+      // Every destination is validated before the first write, so a bad slug in
+      // the last project cannot leave the first half of the batch applied.
       const destinations = new Map<string, string | null>();
       for (const projectId of projectIds) {
         await assertValidTaskStatus(value, projectId);
@@ -120,71 +119,71 @@ async function bulkUpdateTasks({
         });
         destinations.set(projectId, column?.id ?? null);
       }
+
       const { updatedTasks, beforeById } = await db.transaction(async (tx) => {
-        const before = await tx
-          .select({ id: taskTable.id, status: taskTable.status })
+        const locked = await tx
+          .select({
+            id: taskTable.id,
+            projectId: taskTable.projectId,
+            status: taskTable.status,
+          })
           .from(taskTable)
           .where(inArray(taskTable.id, foundIds))
-          .orderBy(asc(taskTable.id))
-          .for("update");
-        const beforeById = new Map(before.map((task) => [task.id, task]));
-        const result: Array<{
-          id: string;
-          projectId: string;
-          status: string;
-          title: string;
-          userId: string | null;
-        }> = [];
+          .orderBy(asc(taskTable.id));
+        const originalProjects = new Map(
+          tasks.map((task) => [task.id, task.projectId]),
+        );
+        if (
+          locked.length !== foundIds.length ||
+          locked.some(
+            (task) =>
+              task.projectId !== originalProjects.get(task.id) ||
+              task.status === value,
+          )
+        )
+          throw new HTTPException(409, {
+            message: "Tasks changed; retry the operation",
+          });
+        const before = new Map(locked.map((task) => [task.id, task]));
+        const changed: (typeof taskTable.$inferSelect)[] = [];
         for (const projectId of projectIds) {
           const projectTaskIds = tasks
             .filter((task) => task.projectId === projectId)
             .map((task) => task.id);
-          const changed = await tx
+          const rows = await tx
             .update(taskTable)
             .set({
               status: value,
               columnId: destinations.get(projectId) ?? null,
             })
-            .where(
-              and(
-                inArray(taskTable.id, projectTaskIds),
-                eq(taskTable.projectId, projectId),
-              ),
-            )
-            .returning({
-              id: taskTable.id,
-              projectId: taskTable.projectId,
-              status: taskTable.status,
-              title: taskTable.title,
-              userId: taskTable.userId,
-            });
-          if (changed.length !== projectTaskIds.length)
+            .where(inArray(taskTable.id, projectTaskIds))
+            .returning();
+          if (rows.length !== projectTaskIds.length)
             throw new HTTPException(409, {
               message: "Tasks changed projects; retry the operation",
             });
-          result.push(...changed);
+          changed.push(...rows);
         }
-        return { updatedTasks: result, beforeById };
+        return { updatedTasks: changed, beforeById: before };
       });
       updatedCount = updatedTasks.length;
-      const parentProjects = await getSubtaskParentProjects(foundIds);
+
+      // One parent lookup for the batch: the boards are the same for every
+      // task, so each per-task event opts out of its own refresh.
       await publishEvent("subtask-parents.refresh", {
-        projects: parentProjects,
+        projects: await getSubtaskParentProjects(foundIds),
       });
       for (const updatedTask of updatedTasks) {
-        const before = beforeById.get(updatedTask.id)!;
-        await publishTaskMutation(before, updatedTask, userId, {
-          fields: ["status"],
-          skipRelationRefresh: true,
-
-          skipSubtaskParentRefresh: true,
-        });
-        if (before.status === updatedTask.status)
-          await publishEvent("task.updated", {
-            taskId: updatedTask.id,
-            projectId: updatedTask.projectId,
-            userId,
-          });
+        await publishTaskMutation(
+          beforeById.get(updatedTask.id)!,
+          updatedTask,
+          userId,
+          {
+            fields: ["status"],
+            skipRelationRefresh: true,
+            skipSubtaskParentRefresh: true,
+          },
+        );
       }
       for (const projectId of projectIds)
         await publishEvent("task-relation.refresh", { projectId, userId });
@@ -197,6 +196,8 @@ async function bulkUpdateTasks({
       }
       assertValidPriority(value);
 
+      // Read the overwritten priority inside the write transaction, so the
+      // event reports what was really displaced rather than a stale read.
       const before = await db.transaction(async (tx) => {
         const locked = await tx
           .select({
@@ -208,8 +209,7 @@ async function bulkUpdateTasks({
           })
           .from(taskTable)
           .where(inArray(taskTable.id, foundIds))
-          .orderBy(asc(taskTable.id))
-          .for("update");
+          .orderBy(asc(taskTable.id));
         const originalProjects = new Map(
           tasks.map((task) => [task.id, task.projectId]),
         );
@@ -229,16 +229,11 @@ async function bulkUpdateTasks({
         return locked;
       });
       updatedCount = before.length;
+
       for (const task of before)
-        await publishTaskMutation(
-          task,
-          {
-            ...task,
-            priority: value,
-          },
-          userId,
-          { fields: ["priority"] },
-        );
+        await publishTaskMutation(task, { ...task, priority: value }, userId, {
+          fields: ["priority"],
+        });
       break;
     }
 
@@ -246,15 +241,21 @@ async function bulkUpdateTasks({
       const assigneeId = value?.trim() || null;
 
       if (assigneeId) {
-        await assertAssignableUser(assigneeId, workspaceId);
+        // A bulk assignee change may span projects: the target must be able
+        // to open every project receiving the assignment.
+        for (const projectId of new Set(tasks.map((task) => task.projectId))) {
+          await assertAssignableUser(assigneeId, projectId);
+        }
       }
 
+      // Resolved once for the whole batch, not once per task.
       const assignee = assigneeId
         ? await db.query.userTable.findFirst({
             columns: { name: true },
             where: eq(userTable.id, assigneeId),
           })
         : undefined;
+
       const before = await db.transaction(async (tx) => {
         const locked = await tx
           .select({
@@ -265,8 +266,7 @@ async function bulkUpdateTasks({
           })
           .from(taskTable)
           .where(inArray(taskTable.id, foundIds))
-          .orderBy(asc(taskTable.id))
-          .for("update");
+          .orderBy(asc(taskTable.id));
         const originalProjects = new Map(
           tasks.map((task) => [task.id, task.projectId]),
         );
@@ -286,13 +286,11 @@ async function bulkUpdateTasks({
         return locked;
       });
       updatedCount = before.length;
+
       for (const task of before)
         await publishTaskMutation(
           task,
-          {
-            ...task,
-            userId: assigneeId,
-          },
+          { ...task, userId: assigneeId },
           userId,
           { fields: ["userId"], assigneeName: assignee?.name ?? null },
         );
@@ -300,15 +298,18 @@ async function bulkUpdateTasks({
     }
 
     case "delete": {
-      // Relations cascade away with the children, so capture parents first.
+      // Resolved before the delete: the relation rows that name the parent
+      // boards are cascade-deleted with the tasks.
       const parentProjects = await getSubtaskParentProjects(foundIds);
+      // Collecting keys and deleting in one transaction keeps an asset that
+      // moved with its task out of the cleanup queue, and refuses the whole
+      // batch when a task changed projects since the authorized read.
       const result = await db.transaction(async (tx) => {
         const locked = await tx
           .select({ id: taskTable.id, projectId: taskTable.projectId })
           .from(taskTable)
           .where(inArray(taskTable.id, foundIds))
-          .orderBy(asc(taskTable.id))
-          .for("update");
+          .orderBy(asc(taskTable.id));
         const originalProjects = new Map(
           tasks.map((task) => [task.id, task.projectId]),
         );
@@ -332,7 +333,11 @@ async function bulkUpdateTasks({
         return tx.delete(taskTable).where(inArray(taskTable.id, foundIds));
       });
 
-      updatedCount = result.rowCount ?? foundIds.length;
+      updatedCount = result.rowsAffected ?? foundIds.length;
+
+      await publishEvent("subtask-parents.refresh", {
+        projects: parentProjects,
+      });
 
       for (const task of tasks) {
         await publishEvent("task.deleted", {
@@ -342,9 +347,6 @@ async function bulkUpdateTasks({
           title: task.title,
         });
       }
-      await publishEvent("subtask-parents.refresh", {
-        projects: parentProjects,
-      });
       break;
     }
 
@@ -471,50 +473,64 @@ async function bulkUpdateTasks({
         }
       }
 
+      // The comparison runs against the dates read inside the write
+      // transaction, so a concurrent date change is neither silently discarded
+      // nor reported as an unchanged update.
       const { updatedTasks, beforeById } = await db.transaction(async (tx) => {
-        const before = await tx
+        const locked = await tx
           .select({
             id: taskTable.id,
             projectId: taskTable.projectId,
+            title: taskTable.title,
             dueDate: taskTable.dueDate,
           })
           .from(taskTable)
           .where(inArray(taskTable.id, foundIds))
-          .orderBy(asc(taskTable.id))
-          .for("update");
+          .orderBy(asc(taskTable.id));
         const originalProjects = new Map(
           tasks.map((task) => [task.id, task.projectId]),
         );
         if (
-          before.length !== foundIds.length ||
-          before.some(
+          locked.length !== foundIds.length ||
+          locked.some(
             (task) => task.projectId !== originalProjects.get(task.id),
           )
         )
           throw new HTTPException(409, {
             message: "Tasks changed projects; retry the operation",
           });
-        const beforeById = new Map(before.map((task) => [task.id, task]));
-        const changedIds = before
-          .filter((task) => task.dueDate?.getTime() !== parsedDate?.getTime())
+        const before = new Map(locked.map((task) => [task.id, task]));
+        // Same contract as the single-task due-date endpoint: due-date driven
+        // reminder history must reset so the new date notifies, while
+        // start-anchored Telegram reminders stay untouched.
+        const changedIds = locked
+          .filter(
+            (task) =>
+              (task.dueDate?.getTime() ?? null) !==
+              (parsedDate?.getTime() ?? null),
+          )
           .map((task) => task.id);
-        if (changedIds.length)
+        if (changedIds.length > 0)
           await tx
             .delete(taskReminderSentTable)
-            .where(inArray(taskReminderSentTable.taskId, changedIds));
-        const updatedTasks = await tx
+            .where(
+              and(
+                inArray(taskReminderSentTable.taskId, changedIds),
+                notLike(
+                  taskReminderSentTable.reminderType,
+                  "telegram_unified:%",
+                ),
+              ),
+            );
+        const rows = await tx
           .update(taskTable)
           .set({ dueDate: parsedDate })
           .where(inArray(taskTable.id, foundIds))
-          .returning({
-            id: taskTable.id,
-            projectId: taskTable.projectId,
-            title: taskTable.title,
-            dueDate: taskTable.dueDate,
-          });
-        return { updatedTasks, beforeById };
+          .returning();
+        return { updatedTasks: rows, beforeById: before };
       });
       updatedCount = updatedTasks.length;
+
       for (const updatedTask of updatedTasks)
         await publishTaskMutation(
           beforeById.get(updatedTask.id)!,

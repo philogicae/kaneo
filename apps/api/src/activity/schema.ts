@@ -1,14 +1,17 @@
-import { pagingNumber, z } from "../openapi";
+import { z } from "../openapi";
+import { pagingNumber } from "../utils/paging";
 
+export const taskIdParam = z.object({ taskId: z.string() });
+
+export const workspaceIdParam = z.object({ workspaceId: z.string().min(1) });
+
+// The task feed is capped rather than paged: the client asks for a bounded
+// preview or the whole feed, never an offset window.
 export const activitiesQuery = z.object({
   limit: pagingNumber(1, 100).optional().openapi({
     description: "Maximum number of recent activities; omit for the full feed.",
   }),
 });
-
-export const taskIdParam = z.object({ taskId: z.string() });
-
-export const workspaceIdParam = z.object({ workspaceId: z.string().min(1) });
 
 export const createActivityBody = z.object({
   taskId: z.string(),

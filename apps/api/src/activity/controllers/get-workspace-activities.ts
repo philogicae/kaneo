@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import db from "../../database";
 import {
   activityTable,
@@ -18,9 +18,9 @@ const WINDOW_DAYS = 30;
 async function getWorkspaceActivities(workspaceId: string) {
   const since = new Date(Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
-  // Concrete project IDs let PostgreSQL estimate task selectivity before it
-  // chooses an activity index. A join-only workspace filter can instead scan
-  // every tenant's recent events to fill a quiet workspace's small feed.
+  // Resolving the project IDs up front lets the feed filter on an indexed
+  // project column instead of relying on the join alone, which would otherwise
+  // scan every tenant's recent events to fill a quiet workspace's small feed.
   const projects = await db
     .select({ id: projectTable.id })
     .from(projectTable)
@@ -56,8 +56,10 @@ async function getWorkspaceActivities(workspaceId: string) {
     .leftJoin(userTable, eq(activityTable.userId, userTable.id))
     .where(
       and(
-        eq(projectTable.workspaceId, workspaceId),
-        sql`${taskTable.projectId} = ANY(${sql.param(projects.map((project) => project.id))}::text[])`,
+        inArray(
+          taskTable.projectId,
+          projects.map((project) => project.id),
+        ),
         isNull(projectTable.archivedAt),
         gte(activityTable.createdAt, since),
       ),
