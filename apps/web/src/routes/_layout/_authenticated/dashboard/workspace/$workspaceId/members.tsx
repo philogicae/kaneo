@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import WorkspaceLayout from "@/components/common/workspace-layout";
 import PageTitle from "@/components/page-title";
+import InviteLinksManager from "@/components/team/invite-links-manager";
 import InviteTeamMemberModal from "@/components/team/invite-team-member-modal";
 import MembersTable from "@/components/team/members-table";
 import { Button } from "@/components/ui/button";
@@ -20,8 +21,9 @@ function RouteComponent() {
   const { t } = useTranslation();
   const { workspaceId } = Route.useParams();
   const { data: workspace } = useGetFullWorkspace({ workspaceId });
-  const { canInviteUsers } = useWorkspacePermission();
+  const { canInviteUsers, canManageWorkspace } = useWorkspacePermission();
   const canInvite = Boolean(canInviteUsers());
+  const canManage = Boolean(canManageWorkspace());
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   return (
@@ -48,6 +50,8 @@ function RouteComponent() {
           users={workspace?.members ?? []}
           invitations={workspace?.invitations ?? []}
         />
+
+        {canManage && <InviteLinksManager workspaceId={workspaceId} />}
 
         <InviteTeamMemberModal
           open={isInviteOpen}

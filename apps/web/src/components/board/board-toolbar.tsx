@@ -1,7 +1,9 @@
 import { Filter, PanelsTopLeft, Rows3, X } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { useTranslation } from "react-i18next";
+import GroupControl from "@/components/common/group-control";
 import SortControl from "@/components/common/sort-control";
+import TaskSearchInput from "@/components/common/task-search-input";
 import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,6 +25,7 @@ import {
 import { cn } from "@/lib/cn";
 import { getColumnIcon } from "@/lib/column";
 import { getInitials } from "@/lib/get-initials";
+import type { BoardGroupBy } from "@/lib/group-tasks";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { resolveLabelColor } from "@/lib/label-color";
 import { getPriorityIcon } from "@/lib/priority";
@@ -63,8 +66,13 @@ type BoardToolbarProps = {
   setViewMode: (mode: "board" | "list") => void;
   sort: SortConfig;
   onSortChange: (sort: SortConfig) => void;
+  groupBy: BoardGroupBy;
+  onGroupByChange: (groupBy: BoardGroupBy) => void;
   customFieldDefinitions?: CustomFieldDefinition[];
   usedCustomFieldValues?: Record<string, string[]>;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  searchInputRef?: RefObject<HTMLInputElement | null>;
 };
 
 function CheckSlot({ checked }: { checked: boolean }) {
@@ -160,8 +168,13 @@ export default function BoardToolbar({
   setViewMode,
   sort,
   onSortChange,
+  groupBy,
+  onGroupByChange,
   customFieldDefinitions = [],
   usedCustomFieldValues = {},
+  searchQuery,
+  onSearchChange,
+  searchInputRef,
 }: BoardToolbarProps) {
   const { t } = useTranslation();
   const selectedStatusIds = filters.status ?? [];
@@ -697,6 +710,14 @@ export default function BoardToolbar({
             </DropdownMenu>
 
             <SortControl sort={sort} onSortChange={onSortChange} />
+
+            <GroupControl groupBy={groupBy} onGroupByChange={onGroupByChange} />
+
+            <TaskSearchInput
+              value={searchQuery}
+              onChange={onSearchChange}
+              inputRef={searchInputRef}
+            />
 
             {selectedStatusIds.length > 0 && (
               <ActiveFilterChip

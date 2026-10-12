@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { shortcuts } from "@/constants/shortcuts";
 import { usePendingInvitations } from "@/hooks/queries/invitation/use-pending-invitations";
 import useGetNotifications from "@/hooks/queries/notification/use-get-notifications";
@@ -60,7 +61,7 @@ export function NavMain() {
 
   const homeUrl = `/dashboard/workspace/${workspace.id}`;
   const unreadCount = notifications.filter(
-    (notification) => !notification.isRead,
+    (notification: { isRead: boolean | null }) => !notification.isRead,
   ).length;
 
   const navItems: NavItem[] = [
@@ -99,6 +100,8 @@ export function NavMain() {
   return (
     <SidebarGroup className="gap-1 p-2">
       <SidebarGroupContent>
+        {/* Workspace selector above the nav list; carries the sort and drag order. */}
+        <WorkspaceSwitcher />
         <SidebarMenu className="gap-0.5">
           {navItems.map((item) => (
             <SidebarMenuItem key={item.url}>

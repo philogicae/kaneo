@@ -106,11 +106,11 @@ export default function SubtaskRow({
                 {task.userId && assignee ? (
                   <Avatar className="h-5 w-5">
                     <AvatarImage
-                      src={assignee?.user?.image ?? ""}
-                      alt={assignee?.user?.name || ""}
+                      src={assignee?.user?.image ?? task.assigneeImage ?? ""}
+                      alt={assignee?.user?.name || task.assigneeName || ""}
                     />
                     <AvatarFallback className="text-[9px] font-medium border border-border/30">
-                      {getInitials(assignee?.user?.name)}
+                      {getInitials(assignee?.user?.name ?? task.assigneeName)}
                     </AvatarFallback>
                   </Avatar>
                 ) : (

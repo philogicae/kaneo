@@ -1,25 +1,29 @@
 import "@testing-library/jest-dom/vitest";
 
-// Node can expose an incomplete global localStorage when it is launched with
-// --localstorage-file but no usable path. Because that property takes
-// precedence over jsdom's implementation, tests then receive an object without
-// the Storage methods. Install a small in-memory implementation only in that
-// broken environment.
-if (typeof globalThis.localStorage?.clear !== "function") {
-  const values = new Map<string, string>();
-  const localStorage: Storage = {
-    get length() {
-      return values.size;
-    },
-    clear: () => values.clear(),
-    getItem: (key) => values.get(key) ?? null,
-    key: (index) => [...values.keys()][index] ?? null,
-    removeItem: (key) => values.delete(key),
-    setItem: (key, value) => values.set(key, String(value)),
-  };
-
-  Object.defineProperty(globalThis, "localStorage", {
+// Node 26 exposes an experimental global `localStorage` that is unavailable
+// without `--localstorage-file`; it shadows the one provided by the jsdom
+// environment, leaving `window.localStorage` undefined. Install a minimal
+// in-memory storage so tests (and hooks) share working semantics.
+if (typeof window.localStorage === "undefined") {
+  const store = new Map<string, string>();
+  Object.defineProperty(window, "localStorage", {
+    value: {
+      get length() {
+        return store.size;
+      },
+      key: (index: number) => [...store.keys()][index] ?? null,
+      getItem: (key: string) =>
+        store.has(key) ? (store.get(key) as string) : null,
+      setItem: (key: string, value: string) => {
+        store.set(key, String(value));
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+      clear: () => {
+        store.clear();
+      },
+    } satisfies Storage,
     configurable: true,
-    value: localStorage,
   });
 }

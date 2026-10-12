@@ -1,5 +1,5 @@
 import type { ImportedLabel } from "@kaneo/importers";
-import { and, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type db from "../../database";
 import { labelTable } from "../../database/schema";
 import { chunk } from "./chunk";
@@ -43,7 +43,24 @@ export async function writeImportLabels(
   const names = [...colors.keys()];
   if (names.length === 0) return 0;
 
-  for (const batch of chunk(names)) {
+  // `onConflictDoNothing` cannot target the partial
+  // `label_workspace_name_unique` index: SQLite wants the index predicate
+  // between the conflict target and `DO NOTHING`, and drizzle emits it after.
+  // Insert the names that have no definition yet instead, and let a bare
+  // `do nothing` cover the race with a concurrent insert.
+  const existing = await tx
+    .select({ name: labelTable.name })
+    .from(labelTable)
+    .where(
+      and(
+        eq(labelTable.workspaceId, workspaceId),
+        isNull(labelTable.taskId),
+        inArray(labelTable.name, names),
+      ),
+    );
+  const defined = new Set(existing.map((row) => row.name));
+  const missing = names.filter((name) => !defined.has(name));
+  for (const batch of chunk(missing)) {
     await tx
       .insert(labelTable)
       .values(
@@ -54,10 +71,7 @@ export async function writeImportLabels(
           workspaceId,
         })),
       )
-      .onConflictDoNothing({
-        target: [labelTable.workspaceId, labelTable.name],
-        where: sql`${labelTable.taskId} is null`,
-      });
+      .onConflictDoNothing();
   }
 
   const definitionColors = new Map<string, string>();

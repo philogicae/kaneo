@@ -18,6 +18,7 @@ function config(overrides: Partial<GetConfigResponse> = {}) {
     disableWorkspaceCreation: false,
     isDemoMode: false,
     hasSmtp: true,
+    hasEmail: true,
     hasGithubSignIn: false,
     hasGoogleSignIn: false,
     hasDiscordSignIn: false,
@@ -27,7 +28,6 @@ function config(overrides: Partial<GetConfigResponse> = {}) {
     customOAuthName: null,
     customOAuthAutoLogin: false,
     customOAuthLogoutUrl: null,
-    billingEnabled: false,
     ...overrides,
   } satisfies GetConfigResponse;
 }

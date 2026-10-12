@@ -18,13 +18,12 @@ export async function lockResumeScope(
   authorizedWorkspaceId: string,
   tx: IntegrationDatabase,
 ) {
-  await getAuthorizedSyncProject(projectId, authorizedWorkspaceId, tx, true);
+  await getAuthorizedSyncProject(projectId, authorizedWorkspaceId, tx);
   const integration = await getSyncIntegration(projectId, provider, tx);
   const [binding] = await tx
     .select()
     .from(integrationTable)
-    .where(eq(integrationTable.id, integration.id))
-    .for("share");
+    .where(eq(integrationTable.id, integration.id));
   const link = await tx.query.externalLinkTable.findFirst({
     where: and(
       eq(externalLinkTable.id, linkId),
@@ -38,8 +37,7 @@ export async function lockResumeScope(
     .from(taskTable)
     .where(
       and(eq(taskTable.id, link.taskId), eq(taskTable.projectId, projectId)),
-    )
-    .for("no key update");
+    );
   const rule = readSyncRules(binding!.config)?.outgoing;
   if (!rule)
     throw new HTTPException(409, {
@@ -60,12 +58,10 @@ export async function lockResumeScope(
           ),
         ),
       )
-      .orderBy(labelTable.id)
-      .for("share");
+      .orderBy(labelTable.id);
   }
   await tx
     .select({ id: externalLinkTable.id })
     .from(externalLinkTable)
-    .where(eq(externalLinkTable.id, linkId))
-    .for("update");
+    .where(eq(externalLinkTable.id, linkId));
 }

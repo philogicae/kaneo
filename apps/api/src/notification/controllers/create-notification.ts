@@ -3,10 +3,30 @@ import db from "../../database";
 import { notificationTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { deliverNotification } from "../../notification-preferences/delivery";
-
-import { safeOutboundError } from "../../utils/outbound-request";
+import { canAccessProject } from "../../utils/access-scope";
 import { canReceiveResourceNotification } from "../resource-access";
 
+export type CreateNotificationInput = {
+  userId: string;
+  title?: string | null;
+  content?: string | null;
+  type?: string;
+  eventData?: Record<string, unknown> | null;
+  resourceId?: string;
+  resourceType?: string;
+  projectId?: string | null;
+};
+
+type NotificationDatabase =
+  | typeof db
+  | Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/**
+ * Store the notification, or return null when the recipient must not have it.
+ *
+ * Split from dispatch so a caller inside a transaction can persist first and
+ * publish once the surrounding work has committed.
+ */
 export async function persistNotification(
   {
     userId,
@@ -16,17 +36,21 @@ export async function persistNotification(
     eventData,
     resourceId,
     resourceType,
-  }: {
-    userId: string;
-    title?: string | null;
-    content?: string | null;
-    type?: string;
-    eventData?: Record<string, unknown> | null;
-    resourceId?: string;
-    resourceType?: string;
-  },
-  database: Pick<typeof db, "query" | "insert" | "select"> = db,
+    projectId,
+  }: CreateNotificationInput,
+  // A caller that already holds a transaction passes it, so the notification
+  // and its surrounding work commit or roll back together.
+  database: NotificationDatabase = db,
 ) {
+  // A project-scoped notification would deep-link to a surface the recipient
+  // is refused on: drop it instead of storing a dead link.
+  if (projectId && !(await canAccessProject(userId, projectId))) {
+    return null;
+  }
+
+  // A task- or workspace-referenced notification is only readable if the
+  // recipient can reach that resource at all, so the boundary is enforced where
+  // the row is created rather than only where it is read.
   if (
     !(await canReceiveResourceNotification(
       userId,
@@ -38,8 +62,13 @@ export async function persistNotification(
     return null;
   }
 
+  // Appointments reuse the assignment preference: they are assigned like
+  // tasks and have no status of their own.
   const preferenceKey =
-    type === "task_assignee_changed" || type === "task_created"
+    type === "task_assignee_changed" ||
+    type === "task_created" ||
+    type === "appointment_created" ||
+    type === "appointment_updated"
       ? "taskAssignmentEnabled"
       : type === "task_comment" || type === "task_mention"
         ? "taskCommentEnabled"
@@ -77,6 +106,7 @@ export async function persistNotification(
   return notification;
 }
 
+/** Publish and deliver an already-persisted notification. */
 export async function dispatchNotification(
   notification: typeof notificationTable.$inferSelect,
 ) {
@@ -87,14 +117,12 @@ export async function dispatchNotification(
   void deliverNotification(notification.id).catch((error) => {
     console.error("Failed to deliver notification", {
       notificationId: notification.id,
-      error: safeOutboundError(error),
+      error,
     });
   });
 }
 
-async function createNotification(
-  data: Parameters<typeof persistNotification>[0],
-) {
+async function createNotification(data: CreateNotificationInput) {
   const notification = await persistNotification(data);
   if (notification) await dispatchNotification(notification);
   return notification;

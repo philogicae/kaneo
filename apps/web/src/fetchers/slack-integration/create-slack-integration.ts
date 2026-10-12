@@ -12,6 +12,7 @@ export type CreateSlackIntegrationRequest = {
     taskTitleChanged?: boolean;
     taskDescriptionChanged?: boolean;
     taskCommentCreated?: boolean;
+    taskMentionCreated?: boolean;
   };
 };
 

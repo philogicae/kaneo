@@ -20,6 +20,7 @@ const [project] = buildSettingsNav({
   billingEnabled: false,
   canImport: false,
   hasAdminAccess: false,
+  canInviteUsers: false,
   projects: [{ id: "p1", name: "Kaneo Web" }],
 }).projects;
 

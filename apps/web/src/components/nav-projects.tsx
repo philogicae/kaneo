@@ -23,6 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
+  ArrowUpDown,
   ChevronRight,
   Folder,
   Forward,
@@ -31,7 +32,7 @@ import {
   Settings,
   Trash2,
 } from "lucide-react";
-import { type CSSProperties, type ReactNode, useState } from "react";
+import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { ProjectProgress } from "@/components/project-progress";
@@ -44,12 +45,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/menu";
 import {
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
@@ -64,6 +66,10 @@ import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { toast } from "@/lib/toast";
+import {
+  isProjectSortMode,
+  useUserPreferencesStore,
+} from "@/store/user-preferences";
 import type { ProjectWithTasks } from "@/types/project";
 import CreateProjectModal from "./shared/modals/create-project-modal";
 import {
@@ -130,18 +136,49 @@ export function NavProjects() {
   const queryClient = useQueryClient();
   const { mutateAsync: deleteProject } = useDeleteProject();
   const reorderProjects = useReorderProjects();
+  const { projectsSort, setProjectsSort } = useUserPreferencesStore();
   const { canCreateProjects, canDeleteProjects, canUpdateProjects } =
     useWorkspacePermission();
   const canCreate = canCreateProjects();
   const canDeleteProject = canDeleteProjects();
   // Matches the API, which gates /project/reorder on `project: ["update"]`
   // alone — not the create+update+delete bundle.
-  const canReorder = canUpdateProjects();
+  const canReorder = canUpdateProjects() && projectsSort === "custom";
   const navigate = useNavigate();
   const { workspaceId: currentWorkspaceId, projectId: currentProjectId } =
     useParams({
       strict: false,
     });
+
+  // Drag & drop only reflects the stored custom order; the other sort modes
+  // are purely presentational and reset once the user picks one.
+  const sortedProjects = useMemo(() => {
+    if (!projects) return undefined;
+    if (projectsSort === "custom") return projects;
+
+    const sorted = [...projects];
+    switch (projectsSort) {
+      case "name":
+        sorted.sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+        );
+        break;
+      case "date":
+        sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+        break;
+      case "completion":
+        sorted.sort(
+          (a, b) =>
+            (b.statistics?.completionPercentage ?? -1) -
+            (a.statistics?.completionPercentage ?? -1),
+        );
+        break;
+    }
+    return sorted;
+  }, [projects, projectsSort]);
 
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] =
     useState(false);
@@ -154,7 +191,7 @@ export function NavProjects() {
     null,
   );
 
-  const draggingProject = projects?.find(
+  const draggingProject = sortedProjects?.find(
     (project) => project.id === draggingProjectId,
   );
 
@@ -200,14 +237,18 @@ export function NavProjects() {
 
     endDrag();
 
-    if (!over || active.id === over.id || !projects || !workspace) return;
+    if (!over || active.id === over.id || !sortedProjects || !workspace) return;
 
-    const oldIndex = projects.findIndex((project) => project.id === active.id);
-    const newIndex = projects.findIndex((project) => project.id === over.id);
+    const oldIndex = sortedProjects.findIndex(
+      (project) => project.id === active.id,
+    );
+    const newIndex = sortedProjects.findIndex(
+      (project) => project.id === over.id,
+    );
 
     if (oldIndex === -1 || newIndex === -1) return;
 
-    const reordered = arrayMove(projects, oldIndex, newIndex);
+    const reordered = arrayMove(sortedProjects, oldIndex, newIndex);
 
     reorderProjects(workspace.id, reordered, {
       onError: () => {
@@ -222,27 +263,56 @@ export function NavProjects() {
     <>
       <Collapsible defaultOpen className="group/collapsible">
         <SidebarGroup className="group-data-[collapsible=icon]:hidden gap-1 p-2 pt-1">
-          <CollapsibleTrigger
-            className="data-panel-open:[&_svg]:rotate-90"
-            render={
-              <SidebarGroupLabel className="h-7 cursor-pointer justify-start gap-1 px-0 text-sidebar-accent-foreground" />
-            }
-          >
-            <span>{t("navigation:sidebar.projects")}</span>
-            <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/60 transition-transform duration-200" />
-          </CollapsibleTrigger>
-          {canCreate && (
-            <SidebarGroupAction
-              className="top-2 right-2 text-sidebar-foreground/70"
-              title={t("navigation:projectList.addProject")}
-              onClick={() => setIsCreateProjectModalOpen(true)}
+          <div className="flex h-7 items-center">
+            <CollapsibleTrigger
+              className="min-w-0 flex-1 data-panel-open:[&_svg]:rotate-90"
+              render={
+                <SidebarGroupLabel className="h-7 cursor-pointer justify-between px-0 text-sidebar-accent-foreground" />
+              }
             >
-              <Plus />
-              <span className="sr-only">
-                {t("navigation:projectList.addProject")}
-              </span>
-            </SidebarGroupAction>
-          )}
+              <span>{t("navigation:sidebar.projects")}</span>
+              <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/60 transition-transform duration-200" />
+            </CollapsibleTrigger>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label={t("navigation:projectList.sortProjects")}
+                    title={t("navigation:projectList.sortProjects")}
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-sidebar-foreground/60 outline-hidden ring-sidebar-ring transition-colors group-data-[collapsible=icon]:hidden hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2"
+                  />
+                }
+              >
+                <ArrowUpDown aria-hidden="true" className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="min-w-44 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+              >
+                <DropdownMenuRadioGroup
+                  value={projectsSort}
+                  onValueChange={(value) =>
+                    isProjectSortMode(value) && setProjectsSort(value)
+                  }
+                >
+                  <DropdownMenuRadioItem value="custom">
+                    {t("navigation:projectList.sortCustom")}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="name">
+                    {t("navigation:projectList.sortName")}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="date">
+                    {t("navigation:projectList.sortDate")}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="completion">
+                    {t("navigation:projectList.sortCompletion")}
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <CollapsiblePanel>
             <SidebarGroupContent>
               <DndContext
@@ -258,10 +328,10 @@ export function NavProjects() {
               >
                 <SidebarMenu className="gap-0.5">
                   <SortableContext
-                    items={projects?.map((project) => project.id) ?? []}
+                    items={sortedProjects?.map((project) => project.id) ?? []}
                     strategy={verticalListSortingStrategy}
                   >
-                    {projects?.map((project) => {
+                    {sortedProjects?.map((project) => {
                       const ProjectIcon =
                         icons[project.icon as keyof typeof icons] ||
                         icons.Layout;
@@ -275,14 +345,20 @@ export function NavProjects() {
                           <SidebarMenuButton
                             isActive={isCurrentProject(project.id)}
                             size="default"
-                            className="h-8 text-sm"
+                            tooltip={project.name}
+                            className="h-8 gap-0 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
                             onClick={() => handleProjectClick(project)}
                           >
-                            <ProjectIcon aria-hidden="true" />
-                            <span className="min-w-0 flex-1 truncate">
+                            <span className="hidden h-5 min-w-6 items-center justify-center rounded-md bg-sidebar-accent px-1 text-[10px] font-semibold tracking-wide text-sidebar-accent-foreground uppercase group-data-[collapsible=icon]:flex">
+                              {project.slug}
+                            </span>
+                            <ProjectIcon
+                              aria-hidden="true"
+                              className="group-data-[collapsible=icon]:hidden"
+                            />
+                            <span className="min-w-0 flex-1 truncate group-data-[collapsible=icon]:hidden">
                               {project.name}
                             </span>
-                            {/* Gives way to the row menu, which sits here on hover. */}
                             <ProjectProgress
                               percentage={
                                 project.statistics.completionPercentage
@@ -379,6 +455,23 @@ export function NavProjects() {
                       );
                     })}
                   </SortableContext>
+
+                  {canCreate && (
+                    <SidebarMenuItem className="mt-1">
+                      <SidebarMenuButton
+                        size="default"
+                        tooltip={t("navigation:projectList.addProject")}
+                        className="h-8 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
+                        onClick={() => setIsCreateProjectModalOpen(true)}
+                      >
+                        <Plus
+                          aria-hidden="true"
+                          className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/70"
+                        />
+                        <span>{t("navigation:projectList.addProject")}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                 </SidebarMenu>
 
                 {/* Portalled: `SidebarContent` is `overflow-auto` and clips it. */}

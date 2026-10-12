@@ -7,8 +7,7 @@ export async function lockWorkspace(database: DbOrTx, workspaceId: string) {
   const [workspace] = await database
     .select({ id: schema.workspaceTable.id })
     .from(schema.workspaceTable)
-    .where(eq(schema.workspaceTable.id, workspaceId))
-    .for("update");
+    .where(eq(schema.workspaceTable.id, workspaceId));
   if (!workspace) {
     throw new HTTPException(404, { message: "Workspace not found" });
   }
@@ -20,6 +19,5 @@ export async function lockWorkspace(database: DbOrTx, workspaceId: string) {
     })
     .from(schema.workspaceUserTable)
     .where(eq(schema.workspaceUserTable.workspaceId, workspaceId))
-    .orderBy(schema.workspaceUserTable.id)
-    .for("update");
+    .orderBy(schema.workspaceUserTable.id);
 }

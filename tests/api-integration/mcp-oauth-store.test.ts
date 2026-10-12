@@ -1,5 +1,5 @@
-import { and, count, eq, sql } from "drizzle-orm";
-import { afterAll, beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { and, count, eq } from "drizzle-orm";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import db from "../../apps/api/src/database";
 import { mcpOauthStateTable } from "../../apps/api/src/database/schema";
 import {
@@ -12,10 +12,6 @@ import {
 } from "../../apps/api/src/mcp/oauth-store";
 import { resetTestDatabase } from "./helpers/database";
 
-// Set this before the lazy database pool opens any connections, including in CI.
-vi.stubEnv("PGOPTIONS", "-c timezone=Europe/Paris");
-afterAll(() => vi.unstubAllEnvs());
-
 beforeEach(async () => {
   await resetTestDatabase();
 });
@@ -26,11 +22,22 @@ async function seed(
   expired = false,
   clientId = "seed-client",
 ) {
-  await db.execute(sql`INSERT INTO mcp_oauth_state (id,kind,key,payload,expires_at)
-    SELECT ${kind} || '-' || i, ${kind}, ${kind} || '-' || i,
-      jsonb_build_object('clientId', ${clientId}::text),
-      CASE WHEN ${expired} THEN (now() AT TIME ZONE 'UTC') - interval '1 hour' ELSE (now() AT TIME ZONE 'UTC') + interval '1 hour' END
-    FROM generate_series(1, ${total}::integer) AS i`);
+  const expiresAt = new Date(Date.now() + (expired ? -3_600_000 : 3_600_000));
+  for (let offset = 0; offset < total; offset += 500) {
+    const size = Math.min(500, total - offset);
+    await db.insert(mcpOauthStateTable).values(
+      Array.from({ length: size }, (_, index) => {
+        const n = offset + index + 1;
+        return {
+          id: `${kind}-${n}`,
+          kind,
+          key: `${kind}-${n}`,
+          payload: { clientId },
+          expiresAt,
+        };
+      }),
+    );
+  }
 }
 async function total(kind: string) {
   const [row] = await db
@@ -41,11 +48,9 @@ async function total(kind: string) {
 }
 
 describe("bounded shared MCP OAuth store", () => {
-  it("keeps live UTC timestamps through cleanup and consent approval in the configured database timezone", async () => {
-    const timezone = await db.execute<{ timezone: string }>(
-      sql`SELECT current_setting('TimeZone') AS timezone`,
-    );
-    expect(timezone.rows[0].timezone).toBe("Europe/Paris");
+  it("keeps live UTC timestamps through cleanup and consent approval", async () => {
+    // libSQL stores these as epoch milliseconds, so a live row must survive a
+    // sweep that a same-second-but-expired row does not.
     await putState("request", "live-request", { clientId: "client" }, future());
     await db.insert(mcpOauthStateTable).values({
       kind: "request",

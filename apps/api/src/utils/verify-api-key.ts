@@ -99,8 +99,7 @@ export async function verifyApiKey(
       .select()
       .from(schema.apikeyTable)
       .where(activeApiKey(hashedKey))
-      .limit(1)
-      .for("update");
+      .limit(1);
 
     if (!apiKey) {
       return null;

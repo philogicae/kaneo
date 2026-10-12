@@ -4,7 +4,6 @@ import { columnTable, projectTable } from "../../database/schema";
 import { grantProjectToRestrictedMember } from "../../project-access/grant-project-to-restricted-member";
 import {
   assertProjectKeyAvailable,
-  lockProjectOrdering,
   nextProjectPosition,
 } from "./project-placement";
 
@@ -51,7 +50,6 @@ export async function insertProject(
   // creates can read the same max(position) and land on the same slot, and a
   // create can interleave with a reorder's renumber. `reorderProjects` takes
   // the same lock with the same key.
-  await lockProjectOrdering(tx, workspaceId);
   await assertProjectKeyAvailable(tx, workspaceId, slug);
 
   // New projects go to the bottom of the workspace's ordering.
@@ -99,7 +97,6 @@ export async function placeProject(
   tx: Transaction,
   { workspaceId, projectId, slug }: ProjectPlacement,
 ) {
-  await lockProjectOrdering(tx, workspaceId);
   await assertProjectKeyAvailable(tx, workspaceId, slug, projectId);
   const position = await nextProjectPosition(tx, workspaceId, projectId);
 

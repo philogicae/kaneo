@@ -1,32 +1,28 @@
-import integrationSync from "./integration-sync";
-import { syncWorkspaceAccess } from "./ws/workspace-access";
-import { drainPasswordResetDeliveries } from "./utils/password-reset-delivery";
-import "./instrument";
-
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/node";
+import { Scalar } from "@scalar/hono-api-reference";
 import type { Session, User } from "better-auth/types";
-import { eq, sql } from "drizzle-orm";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { eq } from "drizzle-orm";
+import { migrate } from "drizzle-orm/libsql/migrator";
 import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import accessTeam from "./access-team";
 import activity from "./activity";
-import admin from "./admin";
+import appointment from "./appointment";
 import { auth } from "./auth";
+import admin from "./admin";
 import { organizationRoutes } from "./auth-openapi";
-import billing from "./billing";
 import calendarFeed, { publicCalendarFeed } from "./calendar-feed";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
 import customField from "./custom-field";
-import db, { getDatabase, schema } from "./database";
+import db, { applyDatabasePragmas, getDatabase, schema } from "./database";
 import { apiErrorSchema } from "./errors/api-error-schema";
 import { httpExceptionResponse } from "./errors/http-exception-response";
 import {
@@ -38,27 +34,28 @@ import {
   validationHook,
   validationHookWithMessage,
 } from "./errors/validation-error";
-import { prepareDatabaseStartup } from "./database/prepare-database-startup";
-import { waitForDatabase } from "./database/wait-for-database";
 import discordIntegration from "./discord-integration";
 import { eventContext } from "./events";
 import externalLink from "./external-link";
 import genericWebhookIntegration from "./generic-webhook-integration";
 import giteaIntegration, { handleGiteaWebhookRoute } from "./gitea-integration";
-import githubIntegration, {
-  handleGithubWebhookRoute,
-} from "./github-integration";
 import gitlabIntegration, {
   handleGitlabWebhookRoute,
 } from "./gitlab-integration";
+import githubIntegration, {
+  handleGithubWebhookRoute,
+} from "./github-integration";
 import importRoutes from "./import";
 import { stopActiveImports } from "./import/runs/stop-active-imports";
 import getInstanceStatus from "./instance/controllers/get-instance-status";
+import integrationSync from "./integration-sync";
 import invitation from "./invitation";
 import label from "./label";
 import mattermostIntegration from "./mattermost-integration";
 import mcpRoutes, { mcpWellKnownRoutes } from "./mcp";
 import { migrateColumns } from "./migrations/column-migration";
+import { migrateLabelColors } from "./migrations/label-color-migration";
+import milestone from "./milestone";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
@@ -66,24 +63,26 @@ import { createRoute, errorResponse, jsonResponse, z } from "./openapi";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
-import { assertProjectAccess } from "./project-access/assert-project-access";
 import { getPublicProject } from "./project/controllers/get-public-project";
-import { initializeScheduler, shutdownScheduler } from "./scheduler";
-import search from "./search";
-import slackIntegration from "./slack-integration";
-import { getPrivateObject } from "./storage/s3";
-import task from "./task";
+import { descriptionPageSchema, publicBoardPageSchema } from "./task/response";
+import { descriptionPageQuery, listTasksQuery } from "./task/schema";
 import {
   getDescriptionPage,
   getPublicProjectDescriptionPage,
 } from "./task/description-pages";
-import { boardSchema, descriptionPageSchema } from "./task/response";
-import { descriptionPageQuery, listTasksQuery } from "./task/schema";
+import { initializeScheduler, shutdownScheduler } from "./scheduler";
+import search from "./search";
+import skills from "./skills";
+import slackIntegration from "./slack-integration";
+import { getPrivateObject } from "./storage/s3";
+import task from "./task";
 import taskRelation from "./task-relation";
+import telegramConfig from "./telegram-config";
 import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
 import user from "./user";
 import getAvatar from "./user/controllers/get-avatar";
+import { canAccessProject } from "./utils/access-scope";
 import { apiKeyRejection } from "./utils/api-key-rejection";
 import { applyApiKeyHeaders } from "./utils/apply-api-key-headers";
 import { authenticateApiRequest } from "./utils/authenticate-api-request";
@@ -93,18 +92,17 @@ import {
 } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
 import { clientIpMiddleware } from "./utils/client-ip";
-import { migrateApiKeyReferenceId } from "./utils/migrate-apikey-reference-id";
-import { migrateNotificationPreferencesSchema } from "./utils/migrate-notification-preferences-schema";
-import { migrateSessionColumn } from "./utils/migrate-session-column";
-import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
-import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
+import { drainPasswordResetDeliveries } from "./utils/password-reset-delivery";
+import { seedDefaultWorkspaceInviteLinks } from "./utils/seed-default-workspace-invite-links";
 import { drainSignInEmails } from "./utils/sign-in-email-tasks";
+import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
 import { apiKeyResponseHeaders } from "./utils/rate-limit-headers";
 import { readApiKeyCheck, verifyApiKey } from "./utils/verify-api-key";
 import workflowRule from "./workflow-rule";
 import workspace from "./workspace";
+import workspaceSharing from "./workspace-sharing";
 import {
   addConnection,
   addUserConnection,
@@ -118,6 +116,7 @@ import {
   handleWebSocketMessage,
   MAX_WEBSOCKET_MESSAGE_BYTES,
 } from "./ws/security";
+import { syncWorkspaceAccess } from "./ws/workspace-access";
 
 type ApiKey = {
   id: string;
@@ -183,18 +182,18 @@ function buildContentDisposition(filename: string, inline: boolean) {
 
 export function createApp() {
   const app = new Hono<AppVariables>();
+
+  // Resolves the client address once, from the transport peer and the hops a
+  // trusted proxy chain reports, and hands Better Auth a private header it is
+  // the only reader of.
   app.use("*", clientIpMiddleware());
 
-  app.onError((err) => {
+  app.onError((err, c) => {
     if (err instanceof HTTPException) {
-      // expected errors (401/404/...) are not reported; real failures are
-      if (err.status >= 500) {
-        Sentry.captureException(err);
-      }
       return httpExceptionResponse(err);
     }
 
-    Sentry.captureException(err);
+    console.error(`Unhandled error on ${c.req.method} ${c.req.path}:`, err);
     return httpExceptionResponse(
       new HTTPException(500, { message: "Internal Server Error" }),
     );
@@ -335,29 +334,23 @@ export function createApp() {
         tags: ["Projects"],
         summary: "Get a public project board",
         description:
-          "Read a public board in bounded task pages. Visibility is checked before loading tasks. Continue through pagination.totalPages for all tasks and through relatedPage/pagination.relatedTotalPages for their complete related records.",
+          "Read a public board in bounded task pages. Visibility is checked before loading tasks.",
+        // No authentication: the board is public by definition here.
         security: [],
         request: {
           params: z.object({ id: z.string() }),
           query: listTasksQuery,
         },
         responses: {
-          200: jsonResponse(
-            "A public board page",
-            boardSchema.shape.data
-              .extend({ pagination: boardSchema.shape.pagination })
-              .openapi("PublicBoardPage"),
-          ),
+          200: jsonResponse("A public board page", publicBoardPageSchema),
+          400: errorResponse("Invalid pagination or filters"),
           403: errorResponse("Project is not public"),
           404: errorResponse("Project not found"),
-          400: errorResponse("Invalid pagination or filters"),
-          503: errorResponse("Task list request timed out"),
         },
       }),
       async (c) => {
         const { id } = c.req.valid("param");
-        const project = await getPublicProject(id, c.req.valid("query"));
-        return c.json(project, 200);
+        return c.json(await getPublicProject(id, c.req.valid("query")), 200);
       },
       validationHookWithMessage("Invalid task pagination or filters"),
     )
@@ -381,7 +374,6 @@ export function createApp() {
           400: errorResponse("Invalid description cursor"),
           404: errorResponse("Public project not found"),
           409: errorResponse("Description changed or no longer public"),
-          503: errorResponse("Description request timed out"),
         },
       }),
       async (c) =>
@@ -414,7 +406,6 @@ export function createApp() {
           400: errorResponse("Invalid description cursor"),
           404: errorResponse("Public task not found"),
           409: errorResponse("Description changed or no longer public"),
-          503: errorResponse("Description request timed out"),
         },
       }),
       async (c) => {
@@ -429,8 +420,6 @@ export function createApp() {
       },
       validationHookWithMessage("Invalid description cursor"),
     );
-
-  api.route("/calendar-feed", publicCalendarFeed);
 
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
@@ -450,6 +439,13 @@ export function createApp() {
     return c.json(result);
   });
 
+  // The feed link itself is the secret, so it is mounted before the
+  // authenticating `*` middleware below: a subscriber holds no session.
+  api.route("/calendar-feed", publicCalendarFeed);
+
+  // Better Auth's API-key plugin validates the key itself and never checks the
+  // owner's ban state, so a banned user would keep a working key. Reject such a
+  // key before any auth route — including /auth/get-session — sees it.
   api.use("/auth/*", async (c, next) => {
     const apiKeyHeader = c.req.header("x-api-key")?.trim();
     if (!apiKeyHeader) return next();
@@ -695,6 +691,16 @@ export function createApp() {
     return c.json(document);
   });
 
+  // Interactive API reference reading the public /openapi document above.
+  // Kept a plain route so it does not appear inside the spec it renders.
+  api.get(
+    "/docs",
+    Scalar({
+      url: "/api/openapi",
+      pageTitle: "Kaneo API Reference",
+    }),
+  );
+
   // Better Auth serves GET /auth/device as JSON. Browsers that open the API URL
   // directly expect a page, so redirect full document navigations to the web app.
   const authDeviceQuerySchema = z.object({
@@ -752,6 +758,8 @@ export function createApp() {
     const bearerToken = authHeader?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
     if (bearerToken && !apiKeyHeader) {
+      // A bearer credential must not be able to fall back to a browser cookie,
+      // so the cookie never travels with it.
       const headers = new Headers(c.req.raw.headers);
       headers.delete("cookie");
       const session = await auth.api.getSession({ headers });
@@ -798,42 +806,45 @@ export function createApp() {
     const path = c.req.path;
     if (
       path.startsWith("/api/mcp") ||
+      path.startsWith("/api/skills") ||
       path.startsWith("/api/.well-known/") ||
-      path === "/api/billing/webhook"
+      // Public invite-link lookups are anonymous by design (the web fetcher
+      // sends no credentials for signed-out visitors). The accept route is
+      // POST, so it still goes through authentication below.
+      (c.req.method === "GET" &&
+        path.startsWith("/api/workspace-sharing/public/"))
     ) {
       return next();
     }
-    return Sentry.withIsolationScope(async () => {
-      Sentry.setUser(null);
-      try {
-        await authenticateApiRequest(c);
-        const windowId = c.req.header("X-Kaneo-Window-Id");
-        const userId = c.get("userId");
-        const initiatorId = windowId ? `${userId}:${windowId}` : userId;
-        return await eventContext.run({ initiatorId }, next);
-      } catch (error) {
-        if (!(error instanceof HTTPException)) {
-          console.error("API authentication failed:", error);
-          throw new HTTPException(500, { message: "Internal Server Error" });
-        }
-        throw error;
-      } finally {
-        Sentry.setUser(null);
+    try {
+      await authenticateApiRequest(c);
+      const windowId = c.req.header("X-Kaneo-Window-Id");
+      const userId = c.get("userId");
+      const initiatorId = windowId ? `${userId}:${windowId}` : userId;
+      return await eventContext.run({ initiatorId }, next);
+    } catch (error) {
+      if (!(error instanceof HTTPException)) {
+        console.error("API authentication failed:", error);
+        throw new HTTPException(500, { message: "Internal Server Error" });
       }
-    });
+      throw error;
+    }
   });
 
   const oauthApi = api.route("/oauth", oauth);
 
-  const billingApi = api.route("/billing", billing);
+  api.route("/skills", skills);
+
   const projectApi = api.route("/project", project);
   const calendarFeedApi = api.route("/calendar-feed", calendarFeed);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
+  const appointmentApi = api.route("/appointment", appointment);
   const commentApi = api.route("/comment", comment);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
+  const milestoneApi = api.route("/milestone", milestone);
   const notificationApi = api.route("/notification", notification);
   const notificationPreferencesApi = api.route(
     "/notification-preferences",
@@ -850,6 +861,7 @@ export function createApp() {
     "/gitlab-integration",
     gitlabIntegration,
   );
+  const adminApi = api.route("/admin", admin);
   const genericWebhookIntegrationApi = api.route(
     "/generic-webhook-integration",
     genericWebhookIntegration,
@@ -867,15 +879,17 @@ export function createApp() {
     "/telegram-integration",
     telegramIntegration,
   );
+  const telegramConfigApi = api.route("/telegram-config", telegramConfig);
   const taskRelationApi = api.route("/task-relation", taskRelation);
   const externalLinkApi = api.route("/external-link", externalLink);
   const workflowRuleApi = api.route("/workflow-rule", workflowRule);
   const invitationApi = api.route("/invitation", invitation);
+  const accessTeamApi = api.route("/access-team", accessTeam);
   const workspaceApi = api.route("/workspace", workspace);
+  const workspaceSharingApi = api.route("/workspace-sharing", workspaceSharing);
   const customFieldApi = api.route("/custom-field", customField);
   const importApi = api.route("/import", importRoutes);
   const userApi = api.route("/user", user);
-  const adminApi = api.route("/admin", admin);
 
   app.route(
     "/",
@@ -892,6 +906,9 @@ export function createApp() {
   api.get(
     "/ws/user",
     upgradeWebSocket(async (c) => {
+      // The `*` middleware above already authenticated the handshake, so the
+      // API key's single quota unit is spent once. Re-authenticating here would
+      // reject the very key that just opened the socket.
       assertWebSocketOrigin(c.req.raw.headers);
 
       const userId = c.get("userId");
@@ -922,7 +939,10 @@ export function createApp() {
 
       const userId = c.get("userId");
 
-      let workspaceId: string | undefined;
+      // Carried on the connection so a later revocation of this workspace can
+      // close it.
+      let projectWorkspaceId = "";
+
       if (projectId) {
         const [project] = await db
           .select({ workspaceId: schema.projectTable.workspaceId })
@@ -934,11 +954,16 @@ export function createApp() {
           throw new HTTPException(404, { message: "Project not found" });
         }
 
-        await validateWorkspaceAccess(userId, project.workspaceId, undefined, {
-          notFoundMessage: "Project not found",
-        });
-        await assertProjectAccess(userId, projectId);
-        workspaceId = project.workspaceId;
+        projectWorkspaceId = project.workspaceId;
+        await validateWorkspaceAccess(userId, project.workspaceId);
+
+        // A scoped member without a grant for this project must not hear its
+        // broadcasts, even though the workspace itself is reachable.
+        if (!(await canAccessProject(userId, projectId))) {
+          throw new HTTPException(403, {
+            message: "No access to this project",
+          });
+        }
       }
 
       const windowId = c.req.query("windowId");
@@ -947,13 +972,13 @@ export function createApp() {
 
       return {
         onOpen(_evt, ws) {
-          if (projectId && workspaceId) {
+          if (projectId) {
             conn = addConnection(
               projectId,
               ws,
               userId,
               initiatorId,
-              workspaceId,
+              projectWorkspaceId,
             );
           }
         },
@@ -973,8 +998,10 @@ export function createApp() {
     app,
     api,
     injectWebSocket,
+    accessTeamApi,
     activityApi,
-    billingApi,
+    adminApi,
+    appointmentApi,
     columnApi,
     commentApi,
     configApi,
@@ -985,25 +1012,27 @@ export function createApp() {
     githubIntegrationApi,
     giteaIntegrationApi,
     gitlabIntegrationApi,
+    calendarFeedApi,
     invitationApi,
     invitationPublicApi,
     labelApi,
+    milestoneApi,
     notificationApi,
     notificationPreferencesApi,
     projectApi,
-    calendarFeedApi,
     publicProjectApi,
     searchApi,
     mattermostIntegrationApi,
     slackIntegrationApi,
     taskApi,
     taskRelationApi,
+    telegramConfigApi,
     telegramIntegrationApi,
     timeEntryApi,
     userApi,
-    adminApi,
     workflowRuleApi,
     workspaceApi,
+    workspaceSharingApi,
     customFieldApi,
     importApi,
     oauthApi,
@@ -1013,34 +1042,19 @@ export function createApp() {
 export async function runStartupTasks() {
   const currentDir = dirname(fileURLToPath(import.meta.url));
 
-  await prepareDatabaseStartup({
-    waitForDatabase: async () => {
-      await waitForDatabase({
-        query: async () => {
-          await getDatabase().execute(sql`SELECT 1`);
-        },
-      });
-    },
-    runStartupMigrations: async () => {
-      await migrateWorkspaceUserEmail();
-      await migrateSessionColumn();
+  await applyDatabasePragmas();
 
-      console.log("🔄 Migrating database...");
-      await migrate(getDatabase(), {
-        migrationsFolder: `${currentDir}/../drizzle`,
-      });
-      console.log("✅ Database migrated successfully!");
-    },
+  console.log("🔄 Migrating database...");
+  await migrate(getDatabase(), {
+    migrationsFolder: `${currentDir}/../drizzle`,
   });
+  console.log("✅ Database migrated successfully!");
 
-  // After Drizzle migrations: apikey table must exist so we can align columns
-  // with Better Auth (reference_id + nullable user_id).
-  await migrateApiKeyReferenceId();
-
-  await migrateNotificationPreferencesSchema();
   await migrateGitHubIntegration();
   await migrateColumns();
+  await migrateLabelColors();
   await seedDefaultWorkspaceRoles();
+  await seedDefaultWorkspaceInviteLinks();
 
   initializePlugins();
   initializeScheduler();
@@ -1082,6 +1096,7 @@ export async function startServer(
     shutdownScheduler();
     await shutdownWebSocketAdapter();
     server.close();
+    // Accepted recovery/sign-in requests must not lose their mail to the exit.
     const [, signInEmailsDrained] = await Promise.all([
       drainPasswordResetDeliveries(),
       drainSignInEmails(),
@@ -1106,8 +1121,10 @@ const createdApp = createApp();
 const {
   app,
   injectWebSocket,
+  accessTeamApi,
   activityApi,
-  billingApi,
+  adminApi,
+  appointmentApi,
   columnApi,
   commentApi,
   configApi,
@@ -1118,25 +1135,27 @@ const {
   githubIntegrationApi,
   giteaIntegrationApi,
   gitlabIntegrationApi,
+  calendarFeedApi,
   invitationApi,
   invitationPublicApi,
   labelApi,
   mattermostIntegrationApi,
+  milestoneApi,
   notificationApi,
   notificationPreferencesApi,
   projectApi,
-  calendarFeedApi,
   publicProjectApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
   taskRelationApi,
+  telegramConfigApi,
   telegramIntegrationApi,
   timeEntryApi,
   userApi,
-  adminApi,
   workflowRuleApi,
   workspaceApi,
+  workspaceSharingApi,
   customFieldApi,
   importApi,
   oauthApi,
@@ -1153,16 +1172,17 @@ if (isMainModule) {
 }
 
 export type AppType =
-  | typeof billingApi
+  | typeof accessTeamApi
   | typeof configApi
   | typeof projectApi
-  | typeof calendarFeedApi
   | typeof taskApi
+  | typeof appointmentApi
   | typeof columnApi
   | typeof activityApi
   | typeof commentApi
   | typeof timeEntryApi
   | typeof labelApi
+  | typeof milestoneApi
   | typeof notificationApi
   | typeof notificationPreferencesApi
   | typeof searchApi
@@ -1170,20 +1190,23 @@ export type AppType =
   | typeof githubIntegrationApi
   | typeof giteaIntegrationApi
   | typeof gitlabIntegrationApi
+  | typeof calendarFeedApi
+  | typeof adminApi
   | typeof genericWebhookIntegrationApi
   | typeof discordIntegrationApi
   | typeof mattermostIntegrationApi
   | typeof slackIntegrationApi
+  | typeof telegramConfigApi
   | typeof telegramIntegrationApi
   | typeof taskRelationApi
   | typeof externalLinkApi
   | typeof workflowRuleApi
   | typeof invitationApi
   | typeof workspaceApi
+  | typeof workspaceSharingApi
   | typeof customFieldApi
   | typeof importApi
   | typeof userApi
-  | typeof adminApi
   | typeof publicProjectApi
   | typeof invitationPublicApi
   | typeof oauthApi;

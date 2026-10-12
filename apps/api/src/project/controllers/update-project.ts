@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { projectTable } from "../../database/schema";
@@ -18,58 +18,64 @@ async function updateProject(
   workspaceId: string,
   canShare: boolean,
 ) {
-  return db.transaction(async (tx) => {
-    await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(1524, hashtext(${workspaceId}))`,
-    );
+  return db.transaction(
+    async (tx) => {
+      const [existingProject] = await tx
+        .select()
+        .from(projectTable)
+        .where(
+          and(
+            eq(projectTable.id, id),
+            eq(projectTable.workspaceId, workspaceId),
+          ),
+        );
 
-    const [existingProject] = await tx
-      .select()
-      .from(projectTable)
-      .where(
-        and(eq(projectTable.id, id), eq(projectTable.workspaceId, workspaceId)),
-      )
-      .for("update");
-
-    if (!existingProject) {
-      throw new HTTPException(404, {
-        message:
-          "Project doesn't exist or doesn't belong to the specified workspace",
-      });
-    }
-
-    if (isPublic !== existingProject.isPublic && !canShare) {
-      throw new HTTPException(403, {
-        message:
-          "Changing project visibility requires the project:share permission",
-      });
-    }
-
-    if (!isSameProjectKey(slug, existingProject.slug)) {
-      const keyConflict = await findProjectKeyConflict(tx, workspaceId, slug, {
-        excludeProjectId: id,
-      });
-      if (keyConflict) {
-        throw new HTTPException(409, {
-          message: projectKeyTakenMessage(slug, keyConflict.name),
+      if (!existingProject) {
+        throw new HTTPException(404, {
+          message:
+            "Project doesn't exist or doesn't belong to the specified workspace",
         });
       }
-    }
 
-    const [updatedProject] = await tx
-      .update(projectTable)
-      .set({
-        name,
-        icon,
-        slug,
-        description,
-        isPublic,
-      })
-      .where(eq(projectTable.id, id))
-      .returning();
+      if (isPublic !== existingProject.isPublic && !canShare) {
+        throw new HTTPException(403, {
+          message:
+            "Changing project visibility requires the project:share permission",
+        });
+      }
 
-    return updatedProject;
-  });
+      if (!isSameProjectKey(slug, existingProject.slug)) {
+        const keyConflict = await findProjectKeyConflict(
+          tx,
+          workspaceId,
+          slug,
+          {
+            excludeProjectId: id,
+          },
+        );
+        if (keyConflict) {
+          throw new HTTPException(409, {
+            message: projectKeyTakenMessage(slug, keyConflict.name),
+          });
+        }
+      }
+
+      const [updatedProject] = await tx
+        .update(projectTable)
+        .set({
+          name,
+          icon,
+          slug,
+          description,
+          isPublic,
+        })
+        .where(eq(projectTable.id, id))
+        .returning();
+
+      return updatedProject;
+    },
+    { behavior: "immediate" },
+  );
 }
 
 export default updateProject;

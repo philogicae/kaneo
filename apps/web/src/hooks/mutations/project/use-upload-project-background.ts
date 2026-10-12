@@ -14,7 +14,9 @@ function useUploadProjectBackground() {
 
   return useMutation({
     mutationFn: ({ projectId, file }: UploadProjectBackgroundVariables) =>
-      uploadProjectBackground(projectId, file),
+      // A fresh version per upload lets the board tell a replaced background
+      // from the previous one without comparing bytes.
+      uploadProjectBackground(projectId, file, crypto.randomUUID()),
     onSuccess: async (_data, { projectId }) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["tasks", projectId] }),

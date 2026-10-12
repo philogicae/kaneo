@@ -6,13 +6,12 @@ export type GetProjectMembersRequest = {
   projectId: string;
 };
 
-async function getProjectMembers({
-  workspaceId,
-  projectId,
-}: GetProjectMembersRequest) {
-  const response = await client.workspace[":workspaceId"].members.$get({
-    param: { workspaceId },
-    query: { projectId },
+// The project route answers with the members the fork's access model grants
+// (teams and direct grants); the workspace route filters by the newer
+// per-member project access rows, which hides team-granted members.
+async function getProjectMembers({ projectId }: GetProjectMembersRequest) {
+  const response = await client.project[":id"].members.$get({
+    param: { id: projectId },
   });
 
   if (!response.ok) {

@@ -12,6 +12,7 @@ function build(
     billingEnabled: false,
     canImport: false,
     hasAdminAccess: false,
+    canInviteUsers: false,
     projects: [],
     ...overrides,
   });

@@ -7,6 +7,7 @@ export type ProjectBroadcastMessage = {
   targetTaskId?: string;
   linksChanged?: boolean;
   taskTitleChanged?: boolean;
+  appointmentId?: string;
 };
 
 export type BroadcastMessage = {

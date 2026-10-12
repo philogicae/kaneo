@@ -3,11 +3,12 @@ import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemePreviewWindow } from "@/components/account/theme-preview-window";
 import { RadioGroup } from "@/components/ui/radio-group";
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark" | "volt" | "system";
 
 const THEMES: { value: Theme; labelKey: string }[] = [
   { value: "light", labelKey: "settings:preferencesPage.themeLight" },
   { value: "dark", labelKey: "settings:preferencesPage.themeDark" },
+  { value: "volt", labelKey: "settings:preferencesPage.themeVolt" },
   { value: "system", labelKey: "settings:preferencesPage.themeSystem" },
 ];
 
@@ -24,7 +25,7 @@ export function ThemePicker({ value, onChange }: ThemePickerProps) {
       value={value}
       onValueChange={(next) => onChange(next as Theme)}
       aria-label={t("settings:preferencesPage.theme")}
-      className="grid grid-cols-3 gap-3"
+      className="grid grid-cols-2 gap-3 sm:grid-cols-4"
     >
       {THEMES.map((theme) => {
         const checked = theme.value === value;
@@ -44,6 +45,10 @@ export function ThemePicker({ value, onChange }: ThemePickerProps) {
                   <ThemePreviewWindow tone="light" />
                   <ThemePreviewWindow tone="dark" className="pl-0" />
                 </span>
+              ) : theme.value === "volt" ? (
+                <span
+                  className={`theme-preview-${theme.value} block h-full w-full`}
+                />
               ) : (
                 <ThemePreviewWindow tone={theme.value} />
               )}

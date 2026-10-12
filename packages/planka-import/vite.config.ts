@@ -56,6 +56,13 @@ export default defineConfig({
         ],
         cache: false,
       },
+      "test:coverage:run": {
+        command: "vp test run --config vitest.config.ts --coverage",
+        dependsOn: [
+          { task: "build", from: ["dependencies", "devDependencies"] },
+        ],
+        cache: false,
+      },
     },
   },
 });

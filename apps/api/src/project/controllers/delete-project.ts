@@ -19,8 +19,7 @@ async function deleteProject(id: string, workspaceId: string) {
       .from(projectTable)
       .where(
         and(eq(projectTable.id, id), eq(projectTable.workspaceId, workspaceId)),
-      )
-      .for("update");
+      );
     if (!project)
       throw new HTTPException(404, { message: "Project not found" });
     const assets = await tx

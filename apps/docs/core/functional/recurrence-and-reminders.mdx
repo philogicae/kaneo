@@ -1,0 +1,32 @@
+---
+title: Recurrence and reminders
+description: Repeat tasks on a schedule and get reminded before their start date.
+---
+
+Tasks can repeat themselves and remind you before they start. Both settings live on the task detail page and travel through the API and MCP.
+
+## Recurrence
+
+A recurrence rule is a frequency — **daily**, **weekly**, or **monthly** — with an interval (every 2 weeks, every 3 months). A start date is required.
+
+When a recurring task is completed (moved into a final column), Kaneo creates its next occurrence in the same project and column, with start date, due date, and reminders shifted by one period. The rule stays on the new occurrence, so the chain continues until you clear it. Editing or clearing recurrence on one occurrence does not rewrite its history.
+
+## Task reminders
+
+Reminders are offsets before the task's **start date**, expressed in minutes, hours, days, or weeks; a task can carry several (for example 24 hours and 1 hour before). A start date is required, and the task detail page shows the resolved countdown.
+
+Task reminders are delivered through the workspace's Telegram notification setup. Configure or verify it under **Settings → Account → Notifications**.
+
+## Appointment reminders
+
+Appointments use the same offset vocabulary before their start time. The appointment dialog offers common presets; the API and MCP accept arbitrary offsets.
+
+## Personal due-date reminders
+
+Separate from per-task reminders, notification preferences let each member pick a lead time — from 1 hour to 30 days — before a due date, per channel (email, ntfy, Gotify, custom webhook, and the configured Discord/Slack rules). See [Account notifications](/core/functional/account-notifications).
+
+## Related
+
+- [Plan and execute tasks](/core/functional/plan-and-execute-tasks)
+- [Appointments, Calendar and Gantt](/core/functional/appointments-calendar-gantt)
+- [Telegram integration](/core/integrations/telegram)

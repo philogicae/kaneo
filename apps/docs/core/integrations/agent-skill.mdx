@@ -1,0 +1,43 @@
+---
+title: Agent skill
+description: Install the Kaneo operating skill so coding agents use the MCP tools and the project workflow correctly.
+---
+
+The **Kaneo skill** is a portable operating guide for coding agents: how to resolve workspaces and projects, file and qualify tasks, transition statuses, attach evidence, and use the MCP tools without inventing calls. It complements the MCP connection — the skill says *what to do and why*, the tools do it.
+
+Every instance serves its own copy of the bundle, so agents always read the version that matches the running instance.
+
+## Served URLs
+
+The bundle is public (no token): it contains operating documentation, never workspace data.
+
+```
+GET /api/skills/kaneo/skill.md             → SKILL.md
+GET /api/skills/kaneo/references/<name>.md → reference files (lifecycle, mcp-guidelines, setup, …)
+```
+
+Browsers receive a rendered page with clickable links and the skill metadata (name, description, version); API clients and agents receive the raw `text/markdown` response. Responses are cached for five minutes. Unknown skills, non-`.md` files, and path-traversal attempts return `404`. Set `KANEO_SKILLS_DIR` to serve bundles from a different directory.
+
+## Install in an agent host
+
+Copy the `skills/kaneo/` folder into the host's skill directory, or use the copyable commands in **Settings → Account → Skills**. The page also shows the exact bundle URL for the connected instance.
+
+| Agent | User scope | Project scope |
+| --- | --- | --- |
+| Codex · Gemini CLI · OpenCode | `~/.agents/skills/kaneo/` | `.agents/skills/kaneo/` |
+| Claude Code | `~/.claude/skills/kaneo/` | `.claude/skills/kaneo/` |
+| OpenCode | `~/.config/opencode/skills/kaneo/` | `.opencode/skills/kaneo/` |
+| Gemini CLI | `gemini skills link ./skills/kaneo` | same command from the project root |
+
+Codex also supports an admin scope at `/etc/codex/skills/kaneo/`. The dashboard header exposes a **Skills** shortcut that opens the settings page.
+
+## Requirements and updates
+
+- The skill assumes a working [MCP connection](/core/integrations/mcp); the tool catalog on the connected instance is the executable contract, so agents should discover it before calling anything.
+- The skill version lives in the `SKILL.md` frontmatter and is shown on the served page. Re-copy the folder (or re-link it) after deploying a Kaneo update to pick up the current bundle.
+
+## Related
+
+- [MCP integration](/core/integrations/mcp)
+- [MCP stateless compatibility](/core/integrations/mcp-stateless)
+- [Environment variables](/core/installation/environment-variables)

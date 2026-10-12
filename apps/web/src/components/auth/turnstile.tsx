@@ -16,7 +16,7 @@ declare global {
           callback?: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
-          theme?: "light" | "dark" | "auto";
+          theme?: "light" | "dark" | "auto" | "volt";
           size?: "normal" | "compact" | "flexible" | "invisible";
           appearance?: "always" | "execute" | "interaction-only";
           "refresh-expired"?: "auto" | "manual" | "never";

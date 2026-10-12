@@ -31,8 +31,7 @@ export function withIntegrationLink<T>(
             eq(externalLinkTable.taskId, link.taskId),
             eq(externalLinkTable.integrationId, integration.id),
           ),
-        )
-        .for("update");
+        );
       if (!lockedLink) return;
       if (
         lockedLink.resourceType === "issue" &&

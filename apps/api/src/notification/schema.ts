@@ -1,4 +1,7 @@
 import { z } from "../openapi";
+import { listPagingQuery } from "../utils/paging";
+
+export const notificationParam = z.object({ id: z.string() });
 
 export const notificationWorkspaceQuery = z.object({
   workspaceId: z.string().min(1).optional().openapi({
@@ -7,7 +10,11 @@ export const notificationWorkspaceQuery = z.object({
   }),
 });
 
-export const notificationParam = z.object({ id: z.string() });
+// The list endpoint pages like the rest of the API; the bulk endpoints only
+// take the workspace filter.
+export const notificationListQuery = listPagingQuery.extend(
+  notificationWorkspaceQuery.shape,
+);
 
 export const createNotificationBody = z.object({
   title: z.string().nullable().optional(),

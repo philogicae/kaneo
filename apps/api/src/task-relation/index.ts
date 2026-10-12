@@ -9,15 +9,18 @@ import {
   createRoute,
   errorResponse,
   jsonResponse,
+  z,
 } from "../openapi";
-import { assertProjectAccess } from "../project-access/assert-project-access";
+import { canAccessProject } from "../utils/access-scope";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { validateWorkspaceAccess } from "../utils/validate-workspace-access";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import createTaskRelation from "./controllers/create-task-relation";
 import deleteTaskRelation from "./controllers/delete-task-relation";
+import getProjectRelations from "./controllers/get-project-relations";
 import getTaskRelations from "./controllers/get-task-relations";
 import {
+  projectRelationsSchema,
   taskRelationSchema,
   taskRelationWithTasksListSchema,
 } from "./response";
@@ -70,7 +73,9 @@ async function scopeToSourceTask(c: Context, next: Next) {
   await validateWorkspaceAccess(userId, scope.workspaceId, undefined, {
     notFoundMessage: "Source task not found",
   });
-  await assertProjectAccess(userId, scope.projectId);
+  if (!(await canAccessProject(userId, scope.projectId))) {
+    throw new HTTPException(403, { message: "No access to this project" });
+  }
   c.set("workspaceId", scope.workspaceId);
   return next();
 }
@@ -96,10 +101,31 @@ async function scopeToRelation(c: Context, next: Next) {
   await validateWorkspaceAccess(userId, scope.workspaceId, undefined, {
     notFoundMessage: "Task relation not found",
   });
-  await assertProjectAccess(userId, scope.projectId);
+  if (!(await canAccessProject(userId, scope.projectId))) {
+    throw new HTTPException(403, { message: "No access to this project" });
+  }
   c.set("workspaceId", scope.workspaceId);
   return next();
 }
+
+const getProjectRelationsRoute = createRoute({
+  method: "get",
+  operationId: "getProjectRelations",
+  path: "/project/{projectId}",
+  tags: ["Task Relations"],
+  summary: "Get project relations",
+  description:
+    "Get every task relation whose two endpoints belong to the project. The roadmap reads this once instead of fetching relations per task.",
+  middleware: [workspaceAccess.fromProject("projectId")] as const,
+  request: { params: z.object({ projectId: z.string() }) },
+  responses: {
+    200: jsonResponse("The project's task relations", projectRelationsSchema),
+    400: errorResponse(
+      "Unknown project, or its workspace could not be determined",
+    ),
+    403: errorResponse("No access to the project's workspace"),
+  },
+});
 
 const getTaskRelationsRoute = createRoute({
   method: "get",
@@ -172,6 +198,9 @@ const deleteTaskRelationRoute = createRoute({
 });
 
 const taskRelation = apiRouter<BaseVariables & { workspaceId: string }>()
+  .openapi(getProjectRelationsRoute, async (c) =>
+    c.json(await getProjectRelations(c.req.valid("param").projectId), 200),
+  )
   .openapi(getTaskRelationsRoute, async (c) =>
     c.json(
       await getTaskRelations(

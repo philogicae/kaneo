@@ -1,0 +1,28 @@
+name: kaneo
+
+services:
+  kaneo:
+    container_name: kaneo
+    image: ghcr.io/philogicae/kaneo:latest
+    init: true
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    volumes:
+      - ${KANEO_DATA_PATH:-./data}:/app/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:5173/api/health",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3

@@ -1,0 +1,40 @@
+---
+title: Teams and scoped project access
+description: Give members access to specific projects with access teams, scoped invitations, and direct grants.
+---
+
+By default a workspace member reaches every project in the workspace. When that is too broad, Kaneo scopes a member to a set of projects — through an **access team**, a **scoped invitation**, or a **direct grant**. The workspace stays the authorization boundary; project scope narrows what a member can see and do inside it.
+
+## Roles
+
+Members have a workspace role: **owner**, **admin**, **member**, or **viewer**. The role defines the permission set; project scope decides which projects those permissions apply to.
+
+## Invite someone with a scope
+
+1. Open the workspace **Members** page and choose **Invite member**.
+2. Enter the email, pick a role, and set the **scope**: all projects or a selection of projects, optionally through one or more access teams.
+3. Send the invitation. Pending invitations stay listed and can be cancelled until accepted; the scope is materialised when the invitation is accepted and follows later team edits dynamically.
+
+To invite without an email, create a **shareable invite link** with an expiry (24 hours, 7 days, 30 days, or never) and an optional maximum number of uses. Revoke a link at any time.
+
+## Access teams
+
+Access teams are named bundles of projects and members, managed from **Settings → Workspace → Teams**. Use them when several people should share the same project set — for example a client pod or a squad.
+
+- A team has a name, an optional description, members, and a project scope (all projects or a selection).
+- Adding a member to a team grants that member the team's projects; removing them takes the grant back.
+- Editing the team's project scope updates access for every member.
+
+## Direct grants on an existing member
+
+On the Members page, open a member's menu and choose **Manage access**. You can grant individual projects or lift the scope back to full workspace access. A scoped member keeps access to a project they create themselves through a direct grant.
+
+## What scoping affects
+
+A scoped member only sees and touches their projects across the product: project lists and boards, assignable members, global search results, notifications, project WebSockets, and private assets. Permission checks remain the same; they are simply evaluated against the projects the member can reach.
+
+## Related
+
+- [Collaborate with your team](/core/functional/collaborate-with-team)
+- [Create a workspace and project](/core/functional/create-workspace-and-project)
+- [Account notifications](/core/functional/account-notifications)

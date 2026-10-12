@@ -3,12 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { columnTable, projectTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
-import { filterUsersWithProjectAccess } from "../../project-access/filter-users-with-project-access";
-import {
-  filterAssignableUsers,
-  NO_PROJECT_ACCESS,
-  NOT_ASSIGNABLE,
-} from "../../utils/assert-assignable-user";
+import { filterAssignableUsers } from "../../utils/assert-assignable-user";
 import {
   coercePriority,
   coerceStatus,
@@ -50,14 +45,7 @@ async function importTasks(
     ),
   ];
 
-  const memberIds = await filterAssignableUsers(
-    assigneeIds,
-    project.workspaceId,
-  );
-  const assignableIds = await filterUsersWithProjectAccess(
-    memberIds,
-    projectId,
-  );
+  const assignableIds = await filterAssignableUsers(assigneeIds, projectId);
 
   const validStatuses = await getValidTaskStatuses(projectId);
 
@@ -69,7 +57,7 @@ async function importTasks(
     if (assigneeId && !assignableIds.has(assigneeId)) {
       results.push({
         success: false,
-        error: memberIds.has(assigneeId) ? NO_PROJECT_ACCESS : NOT_ASSIGNABLE,
+        error: "Assignee does not have access to this project",
         task: taskData,
       });
       continue;

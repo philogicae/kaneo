@@ -4,9 +4,12 @@ import {
   CalendarClock,
   CalendarDays,
   CalendarX,
+  Milestone as MilestoneIcon,
   Plus,
+  Repeat,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import TaskRemindersPopover from "@/components/task/task-reminders-popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,19 +18,21 @@ import useGetGiteaIntegration from "@/hooks/queries/gitea-integration/use-get-gi
 import useGetGithubIntegration from "@/hooks/queries/github-integration/use-get-github-integration";
 import useGetGitlabIntegration from "@/hooks/queries/gitlab-integration/use-get-gitlab-integration";
 import useGetLabelsByTask from "@/hooks/queries/label/use-get-labels-by-task";
+import useGetMilestones from "@/hooks/queries/milestone/use-get-milestones";
 import useGetProject from "@/hooks/queries/project/use-get-project";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useGetTask from "@/hooks/queries/task/use-get-task";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
 import { useTaskCopyShortcuts } from "@/hooks/use-task-copy-shortcuts";
+import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { getColumnIcon } from "@/lib/column";
 import {
   dueDateStatusColors,
   getDueDateStatus,
   isTaskCompleted,
 } from "@/lib/due-date-status";
-import { formatDateShort } from "@/lib/format";
+import { formatDateWithTime } from "@/lib/format";
 import { generateLink } from "@/lib/generate-link";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityLabel, getStatusDisplayLabel } from "@/lib/i18n/domain";
@@ -39,8 +44,11 @@ import TaskActions from "./task-actions";
 import TaskAssigneePopover from "./task-assignee-popover";
 import TaskDueDatePopover from "./task-due-date-popover";
 import TaskLabelsPopover from "./task-labels-popover";
+import TaskMilestonePopover from "./task-milestone-popover";
 import TaskPriorityPopover from "./task-priority-popover";
-import TaskStartDatePopover from "./task-start-date-popover";
+import TaskStartDatePopover, {
+  formatRecurrenceSummary,
+} from "./task-start-date-popover";
 import TaskStatusPopover from "./task-status-popover";
 
 function slugify(text: string | undefined): string {
@@ -92,10 +100,16 @@ export default function TaskPropertiesSidebar({
   const taskIsCompleted = isTaskCompleted(task?.status ?? "", columns);
   const { data: workspaceUsers } = useGetActiveWorkspaceUsers(workspaceId);
   const { data: taskLabels = [] } = useGetLabelsByTask(taskId ?? "");
+  const { data: milestones = [] } = useGetMilestones(projectId);
+  const milestoneName = task?.milestoneId
+    ? milestones.find((milestone) => milestone.id === task.milestoneId)?.name
+    : undefined;
   const { data: githubIntegration } = useGetGithubIntegration(projectId);
   const { data: giteaIntegration } = useGetGiteaIntegration(projectId);
   const { data: gitlabIntegration } = useGetGitlabIntegration(projectId);
   const { data: workspaceProjects = [] } = useGetProjects({ workspaceId });
+  const { canUpdateLabels } = useWorkspacePermission();
+  const canEditLabels = canUpdateLabels();
   const canMoveTask =
     Boolean(task) && workspaceProjects.some((p) => p.id !== task?.projectId);
   const statusColumn = columns.find(
@@ -256,9 +270,17 @@ export default function TaskPropertiesSidebar({
                       className={`text-xs font-semibold ${task.startDate ? "" : "text-muted-foreground"}`}
                     >
                       {task.startDate
-                        ? formatDateShort(task.startDate)
+                        ? formatDateWithTime(task.startDate)
                         : t("tasks:properties.start")}
                     </span>
+                    {task.recurrence && (
+                      <span
+                        className="flex shrink-0"
+                        title={formatRecurrenceSummary(task.recurrence, t)}
+                      >
+                        <Repeat className="w-3 h-3 text-muted-foreground" />
+                      </span>
+                    )}
                   </Button>
                 </TaskStartDatePopover>
               )}
@@ -292,19 +314,34 @@ export default function TaskPropertiesSidebar({
                           />
                         )}
                         <span className="text-xs font-semibold">
-                          {formatDateShort(task.dueDate)}
+                          {formatDateWithTime(task.dueDate)}
                         </span>
                       </>
                     ) : (
                       <>
                         <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                         <span className="text-xs font-semibold text-muted-foreground">
-                          {t("tasks:properties.noDate")}
+                          {t("tasks:properties.end")}
                         </span>
                       </>
                     )}
                   </Button>
                 </TaskDueDatePopover>
+              )}
+              {task && <TaskRemindersPopover task={task} />}
+              {task && (
+                <TaskMilestonePopover task={task}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start h-7 px-1.5 gap-1.5"
+                  >
+                    <MilestoneIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-xs font-semibold truncate">
+                      {milestoneName ?? t("roadmap:noSprint")}
+                    </span>
+                  </Button>
+                </TaskMilestonePopover>
               )}
             </div>
           </div>
@@ -405,9 +442,17 @@ export default function TaskPropertiesSidebar({
                         className={`text-xs font-semibold ${task.startDate ? "" : "text-muted-foreground"}`}
                       >
                         {task.startDate
-                          ? formatDateShort(task.startDate)
+                          ? formatDateWithTime(task.startDate)
                           : t("tasks:properties.start")}
                       </span>
+                      {task.recurrence && (
+                        <span
+                          className="flex shrink-0"
+                          title={formatRecurrenceSummary(task.recurrence, t)}
+                        >
+                          <Repeat className="w-3 h-3 text-muted-foreground" />
+                        </span>
+                      )}
                     </Button>
                   </TaskStartDatePopover>
                 )}
@@ -441,19 +486,34 @@ export default function TaskPropertiesSidebar({
                             />
                           )}
                           <span className="text-xs font-semibold">
-                            {formatDateShort(task.dueDate)}
+                            {formatDateWithTime(task.dueDate)}
                           </span>
                         </>
                       ) : (
                         <>
                           <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                           <span className="text-xs font-semibold text-muted-foreground">
-                            {t("tasks:properties.noDate")}
+                            {t("tasks:properties.end")}
                           </span>
                         </>
                       )}
                     </Button>
                   </TaskDueDatePopover>
+                )}
+                {task && <TaskRemindersPopover task={task} />}
+                {task && (
+                  <TaskMilestonePopover task={task}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start h-7 px-1.5 gap-1.5"
+                    >
+                      <MilestoneIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-xs font-semibold truncate">
+                        {milestoneName ?? t("roadmap:noSprint")}
+                      </span>
+                    </Button>
+                  </TaskMilestonePopover>
                 )}
               </div>
             </div>
@@ -554,9 +614,17 @@ export default function TaskPropertiesSidebar({
                         className={`text-xs font-semibold ${task.startDate ? "" : "text-muted-foreground"}`}
                       >
                         {task.startDate
-                          ? formatDateShort(task.startDate)
-                          : t("tasks:properties.startDate")}
+                          ? formatDateWithTime(task.startDate)
+                          : t("tasks:properties.start")}
                       </span>
+                      {task.recurrence && (
+                        <span
+                          className="flex shrink-0"
+                          title={formatRecurrenceSummary(task.recurrence, t)}
+                        >
+                          <Repeat className="w-3 h-3 text-muted-foreground" />
+                        </span>
+                      )}
                     </Button>
                   </TaskStartDatePopover>
                 )}
@@ -590,25 +658,43 @@ export default function TaskPropertiesSidebar({
                             />
                           )}
                           <span className="text-xs font-semibold">
-                            {formatDateShort(task.dueDate)}
+                            {formatDateWithTime(task.dueDate)}
                           </span>
                         </>
                       ) : (
                         <>
                           <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                           <span className="text-xs font-semibold text-muted-foreground">
-                            {t("tasks:properties.noDate")}
+                            {t("tasks:properties.end")}
                           </span>
                         </>
                       )}
                     </Button>
                   </TaskDueDatePopover>
                 )}
+                {task && <TaskRemindersPopover task={task} />}
+                {task && (
+                  <TaskMilestonePopover task={task}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start h-7 px-1.5 gap-1.5 w-full"
+                    >
+                      <MilestoneIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-xs font-semibold truncate">
+                        {milestoneName ?? t("roadmap:noSprint")}
+                      </span>
+                    </Button>
+                  </TaskMilestonePopover>
+                )}
               </div>
             </div>
           </>
         )}
 
+        {/* Labels are part of the task's identity, not a desktop-only extra:
+            the compact sheet and the narrow full-page layout keep the same
+            chips-and-plus editor as the wide sidebar. */}
         <div className="flex px-3 flex-col gap-3 p-2">
           <div className="flex flex-col gap-1">
             <span className="text-xs font-medium text-foreground/70 px-2">
@@ -635,15 +721,13 @@ export default function TaskPropertiesSidebar({
                             backgroundColor: resolveLabelColor(label.color),
                           }}
                         />
-                        <span className="truncate max-w-[60px]">
-                          {label.name}
-                        </span>
+                        <span>{label.name}</span>
                       </Badge>
                     </TaskLabelsPopover>
                   ),
                 )}
 
-              {task && (
+              {task && canEditLabels && (
                 <TaskLabelsPopover task={task} workspaceId={workspaceId}>
                   <Button
                     variant="ghost"

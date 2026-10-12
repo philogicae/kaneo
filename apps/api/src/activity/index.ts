@@ -181,16 +181,15 @@ const activity = apiRouter()
       200,
     ),
   )
-  .openapi(getActivitiesRoute, async (c) =>
-    c.json(
-      await getActivities(
-        c.req.valid("param").taskId,
-        c.get("userId"),
-        c.req.valid("query").limit,
-      ),
+  .openapi(getActivitiesRoute, async (c) => {
+    const { limit } = c.req.valid("query");
+    return c.json(
+      await getActivities(c.req.valid("param").taskId, c.get("userId"), {
+        limit,
+      }),
       200,
-    ),
-  )
+    );
+  })
   .openapi(createActivityRoute, async (c) => {
     const { taskId, message, type, eventData } = c.req.valid("json");
     if (type === "comment") {
