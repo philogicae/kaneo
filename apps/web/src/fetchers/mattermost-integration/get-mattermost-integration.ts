@@ -14,6 +14,7 @@ export type MattermostIntegration = {
     taskTitleChanged: boolean;
     taskDescriptionChanged: boolean;
     taskCommentCreated: boolean;
+    taskMentionCreated: boolean;
   };
   isActive: boolean | null;
   createdAt: string;

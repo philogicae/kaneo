@@ -45,14 +45,20 @@ export async function nextTaskPosition(
       message: "Task column has reached its capacity",
     });
   }
-  await tx.execute(sql`
+  // `UPDATE ... FROM` with the ranking in a CTE: SQLite has no `UPDATE ... SET
+  // ... = (SELECT ... FROM <same table>)` that still sees the old rows, because
+  // the inner reference resolves to the table being written. run() rather than
+  // execute() is the libsql idiom.
+  await tx.run(sql`
     WITH ranked AS (
       SELECT ${taskTable.id} AS id,
-        row_number() OVER (ORDER BY ${taskTable.position}, ${taskTable.createdAt}, ${taskTable.id}) AS position
+        row_number() OVER (
+          ORDER BY ${taskTable.position}, ${taskTable.createdAt}, ${taskTable.id}
+        ) AS position
       FROM ${taskTable}
       WHERE ${scope}
     )
-    UPDATE ${taskTable} SET position = ranked.position::integer
+    UPDATE ${taskTable} SET position = ranked.position
     FROM ranked WHERE ${taskTable.id} = ranked.id
   `);
   return total + 1;

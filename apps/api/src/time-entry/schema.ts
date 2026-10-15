@@ -1,4 +1,5 @@
 import { z } from "../openapi";
+import { listPagingQuery } from "../utils/paging";
 
 const ISO_TIMESTAMP =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:\d{2})$/;
@@ -29,6 +30,8 @@ const timestamp = z
   .openapi({ format: "date-time", example: "2026-01-31T09:00:00Z" });
 
 export const taskIdParam = z.object({ taskId: z.string() });
+
+export const timeEntryListQuery = listPagingQuery;
 
 export const timeEntryParam = z.object({ id: z.string() });
 

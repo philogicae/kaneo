@@ -95,8 +95,7 @@ export async function handleGiteaIssueOpened(
       const [current] = await tx
         .select()
         .from(integrationTable)
-        .where(eq(integrationTable.id, integration.id))
-        .for("update");
+        .where(eq(integrationTable.id, integration.id));
       if (
         !current?.isActive ||
         current.config !== integration.config ||

@@ -8,7 +8,12 @@ export function projectAccessCondition(
     EXISTS (
       SELECT 1 FROM "user" AS access_user
       WHERE access_user.id = ${userId}
-        AND 'admin' = ANY(string_to_array(access_user.role, ','))
+        AND (
+          access_user.role = 'admin'
+          OR access_user.role LIKE 'admin,%'
+          OR access_user.role LIKE '%,admin'
+          OR access_user.role LIKE '%,admin,%'
+        )
     )
     OR NOT EXISTS (
       SELECT 1 FROM project AS access_project
@@ -21,7 +26,12 @@ export function projectAccessCondition(
           SELECT 1 FROM workspace_member AS access_member
           WHERE access_member.workspace_id = access_project.workspace_id
             AND access_member.user_id = ${userId}
-            AND 'owner' = ANY(string_to_array(access_member.role, ','))
+            AND (
+              access_member.role = 'owner'
+              OR access_member.role LIKE 'owner,%'
+              OR access_member.role LIKE '%,owner'
+              OR access_member.role LIKE '%,owner,%'
+            )
         )
         AND NOT EXISTS (
           SELECT 1 FROM workspace_member_project AS access_grant

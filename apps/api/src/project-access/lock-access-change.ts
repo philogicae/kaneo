@@ -23,8 +23,7 @@ export async function lockAccessChange(
         ]),
       ),
     )
-    .orderBy(schema.workspaceUserTable.id)
-    .for("update");
+    .orderBy(schema.workspaceUserTable.id);
   const roles = new Map(rows.map((row) => [row.userId, row.role]));
   const actorRole = roles.get(change.actorId);
 

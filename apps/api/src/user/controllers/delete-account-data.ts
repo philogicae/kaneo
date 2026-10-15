@@ -1,10 +1,5 @@
 import { APIError } from "better-auth/api";
 import { and, eq, inArray } from "drizzle-orm";
-import {
-  findBillableWorkspaces,
-  formatBillableWorkspacesMessage,
-} from "../../billing/controllers/find-billable-workspaces";
-import { syncWorkspaceSeats } from "../../billing/controllers/sync-seats";
 import db from "../../database";
 import { revokeWorkspaceConnections } from "../../ws";
 import {
@@ -71,18 +66,7 @@ export async function deleteAccountData(userId: string) {
 
   if (plan.blockedWorkspaceNames.length > 0) {
     throw new APIError("CONFLICT", {
-      code: "SOLE_WORKSPACE_OWNER",
       message: formatBlockedWorkspacesMessage(plan.blockedWorkspaceNames),
-    });
-  }
-
-  const billable = await findBillableWorkspaces(plan.workspaceIdsToDelete);
-  if (billable.length > 0) {
-    throw new APIError("CONFLICT", {
-      code: "WORKSPACE_HAS_ACTIVE_SUBSCRIPTION",
-      message: formatBillableWorkspacesMessage(
-        billable.map((workspace) => workspace.name),
-      ),
     });
   }
 
@@ -116,16 +100,6 @@ export async function deleteAccountData(userId: string) {
           inArray(workspaceUserTable.workspaceId, plan.workspaceIdsToLeave),
         ),
       );
-
-    for (const workspaceId of plan.workspaceIdsToLeave) {
-      await syncWorkspaceSeats(workspaceId).catch((error) => {
-        console.error(
-          "Seat sync after account deletion failed:",
-          workspaceId,
-          error,
-        );
-      });
-    }
   }
 
   for (const workspaceId of plan.workspaceIdsToLeave) {

@@ -4,6 +4,7 @@ import {
   handleTaskCommentCreated,
   handleTaskCreated,
   handleTaskDescriptionChanged,
+  handleTaskMentionCreated,
   handleTaskPriorityChanged,
   handleTaskStatusChanged,
   handleTaskTitleChanged,
@@ -18,5 +19,6 @@ export const discordPlugin: IntegrationPlugin = {
   onTaskTitleChanged: handleTaskTitleChanged,
   onTaskDescriptionChanged: handleTaskDescriptionChanged,
   onTaskCommentCreated: handleTaskCommentCreated,
+  onTaskMentionCreated: handleTaskMentionCreated,
   validateConfig: validateDiscordConfig,
 };

@@ -8,10 +8,12 @@ export const configSchema = z
     disableEmailOtpSignIn: z.boolean(),
     disableWorkspaceCreation: z.boolean(),
     isDemoMode: z.boolean(),
-    hasSmtp: z.boolean(),
-    hasImageUploads: z.boolean().openapi({
+    hasSmtp: z.boolean().openapi({
+      description: "SMTP_HOST and SMTP_FROM are configured.",
+    }),
+    hasEmail: z.boolean().openapi({
       description:
-        "Whether S3-compatible storage is configured, so task images and board backgrounds can be uploaded.",
+        "Any email transport is configured: Resend (RESEND_API_KEY) or SMTP. Prefer this over hasSmtp to decide whether mail can be sent.",
     }),
     hasGithubSignIn: z.boolean(),
     hasGoogleSignIn: z.boolean(),
@@ -25,6 +27,5 @@ export const configSchema = z
     }),
     customOAuthAutoLogin: z.boolean(),
     customOAuthLogoutUrl: z.string().nullable(),
-    billingEnabled: z.boolean(),
   })
   .openapi("Config");

@@ -25,12 +25,7 @@ const redirectTo = `${origin}/auth/reset-password`;
 function post(path: string, body: unknown) {
   return createApp().app.request(`/api/auth${path}`, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Origin: origin,
-      "user-agent":
-        "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0",
-    },
+    headers: { "content-type": "application/json", Origin: origin },
     body: JSON.stringify(body),
   });
 }
@@ -39,7 +34,7 @@ beforeEach(async () => {
   await resetTestDatabase();
   // Better Auth skips origin checks in test mode unless explicitly enabled.
   (await auth.$context).skipOriginCheck = false;
-  vi.spyOn(email, "isSmtpConfigured").mockReturnValue(true);
+  vi.spyOn(email, "isEmailConfigured").mockReturnValue(true);
   vi.spyOn(email, "sendPasswordResetEmail").mockResolvedValue();
   expect(
     (
@@ -65,12 +60,7 @@ async function requestReset() {
   );
   const props = vi.mocked(email.sendPasswordResetEmail).mock.calls.at(-1)?.[2];
   expect(props).toEqual(
-    expect.objectContaining({
-      locale: "de-DE",
-      userName: "Reset user",
-      device: { browser: "Firefox", os: "Linux" },
-      requestedAt: expect.any(Date),
-    }),
+    expect.objectContaining({ locale: "de-DE", userName: "Reset user" }),
   );
   const link = new URL((props as { resetLink: string }).resetLink);
   expect(link.origin).toBe("http://localhost:1337");
@@ -209,7 +199,7 @@ describe("password reset with email OTP disabled", () => {
     );
   });
 
-  it("rejects untrusted redirects and requests without SMTP", async () => {
+  it("rejects untrusted redirects and requests without a mail transport", async () => {
     expect(
       (
         await post("/request-password-reset", {
@@ -218,7 +208,7 @@ describe("password reset with email OTP disabled", () => {
         })
       ).status,
     ).toBe(403);
-    vi.mocked(email.isSmtpConfigured).mockReturnValue(false);
+    vi.mocked(email.isEmailConfigured).mockReturnValue(false);
     expect(
       (await post("/request-password-reset", { email: address, redirectTo }))
         .status,

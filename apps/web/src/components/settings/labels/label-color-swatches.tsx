@@ -1,4 +1,5 @@
 import { CheckIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import labelColors from "@/constants/label-colors";
 import { cn } from "@/lib/cn";
 
@@ -13,6 +14,8 @@ export function LabelColorSwatches({
   onChange,
   labelledBy,
 }: LabelColorSwatchesProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       role="group"
@@ -26,9 +29,9 @@ export function LabelColorSwatches({
           <button
             key={color.value}
             type="button"
-            aria-label={color.label}
+            aria-label={t(`common:modals.createTask.labelColors.${color.key}`)}
             aria-pressed={selected}
-            title={color.label}
+            title={t(`common:modals.createTask.labelColors.${color.key}`)}
             onClick={() => onChange(color.value)}
             className={cn(
               "flex size-6 cursor-pointer items-center justify-center rounded-full text-white outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-popover",

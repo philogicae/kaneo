@@ -1,6 +1,7 @@
 import { and, eq, or } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db, { schema } from "../database";
+import { getWorkspaceAccessLevel } from "./access-scope";
 import { hasInstanceAdminRole } from "./instance-admin-role";
 
 type ValidateWorkspaceAccessOptions = {
@@ -73,5 +74,15 @@ export async function validateWorkspaceAccess(
 
   if (membership.length === 0) {
     throw notFound();
+  }
+
+  // A row can outlive the grants that justified it: revoked scoped members
+  // keep their membership but reach nothing. Refuse them like before, while
+  // non-members are hidden behind the not-found response above.
+  const level = await getWorkspaceAccessLevel(userId, workspaceId);
+  if (level === "none") {
+    throw new HTTPException(403, {
+      message: "You don't have access to this workspace",
+    });
   }
 }

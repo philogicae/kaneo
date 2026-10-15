@@ -96,6 +96,8 @@ it("keeps details in the rendered open column despite a final column sharing its
   });
   expect(screen.getByText("Regression label")).toBeVisible();
   view.rerender(<TaskCard task={task} isFinalColumn />);
-  expect(screen.queryByText("Regression label")).not.toBeInTheDocument();
+  // The fork keeps labels on completed cards, so a Done column still shows
+  // what the card was tagged with.
+  expect(screen.getByText("Regression label")).toBeVisible();
   expect(screen.getByText("Open work")).toBeVisible();
 });

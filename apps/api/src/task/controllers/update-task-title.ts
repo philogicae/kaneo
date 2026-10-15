@@ -35,8 +35,7 @@ async function updateTaskTitle({
     const [locked] = await tx
       .select()
       .from(taskTable)
-      .where(eq(taskTable.id, id))
-      .for("update");
+      .where(eq(taskTable.id, id));
     if (!locked) throw new HTTPException(404, { message: "Task not found" });
     existingTask = locked;
 

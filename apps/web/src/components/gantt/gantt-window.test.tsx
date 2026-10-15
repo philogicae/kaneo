@@ -9,6 +9,18 @@ import {
   vi,
 } from "vite-plus/test";
 
+vi.mock("@/hooks/queries/appointment/use-get-appointments", () => ({
+  default: () => ({ data: [] }),
+}));
+
+vi.mock("@/components/appointments/appointment-dialog", () => ({
+  default: () => null,
+}));
+
+vi.mock("@/lib/i18n", () => ({
+  i18n: { language: "en", t: (key: string) => key },
+}));
+
 const m = vi.hoisted(() => ({
   component: (() => null) as ComponentType,
   navigate: vi.fn(),

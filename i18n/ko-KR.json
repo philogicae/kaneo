@@ -10,7 +10,9 @@
 			"markAllRead": "모두 읽음으로 표시",
 			"remove": "제거",
 			"reset": "재설정",
-			"filter": "필터"
+			"filter": "필터",
+			"clearAllFilters": "모든 필터 지우기",
+			"save": "Save"
 		},
 		"a11y": {
 			"toggleSidebar": "사이드바 토글"
@@ -148,7 +150,14 @@
 					"amber": "앰버",
 					"terracotta": "테라코타",
 					"rose": "로즈",
-					"crimson": "크림슨"
+					"crimson": "크림슨",
+					"cyan": "시안",
+					"emerald": "에메랄드",
+					"fuchsia": "후크시아",
+					"indigo": "남색",
+					"lime": "라임",
+					"ocean": "바다",
+					"sky": "하늘"
 				},
 				"statusLoadError": "Project statuses couldn’t be loaded."
 			}
@@ -160,6 +169,20 @@
 				"apply": "링크 적용",
 				"remove": "링크 제거"
 			}
+		},
+		"boolean": {
+			"false": "False",
+			"notSet": "Not Set",
+			"true": "True",
+			"undefined": "Undefined"
+		},
+		"formats": {
+			"never": "안 함"
+		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
 		}
 	},
 	"auth": {
@@ -553,6 +576,50 @@
 				"description": "로그인 후 바로 이곳으로 돌아와 검토할 수 있습니다.",
 				"submit": "로그인"
 			}
+		},
+		"cloud": {
+			"signUp": {
+				"title": "다음 단계",
+				"description": "계정을 만든 후 워크스페이스 이름을 정합니다. 그다음 프로젝트를 추가하고 작업을 작성할 수 있습니다."
+			},
+			"onboarding": {
+				"title": "워크스페이스란",
+				"description": "워크스페이스에는 프로젝트와 그 작업, 함께 일하는 사람들이 모입니다. 설정이 끝나면 팀원을 초대하세요."
+			},
+			"invite": {
+				"description": "Everyone in a workspace sees the same boards and gets live updates as tasks move. Roles control who can change what.",
+				"title": "Work better together"
+			},
+			"plan": {
+				"description": "Every plan includes unlimited projects and tasks, automatic backups, and updates. Cancel anytime from billing settings.",
+				"title": "Try everything first"
+			}
+		},
+		"inviteLink": {
+			"errorTitle": "초대 링크 오류",
+			"errors": {
+				"accept": "워크스페이스 참여 실패",
+				"load": "초대 링크 세부 정보를 불러오지 못했습니다."
+			},
+			"invalidTitle": "유효하지 않은 초대 링크",
+			"joinPrompt": "<workspaceName>{{workspaceName}}</workspaceName>에 참여할 초대 링크가 있습니다.",
+			"linkExpired": "초대 링크 만료됨",
+			"loading": "초대 링크 불러오는 중...",
+			"pageTitleAccept": "워크스페이스 참여",
+			"pageTitleError": "초대 링크 오류",
+			"pageTitleInvalid": "유효하지 않은 초대 링크",
+			"signedInAs": "<email>{{email}}</email>(으)로 로그인됨",
+			"signedOutPrompt": "워크스페이스에 참여하려면 계정을 만들거나 로그인하세요.",
+			"title": "워크스페이스에 참여하세요!"
+		},
+		"signUpForm": {
+			"fullName": "이름",
+			"namePlaceholder": "홍길동",
+			"failedSignUp": "회원가입에 실패했습니다",
+			"accountCreated": "계정이 생성되었습니다",
+			"passwordTooShort": "비밀번호가 너무 짧습니다",
+			"creatingAccount": "계정 생성 중...",
+			"createAccount": "계정 만들기"
 		}
 	},
 	"settings": {
@@ -575,7 +642,8 @@
 			"updateError": "프로필 업데이트에 실패했습니다",
 			"validation": {
 				"nameRequired": "이름은 필수입니다",
-				"nameShort": "이름은 2자 이상이어야 합니다"
+				"nameShort": "이름은 2자 이상이어야 합니다",
+				"invalidEmail": "잘못된 이메일 주소입니다"
 			},
 			"avatar": {
 				"hint": "정사각형 이미지가 가장 잘 보입니다.",
@@ -584,7 +652,9 @@
 				"removeSuccess": "Profile picture removed",
 				"updateError": "Failed to update profile picture",
 				"updateSuccess": "Profile picture updated",
-				"upload": "업로드"
+				"upload": "업로드",
+				"change": "Change avatar",
+				"edit": "Change your profile picture"
 			},
 			"deleteAccount": {
 				"confirm": "Delete account",
@@ -596,9 +666,13 @@
 				"sectionTitle": "Danger zone",
 				"success": "Your account has been deleted",
 				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"sessionTooOld": "For security, sign out and sign back in before deleting your account.",
+				"sectionSubtitle": "Permanent actions that affect your whole account."
 			},
-			"emailHint": "이 주소로 로그인합니다."
+			"emailHint": "이 주소로 로그인합니다.",
+			"sectionSubtitle": "프로필 및 계정 세부 정보를 관리합니다.",
+			"emailPlaceholder": "이메일을 입력하세요",
+			"updateSuccess": "프로필이 업데이트되었습니다"
 		},
 		"notificationsPage": {
 			"pageTitle": "알림",
@@ -716,7 +790,46 @@
 			"stopSendingDescription": "이 워크스페이스의 알림은 Kaneo에서만 표시됩니다.",
 			"stopSendingTitle": "{{workspaceName}}에서 전송을 중지할까요?",
 			"workspacesDescription": "채널을 사용할 수 있는 워크스페이스와 프로젝트를 선택하세요.",
-			"workspacesTitle": "워크스페이스"
+			"workspacesTitle": "워크스페이스",
+			"accountEmailHint": "이메일 전송은 항상 로그인된 계정 이메일로 이루어집니다.",
+			"accountEmailLabel": "계정 이메일",
+			"allProjectsDescription": "이 워크스페이스의 모든 프로젝트에서 알림을 전송합니다.",
+			"createRule": "규칙 만들기",
+			"emailChannelHintDisabled": "먼저 이메일을 전역으로 구성하고 활성화하세요.",
+			"emailChannelHintEnabled": "일치하는 워크스페이스 알림을 이메일로 전송합니다.",
+			"emailDescription": "계정 이메일을 알림 수신처로 사용합니다.",
+			"gotifyChannelHintDisabled": "먼저 Gotify를 전역으로 구성하고 활성화하세요.",
+			"gotifyChannelHintEnabled": "일치하는 워크스페이스 알림을 Gotify로 전송합니다.",
+			"integrationNotConfigured": "설정되지 않음",
+			"integrationsDiscordDescription": "각 프로젝트는 작업 업데이트를 자체 Discord 웹훅으로 전송합니다. 프로젝트를 펼쳐 채널과 이벤트를 편집하세요.",
+			"integrationsDiscordTitle": "Discord 연동",
+			"integrationsSlackDescription": "각 프로젝트는 작업 업데이트를 자체 Slack 수신 웹훅으로 전송합니다. 프로젝트를 펼쳐 채널과 이벤트를 편집하세요.",
+			"integrationsSlackTitle": "Slack 연동",
+			"ntfyChannelHintDisabled": "먼저 ntfy를 전역으로 구성하고 활성화하세요.",
+			"ntfyChannelHintEnabled": "일치하는 워크스페이스 알림을 ntfy로 전송합니다.",
+			"projectScope": "프로젝트 범위",
+			"projectScopeDescription": "기본적으로 모든 프로젝트가 포함됩니다. 이 워크스페이스가 선택한 프로젝트에서만 알림을 보내야 한다면 범위를 좁히세요.",
+			"recipientHint": "본인에게 할당된 작업의 댓글과 상태 변경에 대한 알림을 받습니다. 멘션은 선택한 멤버에게 알림을 보냅니다. 본인이 작성한 댓글, 멘션 및 상태 변경에 대해서는 알림을 받지 않습니다.",
+			"reminderLeadTimeHint": "마감 1시간 전부터 30일 전까지 설정할 수 있습니다. 기한 초과 알림은 별도로 전송됩니다.",
+			"reminderLeadTimeUnitDays": "일",
+			"reminderLeadTimeUnitHours": "시간",
+			"removeRule": "규칙 제거",
+			"selectedProjects": "선택한 프로젝트",
+			"selectedProjectsDescription": "선택한 프로젝트에서만 알림을 전송합니다.",
+			"tabDiscord": "Discord",
+			"tabGeneral": "일반",
+			"tabSlack": "Slack",
+			"tabTelegram": "Telegram",
+			"webhookChannelHintDisabled": "먼저 웹훅을 전역으로 구성하고 활성화하세요.",
+			"webhookChannelHintEnabled": "일치하는 워크스페이스 알림을 웹훅으로 전송합니다.",
+			"workspaceCardHint": "이 워크스페이스가 계정 알림에 사용할 수 있는 채널을 선택합니다.",
+			"workspaceCardLabelEmail": "이메일",
+			"workspaceCardLabelGotify": "Gotify",
+			"workspaceCardLabelNtfy": "ntfy",
+			"workspaceCardLabelWebhook": "사용자 정의 웹훅",
+			"workspaceEnabledLabel": "{{workspaceName}} 알림 활성화",
+			"workspaceRulesDescription": "전역 채널을 재사용한 후 어떤 워크스페이스와 프로젝트가 계정 알림을 보낼 수 있는지 결정합니다.",
+			"workspaceRulesTitle": "워크스페이스 전송 규칙"
 		},
 		"preferencesPage": {
 			"title": "환경설정",
@@ -752,7 +865,19 @@
 			"priority": "우선순위",
 			"projectBackgrounds": "Project backgrounds",
 			"projectBackgroundsDescription": "프로젝트에서 보드 배경으로 설정한 이미지를 표시합니다.",
-			"advancedTitle": "고급"
+			"advancedTitle": "고급",
+			"appearanceSubtitle": "시각적 설정 및 레이아웃 환경설정.",
+			"assigneesDescription": "작업 담당자를 표시합니다",
+			"dueDatesDescription": "작업 마감일을 표시합니다",
+			"interfaceSize": "인터페이스 크기",
+			"interfaceSizeDecrease": "인터페이스 크기 줄이기",
+			"interfaceSizeIncrease": "인터페이스 크기 키우기",
+			"labelsDescription": "작업 라벨과 태그를 표시합니다",
+			"languageDescription": "선호하는 인터페이스 언어를 선택합니다",
+			"priorityDescription": "우선순위 표시기를 표시합니다",
+			"taskNumbersDescription": "작업 ID와 번호를 표시합니다",
+			"themeDescription": "선호하는 색상 구성표를 선택합니다",
+			"themeVolt": "볼트"
 		},
 		"developerPage": {
 			"pageTitle": "API 키",
@@ -764,7 +889,10 @@
 			"keysNote": "키는 내가 할 수 있는 모든 일을 할 수 있습니다. 더 이상 사용하지 않는 키는 삭제하세요.",
 			"keysTitle": "키",
 			"loadError": "API 키를 불러오지 못했습니다. 다시 시도해 주세요.",
-			"newKey": "새 키"
+			"newKey": "새 키",
+			"apiKeysCardTitle": "API 키",
+			"apiKeysCardDescription": "Kaneo에 프로그래밍 방식으로 접근하기 위한 API 키를 만들고 관리합니다.",
+			"createApiKey": "API 키 만들기"
 		},
 		"apiKey": {
 			"createdModal": {
@@ -773,7 +901,12 @@
 				"copy": "복사",
 				"copied": "복사됨",
 				"done": "완료",
-				"copyError": "키를 복사하지 못했습니다. 키를 선택해 직접 복사하세요."
+				"copyError": "키를 복사하지 못했습니다. 키를 선택해 직접 복사하세요.",
+				"yourApiKey": "API 키",
+				"toastCopied": "API 키가 클립보드에 복사되었습니다",
+				"alertTitle": "API 키가 생성되었습니다",
+				"alertDescription": "지금 키를 복사하세요. 다시 볼 수 없습니다.",
+				"copyToContinue": "계속하려면 키를 복사하세요"
 			},
 			"table": {
 				"deleteConfirmTitle": "“{{name}}”을(를) 삭제할까요?",
@@ -781,7 +914,19 @@
 				"delete": "키 삭제",
 				"deleting": "삭제 중…",
 				"toastDeleted": "API 키가 삭제되었습니다",
-				"toastDeleteError": "API 키를 삭제하지 못했습니다"
+				"toastDeleteError": "API 키를 삭제하지 못했습니다",
+				"loading": "API 키 로딩 중...",
+				"empty": "아직 API 키가 없습니다. 시작하려면 하나 만드세요.",
+				"columnName": "이름",
+				"columnKey": "키",
+				"columnCreated": "생성일",
+				"columnExpires": "만료일",
+				"columnActions": "작업",
+				"unnamedKey": "이름 없는 키",
+				"expiredBadge": "만료됨 {{label}}",
+				"deleteFallbackName": "이 API 키",
+				"deleteAria": "{{name}} 삭제",
+				"deleteAriaFallback": "API 키"
 			},
 			"createDialog": {
 				"title": "새 API 키",
@@ -800,8 +945,11 @@
 				"failedCreate": "API 키를 만들지 못했습니다",
 				"validation": {
 					"nameRequired": "이름을 입력하세요",
-					"nameShort": "3자 이상 입력하세요"
-				}
+					"nameShort": "3자 이상 입력하세요",
+					"expirationRequired": "만료는 필수입니다"
+				},
+				"expirationPlaceholder": "만료 선택",
+				"expirationDescription": "이 API 키가 유효하게 유지될 기간을 선택합니다. 안 함을 선택하면 자동 만료 없이 키가 생성됩니다."
 			},
 			"row": {
 				"actions": "{{name}} 메뉴",
@@ -846,10 +994,16 @@
 				"dialogTitle": "소유권을 이전하시겠습니까?",
 				"dialogDescription": "{{name}}님이 {{workspace}}의 단독 소유자가 됩니다. 관리자 권한은 유지되지만 워크스페이스 삭제나 재이전 같은 소유자 전용 기능은 잃게 됩니다.",
 				"transferring": "이전 중...",
-				"confirm": "소유권 이전"
+				"confirm": "소유권 이전",
+				"subtitle": "이 워크스페이스를 다른 멤버에게 이전합니다. 이후 관리자로 변경되며 소유자 전용 권한을 잃게 됩니다."
 			},
 			"ownershipSubtitle": "소유자만 볼 수 있습니다.",
-			"ownershipTitle": "소유권"
+			"ownershipTitle": "소유권",
+			"workspaceInfoSubtitle": "워크스페이스 세부 정보 및 환경설정을 구성합니다.",
+			"nameHint": "워크스페이스의 이름",
+			"descriptionHint": "워크스페이스에 대한 간단한 설명",
+			"dangerZoneSubtitle": "되돌릴 수 없으며 파괴적인 작업입니다.",
+			"toastUpdated": "워크스페이스가 업데이트되었습니다"
 		},
 		"projectGeneral": {
 			"pageTitle": "프로젝트 설정",
@@ -905,7 +1059,16 @@
 			"moveDialogTitle": "다른 워크스페이스로 이동할까요?",
 			"moveTargetLabel": "워크스페이스",
 			"moving": "이동 중...",
-			"tasksTitle": "작업"
+			"tasksTitle": "작업",
+			"projectInfoSubtitle": "프로젝트 세부 정보 및 환경설정을 구성합니다.",
+			"projectNameHint": "프로젝트의 이름",
+			"descriptionHint": "프로젝트에 대한 간단한 설명",
+			"dangerZoneSubtitle": "되돌릴 수 없으며 파괴적인 작업입니다.",
+			"toastUpdated": "프로젝트가 업데이트되었습니다",
+			"importExportTasks": "가져오기/내보내기",
+			"importExportTasksDescription": "작업을 가져오고 내보냅니다.",
+			"moveModalDescription": "프로젝트 \"{{name}}\"과(와) 모든 작업이 \"{{workspace}}\"(으)로 이동됩니다. 해당 워크스페이스의 멤버가 아닌 사람에게 할당된 작업은 할당이 해제되며, 이 프로젝트의 알림 구독도 삭제됩니다.",
+			"moveModalTitle": "프로젝트를 이동할까요?"
 		},
 		"projectIntegrations": {
 			"pageTitle": "연동",
@@ -954,7 +1117,10 @@
 			"offNote": "공개 링크를 끄면 즉시 작동하지 않습니다.",
 			"on": "켜짐",
 			"openPublicPage": "공개 페이지 열기",
-			"thisWorkspace": "이 워크스페이스"
+			"thisWorkspace": "이 워크스페이스",
+			"sectionSubtitle": "공개 접근을 토글하고 공개 URL을 공유합니다.",
+			"publicUrlHint": "프로젝트가 공개인 경우 이 링크를 공유하세요",
+			"copiedToast": "복사됨"
 		},
 		"projectWorkflow": {
 			"pageTitle": "워크플로 설정",
@@ -963,7 +1129,9 @@
 			"columnsTitle": "컬럼",
 			"columnsDescription": "드래그하여 순서를 바꿉니다. 완료 컬럼에 있는 작업은 완료된 것으로 간주됩니다.",
 			"automationTitle": "자동화",
-			"automationDescription": "연결된 저장소에서 이벤트가 발생하면 연결된 작업을 이동합니다."
+			"automationDescription": "연결된 저장소에서 이벤트가 발생하면 연결된 작업을 이동합니다.",
+			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
+			"customFieldsTitle": "Custom Fields"
 		},
 		"projectSwitcher": {
 			"selectProject": "프로젝트 선택",
@@ -987,7 +1155,19 @@
 			"deleteTitle": "“{{name}}”을(를) 삭제할까요?",
 			"doneHeader": "완료",
 			"dragAria": "{{name}} 순서 변경",
-			"reorderError": "컬럼 순서를 변경하지 못했습니다"
+			"reorderError": "컬럼 순서를 변경하지 못했습니다",
+			"toastCreated": "컬럼이 생성되었습니다",
+			"toastRenamed": "컬럼 이름이 변경되었습니다",
+			"toastFinalOn": "컬럼이 완료로 표시되었습니다",
+			"toastFinalOff": "컬럼의 완료 표시가 해제되었습니다",
+			"toastIconUpdated": "컬럼 아이콘이 업데이트되었습니다",
+			"toastDeleted": "컬럼이 삭제되었습니다",
+			"loading": "컬럼 로딩 중...",
+			"doneColumnTooltip": "이를 완료 컬럼으로 처리",
+			"doneColumn": "완료 컬럼",
+			"on": "켜짐",
+			"off": "꺼짐",
+			"add": "추가"
 		},
 		"githubIntegration": {
 			"toast": {
@@ -1002,7 +1182,11 @@
 				"importError": "이슈 가져오기에 실패했습니다",
 				"commentOnEnabled": "Kaneo가 새 이슈에 작업 링크를 포함한 댓글을 게시합니다",
 				"commentOnDisabled": "새 이슈의 작업 링크 댓글이 꺼져 있습니다",
-				"settingsUpdateError": "GitHub 연동 업데이트에 실패했습니다"
+				"settingsUpdateError": "GitHub 연동 업데이트에 실패했습니다",
+				"installedOk": "GitHub 앱이 올바르게 설치되었습니다!",
+				"installedMissingPerms": "GitHub 앱이 설치되었지만 필수 권한이 없습니다",
+				"needsInstallOnRepo": "GitHub 앱을 이 저장소에 설치해야 합니다",
+				"repoNotFound": "저장소를 찾을 수 없거나 접근할 수 없습니다"
 			},
 			"commentTaskLinkTitle": "새 이슈에 Kaneo 링크 댓글 달기",
 			"commentTaskLinkHint": "GitHub 사용자가 작업으로 바로 이동할 수 있습니다.",
@@ -1025,12 +1209,51 @@
 			"verifyNotInstalled": "Kaneo GitHub 앱이 이 저장소에 설치되어 있지 않습니다.",
 			"verifyReady": "Kaneo GitHub 앱이 필요한 권한으로 설치되어 있습니다.",
 			"workflowHint": "풀 리퀘스트가 열리거나 병합될 때 작업을 옮기려면",
-			"workflowLink": "워크플로"
+			"workflowLink": "워크플로",
+			"validation": {
+				"ownerRequired": "저장소 소유자는 필수입니다",
+				"ownerInvalid": "잘못된 저장소 소유자 형식입니다",
+				"nameRequired": "저장소 이름은 필수입니다",
+				"nameInvalid": "잘못된 저장소 이름 형식입니다"
+			},
+			"connectionStatus": "연결 상태",
+			"connectedActive": "저장소가 연결되어 활성 상태입니다",
+			"notConnectedHint": "연결된 저장소가 없습니다",
+			"badgeConnected": "연결됨",
+			"badgeNotConnected": "연결 안 됨",
+			"repository": "저장소",
+			"repositoryHint": "연결된 GitHub 저장소",
+			"appStatusTitle": "GitHub 앱 상태",
+			"appStatusHint": "설치 및 권한 상태",
+			"statusProperlyConfigured": "올바르게 구성됨",
+			"statusMissingPermissions": "권한 누락",
+			"statusNotInstalled": "설치되지 않음",
+			"ownerLabel": "저장소 소유자",
+			"ownerHint": "GitHub 사용자 이름 또는 조직",
+			"ownerPlaceholder": "예: octocat",
+			"repoNameLabel": "저장소 이름",
+			"repoNameHint": "저장소 이름",
+			"repoNamePlaceholder": "예: my-project",
+			"actionsTitle": "작업",
+			"actionsHint": "저장소 연결을 관리합니다",
+			"browse": "찾아보기",
+			"verify": "확인",
+			"update": "업데이트",
+			"connect": "연결",
+			"disconnect": "연결 해제",
+			"missingPermissionsLabel": "누락된 권한:",
+			"importSectionTitle": "GitHub 이슈 가져오기",
+			"importing": "가져오는 중...",
+			"importIssues": "이슈 가져오기"
 		},
 		"giteaIntegration": {
 			"validation": {
 				"baseUrlRequired": "Gitea 기본 URL은 필수입니다",
-				"baseUrlInvalid": "유효한 URL을 입력하세요 (예: https://gitea.example.com)"
+				"baseUrlInvalid": "유효한 URL을 입력하세요 (예: https://gitea.example.com)",
+				"ownerRequired": "저장소 소유자는 필수입니다",
+				"ownerInvalid": "잘못된 저장소 소유자 형식입니다",
+				"nameRequired": "저장소 이름은 필수입니다",
+				"nameInvalid": "잘못된 저장소 이름 형식입니다"
 			},
 			"toast": {
 				"verifyError": "Gitea 접근 확인에 실패했습니다",
@@ -1043,7 +1266,16 @@
 				"importError": "이슈 가져오기에 실패했습니다",
 				"commentOnEnabled": "Kaneo가 새 이슈에 작업 링크를 포함한 댓글을 게시합니다",
 				"commentOnDisabled": "새 이슈의 작업 링크 댓글이 꺼져 있습니다",
-				"settingsUpdateError": "Gitea 연동 업데이트에 실패했습니다"
+				"settingsUpdateError": "Gitea 연동 업데이트에 실패했습니다",
+				"verifyOk": "Gitea 토큰이 이 저장소에 접근할 수 있습니다",
+				"verifyWarning": "토큰 권한 또는 저장소 접근을 확인하세요",
+				"repoNotFound": "저장소를 찾을 수 없거나 접근할 수 없습니다",
+				"tokenRequired": "개인 액세스 토큰은 필수입니다",
+				"tokenRequiredVerify": "확인하려면 토큰을 입력하세요",
+				"secretCopied": "복사됨",
+				"unableToCopySecret": "시크릿을 복사할 수 없습니다",
+				"notGiteaInstance": "URL이 Gitea 인스턴스를 가리키지 않습니다",
+				"redirected": "Gitea URL이 리디렉션되었습니다(보통 HTTPS로). 최종 URL을 직접 사용하세요."
 			},
 			"commentTaskLinkTitle": "새 이슈에 Kaneo 링크 댓글 달기",
 			"commentTaskLinkHint": "Gitea 사용자가 작업으로 바로 이동할 수 있습니다.",
@@ -1058,7 +1290,40 @@
 			"browseNeedsCredentials": "찾아보려면 Gitea URL과 토큰을 입력하세요.",
 			"browseEmpty": "이 토큰으로 볼 수 있는 저장소가 없습니다.",
 			"chooseRepositoryDescription": "owner/name을 입력하거나 목록에서 선택하세요.",
-			"webhookEvents": "푸시, 풀 리퀘스트, 이슈, 이슈 댓글, 생성 이벤트를 켜세요."
+			"webhookEvents": "푸시, 풀 리퀘스트, 이슈, 이슈 댓글, 생성 이벤트를 켜세요.",
+			"webhookShow": "표시",
+			"webhookHide": "숨기기",
+			"webhookCopy": "복사",
+			"connectionStatus": "연결 상태",
+			"connectedActive": "저장소가 연결되어 활성 상태입니다",
+			"notConnectedHint": "연결된 Gitea 저장소가 없습니다",
+			"badgeConnected": "연결됨",
+			"badgeNotConnected": "연결 안 됨",
+			"repository": "저장소",
+			"repositoryHint": "연결된 Gitea 저장소",
+			"webhookTitle": "웹훅",
+			"webhookSecretLabel": "시크릿 (Gitea의 웹훅 시크릿과 일치해야 함)",
+			"baseUrlHint": "Gitea 인스턴스의 루트 URL",
+			"tokenHint": "저장소 및 이슈 접근 권한이 있는 토큰",
+			"currentToken": "저장됨",
+			"ownerLabel": "소유자",
+			"ownerHint": "사용자 또는 조직 이름",
+			"repoNameLabel": "저장소 이름",
+			"repoNameHint": "저장소 이름만 (소유자 제외)",
+			"actionsTitle": "작업",
+			"actionsHint": "접근을 확인하고 연결합니다",
+			"browse": "찾아보기",
+			"verify": "확인",
+			"update": "업데이트",
+			"connect": "연결",
+			"disconnect": "연결 해제",
+			"importSectionTitle": "Gitea 이슈 가져오기",
+			"importing": "가져오는 중…",
+			"importIssues": "이슈 가져오기",
+			"browseModalTitle": "내 저장소",
+			"searchRepos": "검색…",
+			"loadingRepos": "저장소 로딩 중…",
+			"retry": "재시도"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1076,7 +1341,28 @@
 			"webhookPlaceholder": "https://hooks.slack.com/services/...",
 			"webhookHint": "Slack에서 수신 웹훅을 만들고 여기에 붙여넣으세요.",
 			"connect": "Slack 연결",
-			"update": "Slack 업데이트"
+			"update": "Slack 업데이트",
+			"channelHint": "참고용 선택 라벨입니다. 실제 대상 채널은 Slack의 웹훅 설정에서 제어합니다.",
+			"channelLabel": "채널 이름",
+			"channelPlaceholder": "#team-updates",
+			"connected": "연결됨",
+			"connectionHint": "Slack 수신 웹훅 URL을 붙여넣고 게시할 작업 이벤트를 선택하세요.",
+			"connectionTitle": "Slack 웹훅 연결",
+			"disconnect": "연결 해제",
+			"events": {
+				"taskCommentCreated": "새 댓글",
+				"taskCreated": "새 작업",
+				"taskDescriptionChanged": "설명 변경",
+				"taskMentionCreated": "작업 본문 또는 댓글의 멘션",
+				"taskPriorityChanged": "우선순위 변경",
+				"taskStatusChanged": "상태 변경",
+				"taskTitleChanged": "제목 변경"
+			},
+			"eventsHint": "Slack에 게시할 프로젝트 변경 사항을 선택합니다.",
+			"eventsTitle": "이벤트 알림",
+			"paused": "일시 중지됨",
+			"saveChanges": "변경사항 저장",
+			"webhookLabel": "수신 웹훅 URL"
 		},
 		"discordIntegration": {
 			"validation": {
@@ -1094,7 +1380,28 @@
 			"webhookPlaceholder": "https://discord.com/api/webhooks/...",
 			"webhookHint": "Discord에서 채널 웹훅을 만들고 여기에 붙여넣으세요.",
 			"connect": "Discord 연결",
-			"update": "Discord 업데이트"
+			"update": "Discord 업데이트",
+			"channelHint": "참고용 선택 라벨입니다. 실제 대상 채널은 Discord의 웹훅 설정에서 제어합니다.",
+			"channelLabel": "채널 이름",
+			"channelPlaceholder": "#team-updates",
+			"connected": "연결됨",
+			"connectionHint": "Discord 웹훅 URL을 붙여넣고 게시할 작업 이벤트를 선택하세요.",
+			"connectionTitle": "Discord 웹훅 연결",
+			"disconnect": "연결 해제",
+			"events": {
+				"taskCommentCreated": "새 댓글",
+				"taskCreated": "새 작업",
+				"taskDescriptionChanged": "설명 변경",
+				"taskMentionCreated": "작업 본문 또는 댓글의 멘션",
+				"taskPriorityChanged": "우선순위 변경",
+				"taskStatusChanged": "상태 변경",
+				"taskTitleChanged": "제목 변경"
+			},
+			"eventsHint": "Discord에 게시할 프로젝트 변경 사항을 선택합니다.",
+			"eventsTitle": "이벤트 알림",
+			"paused": "일시 중지됨",
+			"saveChanges": "변경사항 저장",
+			"webhookLabel": "웹훅 URL"
 		},
 		"genericWebhookIntegration": {
 			"validation": {
@@ -1138,7 +1445,14 @@
 			"disconnectDescription": "Kaneo가 이벤트 전송을 중단하고 저장된 엔드포인트와 시크릿을 삭제합니다.",
 			"disconnectTitle": "웹훅 연결을 해제할까요?",
 			"reminderLeadTimeAfter": "시간 전에 알림 보내기",
-			"reminderLeadTimeBefore": "작업 마감"
+			"reminderLeadTimeBefore": "작업 마감",
+			"connectionTitle": "발신 웹훅 연결",
+			"connectionHint": "작업 이벤트를 자체 엔드포인트로 JSON 형식으로 전송합니다. 시크릿이 구성된 경우 서명된 X-Kaneo-Signature 헤더가 포함됩니다.",
+			"connected": "연결됨",
+			"paused": "일시 중지됨",
+			"eventsHint": "발신 웹훅을 트리거할 프로젝트 변경 사항을 선택합니다.",
+			"saveChanges": "변경사항 저장",
+			"disconnect": "연결 해제"
 		},
 		"telegramIntegration": {
 			"validation": {
@@ -1167,7 +1481,29 @@
 			"chatLabelPlaceholder": "엔지니어링 업데이트",
 			"connect": "Telegram 연결",
 			"botTokenSavedPlaceholder": "저장되었습니다. 교체하려면 새 토큰을 붙여넣으세요.",
-			"loadError": "Telegram 설정을 불러오지 못했습니다."
+			"loadError": "Telegram 설정을 불러오지 못했습니다.",
+			"chatIdHint": "업데이트를 게시할 Telegram 채팅 ID 또는 채널 사용자 이름을 입력하세요.",
+			"chatLabelHint": "Kaneo 내부 참고용 선택 라벨입니다.",
+			"connected": "연결됨",
+			"connectionHint": "Telegram 봇 토큰과 채팅 ID를 사용하여 채팅 또는 토픽으로 프로젝트 작업 업데이트를 전송합니다.",
+			"connectionTitle": "Telegram 봇 연결",
+			"disconnect": "연결 해제",
+			"events": {
+				"appointmentCreated": "새 일정",
+				"appointmentUpdated": "일정 변경",
+				"taskCommentCreated": "새 댓글",
+				"taskCreated": "새 작업",
+				"taskDescriptionChanged": "설명 변경",
+				"taskMentionCreated": "작업 본문 또는 댓글의 멘션",
+				"taskPriorityChanged": "우선순위 변경",
+				"taskStatusChanged": "상태 변경",
+				"taskTitleChanged": "제목 변경"
+			},
+			"eventsHint": "Telegram에 게시할 프로젝트 변경 사항을 선택합니다.",
+			"eventsTitle": "이벤트 알림",
+			"paused": "일시 중지됨",
+			"saveChanges": "변경사항 저장",
+			"threadIdHint": "선택 사항. Telegram 그룹 내 포럼 토픽에 사용하세요."
 		},
 		"repositoryBrowser": {
 			"title": "저장소 선택",
@@ -1186,7 +1522,14 @@
 			"missingOne": "찾는 저장소가 없나요?",
 			"searching": "검색 중…",
 			"updated": "{{time}} 업데이트됨",
-			"useRepository": "저장소 사용"
+			"useRepository": "저장소 사용",
+			"footerSummary": "설치 {{installationCount}}건에 걸쳐 저장소 {{repoCount}}개",
+			"manageInstallations": "설치 관리",
+			"updatedPrefix": "업데이트됨",
+			"relativeJustNow": "방금 전",
+			"relativeMinutesAgo": "{{count}}분 전",
+			"relativeHoursAgo": "{{count}}시간 전",
+			"relativeDaysAgo": "{{count}}일 전"
 		},
 		"tasksImportExport": {
 			"exportTasks": "작업 내보내기",
@@ -1224,7 +1567,17 @@
 			"dontMove": "이동 안 함",
 			"emptyDescription": "자동화를 사용하려면 GitHub, Gitea 또는 GitLab 저장소를 연결해야 합니다.",
 			"emptyTitle": "연결된 저장소가 없습니다",
-			"openIntegrations": "연동 열기"
+			"openIntegrations": "연동 열기",
+			"loading": "로딩 중...",
+			"createColumnsFirst": "자동화 규칙을 구성하려면 먼저 컬럼을 만드세요.",
+			"githubHeading": "GitHub",
+			"githubHint": "GitHub 이벤트가 발생하면 연결된 작업을 컬럼으로 이동합니다.",
+			"giteaHeading": "Gitea",
+			"giteaHint": "Gitea 웹훅 이벤트가 발생하면 연결된 작업을 컬럼으로 이동합니다.",
+			"selectColumnPlaceholder": "컬럼 선택...",
+			"toastUpdated": "워크플로 규칙이 업데이트되었습니다",
+			"gitlabHeading": "GitLab",
+			"gitlabHint": "When a GitLab webhook event occurs, move the linked task to a column."
 		},
 		"externalLinks": {
 			"resources": "리소스",
@@ -1484,7 +1837,9 @@
 			"rowActions": "{{name}} 메뉴",
 			"sectionDescription": "라벨 이름이나 색상을 바꾸면 해당 라벨을 사용하는 모든 작업에 반영됩니다.",
 			"sectionTitle": "워크스페이스 라벨",
-			"subtitleWithWorkspace": "라벨은 {{workspaceName}}의 모든 프로젝트에서 공유됩니다."
+			"subtitleWithWorkspace": "라벨은 {{workspaceName}}의 모든 프로젝트에서 공유됩니다.",
+			"cardDescription": "작업에 할당할 수 있는 라벨을 관리합니다.",
+			"empty": "아직 라벨이 없습니다. 첫 라벨을 만들어 시작하세요."
 		},
 		"mattermostIntegration": {
 			"connect": "Connect Mattermost",
@@ -1502,7 +1857,27 @@
 				"webhookInvalid": "Enter a valid Mattermost webhook URL"
 			},
 			"webhookHint": "Mattermost에서 수신 웹훅을 만들고 여기에 붙여넣으세요.",
-			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/...",
+			"channelHint": "Optional label for your reference. Mattermost controls the actual destination channel from the webhook setup.",
+			"channelLabel": "Channel name",
+			"channelPlaceholder": "#team-updates",
+			"connected": "Connected",
+			"connectionHint": "Paste a Mattermost incoming webhook URL and choose which task events should be posted.",
+			"connectionTitle": "Mattermost webhook connection",
+			"disconnect": "Disconnect",
+			"events": {
+				"taskCommentCreated": "New comments",
+				"taskCreated": "New tasks",
+				"taskDescriptionChanged": "Description changes",
+				"taskPriorityChanged": "Priority changes",
+				"taskStatusChanged": "Status changes",
+				"taskTitleChanged": "Title changes"
+			},
+			"eventsHint": "Choose which project changes should post to Mattermost.",
+			"eventsTitle": "Event notifications",
+			"paused": "Paused",
+			"saveChanges": "Save changes",
+			"webhookLabel": "Incoming webhook URL"
 		},
 		"customFields": {
 			"createError": "Failed to create custom field.",
@@ -1567,7 +1942,19 @@
 			"typeLocked": "필드를 만든 후에는 유형을 변경할 수 없습니다.",
 			"unchecked": "체크 안 됨",
 			"updateError": "사용자 정의 필드를 저장하지 못했습니다.",
-			"updateSuccess": "사용자 정의 필드가 저장되었습니다."
+			"updateSuccess": "사용자 정의 필드가 저장되었습니다.",
+			"addButton": "Add",
+			"defaultValuePlaceholder": "Default value",
+			"deleteButton": "Delete",
+			"empty": "No custom fields configured yet.",
+			"loading": "Loading custom fields...",
+			"noOptionsPlaceholder": "No options",
+			"optionsPlaceholder": "Options separated by commas",
+			"typePlaceholder": "Select field type",
+			"availableOptions": "Available options",
+			"defaultValues": "{{count}} default(s)",
+			"multiple": "Multiple",
+			"options": "{{count}} option(s)"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -1643,7 +2030,9 @@
 				"updated": "User updated",
 				"updateError": "Failed to update user"
 			},
-			"you": "나"
+			"you": "나",
+			"instanceBadge": "Instance",
+			"userCount_other": "{{count}} registered users"
 		},
 		"security": "Security",
 		"securityPage": {
@@ -1676,7 +2065,8 @@
 			"dialogDescription": "8자 이상이어야 하며 현재 비밀번호와 달라야 합니다.",
 			"dialogTitle": "비밀번호 변경",
 			"passwordHint": "다른 곳에서 사용하지 않는 8자 이상의 비밀번호를 사용하세요.",
-			"passwordTitle": "비밀번호"
+			"passwordTitle": "비밀번호",
+			"sectionSubtitle": "Change the password you use to sign in."
 		},
 		"gitlabIntegration": {
 			"baseUrlLabel": "GitLab URL",
@@ -1699,7 +2089,16 @@
 				"updated": "GitLab integration saved",
 				"updateError": "Failed to save GitLab integration",
 				"verifyError": "Failed to verify GitLab access",
-				"verifyFirst": "Verify access failed. Check URL, token, and project path"
+				"verifyFirst": "Verify access failed. Check URL, token, and project path",
+				"notGitlabInstance": "The URL does not point to a GitLab instance",
+				"projectNotFound": "Project not found or not accessible",
+				"redirected": "GitLab URL redirected (usually to HTTPS). Use the final URL directly.",
+				"secretCopied": "Copied",
+				"tokenRequired": "Access token is required",
+				"tokenRequiredVerify": "Enter a token to verify",
+				"unableToCopySecret": "Unable to copy secret",
+				"verifyOk": "GitLab token can access this project",
+				"verifyWarning": "Check token permissions or project access"
 			},
 			"tokenLabel": "Access token",
 			"tokenPlaceholder": "Paste token",
@@ -1710,7 +2109,8 @@
 			"validation": {
 				"baseUrlInvalid": "Enter a valid URL (e.g. https://gitlab.com)",
 				"baseUrlRequired": "GitLab base URL is required",
-				"pathInvalid": "Enter the full path, e.g. group/project"
+				"pathInvalid": "Enter the full path, e.g. group/project",
+				"pathRequired": "Project path is required"
 			},
 			"webhookHint": "변경 사항이 Kaneo에 반영되도록 프로젝트 설정에서 이 웹훅을 추가하세요.",
 			"loadProjectsError": "프로젝트를 불러오지 못했습니다.",
@@ -1719,7 +2119,38 @@
 			"chooseProjectDescription": "경로를 입력하거나 목록에서 선택하세요.",
 			"noSearchMatchTitle": "일치하는 프로젝트 없음",
 			"useProject": "프로젝트 사용",
-			"webhookEvents": "푸시, 이슈, 댓글, 머지 리퀘스트 이벤트를 켜세요."
+			"webhookEvents": "푸시, 이슈, 댓글, 머지 리퀘스트 이벤트를 켜세요.",
+			"actionsHint": "Verify access and connect",
+			"actionsTitle": "Actions",
+			"badgeConnected": "Connected",
+			"badgeNotConnected": "Not connected",
+			"baseUrlHint": "https://gitlab.com, or the root URL of your instance",
+			"browse": "Browse",
+			"browseModalTitle": "Your projects",
+			"connect": "Connect",
+			"connectedActive": "Project connected and active",
+			"connectionStatus": "Connection status",
+			"currentToken": "stored",
+			"disconnect": "Disconnect",
+			"importDisabledHint": "Verify the project above to enable importing",
+			"importing": "Importing…",
+			"importIssues": "Import issues",
+			"importSectionTitle": "Import GitLab issues",
+			"loadingProjects": "Loading projects…",
+			"notConnectedHint": "No GitLab project connected",
+			"project": "Project",
+			"projectHint": "Linked GitLab project",
+			"projectPathHint": "Full path including any groups, e.g. group/subgroup/project",
+			"retry": "Retry",
+			"tokenHint": "Token with api scope and at least Developer on the project",
+			"tokenTypeHint": "How the token is sent. Access tokens use PRIVATE-TOKEN; an OAuth2 token uses Authorization.",
+			"update": "Update",
+			"verify": "Verify",
+			"webhookCopy": "Copy",
+			"webhookHide": "Hide",
+			"webhookSecretLabel": "Secret token (must match the one set on the webhook in GitLab)",
+			"webhookShow": "Show",
+			"webhookTitle": "Webhook"
 		},
 		"calendarFeeds": {
 			"title": "Calendar feeds",
@@ -1755,7 +2186,12 @@
 			"revokeConfirm": "피드 폐기",
 			"revokeConfirmDescription": "이 링크를 사용하는 캘린더 앱은 더 이상 업데이트를 받지 않습니다. 이 작업은 되돌릴 수 없습니다.",
 			"revokeConfirmTitle": "이 피드를 폐기할까요?",
-			"revoking": "폐기 중…"
+			"revoking": "폐기 중…",
+			"createTitle": "Create a calendar feed",
+			"filterHint": "Include tasks with a start or due date. Select labels to include only tasks matching at least one, or leave empty to include all scheduled project tasks.",
+			"empty": "No calendar feeds yet.",
+			"feedUrl": "Calendar feed URL",
+			"copied": "Calendar feed link copied."
 		},
 		"invitationEmailFailed": "Invitation saved, but email delivery failed. Check SMTP settings and resend the invitation.",
 		"billing": {
@@ -1767,7 +2203,8 @@
 				"title": "Choose a plan"
 			},
 			"currentPlan": {
-				"title": "Current plan"
+				"title": "Current plan",
+				"subtitle": "Your workspace's active plan and billing status."
 			},
 			"disabled": "Billing isn't enabled on this instance. Self-hosted Kaneo includes every feature, free forever.",
 			"expiredCallout": {
@@ -1838,7 +2275,8 @@
 				"expiredDescription": "Subscribe to a plan below to keep creating and editing. Your data stays safe and exportable in the meantime.",
 				"expiredTitle": "Your trial has ended",
 				"noDate": "Choose a plan below to continue after your trial.",
-				"badgeDaysLeft_other": "{{count}}일 남음"
+				"badgeDaysLeft_other": "{{count}}일 남음",
+				"daysLeft_other": "You have {{count}} days left on your free trial. Choose a plan to continue without interruption."
 			},
 			"trialCard": {
 				"activeDescription": "Upgrade anytime to keep your workspace after the trial.",
@@ -1854,7 +2292,8 @@
 			"checkoutSuccess": {
 				"title": "구독해 주셔서 감사합니다",
 				"description": "결제가 접수되었습니다. 확인되는 대로 아래 플랜이 업데이트됩니다."
-			}
+			},
+			"planName": "Kaneo Cloud {{plan}}"
 		},
 		"syncRules": {
 			"addLabel": "Add label",
@@ -1919,7 +2358,11 @@
 			"pausedSummary_other": "동기화 규칙과 더 이상 일치하지 않아 작업 {{count}}개의 동기화가 중지되었습니다.",
 			"providerToKaneo": "{{provider}} → Kaneo",
 			"reviewPaused": "검토",
-			"tasksLabelled": "라벨이 지정된 작업:"
+			"tasksLabelled": "라벨이 지정된 작업:",
+			"allSummary": "All of: {{labels}}",
+			"anySummary": "Any of: {{labels}}",
+			"filteredBadge": "Filtered by labels",
+			"pausedCount_other": "{{count}} paused links"
 		},
 		"advancedSettingsDescription": "연동 동기화 규칙 같은 추가 컨트롤을 표시합니다. 이 브라우저에만 적용됩니다.",
 		"adminWorkspaces": {
@@ -1975,7 +2418,14 @@
 				"makeOwner": "Make owner",
 				"remove": "Remove from workspace",
 				"roleLabel": "Role for {{name}}",
-				"title": "Members of {{name}}"
+				"title": "Members of {{name}}",
+				"columns": {
+					"actions": "Actions",
+					"joined": "Joined",
+					"member": "Member",
+					"projects": "Projects",
+					"role": "Role"
+				}
 			},
 			"next": "Next",
 			"noOwner": "No owner",
@@ -1997,7 +2447,9 @@
 				"roleError": "Failed to update role",
 				"roleUpdated": "Role updated",
 				"transferError": "Failed to transfer ownership"
-			}
+			},
+			"instanceBadge": "Instance",
+			"workspaceCount_other": "{{count}} workspaces"
 		},
 		"workspaceImport": {
 			"back": {
@@ -2253,7 +2705,8 @@
 				"taskDescriptionChanged": "설명이 변경될 때",
 				"taskPriorityChanged": "우선순위가 변경될 때",
 				"taskStatusChanged": "상태가 변경될 때",
-				"taskTitleChanged": "제목이 변경될 때"
+				"taskTitleChanged": "제목이 변경될 때",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"optional": "선택 사항",
 			"postWhen": "게시 조건",
@@ -2314,6 +2767,107 @@
 		},
 		"shared": {
 			"autosave": "변경 사항이 자동으로 저장됩니다"
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "먼저 API 키를 만든 다음 <YOUR_API_KEY> 자리 표시자를 해당 키로 바꾸세요.",
+			"authModeApiKey": "API 키",
+			"authModeOauth": "OAuth",
+			"cardDescription": "인증 모드를 선택한 다음 설치 명령을 실행하거나 구성을 에이전트에 붙여넣으세요.",
+			"cardTitle": "에이전트 연결",
+			"copied": "복사됨",
+			"copy": "복사",
+			"createApiKey": "API 키 만들기",
+			"followUpLabel": "그런 다음 인증",
+			"installCommandLabel": "설치 명령",
+			"manualConfigLabel": "수동 구성",
+			"oauthNote": "OAuth가 기본입니다. 첫 연결 시 브라우저에서 Kaneo를 열어 에이전트를 승인하고, 이후 토큰은 에이전트가 직접 관리합니다.",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "이 인스턴스의 내장 HTTP MCP 엔드포인트",
+			"serverUrlLabel": "서버 URL",
+			"subtitle": "Claude, Codex, Gemini 또는 OpenCode와 같은 AI 에이전트를 내장 HTTP MCP 서버를 통해 이 Kaneo 인스턴스에 연결하세요.",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"skills": "스킬",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Kaneo 체크아웃 루트에서 이 명령을 실행한 다음 에이전트를 다시 시작하세요.",
+			"cardTitle": "Kaneo 스킬 설치",
+			"copied": "복사됨",
+			"copy": "복사",
+			"destinationLabel": "대상",
+			"installCommandLabel": "설치 명령",
+			"mcpRequirement": "이 스킬은 MCP 연결을 전제로 합니다. 먼저 구성하세요.",
+			"openMcpSettings": "MCP 설정 열기",
+			"pageTitle": "스킬",
+			"projectScope": "프로젝트",
+			"skillUrlDescription": "이 인스턴스가 에이전트용으로 제공",
+			"skillUrlLabel": "스킬 URL",
+			"subtitle": "Kaneo 스킬을 설치하면 AI 에이전트가 이 인스턴스의 규칙을 따르고 MCP 도구를 올바르게 사용합니다.",
+			"title": "에이전트 스킬",
+			"updateDescription": "스킬은 디스크에서 읽습니다. Kaneo 업데이트 후 폴더를 다시 복사해 변경 사항을 반영하세요.",
+			"userScope": "사용자",
+			"verifyLabel": "확인"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopicsLabel": "감지된 주제",
+			"detectedTopics_other": "{{count}} topics detected",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"topicHint": "The Telegram Bot API cannot list forum topics, so enter the topic id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -2336,7 +2890,8 @@
 				"navigate": "이동",
 				"open": "열기",
 				"close": "닫기"
-			}
+			},
+			"voltTheme": "볼트 테마"
 		},
 		"sidebar": {
 			"projects": "프로젝트",
@@ -2359,7 +2914,12 @@
 			"deleteConfirmDescription": "프로젝트와 모든 데이터가 영구적으로 제거됩니다. 이 작업은 취소할 수 없습니다.",
 			"deletedToast": "프로젝트가 삭제되었습니다",
 			"deleteProject": "프로젝트 삭제",
-			"switcherLabel": "프로젝트 또는 보기 전환"
+			"switcherLabel": "프로젝트 또는 보기 전환",
+			"sortCompletion": "진행률",
+			"sortCustom": "사용자 지정 순서",
+			"sortDate": "생성일",
+			"sortName": "이름",
+			"sortProjects": "프로젝트 정렬"
 		},
 		"search": {
 			"inputPlaceholder": "작업, 프로젝트, 댓글 검색...",
@@ -2370,7 +2930,8 @@
 				"workspace": "워크스페이스",
 				"comment": "댓글",
 				"activity": "활동",
-				"fallback": "결과"
+				"fallback": "결과",
+				"appointment": "일정"
 			}
 		},
 		"settingsLayout": {
@@ -2389,7 +2950,8 @@
 			"workspaces": "워크스페이스",
 			"switching": "전환 중...",
 			"addWorkspace": "워크스페이스 추가",
-			"selectWorkspace": "워크스페이스 선택"
+			"selectWorkspace": "워크스페이스 선택",
+			"sortWorkspaces": "워크스페이스 정렬"
 		},
 		"page": {
 			"projectsTitle": "프로젝트",
@@ -2515,7 +3077,39 @@
 			"then": "다음",
 			"or": "또는",
 			"thenEllipsis": "다음…"
-		}
+		},
+		"keyboardShortcuts": {
+			"title": "키보드 단축키",
+			"subtitle": "키보드 단축키로 워크플로 속도를 높이세요",
+			"searchPlaceholder": "단축키 검색...",
+			"footer": "닫으려면 <kbd>Escape</kbd>를 누르세요",
+			"categories": {
+				"general": "일반",
+				"create": "만들기",
+				"views": "보기",
+				"navigation": "탐색",
+				"quickSelect": "빠른 선택 (팝오버 내)"
+			},
+			"items": {
+				"openCommandPalette": "명령 팔레트 열기",
+				"globalSearch": "전체 검색",
+				"toggleSidebar": "사이드바 토글",
+				"showShortcuts": "키보드 단축키 표시",
+				"closeModal": "모달/팝오버 닫기",
+				"createTask": "작업 만들기",
+				"createProject": "프로젝트 만들기",
+				"createWorkspace": "워크스페이스 만들기",
+				"boardView": "보드 보기로 전환",
+				"listView": "목록 보기로 전환",
+				"backlogView": "백로그 보기로 전환",
+				"calendarView": "캘린더 보기로 전환",
+				"nextTask": "다음 작업",
+				"prevTask": "이전 작업",
+				"openTask": "선택한 작업 열기",
+				"quickSelectNumber": "번호로 옵션 선택"
+			}
+		},
+		"notifications": "알림"
 	},
 	"notifications": {
 		"newCount_other": "새 알림 {{count}}개",
@@ -2561,6 +3155,15 @@
 			"task_overdue": {
 				"title": "작업 기한 초과",
 				"content": "{{taskTitle}}이(가) 마감일을 지났습니다"
+			},
+			"appointment_created": {
+				"content": "일정이 배정되었습니다: {{appointmentTitle}}",
+				"title": "일정이 배정되었습니다"
+			},
+			"appointment_updated": {
+				"contentAssignee": "일정이 배정되었습니다: {{appointmentTitle}}",
+				"contentRescheduled": "\"{{appointmentTitle}}\" 일정이 변경되었습니다.",
+				"title": "일정이 업데이트되었습니다"
 			}
 		},
 		"reminderLeadTime": {
@@ -2589,7 +3192,11 @@
 			"taskLoadError": "This task couldn’t be loaded.",
 			"actionError": "받은 편지함을 업데이트하지 못했습니다. 다시 시도해 주세요.",
 			"readCleared": "읽은 알림을 삭제했습니다"
-		}
+		},
+		"shortcuts": {
+			"open": "알림 열기"
+		},
+		"title": "알림"
 	},
 	"activity": {
 		"assignedToSelf": "이 작업을 자신에게 할당함",
@@ -2697,11 +3304,14 @@
 				},
 				"mermaid": {
 					"renderFailed": "Mermaid 다이어그램을 렌더링할 수 없습니다"
-				}
+				},
+				"enterUrl": "URL 입력"
 			},
 			"importedFrom": "Imported from {{source}}",
 			"importedBy": "Imported by {{name}}",
-			"commentedOnForge": "{{forge}}에 댓글을 남김"
+			"commentedOnForge": "{{forge}}에 댓글을 남김",
+			"commentedOnGithub": "GitHub에 댓글을 남김",
+			"github": "GitHub"
 		},
 		"movedFromOtherProject": "moved task from another project to \"{{to}}\""
 	},
@@ -2854,8 +3464,11 @@
 				"saved": "Saved",
 				"saving": "Saving…",
 				"saveFailed": "Changes could not be saved",
-				"retrySave": "Retry"
-			}
+				"retrySave": "Retry",
+				"enterUrl": "URL 입력"
+			},
+			"customFieldUpdated": "Field updated",
+			"selectOption": "Select option"
 		},
 		"entity": {
 			"task": "작업"
@@ -2907,7 +3520,8 @@
 			"startDate": "시작일",
 			"noDate": "날짜 없음",
 			"dates": "날짜",
-			"project": "프로젝트"
+			"project": "프로젝트",
+			"end": "End"
 		},
 		"move": {
 			"title": "작업 이동",
@@ -2933,11 +3547,19 @@
 			},
 			"dueDate": {
 				"updateError": "작업 마감일 업데이트에 실패했습니다",
-				"clear": "날짜 지우기"
+				"clear": "날짜 지우기",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Due time",
+				"updateSuccess": "작업 마감일이 업데이트되었습니다"
 			},
 			"startDate": {
 				"updateError": "작업 시작일 업데이트에 실패했습니다",
-				"clear": "시작일 지우기"
+				"clear": "시작일 지우기",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time",
+				"updateSuccess": "작업 시작일이 업데이트되었습니다"
 			},
 			"labels": {
 				"searchPlaceholder": "라벨 검색...",
@@ -2958,7 +3580,9 @@
 					"rose": "로즈",
 					"crimson": "크림슨"
 				},
-				"editLabels": "라벨 편집"
+				"editLabels": "라벨 편집",
+				"addSuccess": "라벨이 추가되었습니다",
+				"removeSuccess": "라벨이 제거되었습니다"
 			}
 		},
 		"backlog": {
@@ -2978,8 +3602,14 @@
 			"filters": {
 				"dueThisWeek": "이번 주 마감",
 				"dueNextWeek": "다음 주 마감",
-				"noDueDate": "마감일 없음"
-			}
+				"noDueDate": "마감일 없음",
+				"priority": "우선순위: {{name}}",
+				"assignee": "담당자: {{name}}",
+				"due": "마감일: {{date}}",
+				"label": "라벨: {{name}}"
+			},
+			"filter": "필터",
+			"addFilter": "필터 추가..."
 		},
 		"sort": {
 			"direction": "방향",
@@ -2992,7 +3622,9 @@
 				"dueDate": "마감일",
 				"title": "제목",
 				"number": "작업 번호"
-			}
+			},
+			"label": "정렬",
+			"by": "정렬 기준"
 		},
 		"boardFilters": {
 			"selectedCount": "{{count}}개 선택됨",
@@ -3014,7 +3646,14 @@
 			},
 			"allCustomFieldValues": "All values",
 			"noCustomFieldValues": "No custom field values",
-			"noValuesUsedYet": "No values used yet"
+			"noValuesUsedYet": "No values used yet",
+			"filterBy": "필터 기준",
+			"allStatuses": "모든 상태",
+			"allPriorities": "모든 우선순위",
+			"allAssignees": "모든 담당자",
+			"allDueDates": "모든 마감일",
+			"allLabels": "모든 라벨",
+			"all": "All"
 		},
 		"calendar": {
 			"pageTitle": "{{name}} – 캘린더",
@@ -3048,7 +3687,8 @@
 			"previousPeriod": "Previous period",
 			"nextPeriod": "Next period",
 			"periodStart": "Timeline start date",
-			"showTaskDates": "Show task dates"
+			"showTaskDates": "Show task dates",
+			"noTasksMatch": "\"{{query}}\"와(과) 일치하는 예약된 작업이 없습니다"
 		},
 		"delete": {
 			"title": "작업을 삭제하시겠습니까?",
@@ -3092,13 +3732,17 @@
 			"label": "마감일",
 			"clear": "날짜 지우기",
 			"updateError": "작업 마감일 업데이트에 실패했습니다",
-			"clearError": "마감일 지우기에 실패했습니다"
+			"clearError": "마감일 지우기에 실패했습니다",
+			"updateSuccess": "작업 마감일이 업데이트되었습니다",
+			"clearSuccess": "작업 마감일이 지워졌습니다"
 		},
 		"labels": {
-			"empty": "사용 가능한 라벨이 없습니다"
+			"empty": "사용 가능한 라벨이 없습니다",
+			"label": "라벨"
 		},
 		"update": {
-			"error": "작업 업데이트에 실패했습니다"
+			"error": "작업 업데이트에 실패했습니다",
+			"success": "작업이 업데이트되었습니다"
 		},
 		"contextMenu": {
 			"copyLink": "링크 복사",
@@ -3148,7 +3792,9 @@
 			"priorityPlaceholder": "우선순위 설정…",
 			"assigneePlaceholder": "담당자 지정…",
 			"labelPlaceholder": "라벨 추가…",
-			"columnPlaceholder": "열로 이동…"
+			"columnPlaceholder": "열로 이동…",
+			"deleteConfirm": "작업 {{count}}개를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+			"setDueDate": "마감일 설정"
 		},
 		"editor": {
 			"table": {
@@ -3179,7 +3825,8 @@
 			"missingRequired_other": "필수 필드 {{count}}개가 비어 있습니다",
 			"saveError": "{{field}}을(를) 저장하지 못했습니다",
 			"moreFields_other": "필드 {{count}}개 더 보기",
-			"manage": "필드 관리"
+			"manage": "필드 관리",
+			"ariaLabel": "Custom fields"
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
@@ -3236,6 +3883,52 @@
 			"startsOn": "시작: {{date}}",
 			"beforeStart": "{{date}}은(는) 시작일 이전입니다",
 			"afterDue": "{{date}}은(는) 마감일 이후입니다"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "라벨",
+			"noLabel": "No label",
+			"none": "No grouping"
+		},
+		"boardSearchPlaceholder": "티켓 검색...",
+		"recurrence": {
+			"daily": "Daily",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders are delivered via the unified Telegram configuration.",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_other": "days",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_other": "분",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -3418,7 +4111,13 @@
 			"error": "팀 멤버 초대에 실패했습니다",
 			"createdTitle": "초대가 생성되었습니다",
 			"shareLinkDescription": "{{email}}님이 워크스페이스에 참여할 수 있도록 이 링크를 공유하세요.",
-			"done": "완료"
+			"done": "완료",
+			"noTeams": "No team covers this workspace yet.",
+			"scopeHint": "Limit the invitation to specific workspaces and projects. Untick everything to rely on teams only.",
+			"scopeLabel": "Workspaces and projects",
+			"scopeRequired": "Select at least one team, workspace or project.",
+			"teamsHint": "Teams keep applying after acceptance: editing a team updates its members' access.",
+			"teamsLabel": "Teams"
 		},
 		"membersTable": {
 			"emptyTitle": "아직 팀 멤버가 없습니다",
@@ -3445,7 +4144,8 @@
 			"cancelInviteError": "초대 취소에 실패했습니다",
 			"ariaInvitationActions": "초대 작업",
 			"roleUpdateSuccess": "역할이 업데이트되었습니다",
-			"roleUpdateError": "역할 업데이트에 실패했습니다"
+			"roleUpdateError": "역할 업데이트에 실패했습니다",
+			"ariaMemberActions": "멤버 작업"
 		},
 		"projectAccess": {
 			"allProjects": "All projects",
@@ -3466,6 +4166,83 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"accessScope": {
+			"allProjects": "All projects",
+			"noProjects": "No projects in this workspace.",
+			"noWorkspaces": "You don't administer any workspace yet."
+		},
+		"accessTeams": {
+			"addMember": "Add",
+			"addMemberPlaceholder": "Add a workspace member",
+			"allProjects": "All projects",
+			"createTitle": "New team",
+			"created": "Team created",
+			"delete": "Delete",
+			"deleteDialogDescription": "Delete the team \"{{name}}\"? Members lose the access this team was the only source of. This action cannot be undone.",
+			"deleteDialogTitle": "Delete this team?",
+			"deleteError": "Failed to delete the team",
+			"deleted": "Team deleted",
+			"description": "Reusable access bundles: pick workspaces and projects, then assign the team to members or invitations.",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this team for?",
+			"edit": "Edit",
+			"editTitle": "Edit team",
+			"empty": "No teams yet",
+			"emptyDescription": "Create a team to grant scoped access at invitation time.",
+			"memberAdded": "Member added to the team",
+			"memberCount_other": "{{count}} members",
+			"memberError": "Failed to update the team member",
+			"memberRemoved": "Member removed from the team",
+			"membersLabel": "Members",
+			"nameLabel": "Name",
+			"namePlaceholder": "Design team",
+			"newTeam": "New team",
+			"noMembers": "No members yet.",
+			"pageTitle": "Teams",
+			"projectCount_other": "{{count}} projects",
+			"removeMember": "Remove from the team",
+			"saveError": "Failed to save the team",
+			"scopeHint": "Projects selected here define everything the team can reach, including future invitations.",
+			"scopeLabel": "Access scope",
+			"title": "Teams",
+			"updated": "Team updated"
+		},
+		"inviteLinks": {
+			"copyFailed": "자동 복사에 실패했습니다. 링크를 선택하고 Ctrl+C를 누르세요.",
+			"copyIconAria": "초대 링크 복사",
+			"create": "링크 만들기",
+			"createError": "초대 링크를 만들지 못했습니다",
+			"createSuccess": "초대 링크가 생성되었습니다",
+			"deleteError": "초대 링크를 취소하지 못했습니다",
+			"deleteSuccess": "초대 링크가 취소되었습니다",
+			"description": "링크가 있는 누구나 이 워크스페이스에 멤버로 참여할 수 있습니다 — 이메일이 필요하지 않습니다.",
+			"empty": "아직 공유 가능한 초대 링크가 없습니다.",
+			"expiry24h": "24시간",
+			"expiry30d": "30일",
+			"expiry7d": "7일",
+			"expiryLabel": "만료",
+			"expiryNever": "만료되지 않음",
+			"join": "{{workspaceName}}에 참여",
+			"linkCopied": "초대 링크가 복사되었습니다",
+			"maxUsesLabel": "최대 사용 횟수",
+			"maxUsesUnlimited": "무제한",
+			"never": "만료되지 않음",
+			"revokeIconAria": "초대 링크 취소",
+			"title": "공유 가능한 초대 링크",
+			"uses": "{{used}}/{{max}}회 사용",
+			"usesUnlimited": "{{used}}회 사용",
+			"workspace": "워크스페이스: {{workspaceName}}"
+		},
+		"memberAccess": {
+			"description": "이 워크스페이스에서 {{name}} 님의 직접 프로젝트 액세스입니다.",
+			"fullAccess": "이 멤버는 이미 워크스페이스 전체 액세스 권한이 있습니다.",
+			"hint": "모두 선택 해제하면 직접 액세스가 제거됩니다. 팀이나 다른 액세스가 남아 있지 않으면 멤버는 워크스페이스에서 나갑니다.",
+			"menuItem": "액세스 관리",
+			"save": "액세스 저장",
+			"saveError": "멤버 액세스를 업데이트하지 못했습니다",
+			"saveSuccess": "멤버 액세스가 업데이트되었습니다",
+			"title": "액세스 관리"
 		}
 	},
 	"publicProject": {
@@ -3714,6 +4491,174 @@
 			"composeLinkDescription": "The maintained compose.yml with persistent storage and health checks.",
 			"startLink": "Start and verify the services",
 			"startLinkDescription": "Start the stack, inspect its status, and check that the application is available."
+		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "담당자",
+			"create": "만들기",
+			"createTitle": "새 일정",
+			"delete": "삭제",
+			"description": "일정은 작업처럼 예약되지만 보드나 백로그에는 절대 표시되지 않습니다.",
+			"descriptionLabel": "설명",
+			"editTitle": "일정 편집",
+			"endLabel": "종료",
+			"priorityLabel": "우선순위",
+			"rangeError": "종료는 시작 이후여야 합니다.",
+			"save": "저장",
+			"startLabel": "시작",
+			"titleLabel": "제목",
+			"titlePlaceholder": "예: 디자인 리뷰",
+			"unassigned": "미배정"
+		},
+		"empty": {
+			"description": "일정은 여기에 표시되며 보드나 백로그에는 표시되지 않습니다.",
+			"title": "아직 일정이 없습니다"
+		},
+		"loadError": "일정을 불러오지 못했습니다.",
+		"moveFromBacklog": "일정으로 이동",
+		"newAppointment": "새 일정",
+		"nextWeek": "다음 주",
+		"pageTitle": "일정 · {{name}}",
+		"previousWeek": "이전 주",
+		"tab": "일정",
+		"toast": {
+			"created": "일정이 생성되었습니다",
+			"deleted": "일정이 삭제되었습니다",
+			"error": "문제가 발생했습니다",
+			"moved": "일정으로 이동했습니다",
+			"updated": "일정이 업데이트되었습니다"
+		},
+		"today": "오늘",
+		"unscheduled": "미예약",
+		"weekHint": "빈 슬롯을 클릭해 일정을 추가하고, 일정을 클릭해 편집하세요."
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
+	},
+	"unified": {
+		"appointments": {
+			"count_other": "일정 {{count}}개",
+			"emptyDescription": "모든 프로젝트의 일정은 예약되는 대로 여기에 표시됩니다.",
+			"emptyTitle": "아직 일정이 없습니다",
+			"unscheduled": "미예약"
+		},
+		"charts": {
+			"average": "평균",
+			"backlog": "백로그",
+			"byProject": "프로젝트별",
+			"completed": "완료됨",
+			"created": "생성됨",
+			"empty": "최근 6개월간 작업 활동이 없습니다.",
+			"noTasks": "배분할 작업이 없습니다.",
+			"other": "기타",
+			"perUnit": "{{value}}/{{unit}}",
+			"period": "기간",
+			"periodSummary": "{{created}} 생성 · {{completed}} 완료",
+			"rangeAll": "전체 기간",
+			"rangeWeek": "1주",
+			"range_one": "{{count}}개월",
+			"range_other": "{{count}}개월",
+			"statusDescription": "모든 프로젝트의 작업이 현재 어디에 있는지.",
+			"statusTitle": "상태 분포",
+			"tasks": "작업",
+			"unassigned": "미배정",
+			"unit": "단위",
+			"unitDay": "일",
+			"unitHint": "Finer units narrow the period to one that supports them.",
+			"unitHour": "시간",
+			"unitLabelDay": "일",
+			"unitLabelHour": "시간",
+			"unitLabelMonth": "월",
+			"unitLabelWeek": "주",
+			"unitMonth": "월",
+			"unitWeek": "주",
+			"velocityDescription": "모든 프로젝트에서 {{unit}} 단위로 생성 및 완료된 작업.",
+			"velocityTitle": "속도",
+			"workloadDescription": "모든 프로젝트에서 담당자별 미완료 보드 작업.",
+			"workloadEmpty": "할당된 미완료 작업이 없습니다.",
+			"workloadTitle": "작업량"
+		},
+		"consolidated": {
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_other": "{{count}} active tasks"
+		},
+		"empty": {
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"description": "프로젝트를 만들면 모든 워크스페이스의 프로젝트가 여기에 표시됩니다.",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet",
+			"title": "아직 프로젝트가 없습니다"
+		},
+		"links": {
+			"mcp": "MCP",
+			"skills": "스킬"
+		},
+		"pageTitle": "모든 프로젝트",
+		"section": {
+			"projectCount_other": "프로젝트 {{count}}개"
+		},
+		"stats": {
+			"completion": "완료율",
+			"projects": "프로젝트",
+			"tasks": "작업"
+		},
+		"table": {
+			"progress": "진행률",
+			"tasks": "작업"
+		},
+		"tabs": {
+			"appointments": "일정",
+			"backlog": "Backlog",
+			"calendar": "캘린더",
+			"charts": "차트",
+			"gantt": "간트",
+			"overview": "개요",
+			"tasks": "작업"
 		}
 	}
 }

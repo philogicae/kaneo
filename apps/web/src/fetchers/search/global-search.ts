@@ -7,11 +7,13 @@ type SearchParams = {
   type?:
     | "all"
     | "tasks"
+    | "appointments"
     | "projects"
     | "workspaces"
     | "comments"
     | "activities";
-  workspaceId: string;
+  // Omitted: the search covers every workspace the user is a member of.
+  workspaceId?: string;
   projectId?: string;
   limit?: number;
 };

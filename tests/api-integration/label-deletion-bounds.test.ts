@@ -1,15 +1,12 @@
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
-import db, { getDatabasePool, schema } from "../../apps/api/src/database";
+import db, { schema } from "../../apps/api/src/database";
 import { subscribeToEvent } from "../../apps/api/src/events";
 import { createApp } from "../../apps/api/src/index";
 import deleteLabel, {
   LABEL_DELETE_BATCH_SIZE,
 } from "../../apps/api/src/label/controllers/delete-label";
-import {
-  MAX_LABEL_DELETIONS_IN_FLIGHT,
-  withLabelDeletionLock,
-} from "../../apps/api/src/label/deletion-lock";
+import { withLabelDeletionLock } from "../../apps/api/src/label/deletion-lock";
 import { mockAuthenticatedSession } from "./helpers/auth";
 import { resetTestDatabase } from "./helpers/database";
 import {
@@ -273,30 +270,37 @@ describe("bounded, resumable label deletion", () => {
       withLabelDeletionLock("failure", async () => "ok"),
     ).resolves.toBe("ok");
   });
-  it("honors the four-slot cap held by a separate database session", async () => {
+  it("refuses a label another database session already holds, and only that label", async () => {
     const { app, member, root } = await fixture(0);
-    const other = await getDatabasePool().connect();
+    const lease = await labelsFor(member.workspace.id);
+    // A lease held elsewhere is this deployment's cross-session lock.
+    await db.insert(schema.jobLeaseTable).values({
+      name: `label-delete:${root.id}`,
+      owner: "another-session",
+      expiresAt: new Date(Date.now() + 60_000),
+    });
     try {
-      for (let i = 0; i < MAX_LABEL_DELETIONS_IN_FLIGHT; i++)
-        await other.query("SELECT pg_advisory_lock(773622, $1::int)", [i]);
       await expect(
-        withLabelDeletionLock("blocked", async () => "must not run"),
+        withLabelDeletionLock(root.id, async () => "must not run"),
       ).rejects.toMatchObject({ status: 429 });
       const response = await app.request(`/api/label/${root.id}`, {
         method: "DELETE",
       });
       expect(response.status).toBe(429);
       expect(response.headers.get("Retry-After")).toBe("1");
-      expect(
-        (await labelsFor(member.workspace.id))[0].deletionStartedAt,
-      ).toBeNull();
+      expect(lease[0].deletionStartedAt).toBeNull();
     } finally {
-      await other.query("SELECT pg_advisory_unlock_all()");
-      other.release();
+      await db
+        .delete(schema.jobLeaseTable)
+        .where(eq(schema.jobLeaseTable.name, `label-delete:${root.id}`));
     }
+    // Another label is unaffected by the held one.
     await expect(
       withLabelDeletionLock("available", async () => "ok"),
     ).resolves.toBe("ok");
+    expect(
+      (await labelsFor(member.workspace.id))[0].deletionStartedAt,
+    ).toBeNull();
   });
 
   it("checks workspace access again when another client tries to resume", async () => {

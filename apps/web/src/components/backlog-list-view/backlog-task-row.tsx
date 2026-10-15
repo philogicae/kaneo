@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import useMoveTaskToAppointments from "@/hooks/mutations/appointment/use-move-task-to-appointments";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
@@ -60,6 +61,19 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
   const { data: workspace } = useActiveWorkspace();
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
   const { mutateAsync: deleteTask } = useDeleteTask();
+  const { mutateAsync: moveTaskToAppointments } = useMoveTaskToAppointments();
+
+  const handleMoveToAppointments = async (moveTask: Task) => {
+    try {
+      await moveTaskToAppointments({
+        taskId: moveTask.id,
+        projectId: moveTask.projectId,
+      });
+      toast.success(t("appointments:toast.moved"));
+    } catch {
+      toast.error(t("appointments:toast.error"));
+    }
+  };
   const toggleSelection = useBacklogBulkSelectionStore(
     (state) => state.toggleSelection,
   );
@@ -196,6 +210,7 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
 
         {projectId && workspace && (
           <TaskCardContextMenuContent
+            onMoveToAppointments={handleMoveToAppointments}
             task={task}
             taskCardContext={{
               projectId,

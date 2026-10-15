@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { getApiUrl } from "@/fetchers/get-api-url";
 import useRemoveProjectBackground from "@/hooks/mutations/project/use-remove-project-background";
 import useUploadProjectBackground from "@/hooks/mutations/project/use-upload-project-background";
-import useGetConfig from "@/hooks/queries/config/use-get-config";
 import type { ProjectWithTasks } from "@/types/project";
 
 const ACCEPTED_BACKGROUND_TYPES =
@@ -27,8 +26,8 @@ export function ProjectBackgroundRow({
     useUploadProjectBackground();
   const { mutate: removeBackground, isPending: isRemoving } =
     useRemoveProjectBackground();
-  const { data: config } = useGetConfig();
-  const uploadsUnavailable = config?.hasImageUploads === false;
+  // Uploads land on the instance's own disk, so they are always available.
+  const uploadsUnavailable = false;
   const isBusy = isUploading || isRemoving;
   const backgroundVersion = project?.backgroundVersion;
 

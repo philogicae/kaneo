@@ -1,4 +1,4 @@
-import { integrationEventToggles } from "../integrations/schema";
+import { mentionIntegrationEventToggles } from "../integrations/schema";
 import { z } from "../openapi";
 
 export const createTelegramBody = z.object({
@@ -8,7 +8,7 @@ export const createTelegramBody = z.object({
   chatId: z.string().min(1),
   threadId: z.number().optional(),
   chatLabel: z.string().optional(),
-  events: integrationEventToggles.optional(),
+  events: mentionIntegrationEventToggles.optional(),
 });
 
 // Must match TelegramIntegrationPatchBody in controllers/telegram-controller.
@@ -18,5 +18,5 @@ export const updateTelegramBody = z.object({
   threadId: z.number().nullable().optional(),
   chatLabel: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
-  events: integrationEventToggles.optional(),
+  events: mentionIntegrationEventToggles.optional(),
 });

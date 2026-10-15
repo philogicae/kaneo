@@ -1,5 +1,6 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import db from "../database";
+import { withLease } from "../database/lease";
 import {
   columnTable,
   dataMigrationTable,
@@ -25,35 +26,42 @@ const EVENT_MAPPING: Record<string, string> = {
 const COMPLETION_ID = "column-workflow-v1";
 const PENDING_PREFIX = "column-workflow-pending:";
 
+type MigrationTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
 export async function migrateColumns() {
-  await db.transaction(async (coordinator) => {
-    // Only coordination lives in this transaction; project writes commit
-    // separately so startup does not retain every migrated task's row lock.
-    await coordinator.execute(
-      sql`SELECT pg_advisory_xact_lock(hashtext('column-workflow-migration-v1'))`,
-    );
-    const markers = await coordinator
-      .select({ id: dataMigrationTable.id })
-      .from(dataMigrationTable);
-    if (markers.some((marker) => marker.id === COMPLETION_ID)) return;
-    const pending = new Set(
-      markers
-        .filter((marker) => marker.id.startsWith(PENDING_PREFIX))
-        .map((marker) => marker.id.slice(PENDING_PREFIX.length)),
-    );
-    const projects = await coordinator
-      .select({ id: projectTable.id })
-      .from(projectTable);
-    let incomplete = false;
-    for (const project of projects) {
-      const complete = await migrateProject(project.id, pending);
-      if (!complete) incomplete = true;
-    }
-    if (!incomplete)
-      await coordinator
-        .insert(dataMigrationTable)
-        .values({ id: COMPLETION_ID });
-  });
+  console.log("🔄 Starting column migration...");
+
+  // The lease replaces upstream's `pg_advisory_xact_lock`: one holder runs the
+  // migration, a concurrent starter waits its turn instead of racing it.
+  await withLease(
+    "column-workflow-migration-v1",
+    async () => {
+      const markers = await db
+        .select({ id: dataMigrationTable.id })
+        .from(dataMigrationTable);
+      if (markers.some((marker) => marker.id === COMPLETION_ID)) return;
+      const pending = new Set(
+        markers
+          .filter((marker) => marker.id.startsWith(PENDING_PREFIX))
+          .map((marker) => marker.id.slice(PENDING_PREFIX.length)),
+      );
+      const projects = await db
+        .select({ id: projectTable.id })
+        .from(projectTable);
+      let incomplete = false;
+      for (const project of projects) {
+        const complete = await migrateProject(project.id, pending);
+        if (!complete) incomplete = true;
+      }
+      if (!incomplete)
+        await db.insert(dataMigrationTable).values({ id: COMPLETION_ID });
+
+      console.log(
+        `✅ Column migration complete! Migrated ${projects.length} projects`,
+      );
+    },
+    { busy: () => new Error("Column migration is already running") },
+  );
 }
 
 async function migrateProject(projectId: string, pending: Set<string>) {
@@ -84,10 +92,15 @@ async function migrateProject(projectId: string, pending: Set<string>) {
         if (!created) throw new Error("Migration column was not created");
         columnMap.set(column.slug, created.id);
       }
+      // `IS NOT` rather than Postgres' `IS DISTINCT FROM`, which SQLite lacks.
       for (const [slug, columnId] of columnMap) {
-        await tx.update(taskTable).set({ columnId })
-          .where(sql`${taskTable.projectId} = ${projectId}
-          AND ${taskTable.status} = ${slug} AND ${taskTable.columnId} IS DISTINCT FROM ${columnId}`);
+        await tx
+          .update(taskTable)
+          .set({ columnId })
+          .where(
+            sql`${taskTable.projectId} = ${projectId}
+          AND ${taskTable.status} = ${slug} AND ${taskTable.columnId} IS NOT ${columnId}`,
+          );
       }
     }
     let complete = true;
@@ -158,7 +171,7 @@ async function migrateProject(projectId: string, pending: Set<string>) {
 }
 
 async function ensureMigrationWorkflowRule(
-  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  tx: MigrationTransaction,
   projectId: string,
   integrationType: "github" | "gitea",
   eventType: string,

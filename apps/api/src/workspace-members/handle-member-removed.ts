@@ -1,4 +1,3 @@
-import { syncWorkspaceSeats } from "../billing/controllers/sync-seats";
 import { publishEvent } from "../events";
 import { clearMemberProjectAccess } from "../project-access/clear-member-project-access";
 import { hasInstanceAdminRole } from "../utils/instance-admin-role";
@@ -19,7 +18,4 @@ export async function handleMemberRemoved(removal: {
       role: userRole ?? null,
     });
   }
-  void syncWorkspaceSeats(workspaceId).catch((error) => {
-    console.error("Seat sync after member remove failed:", error);
-  });
 }

@@ -18,6 +18,20 @@ export const pendingInvitationSchema = z
 
 export const pendingInvitationListSchema = z.array(pendingInvitationSchema);
 
+export const createdInvitationSchema = z
+  .object({
+    id: z.string(),
+    email: z.string(),
+    status: z.string(),
+    expiresAt: responseTimestamp,
+    workspaceCount: z.number().openapi({
+      description:
+        "Distinct workspaces the invitation opens (manual grants plus the workspace scope of the selected teams).",
+    }),
+    teamCount: z.number(),
+  })
+  .openapi("CreatedInvitation");
+
 export const invitationDetailsSchema = z
   .object({
     valid: z.boolean().openapi({

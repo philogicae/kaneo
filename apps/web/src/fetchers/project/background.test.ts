@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { removeProjectBackground, uploadProjectBackground } from "./background";
 
 const mocks = vi.hoisted(() => ({
-  createUpload: vi.fn(),
-  finalizeUpload: vi.fn(),
+  reserve: vi.fn(),
   remove: vi.fn(),
 }));
 
@@ -11,11 +10,7 @@ vi.mock("@kaneo/libs", () => ({
   client: {
     project: {
       ":id": {
-        "background-upload": {
-          $put: mocks.createUpload,
-          finalize: { $post: mocks.finalizeUpload },
-        },
-        background: { $delete: mocks.remove },
+        background: { $put: mocks.reserve, $delete: mocks.remove },
       },
     },
   },
@@ -24,78 +19,71 @@ vi.mock("@kaneo/libs", () => ({
 describe("project background fetchers", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    mocks.createUpload.mockReset();
-    mocks.finalizeUpload.mockReset();
+    mocks.reserve.mockReset();
     mocks.remove.mockReset();
   });
 
-  it("uploads the file with the signed headers before finalizing it", async () => {
+  it("reserves an upload, then posts the bytes to the returned URL", async () => {
     const file = new File(["image bytes"], "board.png", {
       type: "image/png",
     });
-    mocks.createUpload.mockResolvedValue({
+    mocks.reserve.mockResolvedValue({
       ok: true,
       json: async () => ({
-        key: "workspace/ws/project/project-1/backgrounds/background-v1",
-        uploadUrl: "https://storage.example.test/upload",
-        version: "v1",
-        headers: { "Content-Type": "image/png" },
+        key: "projects/ws-1/project-1/background",
+        uploadUrl: "https://api.example.test/project/project-1/background/blob",
+        headers: { "Content-Type": "image/png", "X-Background-Version": "v1" },
       }),
     });
-    const storageFetch = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValue(new Response(null, { status: 200 }));
-    mocks.finalizeUpload.mockResolvedValue({
-      ok: true,
-      json: async () => ({ url: "/api/project/project-1/background?v=v1" }),
-    });
+    const storageFetch = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          backgroundVersion: "v1",
+          contentType: "image/png",
+        }),
+        { status: 200 },
+      ),
+    );
 
-    await expect(uploadProjectBackground("project-1", file)).resolves.toEqual({
-      url: "/api/project/project-1/background?v=v1",
-    });
+    await expect(
+      uploadProjectBackground("project-1", file, "v1"),
+    ).resolves.toEqual({ backgroundVersion: "v1", contentType: "image/png" });
 
-    expect(mocks.createUpload).toHaveBeenCalledWith({
+    expect(mocks.reserve).toHaveBeenCalledWith({
       param: { id: "project-1" },
-      json: { contentType: "image/png", size: file.size },
+      json: { contentType: "image/png", size: file.size, version: "v1" },
     });
+    // The bytes go to the API on its own origin: no storage provider is
+    // exposed to the browser.
     expect(storageFetch).toHaveBeenCalledWith(
-      "https://storage.example.test/upload",
+      "https://api.example.test/project/project-1/background/blob",
       {
-        method: "PUT",
-        headers: { "Content-Type": "image/png" },
+        method: "POST",
+        headers: { "Content-Type": "image/png", "X-Background-Version": "v1" },
         body: file,
       },
     );
-    expect(mocks.finalizeUpload).toHaveBeenCalledWith({
-      param: { id: "project-1" },
-      json: {
-        key: "workspace/ws/project/project-1/backgrounds/background-v1",
-        contentType: "image/png",
-        size: file.size,
-        version: "v1",
-      },
-    });
   });
 
-  it("does not finalize when object storage rejects the upload", async () => {
+  it("propagates the failure when the byte upload is rejected", async () => {
     const file = new File(["image bytes"], "board.png", {
       type: "image/png",
     });
-    mocks.createUpload.mockResolvedValue({
+    mocks.reserve.mockResolvedValue({
       ok: true,
       json: async () => ({
-        key: "background-v1",
-        uploadUrl: "https://storage.example.test/upload",
-        version: "v1",
-        headers: { "Content-Type": "image/png" },
+        key: "projects/ws-1/project-1/background",
+        uploadUrl: "https://api.example.test/project/project-1/background/blob",
+        headers: { "Content-Type": "image/png", "X-Background-Version": "v1" },
       }),
     });
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(null, { status: 413 }),
+      new Response("too large", { status: 413 }),
     );
 
-    await expect(uploadProjectBackground("project-1", file)).rejects.toThrow();
-    expect(mocks.finalizeUpload).not.toHaveBeenCalled();
+    await expect(
+      uploadProjectBackground("project-1", file, "v1"),
+    ).rejects.toThrow("too large");
   });
 
   it("removes the project background", async () => {

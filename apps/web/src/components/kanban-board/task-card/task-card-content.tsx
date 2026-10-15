@@ -2,6 +2,8 @@ import { Trash2Icon } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TaskPullRequests } from "@/components/task/task-pull-requests";
+import { getPriorityLabel } from "@/lib/i18n/domain";
+import { getPriorityIcon } from "@/lib/priority";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -19,7 +21,6 @@ import { AssigneeButton } from "@/components/task-chips/assignee-button";
 import { ChecklistChip } from "@/components/task-chips/checklist-chip";
 import { DueDateChip } from "@/components/task-chips/due-date-chip";
 import { LabelChips } from "@/components/task-chips/label-chips";
-import { PriorityChip } from "@/components/task-chips/priority-chip";
 import { SubtasksChip } from "@/components/task-chips/subtasks-chip";
 import { taskChipClass } from "@/components/task-chips/task-chip-class";
 import { useTaskCardFields } from "@/components/custom-fields/use-task-card-fields";
@@ -154,6 +155,14 @@ function TaskCardContent({
                     </span>
                   )}
                 </div>
+                {showPriority && hasPriority && (
+                  <span
+                    className="shrink-0"
+                    title={getPriorityLabel(task.priority ?? "")}
+                  >
+                    {getPriorityIcon(task.priority ?? "")}
+                  </span>
+                )}
                 {showAssignees && (
                   <AssigneeButton
                     task={task}
@@ -182,9 +191,17 @@ function TaskCardContent({
               {task.title}
             </div>
 
+            {taskIsCompleted && (
+              <div className="mt-2.5 flex flex-wrap items-center gap-1 empty:hidden">
+                {showLabels && (
+                  <LabelChips task={task} workspaceId={workspaceId} />
+                )}
+                {showTaskItemCounts && <ChecklistChip task={task} />}
+              </div>
+            )}
+
             {!taskIsCompleted && (
               <div className="mt-2.5 flex flex-wrap items-center gap-1 empty:hidden">
-                {showPriority && hasPriority && <PriorityChip task={task} />}
                 {showDueDates && <DueDateChip task={task} />}
                 <SubtasksChip task={task} workspaceId={workspaceId} />
                 {showTaskItemCounts && <ChecklistChip task={task} />}

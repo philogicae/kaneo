@@ -29,6 +29,4 @@ const columnIcons = {
   Archive,
 };
 
-export type ColumnIconName = keyof typeof columnIcons;
-
 export default columnIcons;

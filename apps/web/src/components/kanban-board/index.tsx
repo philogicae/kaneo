@@ -26,7 +26,7 @@ import { findTaskColumn } from "./drag-preview/find-task-column";
 import { moveBoardTask } from "./move-task";
 import { useDragPreview } from "./drag-preview/use-drag-preview";
 import { useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTaskViewShortcuts } from "@/components/project/task-view-keys/use-task-view-shortcuts";
 import { useProjectBackground } from "@/hooks/use-project-background";
 import { cn } from "@/lib/cn";
@@ -37,10 +37,13 @@ import useProjectStore from "@/store/project";
 import type { ProjectWithTasks } from "@/types/project";
 import BulkToolbar from "../bulk-selection/bulk-toolbar";
 import Column from "./column";
+import { buildLabelGroups } from "@/lib/group-tasks";
+import GroupColumn from "./group-column";
 import TaskCard from "./task-card";
 
 type KanbanBoardProps = {
   project: ProjectWithTasks;
+  groupActive?: boolean;
   disableDragDrop?: boolean;
   disableCollectionActions?: boolean;
   sortedByNumber?: boolean;
@@ -49,12 +52,18 @@ type KanbanBoardProps = {
 
 function KanbanBoard({
   project,
+  groupActive = false,
   disableDragDrop = false,
   disableCollectionActions = false,
   sortedByNumber = false,
   sortedByPriority = false,
 }: KanbanBoardProps) {
   const isAutomaticallySorted = sortedByNumber || sortedByPriority;
+  const groups = useMemo(
+    () =>
+      groupActive && project.columns ? buildLabelGroups(project.columns) : null,
+    [groupActive, project.columns],
+  );
   const queryClient = useQueryClient();
   const { project: storedProject, setProject } = useProjectStore();
   const setAvailableTasks = useBulkSelectionStore(
@@ -121,12 +130,14 @@ function KanbanBoard({
 
   useEffect(() => {
     if (project?.columns) {
-      const allTaskIds = project.columns.flatMap((column) =>
-        column.tasks.map((task) => task.id),
-      );
+      const allTaskIds = groups
+        ? groups.flatMap((group) => group.tasks.map((task) => task.id))
+        : project.columns.flatMap((column) =>
+            column.tasks.map((task) => task.id),
+          );
       setAvailableTasks(allTaskIds);
     }
-  }, [project, setAvailableTasks]);
+  }, [project, groups, setAvailableTasks]);
 
   useEffect(() => {
     clearFocus();
@@ -295,6 +306,25 @@ function KanbanBoard({
         .flatMap((col) => col.tasks)
         .find((task) => task.id === activeId)
     : null;
+
+  if (groups) {
+    return (
+      <div className="flex h-full w-full flex-col bg-linear-to-b from-muted/20 to-background">
+        <div className="min-h-0 flex-1 overflow-x-auto [-webkit-overflow-scrolling:touch]">
+          <div className="flex h-full min-w-max gap-4 px-4 py-4 md:px-5">
+            {groups.map((group) => (
+              <div
+                key={group.id}
+                className="h-full max-w-96 min-w-80 shrink-0 flex-1"
+              >
+                <GroupColumn group={group} projectId={project.id} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DndContext

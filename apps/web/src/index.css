@@ -11,7 +11,7 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, .volt *));
 
 /* Gives small icon-only controls a 44px touch target on touch screens without
    changing their visual size (same idea as Button's pointer-coarse ::after).
@@ -172,6 +172,9 @@ input:-webkit-autofill:active {
 }
 
 :root {
+  /* Native widgets (time input clock, scrollbars, date pickers) must follow
+     the active palette or their icons render light-on-light / dark-on-dark. */
+  color-scheme: light;
   --font-sans:
     "Geist Variable",
     ui-sans-serif,
@@ -272,6 +275,7 @@ input:-webkit-autofill:active {
 }
 
 .dark {
+  color-scheme: dark;
   --accent: --alpha(var(--color-white) / 4%);
   --accent-foreground: var(--color-neutral-100);
   --background: color-mix(
@@ -360,6 +364,119 @@ input:-webkit-autofill:active {
   --avatar-foreground-done: #707070;
   --avatar-unassigned: #262626;
   --avatar-unassigned-foreground: #8a8a8a;
+}
+
+/* Volt: hardcore cyberpunk — near-pitch-black base, high-contrast neon
+   accents (cyan/magenta/purple) straight out of a Tokyo night. */
+.volt {
+  --accent: #151522;
+  --accent-foreground: #eef0ff;
+  --avatar: #151522;
+  --avatar-border: #ffffff17;
+  --avatar-done: #0f0f1c;
+  --avatar-foreground: #c4c8f0;
+  --avatar-foreground-done: #8f8fb8;
+  --avatar-selected: #1e1e33;
+  --avatar-unassigned: #1e1e33;
+  --avatar-unassigned-foreground: #a2a2d4;
+  --background: #030307;
+  --board-card: #08080f;
+  --board-card-border: transparent;
+  --board-card-border-hover: #2b2b4a;
+  --board-card-done: #ffffff05;
+  --board-card-done-border: #ffffff0f;
+  --board-card-focus: #a2a2d4;
+  --board-card-ring: #ff00d433;
+  --board-card-selected: #151522;
+  --board-card-selected-border: #ff00d44d;
+  --board-card-shadow: 0 1px 2px #00000066, 0 4px 12px -4px #000000a6;
+  --board-id: #7c7ca8;
+  --board-id-done: #62628c;
+  --board-lane: #ffffff08;
+  --board-title: #eef0ff;
+  --board-title-done: #8f8fb8;
+  --border: #2b2b4a;
+  --card: #08080f;
+  --card-foreground: #eef0ff;
+  --chart-1: #00f0ff;
+  --chart-2: #ff00d4;
+  --chart-3: #b026ff;
+  --chart-4: #00ff9d;
+  --chart-5: #ffe600;
+  --chip-border: #ffffff17;
+  --chip-border-hover: #ffffff29;
+  --chip-border-open: #ffffff33;
+  --chip-foreground: #c4c8f0;
+  --chip-hover: #ffffff0a;
+  --chip-icon: #a2a2d4;
+  --chip-muted: #8f8fb8;
+  --chip-open: #ffffff0f;
+  --code: #08080f;
+  --code-foreground: #eef0ff;
+  --code-highlight: --alpha(var(--color-white) / 6%);
+  --destructive: #ff1744;
+  --destructive-foreground: #ff1744;
+  --due-overdue: #ff6b8a;
+  --foreground: #eef0ff;
+  --info: #00f0ff;
+  --info-foreground: #00f0ff;
+  --input: #1e1e33;
+  --muted: #151522;
+  --muted-foreground: #a2a2d4;
+  --popover: #08080f;
+  --popover-foreground: #eef0ff;
+  --primary: #00f0ff;
+  --primary-foreground: #030307;
+  --priority-bar: #a2a2d4;
+  --priority-bar-empty: #ffffff24;
+  --priority-urgent: #ff1744;
+  --ring: #ff00d4;
+  --secondary: #151522;
+  --secondary-foreground: #eef0ff;
+  --sidebar: #020204;
+  --sidebar-accent: #151522;
+  --sidebar-accent-foreground: #eef0ff;
+  --sidebar-border: #1e1e33;
+  --sidebar-foreground: #c4c8f0;
+  --sidebar-primary: #00f0ff;
+  --sidebar-primary-foreground: #030307;
+  --sidebar-ring: #ff00d4;
+  --success: #00ff9d;
+  --success-foreground: #00ff9d;
+  --warning: #ffe600;
+  --warning-foreground: #ffe600;
+  color-scheme: dark;
+}
+
+/* Theme preview swatches in account preferences: each card must show its own
+   palette regardless of the active theme, so these are fixed per preview
+   class instead of reading the live tokens. */
+.theme-preview-light {
+  --preview-bg: #ffffff;
+  --preview-card: #ffffff;
+  --preview-border: #e5e5e5;
+  --preview-accent: #262626;
+}
+
+.theme-preview-dark {
+  --preview-bg: #0a0a0a;
+  --preview-card: #171717;
+  --preview-border: #333333;
+  --preview-accent: #f5f5f5;
+}
+
+.theme-preview-volt {
+  --preview-bg: #030307;
+  --preview-card: #08080f;
+  --preview-border: #2b2b4a;
+  --preview-accent: #00f0ff;
+}
+
+.theme-preview-system {
+  --preview-bg: linear-gradient(135deg, #ffffff 0 50%, #0a0a0a 50% 100%);
+  --preview-card: #ffffff;
+  --preview-border: #d4d4d4;
+  --preview-accent: #737373;
 }
 
 @layer base {

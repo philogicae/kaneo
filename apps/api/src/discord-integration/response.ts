@@ -1,4 +1,4 @@
-import { integrationEventsSchema } from "../integrations/response";
+import { mentionIntegrationEventsSchema } from "../integrations/response";
 import { responseTimestamp, z } from "../openapi";
 
 // The webhook URL is a bearer credential, so only a masked form is returned.
@@ -12,7 +12,7 @@ export const discordIntegrationSchema = z
       description:
         "The webhook URL with its secret path segment masked, or an empty string when none is set.",
     }),
-    events: integrationEventsSchema,
+    events: mentionIntegrationEventsSchema,
     isActive: z.boolean().nullable(),
     createdAt: responseTimestamp,
     updatedAt: responseTimestamp,

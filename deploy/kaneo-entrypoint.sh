@@ -1,10 +1,6 @@
 #!/bin/sh
 set -eu
 
-urlencode() {
-  node -e 'const input = process.argv[1]; process.stdout.write(encodeURIComponent(input).replace(/[!\x27()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`));' -- "$1"
-}
-
 check_file_secret() {
   node -e '
     const fs = require("node:fs");
@@ -46,27 +42,8 @@ if [ -z "${KANEO_API_URL:-}" ] && [ -n "$client_url" ]; then
   echo "KANEO_API_URL not set — derived from KANEO_CLIENT_URL: $KANEO_API_URL"
 fi
 
-# Derive DATABASE_URL for the bundled image when it is not explicitly set.
-# This image requires either DATABASE_URL or POSTGRES_PASSWORD so startup
-# fails fast instead of silently falling back to localhost inside the container.
-if [ -z "${DATABASE_URL:-}" ]; then
-  POSTGRES_DB="${POSTGRES_DB:-kaneo}"
-  POSTGRES_USER="${POSTGRES_USER:-kaneo}"
-  if [ -n "${POSTGRES_PASSWORD:-}" ]; then
-    encoded_user="$(urlencode "$POSTGRES_USER")"
-    encoded_password="$(urlencode "$POSTGRES_PASSWORD")"
-    export DATABASE_URL="postgresql://${encoded_user}:${encoded_password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB}"
-    echo "DATABASE_URL not set — derived from POSTGRES_* vars"
-  elif [ -n "${POSTGRES_PASSWORD_FILE:-}" ]; then
-    check_file_secret POSTGRES_PASSWORD_FILE "$POSTGRES_PASSWORD_FILE"
-    echo "DATABASE_URL not set — the API derives it from POSTGRES_* vars and POSTGRES_PASSWORD_FILE"
-  else
-    echo "ERROR: DATABASE_URL is not set and POSTGRES_PASSWORD is not set for bundled-image startup" >&2
-    exit 1
-  fi
-fi
-
-# Auto-generate AUTH_SECRET if not set
+# Auto-generate AUTH_SECRET if not set. This fork ships libSQL, so there is no
+# database password to source from a file here; AUTH_SECRET_FILE still works.
 if [ -z "${AUTH_SECRET:-}" ] && [ -n "${AUTH_SECRET_FILE:-}" ]; then
   check_file_secret AUTH_SECRET_FILE "$AUTH_SECRET_FILE"
 elif [ -z "${AUTH_SECRET:-}" ]; then
@@ -81,7 +58,7 @@ node --enable-source-maps /app/apps/api/dist/index.js &
 api_pid=$!
 
 echo "Waiting for API to be ready..."
-until wget -Y off --spider --quiet http://127.0.0.1:1337/api/health 2>/dev/null; do
+until wget --spider --quiet http://127.0.0.1:1337/api/health 2>/dev/null; do
   if ! kill -0 "$api_pid" 2>/dev/null; then
     echo "API process exited unexpectedly"
     exit 1

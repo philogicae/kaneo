@@ -27,9 +27,18 @@ type Task = {
   description: string | null;
   descriptionDeferred?: boolean;
   status: string;
+  // Roadmap sprint/phase the task belongs to, when assigned.
+  milestoneId?: string | null;
   priority: string | null;
   startDate: string | null;
   dueDate: string | null;
+  // Minutes before the task's start date at which Telegram reminders fire.
+  reminderOffsets?: number[] | null;
+  // Calendar-like recurrence; the next occurrence is spawned on completion.
+  recurrence?: {
+    frequency: "daily" | "weekly" | "monthly";
+    interval: number;
+  } | null;
   position: number | null;
   createdAt: string;
   updatedAt?: string;

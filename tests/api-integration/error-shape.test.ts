@@ -1,8 +1,7 @@
 import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
-import db, { getDatabasePool, schema } from "../../apps/api/src/database";
+import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
-import { MAX_LABEL_DELETIONS_IN_FLIGHT } from "../../apps/api/src/label/deletion-lock";
 import { mockAuthenticatedSession } from "./helpers/auth";
 import { resetTestDatabase } from "./helpers/database";
 import { readErrorBody } from "./helpers/error-body";
@@ -220,35 +219,6 @@ describe("API integration: error shape", () => {
       message: "Internal Server Error",
       code: "INTERNAL_SERVER_ERROR",
     });
-  });
-
-  it("keeps Retry-After on a busy lock while converting its body", async () => {
-    const member = await createWorkspaceMember({ role: "admin" });
-    const [label] = await db
-      .insert(schema.labelTable)
-      .values({ workspaceId: member.workspace.id, name: "bug", color: "red" })
-      .returning();
-    mockAuthenticatedSession(member.user);
-    const { app } = createApp();
-    const other = await getDatabasePool().connect();
-    try {
-      for (let slot = 0; slot < MAX_LABEL_DELETIONS_IN_FLIGHT; slot++)
-        await other.query("SELECT pg_advisory_lock(773622, $1::int)", [slot]);
-
-      const response = await app.request(`/api/label/${label.id}`, {
-        method: "DELETE",
-      });
-
-      expect(response.status).toBe(429);
-      expect(response.headers.get("Retry-After")).toBe("1");
-      expect(await readErrorBody(response)).toEqual({
-        message: "Label deletion is busy; retry this request",
-        code: "RATE_LIMITED",
-      });
-    } finally {
-      await other.query("SELECT pg_advisory_unlock_all()");
-      other.release();
-    }
   });
 
   it("keeps the OAuth error shape on MCP OAuth endpoints", async () => {

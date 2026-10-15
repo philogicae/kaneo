@@ -8,6 +8,7 @@ const nav = buildSettingsNav({
   billingEnabled: false,
   canImport: false,
   hasAdminAccess: true,
+  canInviteUsers: false,
   projects: [{ id: "p1", name: "Kaneo Web" }],
 });
 

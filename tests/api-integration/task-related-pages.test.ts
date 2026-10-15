@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
-import db, { getDatabasePool, schema } from "../../apps/api/src/database";
+import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
 import getTasks from "../../apps/api/src/task/controllers/get-tasks";
 import { mockAnonymousSession, mockAuthenticatedSession } from "./helpers/auth";
@@ -174,17 +174,32 @@ describe("bounded board related pages", () => {
   });
   it("limits expensive list queries with a retryable database timeout", async () => {
     const { project } = await fixture();
-    const lock = await getDatabasePool().connect();
+    // SQLite serialises writers and this deployment queues them in-process, so
+    // an open write transaction is what a bounded list read waits behind.
+    let release!: () => void;
+    let ready!: () => void;
+    const held = new Promise<void>((resolve) => {
+      ready = resolve;
+    });
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const holder = db.transaction(async (tx) => {
+      await tx.run(sql`update ${schema.taskTable} set title = title`);
+      ready();
+      await hold;
+    });
+    await held;
     try {
-      await lock.query("BEGIN");
-      await lock.query('LOCK TABLE "task" IN ACCESS EXCLUSIVE MODE');
-      await expect(getTasks(project.id)).rejects.toMatchObject({
+      await expect(
+        getTasks(project.id, { deadlineMs: 100 }),
+      ).rejects.toMatchObject({
         status: 503,
         message: "Task list request took too long; retry later",
       });
     } finally {
-      await lock.query("ROLLBACK");
-      lock.release();
+      release();
+      await holder;
     }
   });
 });

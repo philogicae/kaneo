@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ProjectLayout from "@/components/common/project-layout";
+import GroupControl from "@/components/common/group-control";
 import KanbanBoard from "@/components/kanban-board";
 import ListView from "@/components/list-view";
 import PageTitle from "@/components/page-title";
@@ -15,6 +16,7 @@ import { LayoutSwitch } from "@/components/project/views/layout-switch";
 import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
+import { useBoardGrouping } from "@/hooks/use-board-grouping";
 import { useBoardSort } from "@/hooks/use-board-sort";
 import { cn } from "@/lib/cn";
 import { sortTasks } from "@/lib/sort-tasks";
@@ -91,6 +93,7 @@ function RouteComponent() {
   const viewMode = useUserPreferencesStore((state) => state.viewMode);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const { sort, setSort } = useBoardSort(projectId);
+  const { groupBy, setGroupBy } = useBoardGrouping(projectId);
   const { background } = useBackgroundStore();
   const view = useProjectTaskView({
     project,
@@ -136,6 +139,9 @@ function RouteComponent() {
           view={view}
           display={
             <>
+              <DisplaySection>
+                <GroupControl groupBy={groupBy} onGroupByChange={setGroupBy} />
+              </DisplaySection>
               <DisplaySection>
                 <LayoutSwitch
                   workspaceId={workspaceId}
@@ -214,6 +220,7 @@ function RouteComponent() {
             viewMode === "board" ? (
               <KanbanBoard
                 project={sortedProject}
+                groupActive={groupBy === "labels"}
                 disableCollectionActions={boardFetching || boardError}
                 disableDragDrop={
                   boardFetching ||

@@ -1,6 +1,13 @@
-import { ArrowRight, Calendar, CalendarDays } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  CalendarDays,
+  Milestone as MilestoneIcon,
+  Repeat,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import icons from "@/constants/project-icons";
+import useGetMilestones from "@/hooks/queries/milestone/use-get-milestones";
 import { getColumnIcon } from "@/lib/column";
 import { cn } from "@/lib/cn";
 import { formatDateShort } from "@/lib/format";
@@ -9,10 +16,14 @@ import { getPriorityIcon } from "@/lib/priority";
 import { TaskCustomFieldRows } from "../custom-fields/task-custom-field-rows";
 import TaskAssigneePopover from "../task-assignee-popover";
 import TaskDueDatePopover from "../task-due-date-popover";
+import TaskMilestonePopover from "../task-milestone-popover";
 import TaskLabelsPopover from "../task-labels-popover";
 import TaskMovePopover from "../task-move-popover";
 import TaskPriorityPopover from "../task-priority-popover";
-import TaskStartDatePopover from "../task-start-date-popover";
+import TaskRemindersPopover from "../task-reminders-popover";
+import TaskStartDatePopover, {
+  formatRecurrenceSummary,
+} from "../task-start-date-popover";
 import TaskStatusPopover from "../task-status-popover";
 import { AssigneeAvatar } from "./assignee-avatar";
 import { dueDateTextClass } from "./due-date-text-class";
@@ -37,8 +48,13 @@ export function PropertiesRail({
   const { t } = useTranslation();
   const { task, project, labels, status, assignee, dueStatus, canMoveTask } =
     useTaskProperties(taskId, projectId, workspaceId);
+  const { data: milestones = [] } = useGetMilestones(projectId);
 
   if (!task) return null;
+
+  const milestoneName = task.milestoneId
+    ? milestones.find((milestone) => milestone.id === task.milestoneId)?.name
+    : undefined;
 
   const ProjectIcon =
     icons[project?.icon as keyof typeof icons] || icons.Layout;
@@ -124,6 +140,14 @@ export function PropertiesRail({
                     ? formatDateShort(task.startDate)
                     : t("tasks:properties.start")}
                 </span>
+                {task.recurrence && (
+                  <span
+                    className="flex shrink-0"
+                    title={formatRecurrenceSummary(task.recurrence, t)}
+                  >
+                    <Repeat className="size-3 text-muted-foreground" />
+                  </span>
+                )}
               </PropertyValue>
             </TaskStartDatePopover>
             <ArrowRight className="size-3 shrink-0 text-muted-foreground/60" />
@@ -143,6 +167,26 @@ export function PropertiesRail({
               </PropertyValue>
             </TaskDueDatePopover>
           </div>
+        </PropertyRow>
+
+        <PropertyRow label={t("roadmap:assign.title")}>
+          <TaskMilestonePopover task={task}>
+            <PropertyValue>
+              <MilestoneIcon className="text-muted-foreground" />
+              <span
+                className={cn(
+                  "truncate",
+                  !task.milestoneId && "text-muted-foreground",
+                )}
+              >
+                {milestoneName ?? t("roadmap:noSprint")}
+              </span>
+            </PropertyValue>
+          </TaskMilestonePopover>
+        </PropertyRow>
+
+        <PropertyRow label={t("tasks:reminders.title")}>
+          <TaskRemindersPopover task={task} />
         </PropertyRow>
 
         <PropertyRow label={t("tasks:properties.project")}>

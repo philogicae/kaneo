@@ -1,41 +1,37 @@
 ---
-title: "Self-host Kaneo"
-description: "Choose a deployment method and know what you need to run it."
+title: Installation Overview
+description: Install this fork with Docker Compose, either building the image locally or pulling the prebuilt one.
 ---
 
-Kaneo runs as one application container plus PostgreSQL. You can add file storage and email when you need them. Redis is only needed when multiple API instances must share live updates.
+This fork ships as a **single container**: the bundled API and web app plus the libSQL (Turso) database stored on a local file. There is no PostgreSQL sidecar, no external database, and no separate web service.
 
-## Choose your setup
+## Choose your installation method
 
-| Setup | Choose this when… |
-| --- | --- |
-| [Docker Compose](/core/installation/docker-compose) | You want to see and control the configuration. Start here for a local trial or an existing server. |
-| [drim](/core/installation/drim) | You want a CLI to generate the deployment and set up Caddy for HTTPS. |
-| [Coolify](/core/deployments/coolify) | You already deploy applications through Coolify. |
-| [Railway](/core/deployments/railway) | You want a hosted deployment without managing a server. |
-| [Helm](https://github.com/usekaneo/kaneo/tree/main/charts/kaneo) | You already operate a Kubernetes cluster. |
+### Build locally (recommended)
 
-For a small installation, plan for at least 2 GB of memory and 10 GB of free disk as a starting point. Leave additional space for database growth, uploaded files, and backups. Compose deployments need Docker and Docker Compose V2.
+Uses `compose.yml`, which builds the image from `Dockerfile.kaneo`:
 
-## What runs where
+1. [Review the compose file](/core/installation/docker-compose)
+2. [Configure environment variables](/core/installation/environment-variables) (`cp .env.sample .env`)
+3. [Start the services](/core/installation/start-services)
 
-```mermaid
-flowchart LR
-  Browser[Your browser] -->|HTTPS| Proxy[Reverse proxy]
-  Proxy --> Kaneo[Kaneo: web app and API]
-  Kaneo --> DB[(PostgreSQL)]
-  Browser -->|File uploads| Storage[(Optional S3 storage)]
-  Kaneo -->|Read and validate files| Storage
-```
+### Prebuilt image
 
-PostgreSQL stores accounts, projects, tasks, comments, and upload records. File contents live in your configured object storage. Account avatars are stored in PostgreSQL.
+`compose.remote.yml` pulls the image published by `.github/workflows/publish.yml` from GHCR instead of building locally. Same steps, with `docker compose -f compose.remote.yml up -d`.
 
-## Before inviting your team
+## Requirements
 
-1. Put the instance behind [HTTPS](/core/reverse-proxy/nginx).
-2. Create the initial administrator account before opening registration to others.
-3. Configure [email and access settings](/core/installation/environment-variables).
-4. Add [Silo file storage](/core/installation/silo) if your team needs attachments.
-5. Make a [backup and test a restore](/core/operations/backups).
+- Docker 20.10+ and Docker Compose V2
+- 2GB RAM minimum
+- 10GB disk space
+- A directory writable by the container user (uid 1001) for the database
 
-Then follow [Your first project](/core/index).
+**Supported platforms:** Linux, macOS, Windows (WSL)
+
+## Guides
+
+- [The compose file](/core/installation/docker-compose)
+- [Environment variables](/core/installation/environment-variables)
+- [Start the services](/core/installation/start-services)
+- [Image uploads and asset storage](/core/installation/object-storage-and-image-uploads)
+- [Reverse proxy with nginx](/core/reverse-proxy/nginx)

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import ProjectLayout from "@/components/common/project-layout";
+import AppointmentDialog from "@/components/appointments/appointment-dialog";
 import { GanttTaskBar } from "@/components/gantt/gantt-task-bar";
 import {
   buildGanttTimeline,
@@ -27,11 +28,13 @@ import { useProjectTaskView } from "@/components/project/toolbar/use-project-tas
 import { LayoutSwitch } from "@/components/project/views/layout-switch";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { Button } from "@/components/ui/button";
+import useGetAppointments from "@/hooks/queries/appointment/use-get-appointments";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/cn";
 import { getStatusLabel } from "@/lib/i18n/domain";
 import { useUserPreferencesStore } from "@/store/user-preferences";
+import type Appointment from "@/types/appointment";
 
 type GanttSearchParams = {
   taskId?: string;
@@ -52,6 +55,7 @@ function RouteComponent() {
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
   const { data: project } = useGetTasks(projectId);
+  const { data: appointments } = useGetAppointments(projectId);
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
   const view = useProjectTaskView({
     project,
@@ -71,6 +75,8 @@ function RouteComponent() {
   const showDate = (date: Date) => setWindowStart({ projectId, date });
   const isMobile = useIsMobile();
   const [isTaskRailOpen, setIsTaskRailOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
   // Wider day columns on small screens so dragging and reading dates is easier.
   const dayColumnWidthRem = isMobile ? 3.125 : 2.75;
@@ -113,8 +119,41 @@ function RouteComponent() {
     [project],
   );
 
+  useEffect(() => {
+    if (!taskId || !appointments) return;
+    const appointment = appointments.find((item) => item.id === taskId);
+    if (!appointment) return;
+    setSelectedAppointment(appointment);
+    navigate({ to: ".", search: {}, replace: true });
+  }, [taskId, appointments, navigate]);
+
+  const parsedAppointments = useMemo(() => {
+    return (appointments ?? [])
+      .map((appointment) => {
+        const parsedStart =
+          parseTaskDate(appointment.startDate) ??
+          parseTaskDate(appointment.dueDate);
+        const parsedEnd =
+          parseTaskDate(appointment.dueDate) ??
+          parseTaskDate(appointment.startDate);
+
+        if (!parsedStart || !parsedEnd) return null;
+
+        const start = parsedStart <= parsedEnd ? parsedStart : parsedEnd;
+        const end = parsedEnd >= parsedStart ? parsedEnd : parsedStart;
+
+        return {
+          ...appointment,
+          status: "appointment",
+          scheduleStart: start,
+          scheduleEnd: end,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+  }, [appointments]);
+
   const parsedTasks = useMemo(() => {
-    return allTasks
+    return [...allTasks, ...parsedAppointments]
       .map((task) => {
         const parsedStart =
           parseTaskDate(task.startDate) ?? parseTaskDate(task.dueDate);
@@ -137,7 +176,7 @@ function RouteComponent() {
         (left, right) =>
           left.scheduleStart.getTime() - right.scheduleStart.getTime(),
       );
-  }, [allTasks]);
+  }, [allTasks, parsedAppointments]);
 
   const scheduledTasks = useMemo(() => {
     const visibleIds = new Set(
@@ -561,6 +600,14 @@ function RouteComponent() {
               replace: true,
             })
           }
+        />
+
+        <AppointmentDialog
+          open={selectedAppointment !== null}
+          onClose={() => setSelectedAppointment(null)}
+          projectId={projectId}
+          workspaceId={workspaceId}
+          appointment={selectedAppointment}
         />
       </div>
     </ProjectLayout>

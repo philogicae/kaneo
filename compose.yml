@@ -1,42 +1,31 @@
-services:
-  postgres:
-    image: postgres:16-alpine
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-kaneo}
-      POSTGRES_DB: ${POSTGRES_DB:-kaneo}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+name: kaneo
 
+services:
   kaneo:
-    image: ghcr.io/usekaneo/kaneo:latest
+    container_name: kaneo
+    build:
+      context: .
+      dockerfile: Dockerfile.kaneo
+    image: kaneo-custom
+    init: true
+    restart: unless-stopped
     ports:
       - "5173:5173"
     env_file:
       - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
+    volumes:
+      - ${KANEO_DATA_PATH:-./data}:/app/data
     healthcheck:
-      test: ["CMD", "wget", "-Y", "off", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5173/api/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:5173/api/health",
+        ]
       interval: 30s
       timeout: 5s
       start_period: 60s
       retries: 3
-
-#  Optional for HA Setup
-#  redis:
-#    image: valkey/valkey
-#    ports:
-#      - "6379:6379"
-
-volumes:
-  postgres_data:

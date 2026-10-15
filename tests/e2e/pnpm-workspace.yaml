@@ -1,3 +1,0 @@
-# Keep cloud-testing dependencies out of Kaneo's production build graph.
-packages:
-  - .

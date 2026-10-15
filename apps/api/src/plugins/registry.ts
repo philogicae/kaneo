@@ -3,6 +3,8 @@ import { and, eq } from "drizzle-orm";
 import db from "../database";
 import { integrationTable } from "../database/schema";
 import { subscribeToEvent } from "../events";
+import type { TelegramActionInput } from "./telegram/events";
+import { dispatchUnifiedTelegram } from "./telegram/unified";
 import type {
   IntegrationPlugin,
   PluginContext,
@@ -12,6 +14,7 @@ import type {
   TaskDeletedEvent,
   TaskDescriptionChangedEvent,
   TaskDueDateChangedEvent,
+  TaskMentionCreatedEvent,
   TaskMovedEvent,
   TaskPriorityChangedEvent,
   TaskStatusChangedEvent,
@@ -141,6 +144,26 @@ export function initializeEventSubscriptions(): void {
     taskId: string;
     userId: string | null;
     title: string;
+    source: "comment" | "description";
+    mentionedUserIds: string[];
+    mentionedUserNames: string[];
+    projectId: string;
+  }>("task.mentioned", async (data) => {
+    await broadcastTaskMentioned({
+      taskId: data.taskId,
+      projectId: data.projectId,
+      userId: data.userId,
+      title: data.title,
+      source: data.source,
+      mentionedUserIds: data.mentionedUserIds,
+      mentionedUserNames: data.mentionedUserNames,
+    });
+  });
+
+  subscribeToEvent<{
+    taskId: string;
+    userId: string | null;
+    title: string;
     projectId: string;
   }>("task.deleted", async (data) => {
     await broadcastTaskDeleted({
@@ -260,16 +283,63 @@ export function initializeEventSubscriptions(): void {
     },
   );
 
+  subscribeToEvent<{
+    appointmentId: string;
+    projectId: string;
+    currentUserId?: string;
+  }>("appointment.created", async (data) => {
+    await broadcastAppointmentCreated({
+      appointmentId: data.appointmentId,
+      projectId: data.projectId,
+      userId: data.currentUserId ?? null,
+    });
+  });
+
+  subscribeToEvent<{
+    appointmentId: string;
+    projectId: string;
+    currentUserId?: string;
+    oldAssigneeId: string | null;
+    newAssigneeId: string | null;
+    oldStartDate: Date | null;
+    newStartDate: Date | null;
+    oldDueDate: Date | null;
+    newDueDate: Date | null;
+  }>("appointment.updated", async (data) => {
+    const datesChanged =
+      toTime(data.oldStartDate) !== toTime(data.newStartDate) ||
+      toTime(data.oldDueDate) !== toTime(data.newDueDate);
+
+    if (datesChanged) {
+      await broadcastAppointmentUpdated(
+        {
+          appointmentId: data.appointmentId,
+          projectId: data.projectId,
+          userId: data.currentUserId ?? null,
+        },
+        { kind: "appointmentRescheduled" },
+      );
+      return;
+    }
+
+    if (data.newAssigneeId && data.newAssigneeId !== data.oldAssigneeId) {
+      await broadcastAppointmentUpdated(
+        {
+          appointmentId: data.appointmentId,
+          projectId: data.projectId,
+          userId: data.currentUserId ?? null,
+        },
+        { kind: "appointmentReassigned" },
+      );
+    }
+  });
+
   eventSubscriptionsInitialized = true;
   console.log("✓ Plugin event subscriptions initialized");
 }
 
 export function getPlugin(type: string): IntegrationPlugin | undefined {
   return plugins.get(type);
-}
-
-export function listPlugins(): IntegrationPlugin[] {
-  return Array.from(plugins.values());
 }
 
 async function getActiveIntegrations(projectId: string) {
@@ -296,12 +366,57 @@ function createContext(integration: {
   };
 }
 
+function toTime(value: Date | null): number | null {
+  return value ? new Date(value).getTime() : null;
+}
+
+// Appointments have no legacy per-project plugin handlers; they flow straight
+// through the unified Telegram dispatcher (workspace rules).
+export async function broadcastAppointmentCreated(event: {
+  appointmentId: string;
+  projectId: string;
+  userId: string | null;
+}): Promise<void> {
+  await dispatchUnifiedTelegram(
+    {
+      appointmentId: event.appointmentId,
+      projectId: event.projectId,
+      userId: event.userId,
+    },
+    { kind: "appointmentCreated" },
+  );
+}
+
+export async function broadcastAppointmentUpdated(
+  event: {
+    appointmentId: string;
+    projectId: string;
+    userId: string | null;
+  },
+  action:
+    | Extract<TelegramActionInput, { kind: "appointmentRescheduled" }>
+    | Extract<TelegramActionInput, { kind: "appointmentReassigned" }>,
+): Promise<void> {
+  await dispatchUnifiedTelegram(
+    {
+      appointmentId: event.appointmentId,
+      projectId: event.projectId,
+      userId: event.userId,
+    },
+    action,
+  );
+}
+
 export async function broadcastTaskCreated(
   event: TaskCreatedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "created",
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskCreated) continue;
 
@@ -318,10 +433,16 @@ export async function broadcastTaskCreated(
 export async function broadcastTaskStatusChanged(
   event: TaskStatusChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "statusChanged",
+    oldStatus: event.oldStatus ?? null,
+    newStatus: event.newStatus,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
     if (integration.id === event.sourceIntegrationId) continue;
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskStatusChanged) continue;
 
@@ -341,9 +462,15 @@ export async function broadcastTaskStatusChanged(
 export async function broadcastTaskPriorityChanged(
   event: TaskPriorityChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "priorityChanged",
+    oldPriority: event.oldPriority ?? null,
+    newPriority: event.newPriority,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskPriorityChanged) continue;
 
@@ -363,10 +490,16 @@ export async function broadcastTaskPriorityChanged(
 export async function broadcastTaskTitleChanged(
   event: TaskTitleChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "titleChanged",
+    oldTitle: event.oldTitle,
+    newTitle: event.newTitle,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
     if (integration.id === event.sourceIntegrationId) continue;
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskTitleChanged) continue;
 
@@ -386,10 +519,15 @@ export async function broadcastTaskTitleChanged(
 export async function broadcastTaskDescriptionChanged(
   event: TaskDescriptionChangedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "descriptionChanged",
+    newDescription: event.newDescription,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
     if (integration.id === event.sourceIntegrationId) continue;
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskDescriptionChanged) continue;
 
@@ -409,9 +547,14 @@ export async function broadcastTaskDescriptionChanged(
 export async function broadcastTaskCommentCreated(
   event: TaskCommentCreatedEvent,
 ): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "commentCreated",
+    comment: event.comment,
+  });
   const integrations = await getActiveIntegrations(event.projectId);
 
   for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
     const plugin = getPlugin(integration.type);
     if (!plugin?.onTaskCommentCreated) continue;
 
@@ -421,6 +564,31 @@ export async function broadcastTaskCommentCreated(
       await plugin.onTaskCommentCreated(event, context);
     } catch (error) {
       console.error(`Plugin ${plugin.type} error on comment.created:`, error);
+    }
+  }
+}
+
+export async function broadcastTaskMentioned(
+  event: TaskMentionCreatedEvent,
+): Promise<void> {
+  const unifiedHandled = await dispatchUnifiedTelegram(event, {
+    kind: "mentioned",
+    mentionedUserNames: event.mentionedUserNames,
+    source: event.source,
+  });
+  const integrations = await getActiveIntegrations(event.projectId);
+
+  for (const integration of integrations) {
+    if (unifiedHandled && integration.type === "telegram") continue;
+    const plugin = getPlugin(integration.type);
+    if (!plugin?.onTaskMentionCreated) continue;
+
+    const context = createContext(integration);
+
+    try {
+      await plugin.onTaskMentionCreated(event, context);
+    } catch (error) {
+      console.error(`Plugin ${plugin.type} error on task.mentioned:`, error);
     }
   }
 }

@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Archive,
+  CalendarClock,
   CircleDot,
   Clock,
   Copy,
@@ -50,12 +51,15 @@ type TaskCardContext = {
 };
 
 type TaskCardContextMenuContentProps = {
+  /** Backlog-only: converts the planned task into an appointment. */
+  onMoveToAppointments?: (task: Task) => void;
   task: Task;
   taskCardContext: TaskCardContext;
   onDeleteClick: () => void;
 };
 
 export default function TaskCardContextMenuContent({
+  onMoveToAppointments,
   task,
   taskCardContext,
   onDeleteClick,
@@ -313,6 +317,25 @@ export default function TaskCardContextMenuContent({
                   )}
                 </>
               )}
+            </>
+          )}
+
+          {onMoveToAppointments && (
+            <>
+              <ContextMenuSeparator />
+
+              <ContextMenuItem
+                className="[&>svg]:mx-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTimeout(() => {
+                    onMoveToAppointments(task);
+                  }, 0);
+                }}
+              >
+                <CalendarClock className="size-3.5 text-muted-foreground" />
+                <span>{t("appointments:moveFromBacklog")}</span>
+              </ContextMenuItem>
             </>
           )}
 

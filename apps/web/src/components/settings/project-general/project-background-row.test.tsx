@@ -50,14 +50,4 @@ describe("ProjectBackgroundRow", () => {
       screen.getByText("settings:projectGeneral.backgroundHint"),
     ).toBeTruthy();
   });
-
-  it("explains why uploads are off when no storage is configured", () => {
-    m.config = { hasImageUploads: false };
-    render(<ProjectBackgroundRow project={project} canEdit />);
-
-    expect(uploadButton().disabled).toBe(true);
-    expect(
-      screen.getByText("settings:projectGeneral.backgroundUnavailable"),
-    ).toBeTruthy();
-  });
 });

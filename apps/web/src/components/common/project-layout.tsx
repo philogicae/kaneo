@@ -6,15 +6,14 @@ import MobileProjectNav from "@/components/common/header/mobile-project-nav";
 import ProjectCrumbSelect from "@/components/common/header/project-crumb-select";
 import WorkspaceCrumbSelect from "@/components/common/header/workspace-crumb-select";
 import Layout from "@/components/common/layout";
-import { ProjectScopeToggle } from "@/components/project/views/project-scope-toggle";
 import {
-  PROJECT_ROUTE_PATHS,
   type ProjectRoute,
   resolveProjectView,
 } from "@/components/project/views/project-views";
 import { useGoToProjectView } from "@/components/project/views/use-go-to-project-view";
 import { useProjectViewShortcuts } from "@/components/project/views/use-project-view-shortcuts";
 import CreateProjectModal from "@/components/shared/modals/create-project-modal";
+import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Tooltip,
@@ -23,6 +22,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useGetProject from "@/hooks/queries/project/use-get-project";
+import {
+  CalendarClock,
+  CalendarDays,
+  CalendarRange,
+  Milestone as MilestoneIcon,
+  SquareKanban,
+  SquircleDashed,
+} from "lucide-react";
 import { useProjectWebSocket } from "@/hooks/use-project-websocket";
 import { cn } from "@/lib/cn";
 import { getProjectUnavailableReason } from "@/lib/project-unavailable-reason";
@@ -78,6 +85,28 @@ export default function ProjectLayout({
   const currentView = resolveProjectView(resolvedRoute, viewMode);
   const showViews = showViewSwitcher && !unavailableReason;
 
+  // Le fork garde ses propres onglets (rendez-vous et roadmap compris).
+  const forkView =
+    activeView ??
+    (location.pathname.includes("/backlog")
+      ? "backlog"
+      : location.pathname.includes("/appointments")
+        ? "appointments"
+        : location.pathname.includes("/calendar")
+          ? "calendar"
+          : location.pathname.includes("/gantt")
+            ? "gantt"
+            : location.pathname.includes("/roadmap")
+              ? "roadmap"
+              : "board");
+
+  const projectPath = (view: string) =>
+    `/dashboard/workspace/$workspaceId/project/$projectId/${view}` as const;
+
+  const goToForkView = (view: string) => {
+    navigate({ to: projectPath(view), params: { workspaceId, projectId } });
+  };
+
   const goToView = useGoToProjectView({
     workspaceId,
     projectId,
@@ -87,7 +116,7 @@ export default function ProjectLayout({
 
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
-      to: PROJECT_ROUTE_PATHS[resolvedRoute],
+      to: projectPath(forkView),
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -131,11 +160,45 @@ export default function ProjectLayout({
             />
           </div>
 
+          <div className="hidden h-8 items-center gap-0.5 rounded-lg border border-border/80 bg-background p-0.5 sm:inline-flex">
+            {(
+              [
+                ["backlog", t("tasks:view.backlog"), SquircleDashed],
+                ["board", t("tasks:title"), SquareKanban],
+                ["appointments", t("appointments:tab"), CalendarClock],
+                ["calendar", t("tasks:calendar.title"), CalendarRange],
+                ["gantt", t("tasks:view.gantt"), CalendarDays],
+                ["roadmap", t("roadmap:tab"), MilestoneIcon],
+              ] as const
+            ).map(([view, label, Icon]) => (
+              <Button
+                key={view}
+                variant={forkView === view ? "secondary" : "ghost"}
+                size="xs"
+                onClick={() => goToForkView(view)}
+                className={cn(
+                  "h-6 gap-1.5 rounded-md px-2 text-xs",
+                  forkView !== view && "text-muted-foreground",
+                )}
+              >
+                <Icon className="size-3.5" />
+                {label}
+              </Button>
+            ))}
+          </div>
+
           <div className="min-w-0 md:hidden">
             <MobileProjectNav
               workspaceId={workspaceId}
               projectId={projectId}
               projectName={project?.name}
+              activeView={forkView}
+              onSelectBacklog={() => goToForkView("backlog")}
+              onSelectBoard={() => goToForkView("board")}
+              onSelectAppointments={() => goToForkView("appointments")}
+              onSelectCalendar={() => goToForkView("calendar")}
+              onSelectGantt={() => goToForkView("gantt")}
+              onSelectRoadmap={() => goToForkView("roadmap")}
               onSelectProject={handleProjectSwitch}
               onAddProject={() => setIsCreateProjectModalOpen(true)}
             />
@@ -151,14 +214,6 @@ export default function ProjectLayout({
               { "bg-card/80 backdrop-blur": !!background },
             )}
           >
-            {showViewSwitcher && (
-              <ProjectScopeToggle
-                workspaceId={workspaceId}
-                projectId={projectId}
-                currentView={currentView}
-                onSelect={goToView}
-              />
-            )}
             {summary}
             <div className="ml-auto flex shrink-0 items-center gap-1">
               {toolbar}

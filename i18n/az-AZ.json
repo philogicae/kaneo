@@ -10,7 +10,9 @@
 			"markAllRead": "Hamısını oxunmuş kimi işarələ",
 			"remove": "Çıxar",
 			"reset": "Sıfırla",
-			"filter": "Süzgəc"
+			"filter": "Süzgəc",
+			"clearAllFilters": "Bütün süzgəcləri təmizlə",
+			"save": "Save"
 		},
 		"a11y": {
 			"toggleSidebar": "Yan paneli aç/bağla"
@@ -148,7 +150,14 @@
 					"amber": "Kəhrəba rəngi",
 					"terracotta": "Bişmiş gil rəngi",
 					"rose": "Çəhrayı",
-					"crimson": "Tünd qırmızı"
+					"crimson": "Tünd qırmızı",
+					"cyan": "Cyan",
+					"emerald": "Emerald",
+					"fuchsia": "Fuchsia",
+					"indigo": "Indigo",
+					"lime": "Lime",
+					"ocean": "Ocean",
+					"sky": "Sky"
 				},
 				"statusLoadError": "Project statuses couldn’t be loaded."
 			}
@@ -160,6 +169,20 @@
 				"apply": "Keçidi tətbiq et",
 				"remove": "Keçidi sil"
 			}
+		},
+		"boolean": {
+			"false": "False",
+			"notSet": "Not Set",
+			"true": "True",
+			"undefined": "Undefined"
+		},
+		"formats": {
+			"never": "Heç vaxt"
+		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
 		}
 	},
 	"auth": {
@@ -558,6 +581,50 @@
 				"description": "Yoxlamaq üçün dərhal bura qayıdacaqsınız.",
 				"submit": "Daxil ol"
 			}
+		},
+		"cloud": {
+			"signUp": {
+				"title": "Bundan sonra nə olacaq",
+				"description": "Hesabınızı yaratdıqdan sonra iş sahənizə ad verəcəksiniz. Oradan layihə əlavə edib tapşırıq yazmağa başlaya bilərsiniz."
+			},
+			"onboarding": {
+				"title": "İş sahəsi nədir",
+				"description": "İş sahəsi layihələrinizi, onların tapşırıqlarını və birlikdə işlədiyiniz insanları saxlayır. Qurulduqdan sonra komanda üzvlərini dəvət edin."
+			},
+			"invite": {
+				"description": "Everyone in a workspace sees the same boards and gets live updates as tasks move. Roles control who can change what.",
+				"title": "Work better together"
+			},
+			"plan": {
+				"description": "Every plan includes unlimited projects and tasks, automatic backups, and updates. Cancel anytime from billing settings.",
+				"title": "Try everything first"
+			}
+		},
+		"inviteLink": {
+			"errorTitle": "Dəvət linki xətası",
+			"errors": {
+				"accept": "İş sahəsinə qoşulmaq alınmadı",
+				"load": "Dəvət linkinin təfərrüatları yüklənə bilmədi."
+			},
+			"invalidTitle": "Yanlış dəvət linki",
+			"joinPrompt": "<workspaceName>{{workspaceName}}</workspaceName> sahəsinə qoşulmaq üçün dəvət linkiniz var.",
+			"linkExpired": "Dəvət linkinin vaxtı bitdi",
+			"loading": "Dəvət linki yüklənir...",
+			"pageTitleAccept": "İş sahəsinə qoşul",
+			"pageTitleError": "Dəvət linki xətası",
+			"pageTitleInvalid": "Yanlış dəvət linki",
+			"signedInAs": "<email>{{email}}</email> kimi daxil olmusunuz",
+			"signedOutPrompt": "İş sahəsinə qoşulmaq üçün hesab yaradın və ya daxil olun.",
+			"title": "İş sahəsinə qoşulun!"
+		},
+		"signUpForm": {
+			"fullName": "Tam ad",
+			"namePlaceholder": "John Doe",
+			"failedSignUp": "Qeydiyyatdan keçmək alınmadı",
+			"accountCreated": "Hesab uğurla yaradıldı",
+			"passwordTooShort": "Parol çox qısadır",
+			"creatingAccount": "Hesab yaradılır...",
+			"createAccount": "Hesab yarat"
 		}
 	},
 	"settings": {
@@ -580,7 +647,8 @@
 			"updateError": "Profili yeniləmək alınmadı",
 			"validation": {
 				"nameRequired": "Ad tələb olunur",
-				"nameShort": "Ad ən azı 2 simvoldan ibarət olmalıdır"
+				"nameShort": "Ad ən azı 2 simvoldan ibarət olmalıdır",
+				"invalidEmail": "Yanlış e-poçt ünvanı"
 			},
 			"avatar": {
 				"hint": "Kvadrat şəkillər daha yaxşı görünür.",
@@ -589,7 +657,9 @@
 				"updateError": "Profil şəklini yeniləmək alınmadı",
 				"removeSuccess": "Profil şəkli çıxarıldı",
 				"removeError": "Profil şəklini çıxarmaq alınmadı",
-				"upload": "Yüklə"
+				"upload": "Yüklə",
+				"edit": "Profil şəklinizi dəyişin",
+				"change": "Avatarı dəyiş"
 			},
 			"deleteAccount": {
 				"sectionTitle": "Təhlükəli bölmə",
@@ -601,9 +671,13 @@
 				"confirm": "Hesabı sil",
 				"success": "Hesabınız silindi",
 				"error": "Hesabı silmək alınmadı",
-				"sessionTooOld": "Təhlükəsizlik üçün hesabınızı silməzdən əvvəl çıxış edib yenidən daxil olun."
+				"sessionTooOld": "Təhlükəsizlik üçün hesabınızı silməzdən əvvəl çıxış edib yenidən daxil olun.",
+				"sectionSubtitle": "Bütün hesabınıza təsir edən geri dönməz əməliyyatlar."
 			},
-			"emailHint": "Bu ünvanla daxil olursunuz."
+			"emailHint": "Bu ünvanla daxil olursunuz.",
+			"sectionSubtitle": "Profil və hesab təfərrüatlarınızı idarə edin.",
+			"emailPlaceholder": "E-poçtunuzu daxil edin",
+			"updateSuccess": "Profil uğurla yeniləndi"
 		},
 		"notificationsPage": {
 			"pageTitle": "Bildirişlər",
@@ -724,7 +798,46 @@
 			"stopSendingDescription": "Bu iş sahəsindən gələn bildirişlər yalnız Kaneo-da göstəriləcək.",
 			"stopSendingTitle": "{{workspaceName}} üçün göndərmə dayandırılsın?",
 			"workspacesDescription": "Kanallarınızdan hansı iş sahələrinin və layihələrin istifadə edə biləcəyini seçin.",
-			"workspacesTitle": "İş sahələri"
+			"workspacesTitle": "İş sahələri",
+			"accountEmailHint": "E-poçt həmişə daxil olunmuş hesabın e-poçt ünvanına göndərilir.",
+			"accountEmailLabel": "Hesabın e-poçtu",
+			"allProjectsDescription": "Bu iş sahəsindəki bütün layihələrin bildirişlərini çatdır.",
+			"createRule": "Qayda yarat",
+			"emailChannelHintDisabled": "Əvvəlcə e-poçtu ümumi səviyyədə quraşdırıb aktivləşdirin.",
+			"emailChannelHintEnabled": "Uyğun iş sahəsi bildirişlərini e-poçtla göndər.",
+			"emailDescription": "Bildirişlər üçün hesabınızın e-poçt ünvanından istifadə edin.",
+			"gotifyChannelHintDisabled": "Əvvəlcə Gotify-ı ümumi səviyyədə quraşdırıb aktivləşdirin.",
+			"gotifyChannelHintEnabled": "Uyğun iş sahəsi bildirişlərini Gotify-a göndər.",
+			"integrationNotConfigured": "Quraşdırılmayıb",
+			"integrationsDiscordDescription": "Hər layihə tapşırıq yeniliklərini öz Discord webhook-una göndərir. Kanalı və hadisələri redaktə etmək üçün layihəni açın.",
+			"integrationsDiscordTitle": "Discord inteqrasiyaları",
+			"integrationsSlackDescription": "Hər layihə tapşırıq yeniliklərini öz Slack gələn webhook-una göndərir. Kanalı və hadisələri redaktə etmək üçün layihəni açın.",
+			"integrationsSlackTitle": "Slack inteqrasiyaları",
+			"ntfyChannelHintDisabled": "Əvvəlcə ntfy-ni ümumi səviyyədə quraşdırıb aktivləşdirin.",
+			"ntfyChannelHintEnabled": "Uyğun iş sahəsi bildirişlərini ntfy-yə göndər.",
+			"projectScope": "Layihələrin əhatə dairəsi",
+			"projectScopeDescription": "Standart olaraq bütün layihələr daxildir. Bu iş sahəsi yalnız seçilmiş layihələrdən bildiriş göndərməlidirsə, əhatəni daraldın.",
+			"recipientHint": "Şərhlər və status dəyişiklikləri sizə təyin edilmiş tapşırıqlar barədə bildiriş göndərir. Qeyd etmələr seçilmiş üzvə bildiriş göndərir. Öz şərhləriniz, qeyd etmələriniz və status dəyişiklikləriniz üçün bildiriş almırsınız.",
+			"reminderLeadTimeHint": "Son tarixə 1 saatdan 30 günədək qalmış. Vaxtı keçmiş tapşırıqların bildirişləri ayrıca göndərilir.",
+			"reminderLeadTimeUnitDays": "Gün",
+			"reminderLeadTimeUnitHours": "Saat",
+			"removeRule": "Qaydanı çıxar",
+			"selectedProjects": "Seçilmiş layihələr",
+			"selectedProjectsDescription": "Yalnız seçilmiş layihələrin bildirişlərini çatdır.",
+			"tabDiscord": "Discord",
+			"tabGeneral": "Ümumi",
+			"tabSlack": "Slack",
+			"tabTelegram": "Telegram",
+			"webhookChannelHintDisabled": "Əvvəlcə Webhook-u ümumi səviyyədə quraşdırıb aktivləşdirin.",
+			"webhookChannelHintEnabled": "Uyğun iş sahəsi bildirişlərini Webhook-unuza göndər.",
+			"workspaceCardHint": "Bu iş sahəsinin hesab bildirişləri üçün hansı kanallardan istifadə edə biləcəyini seçin.",
+			"workspaceCardLabelEmail": "E-poçt",
+			"workspaceCardLabelGotify": "Gotify",
+			"workspaceCardLabelNtfy": "ntfy",
+			"workspaceCardLabelWebhook": "Fərdi Webhook",
+			"workspaceEnabledLabel": "{{workspaceName}} üçün bildirişləri aktivləşdir",
+			"workspaceRulesDescription": "Ümumi kanallarınızdan yenidən istifadə edin, sonra hansı iş sahələrinin və layihələrin hesab bildirişləri göndərə biləcəyini seçin.",
+			"workspaceRulesTitle": "İş sahəsi üzrə çatdırılma qaydaları"
 		},
 		"preferencesPage": {
 			"title": "Tərcihlər",
@@ -760,7 +873,19 @@
 			"priority": "Prioritet",
 			"projectBackgrounds": "Project backgrounds",
 			"projectBackgroundsDescription": "Layihənin öz lövhəsi üçün təyin etdiyi arxa fon şəklini göstər.",
-			"advancedTitle": "Qabaqcıl"
+			"advancedTitle": "Qabaqcıl",
+			"appearanceSubtitle": "Görünüş parametrləri və düzülüş tərcihləri.",
+			"assigneesDescription": "Tapşırıqların kimə təyin olunduğunu göstər",
+			"dueDatesDescription": "Tapşırıqların son tarixlərini göstər",
+			"interfaceSize": "Interface size",
+			"interfaceSizeDecrease": "Decrease interface size",
+			"interfaceSizeIncrease": "Increase interface size",
+			"labelsDescription": "Tapşırıq etiketlərini göstər",
+			"languageDescription": "İstədiyiniz interfeys dilini seçin",
+			"priorityDescription": "Prioritet göstəricilərini göstər",
+			"taskNumbersDescription": "Tapşırıq identifikatorlarını və nömrələrini göstər",
+			"themeDescription": "İstədiyiniz rəng sxemini seçin",
+			"themeVolt": "Volt"
 		},
 		"developerPage": {
 			"pageTitle": "API açarları",
@@ -772,7 +897,10 @@
 			"keysNote": "Açar sizin edə bildiyiniz hər şeyi edə bilər. Artıq istifadə etmədiyiniz açarları silin.",
 			"keysTitle": "Açarlar",
 			"loadError": "API açarlarını yükləmək alınmadı. Yenidən cəhd edin.",
-			"newKey": "Yeni açar"
+			"newKey": "Yeni açar",
+			"apiKeysCardTitle": "API açarları",
+			"apiKeysCardDescription": "Kaneo-ya proqram vasitəsilə giriş üçün API açarları yaradın və idarə edin.",
+			"createApiKey": "API açarı yarat"
 		},
 		"apiKey": {
 			"createdModal": {
@@ -781,7 +909,12 @@
 				"copy": "Kopyala",
 				"copied": "Kopyalandı",
 				"done": "Hazırdır",
-				"copyError": "Açarı kopyalamaq alınmadı. Onu seçib əl ilə kopyalayın."
+				"copyError": "Açarı kopyalamaq alınmadı. Onu seçib əl ilə kopyalayın.",
+				"yourApiKey": "API açarınız",
+				"toastCopied": "API açarı mübadilə buferinə kopyalandı",
+				"alertTitle": "Uğurludur! API açarınız yaradıldı",
+				"alertDescription": "Bu açarı indi kopyalayın. Onu bir daha görə bilməyəcəksiniz.",
+				"copyToContinue": "Davam etmək üçün açarı kopyalayın"
 			},
 			"table": {
 				"deleteConfirmTitle": "“{{name}}” silinsin?",
@@ -789,7 +922,19 @@
 				"delete": "Açarı sil",
 				"deleting": "Silinir…",
 				"toastDeleted": "API açarı silindi",
-				"toastDeleteError": "API açarını silmək alınmadı"
+				"toastDeleteError": "API açarını silmək alınmadı",
+				"loading": "API açarları yüklənir...",
+				"empty": "Hələ API açarı yoxdur. Başlamaq üçün birini yaradın.",
+				"columnName": "Ad",
+				"columnKey": "Açar",
+				"columnCreated": "Yaradılıb",
+				"columnExpires": "Bitmə vaxtı",
+				"columnActions": "Əməliyyatlar",
+				"unnamedKey": "Adsız açar",
+				"expiredBadge": "Vaxtı bitib: {{label}}",
+				"deleteFallbackName": "bu API açarı",
+				"deleteAria": "Açarı sil: {{name}}",
+				"deleteAriaFallback": "API açarı"
 			},
 			"createDialog": {
 				"title": "Yeni API açarı",
@@ -808,8 +953,11 @@
 				"failedCreate": "API açarını yaratmaq alınmadı",
 				"validation": {
 					"nameRequired": "Ad daxil edin",
-					"nameShort": "Ən azı 3 simvol istifadə edin"
-				}
+					"nameShort": "Ən azı 3 simvol istifadə edin",
+					"expirationRequired": "Bitmə vaxtı tələb olunur"
+				},
+				"expirationPlaceholder": "Bitmə vaxtını seçin",
+				"expirationDescription": "Bu API açarının nə qədər etibarlı qalacağını seçin. «Heç vaxt» seçimi avtomatik bitmə vaxtı olmayan açar yaradır."
 			},
 			"row": {
 				"actions": "{{name}} üçün əməliyyatlar",
@@ -854,10 +1002,16 @@
 				"dialogTitle": "Sahiblik ötürülsün?",
 				"dialogDescription": "{{name}} adlı şəxs {{workspace}} iş sahəsinin yeganə sahibi olacaq. İnzibatçı girişiniz qalacaq, lakin iş sahəsini silmək və ya yenidən ötürmək kimi yalnız sahibə aid imkanları itirəcəksiniz.",
 				"transferring": "Ötürülür…",
-				"confirm": "Sahibliyi ötür"
+				"confirm": "Sahibliyi ötür",
+				"subtitle": "Bu iş sahəsini başqa üzvə verin. Rolunuz inzibatçıya dəyişəcək və yalnız sahibə aid imkanları itirəcəksiniz."
 			},
 			"ownershipSubtitle": "Bunu yalnız sahib görür.",
-			"ownershipTitle": "Sahiblik"
+			"ownershipTitle": "Sahiblik",
+			"workspaceInfoSubtitle": "İş sahənizin təfərrüatlarını və tərcihlərini tənzimləyin.",
+			"nameHint": "İş sahənizin adı",
+			"descriptionHint": "İş sahənizin qısa təsviri",
+			"dangerZoneSubtitle": "Geri qaytarılmayan və məlumatları məhv edən əməliyyatlar.",
+			"toastUpdated": "İş sahəsi uğurla yeniləndi"
 		},
 		"workspaceRoles": {
 			"pageTitle": "Rollar",
@@ -1102,7 +1256,9 @@
 			"rowActions": "{{name}} üçün əməliyyatlar",
 			"sectionDescription": "Etiketin adını və ya rəngini dəyişmək onu istifadə edən bütün tapşırıqları yeniləyir.",
 			"sectionTitle": "İş sahəsinin etiketləri",
-			"subtitleWithWorkspace": "Etiketlər {{workspaceName}} iş sahəsindəki bütün layihələr üçün ortaqdır."
+			"subtitleWithWorkspace": "Etiketlər {{workspaceName}} iş sahəsindəki bütün layihələr üçün ortaqdır.",
+			"cardDescription": "Tapşırıqlara təyin edilə bilən etiketləri idarə edin.",
+			"empty": "Hələ etiket yoxdur. Başlamaq üçün ilk etiketinizi yaradın."
 		},
 		"projectGeneral": {
 			"pageTitle": "Layihə parametrləri",
@@ -1158,7 +1314,16 @@
 			"moveDialogTitle": "Başqa iş sahəsinə köçürülsün?",
 			"moveTargetLabel": "İş sahəsi",
 			"moving": "Köçürülür...",
-			"tasksTitle": "Tapşırıqlar"
+			"tasksTitle": "Tapşırıqlar",
+			"projectInfoSubtitle": "Layihənizin təfərrüatlarını və tərcihlərini tənzimləyin.",
+			"projectNameHint": "Layihənizin adı",
+			"descriptionHint": "Layihənizin qısa təsviri",
+			"dangerZoneSubtitle": "Geri qaytarılmayan və məlumatları məhv edən əməliyyatlar.",
+			"toastUpdated": "Layihə uğurla yeniləndi",
+			"importExportTasks": "İdxal/ixrac",
+			"importExportTasksDescription": "Tapşırıqları idxal və ixrac edin.",
+			"moveModalDescription": "This will move the project \"{{name}}\" and all of its tasks to \"{{workspace}}\". Tasks assigned to people who aren't members of that workspace will be unassigned, and notification subscriptions for this project will be cleared.",
+			"moveModalTitle": "Move Project?"
 		},
 		"projectIntegrations": {
 			"pageTitle": "İnteqrasiyalar",
@@ -1207,7 +1372,10 @@
 			"offNote": "İctimai keçidi söndürdükdə o dərhal işləməyi dayandırır.",
 			"on": "Aktiv",
 			"openPublicPage": "İctimai səhifəni aç",
-			"thisWorkspace": "bu iş sahəsi"
+			"thisWorkspace": "bu iş sahəsi",
+			"sectionSubtitle": "İctimai girişi açıb-bağlayın və ictimai URL-i paylaşın.",
+			"publicUrlHint": "Layihə ictimaidirsə, bu keçidi paylaşın",
+			"copiedToast": "Kopyalandı"
 		},
 		"projectWorkflow": {
 			"pageTitle": "İş axını parametrləri",
@@ -1216,7 +1384,9 @@
 			"columnsTitle": "Sütunlar",
 			"columnsDescription": "Sıralamaq üçün sürükləyin. Tamamlanma sütunundakı tapşırıqlar tamamlanmış sayılır.",
 			"automationTitle": "Avtomatlaşdırmalar",
-			"automationDescription": "Qoşulmuş repozitoriyada nəsə baş verdikdə əlaqəli tapşırığı köçürün."
+			"automationDescription": "Qoşulmuş repozitoriyada nəsə baş verdikdə əlaqəli tapşırığı köçürün.",
+			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
+			"customFieldsTitle": "Custom Fields"
 		},
 		"projectSwitcher": {
 			"selectProject": "Layihə seç",
@@ -1240,7 +1410,19 @@
 			"deleteTitle": "“{{name}}” silinsin?",
 			"doneHeader": "Tamamlanıb",
 			"dragAria": "{{name}} sütununun sırasını dəyiş",
-			"reorderError": "Sütunların sırasını dəyişmək alınmadı"
+			"reorderError": "Sütunların sırasını dəyişmək alınmadı",
+			"toastCreated": "Sütun yaradıldı",
+			"toastRenamed": "Sütunun adı dəyişdirildi",
+			"toastFinalOn": "Sütun yekun kimi işarələndi",
+			"toastFinalOff": "Sütunun yekun işarəsi götürüldü",
+			"toastIconUpdated": "Sütunun nişanı yeniləndi",
+			"toastDeleted": "Sütun silindi",
+			"loading": "Sütunlar yüklənir...",
+			"doneColumnTooltip": "Bunu tamamlanma sütunu kimi qəbul et",
+			"doneColumn": "Tamamlanma sütunu",
+			"on": "Aktiv",
+			"off": "Sönülü",
+			"add": "Əlavə et"
 		},
 		"githubIntegration": {
 			"toast": {
@@ -1255,7 +1437,11 @@
 				"importError": "Məsələləri idxal etmək alınmadı",
 				"commentOnEnabled": "Kaneo yeni məsələlərə tapşırıq keçidi olan şərh yazacaq",
 				"commentOnDisabled": "Yeni məsələlərdə tapşırıq keçidi olan şərhlər söndürülüb",
-				"settingsUpdateError": "GitHub inteqrasiyasını yeniləmək alınmadı"
+				"settingsUpdateError": "GitHub inteqrasiyasını yeniləmək alınmadı",
+				"installedOk": "GitHub tətbiqi düzgün quraşdırılıb!",
+				"installedMissingPerms": "GitHub tətbiqi quraşdırılıb, lakin tələb olunan icazələr çatışmır",
+				"needsInstallOnRepo": "GitHub tətbiqi bu repozitoriyada quraşdırılmalıdır",
+				"repoNotFound": "Repozitoriya tapılmadı və ya əlçatan deyil"
 			},
 			"commentTaskLinkTitle": "Yeni məsələlərə Kaneo keçidi ilə şərh yaz",
 			"commentTaskLinkHint": "GitHub-da olanlar tapşırığa birbaşa keçə bilsin deyə.",
@@ -1278,12 +1464,51 @@
 			"verifyNotInstalled": "Kaneo GitHub tətbiqi bu repozitoriyada quraşdırılmayıb.",
 			"verifyReady": "Kaneo GitHub tətbiqi lazımi icazələrlə quraşdırılıb.",
 			"workflowHint": "Birləşdirmə sorğuları açıldıqda və ya birləşdirildikdə tapşırıqların köçürülməsini burada tənzimləyin:",
-			"workflowLink": "İş axını"
+			"workflowLink": "İş axını",
+			"validation": {
+				"ownerRequired": "Repozitoriyanın sahibi tələb olunur",
+				"ownerInvalid": "Repozitoriya sahibinin formatı yanlışdır",
+				"nameRequired": "Repozitoriyanın adı tələb olunur",
+				"nameInvalid": "Repozitoriya adının formatı yanlışdır"
+			},
+			"connectionStatus": "Qoşulma vəziyyəti",
+			"connectedActive": "Repozitoriya qoşulub və aktivdir",
+			"notConnectedHint": "Repozitoriya qoşulmayıb",
+			"badgeConnected": "Qoşulub",
+			"badgeNotConnected": "Qoşulmayıb",
+			"repository": "Repozitoriya",
+			"repositoryHint": "Qoşulmuş GitHub repozitoriyası",
+			"appStatusTitle": "GitHub tətbiqinin vəziyyəti",
+			"appStatusHint": "Quraşdırma və icazələrin vəziyyəti",
+			"statusProperlyConfigured": "Düzgün tənzimlənib",
+			"statusMissingPermissions": "Çatışmayan icazələr",
+			"statusNotInstalled": "Quraşdırılmayıb",
+			"ownerLabel": "Repozitoriyanın sahibi",
+			"ownerHint": "GitHub istifadəçi adı və ya təşkilat",
+			"ownerPlaceholder": "Məs., octocat",
+			"repoNameLabel": "Repozitoriyanın adı",
+			"repoNameHint": "Repozitoriyanın adı",
+			"repoNamePlaceholder": "Məs., layihəm",
+			"actionsTitle": "Əməliyyatlar",
+			"actionsHint": "Repozitoriyaya qoşulmanızı idarə edin",
+			"browse": "Gözdən keçir",
+			"verify": "Doğrula",
+			"update": "Yenilə",
+			"connect": "Qoşul",
+			"disconnect": "Ayır",
+			"missingPermissionsLabel": "Çatışmayan icazələr:",
+			"importSectionTitle": "GitHub məsələlərini idxal et",
+			"importing": "İdxal edilir...",
+			"importIssues": "Məsələləri idxal et"
 		},
 		"giteaIntegration": {
 			"validation": {
 				"baseUrlRequired": "Gitea-nın əsas URL-i tələb olunur",
-				"baseUrlInvalid": "Etibarlı URL daxil edin (məs., https://gitea.example.com)"
+				"baseUrlInvalid": "Etibarlı URL daxil edin (məs., https://gitea.example.com)",
+				"ownerRequired": "Repozitoriyanın sahibi tələb olunur",
+				"ownerInvalid": "Repozitoriya sahibinin formatı yanlışdır",
+				"nameRequired": "Repozitoriyanın adı tələb olunur",
+				"nameInvalid": "Repozitoriya adının formatı yanlışdır"
 			},
 			"toast": {
 				"verifyError": "Gitea girişini doğrulamaq alınmadı",
@@ -1296,7 +1521,16 @@
 				"importError": "Məsələləri idxal etmək alınmadı",
 				"commentOnEnabled": "Kaneo yeni məsələlərə tapşırıq keçidi olan şərh yazacaq",
 				"commentOnDisabled": "Yeni məsələlərdə tapşırıq keçidi olan şərhlər söndürülüb",
-				"settingsUpdateError": "Gitea inteqrasiyasını yeniləmək alınmadı"
+				"settingsUpdateError": "Gitea inteqrasiyasını yeniləmək alınmadı",
+				"verifyOk": "Gitea giriş nişanının bu repozitoriyaya girişi var",
+				"verifyWarning": "Giriş nişanının icazələrini və ya repozitoriyaya girişi yoxlayın",
+				"repoNotFound": "Repozitoriya tapılmadı və ya əlçatan deyil",
+				"redirected": "Gitea URL-i yönləndirildi (adətən HTTPS-ə). Birbaşa son URL-dən istifadə edin.",
+				"notGiteaInstance": "URL Gitea quraşdırmasına aid deyil",
+				"tokenRequired": "Şəxsi giriş nişanı tələb olunur",
+				"tokenRequiredVerify": "Doğrulamaq üçün giriş nişanı daxil edin",
+				"secretCopied": "Kopyalandı",
+				"unableToCopySecret": "Sirri kopyalamaq mümkün olmadı"
 			},
 			"commentTaskLinkTitle": "Yeni məsələlərə Kaneo keçidi ilə şərh yaz",
 			"commentTaskLinkHint": "Gitea-da olanlar tapşırığa birbaşa keçə bilsin deyə.",
@@ -1311,7 +1545,40 @@
 			"browseNeedsCredentials": "Baxmaq üçün Gitea URL-ini və giriş nişanını daxil edin.",
 			"browseEmpty": "Bu giriş nişanı heç bir repozitoriyanı görmür.",
 			"chooseRepositoryDescription": "Repozitoriyanı owner/name kimi yazın və ya siyahıdan seçin.",
-			"webhookEvents": "Göndərmə (push), birləşdirmə sorğusu, məsələ, məsələ şərhi və yaratma (create) hadisələrini aktivləşdirin."
+			"webhookEvents": "Göndərmə (push), birləşdirmə sorğusu, məsələ, məsələ şərhi və yaratma (create) hadisələrini aktivləşdirin.",
+			"webhookShow": "Göstər",
+			"webhookHide": "Gizlət",
+			"webhookCopy": "Kopyala",
+			"connectionStatus": "Qoşulma vəziyyəti",
+			"connectedActive": "Repozitoriya qoşulub və aktivdir",
+			"notConnectedHint": "Gitea repozitoriyası qoşulmayıb",
+			"badgeConnected": "Qoşulub",
+			"badgeNotConnected": "Qoşulmayıb",
+			"repository": "Repozitoriya",
+			"repositoryHint": "Əlaqələndirilmiş Gitea repozitoriyası",
+			"webhookTitle": "Webhook",
+			"webhookSecretLabel": "Sirr (Gitea-dakı Webhook-un sirri ilə uyğun olmalıdır)",
+			"baseUrlHint": "Gitea quraşdırmanızın kök URL-i",
+			"tokenHint": "Repozitoriyaya və məsələlərə giriş hüququ olan nişan",
+			"currentToken": "Saxlanılıb",
+			"ownerLabel": "Sahib",
+			"ownerHint": "İstifadəçi və ya təşkilat adı",
+			"repoNameLabel": "Repozitoriyanın adı",
+			"repoNameHint": "Yalnız repozitoriyanın adı (sahibsiz)",
+			"actionsTitle": "Əməliyyatlar",
+			"actionsHint": "Girişi doğrula və qoşul",
+			"browse": "Gözdən keçir",
+			"verify": "Doğrula",
+			"update": "Yenilə",
+			"connect": "Qoşul",
+			"disconnect": "Ayır",
+			"importSectionTitle": "Gitea məsələlərini idxal et",
+			"importing": "İdxal edilir…",
+			"importIssues": "Məsələləri idxal et",
+			"browseModalTitle": "Repozitoriyalarınız",
+			"searchRepos": "Axtar…",
+			"loadingRepos": "Repozitoriyalar yüklənir…",
+			"retry": "Yenidən cəhd et"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1329,7 +1596,28 @@
 			"webhookPlaceholder": "https://hooks.slack.com/services/...",
 			"webhookHint": "Slack-də daxil olan Webhook yaradın və onu buraya yapışdırın.",
 			"connect": "Slack-ə qoşul",
-			"update": "Slack-i yenilə"
+			"update": "Slack-i yenilə",
+			"channelHint": "İstinad üçün istəyə bağlı etiket. Slack faktiki təyinat kanalını Webhook-un parametrlərindən idarə edir.",
+			"channelLabel": "Kanalın adı",
+			"channelPlaceholder": "#komanda-yenilikleri",
+			"connected": "Qoşulub",
+			"connectionHint": "Slack üçün daxil olan Webhook-un URL-ini yapışdırın və hansı tapşırıq hadisələrinin göndəriləcəyini seçin.",
+			"connectionTitle": "Slack Webhook-una qoşulma",
+			"disconnect": "Ayır",
+			"events": {
+				"taskCommentCreated": "Yeni şərhlər",
+				"taskCreated": "Yeni tapşırıqlar",
+				"taskDescriptionChanged": "Təsvir dəyişiklikləri",
+				"taskMentionCreated": "Tapşırıq mətnində və ya şərhlərdə xatırlatmalar",
+				"taskPriorityChanged": "Prioritet dəyişiklikləri",
+				"taskStatusChanged": "Vəziyyət dəyişiklikləri",
+				"taskTitleChanged": "Başlıq dəyişiklikləri"
+			},
+			"eventsHint": "Hansı layihə dəyişikliklərinin Slack-ə göndəriləcəyini seçin.",
+			"eventsTitle": "Hadisə bildirişləri",
+			"paused": "Dayandırılıb",
+			"saveChanges": "Dəyişiklikləri yadda saxla",
+			"webhookLabel": "Daxil olan Webhook-un URL-i"
 		},
 		"discordIntegration": {
 			"validation": {
@@ -1347,7 +1635,28 @@
 			"webhookPlaceholder": "https://discord.com/api/webhooks/...",
 			"webhookHint": "Discord-da kanal Webhook-u yaradın və onu buraya yapışdırın.",
 			"connect": "Discord-a qoşul",
-			"update": "Discord-u yenilə"
+			"update": "Discord-u yenilə",
+			"channelHint": "İstinad üçün istəyə bağlı etiket. Discord faktiki təyinat kanalını Webhook-un parametrlərindən idarə edir.",
+			"channelLabel": "Kanalın adı",
+			"channelPlaceholder": "#komanda-yenilikleri",
+			"connected": "Qoşulub",
+			"connectionHint": "Discord Webhook-unun URL-ini yapışdırın və hansı tapşırıq hadisələrinin göndəriləcəyini seçin.",
+			"connectionTitle": "Discord Webhook-una qoşulma",
+			"disconnect": "Ayır",
+			"events": {
+				"taskCommentCreated": "Yeni şərhlər",
+				"taskCreated": "Yeni tapşırıqlar",
+				"taskDescriptionChanged": "Təsvir dəyişiklikləri",
+				"taskMentionCreated": "Tapşırıq mətnində və ya şərhlərdə xatırlatmalar",
+				"taskPriorityChanged": "Prioritet dəyişiklikləri",
+				"taskStatusChanged": "Vəziyyət dəyişiklikləri",
+				"taskTitleChanged": "Başlıq dəyişiklikləri"
+			},
+			"eventsHint": "Hansı layihə dəyişikliklərinin Discord-a göndəriləcəyini seçin.",
+			"eventsTitle": "Hadisə bildirişləri",
+			"paused": "Dayandırılıb",
+			"saveChanges": "Dəyişiklikləri yadda saxla",
+			"webhookLabel": "Webhook-un URL-i"
 		},
 		"mattermostIntegration": {
 			"validation": {
@@ -1365,7 +1674,27 @@
 			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/...",
 			"webhookHint": "Mattermost-da daxil olan Webhook yaradın və onu buraya yapışdırın.",
 			"connect": "Mattermost-a qoşul",
-			"update": "Mattermost-u yenilə"
+			"update": "Mattermost-u yenilə",
+			"connectionTitle": "Mattermost Webhook-una qoşulma",
+			"connectionHint": "Mattermost üçün daxil olan Webhook-un URL-ini yapışdırın və hansı tapşırıq hadisələrinin göndəriləcəyini seçin.",
+			"connected": "Qoşulub",
+			"paused": "Dayandırılıb",
+			"webhookLabel": "Daxil olan Webhook-un URL-i",
+			"channelLabel": "Kanalın adı",
+			"channelPlaceholder": "#komanda-yenilikleri",
+			"channelHint": "İstinad üçün istəyə bağlı etiket. Mattermost faktiki təyinat kanalını Webhook-un parametrlərindən idarə edir.",
+			"eventsTitle": "Hadisə bildirişləri",
+			"eventsHint": "Hansı layihə dəyişikliklərinin Mattermost-a göndəriləcəyini seçin.",
+			"events": {
+				"taskCreated": "Yeni tapşırıqlar",
+				"taskStatusChanged": "Vəziyyət dəyişiklikləri",
+				"taskPriorityChanged": "Prioritet dəyişiklikləri",
+				"taskTitleChanged": "Başlıq dəyişiklikləri",
+				"taskDescriptionChanged": "Təsvir dəyişiklikləri",
+				"taskCommentCreated": "Yeni şərhlər"
+			},
+			"saveChanges": "Dəyişiklikləri yadda saxla",
+			"disconnect": "Ayır"
 		},
 		"genericWebhookIntegration": {
 			"validation": {
@@ -1409,7 +1738,14 @@
 			"disconnectDescription": "Kaneo hadisələri göndərməyi dayandırır və yadda saxlanılmış son nöqtəni və sirri silir.",
 			"disconnectTitle": "Webhook ayrılsın?",
 			"reminderLeadTimeAfter": "saat əvvəl göndər",
-			"reminderLeadTimeBefore": "Xatırlatmaları tapşırığın son tarixindən"
+			"reminderLeadTimeBefore": "Xatırlatmaları tapşırığın son tarixindən",
+			"connectionTitle": "Gedən Webhook-a qoşulma",
+			"connectionHint": "Tapşırıq hadisələrini JSON kimi öz son nöqtənizə göndərin. Sirr təyin edildikdə imzalanmış X-Kaneo-Signature başlığı əlavə olunur.",
+			"connected": "Qoşulub",
+			"paused": "Dayandırılıb",
+			"eventsHint": "Hansı layihə dəyişikliklərinin gedən Webhook-ları işə salacağını seçin.",
+			"saveChanges": "Dəyişiklikləri yadda saxla",
+			"disconnect": "Ayır"
 		},
 		"telegramIntegration": {
 			"validation": {
@@ -1438,7 +1774,29 @@
 			"chatLabelPlaceholder": "Mühəndislik yenilikləri",
 			"connect": "Telegram-a qoşul",
 			"botTokenSavedPlaceholder": "Yadda saxlanılıb. Əvəzləmək üçün yeni giriş nişanı yapışdırın.",
-			"loadError": "Telegram parametrlərini yükləmək alınmadı."
+			"loadError": "Telegram parametrlərini yükləmək alınmadı.",
+			"chatIdHint": "Yeniləmələrin göndəriləcəyi Telegram söhbət identifikatorunu və ya kanal istifadəçi adını daxil edin.",
+			"chatLabelHint": "Kaneo daxilində istinad üçün istəyə bağlı etiket.",
+			"connected": "Qoşulub",
+			"connectionHint": "Layihənin tapşırıq yeniləmələrini söhbətə və ya mövzuya göndərmək üçün Telegram bot giriş nişanından və söhbət identifikatorundan istifadə edin.",
+			"connectionTitle": "Telegram botuna qoşulma",
+			"disconnect": "Ayır",
+			"events": {
+				"appointmentCreated": "Yeni görüşlər",
+				"appointmentUpdated": "Görüş dəyişiklikləri",
+				"taskCommentCreated": "Yeni şərhlər",
+				"taskCreated": "Yeni tapşırıqlar",
+				"taskDescriptionChanged": "Təsvir dəyişiklikləri",
+				"taskMentionCreated": "Tapşırıq mətnində və ya şərhlərdə xatırlatmalar",
+				"taskPriorityChanged": "Prioritet dəyişiklikləri",
+				"taskStatusChanged": "Vəziyyət dəyişiklikləri",
+				"taskTitleChanged": "Başlıq dəyişiklikləri"
+			},
+			"eventsHint": "Hansı layihə dəyişikliklərinin Telegram-a göndəriləcəyini seçin.",
+			"eventsTitle": "Hadisə bildirişləri",
+			"paused": "Dayandırılıb",
+			"saveChanges": "Dəyişiklikləri yadda saxla",
+			"threadIdHint": "İstəyə bağlıdır. Telegram qruplarındakı forum mövzuları üçün istifadə edin."
 		},
 		"repositoryBrowser": {
 			"title": "Repozitoriya seçin",
@@ -1457,7 +1815,14 @@
 			"missingOne": "Axtardığınız yoxdur?",
 			"searching": "Axtarılır…",
 			"updated": "Yeniləndi: {{time}}",
-			"useRepository": "Repozitoriyadan istifadə et"
+			"useRepository": "Repozitoriyadan istifadə et",
+			"footerSummary": "{{installationCount}} quraşdırmada {{repoCount}} repozitoriya",
+			"manageInstallations": "Quraşdırmaları idarə et",
+			"updatedPrefix": "Yenilənib",
+			"relativeJustNow": "İndicə",
+			"relativeMinutesAgo": "{{count}} dəq. əvvəl",
+			"relativeHoursAgo": "{{count}} saat əvvəl",
+			"relativeDaysAgo": "{{count}} gün əvvəl"
 		},
 		"tasksImportExport": {
 			"exportTasks": "Tapşırıqları ixrac et",
@@ -1495,7 +1860,17 @@
 			"dontMove": "Köçürülməsin",
 			"emptyDescription": "Avtomatlaşdırmalar üçün qoşulmuş GitHub, Gitea və ya GitLab repozitoriyası lazımdır.",
 			"emptyTitle": "Qoşulmuş repozitoriya yoxdur",
-			"openIntegrations": "İnteqrasiyaları aç"
+			"openIntegrations": "İnteqrasiyaları aç",
+			"loading": "Yüklənir...",
+			"createColumnsFirst": "Avtomatlaşdırma qaydalarını tənzimləmək üçün əvvəlcə sütunlar yaradın.",
+			"githubHeading": "GitHub",
+			"githubHint": "GitHub hadisəsi baş verdikdə əlaqəli tapşırığı sütuna köçür.",
+			"giteaHeading": "Gitea",
+			"giteaHint": "Gitea Webhook-unun hadisəsi baş verdikdə əlaqəli tapşırığı sütuna köçür.",
+			"selectColumnPlaceholder": "Sütun seç...",
+			"toastUpdated": "İş axını qaydası yeniləndi",
+			"gitlabHeading": "GitLab",
+			"gitlabHint": "When a GitLab webhook event occurs, move the linked task to a column."
 		},
 		"externalLinks": {
 			"resources": "Resurslar",
@@ -1576,7 +1951,19 @@
 			"typeLocked": "Sahə yaradıldıqdan sonra növü dəyişdirilə bilməz.",
 			"unchecked": "İşarələnməyib",
 			"updateError": "Fərdi sahəni yadda saxlamaq alınmadı.",
-			"updateSuccess": "Fərdi sahə yadda saxlanıldı."
+			"updateSuccess": "Fərdi sahə yadda saxlanıldı.",
+			"addButton": "Add",
+			"defaultValuePlaceholder": "Default value",
+			"deleteButton": "Delete",
+			"empty": "No custom fields configured yet.",
+			"loading": "Loading custom fields...",
+			"noOptionsPlaceholder": "No options",
+			"optionsPlaceholder": "Options separated by commas",
+			"typePlaceholder": "Select field type",
+			"availableOptions": "Available options",
+			"defaultValues": "{{count}} default(s)",
+			"multiple": "Multiple",
+			"options": "{{count}} option(s)"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -1653,7 +2040,10 @@
 				"updated": "User updated",
 				"updateError": "Failed to update user"
 			},
-			"you": "Siz"
+			"you": "Siz",
+			"instanceBadge": "Instance",
+			"userCount_one": "{{count}} registered user",
+			"userCount_other": "{{count}} registered users"
 		},
 		"security": "Security",
 		"securityPage": {
@@ -1686,7 +2076,8 @@
 			"dialogDescription": "Ən azı 8 simvol, cari paroldan fərqli.",
 			"dialogTitle": "Parolu dəyiş",
 			"passwordHint": "Başqa heç yerdə istifadə etmədiyiniz ən azı 8 simvol istifadə edin.",
-			"passwordTitle": "Parol"
+			"passwordTitle": "Parol",
+			"sectionSubtitle": "Change the password you use to sign in."
 		},
 		"gitlabIntegration": {
 			"baseUrlLabel": "GitLab URL",
@@ -1709,7 +2100,16 @@
 				"updated": "GitLab integration saved",
 				"updateError": "Failed to save GitLab integration",
 				"verifyError": "Failed to verify GitLab access",
-				"verifyFirst": "Verify access failed. Check URL, token, and project path"
+				"verifyFirst": "Verify access failed. Check URL, token, and project path",
+				"notGitlabInstance": "The URL does not point to a GitLab instance",
+				"projectNotFound": "Project not found or not accessible",
+				"redirected": "GitLab URL redirected (usually to HTTPS). Use the final URL directly.",
+				"secretCopied": "Copied",
+				"tokenRequired": "Access token is required",
+				"tokenRequiredVerify": "Enter a token to verify",
+				"unableToCopySecret": "Unable to copy secret",
+				"verifyOk": "GitLab token can access this project",
+				"verifyWarning": "Check token permissions or project access"
 			},
 			"tokenLabel": "Access token",
 			"tokenPlaceholder": "Paste token",
@@ -1720,7 +2120,8 @@
 			"validation": {
 				"baseUrlInvalid": "Enter a valid URL (e.g. https://gitlab.com)",
 				"baseUrlRequired": "GitLab base URL is required",
-				"pathInvalid": "Enter the full path, e.g. group/project"
+				"pathInvalid": "Enter the full path, e.g. group/project",
+				"pathRequired": "Project path is required"
 			},
 			"webhookHint": "Dəyişikliklərin Kaneo-ya qayıtması üçün bu Webhook-u layihə parametrlərində əlavə edin.",
 			"loadProjectsError": "Layihələri yükləmək alınmadı.",
@@ -1729,7 +2130,38 @@
 			"chooseProjectDescription": "Layihənin yolunu yazın və ya siyahıdan seçin.",
 			"noSearchMatchTitle": "Uyğun layihə yoxdur",
 			"useProject": "Layihədən istifadə et",
-			"webhookEvents": "Göndərmə (push), məsələ, şərh və birləşdirmə sorğusu hadisələrini aktivləşdirin."
+			"webhookEvents": "Göndərmə (push), məsələ, şərh və birləşdirmə sorğusu hadisələrini aktivləşdirin.",
+			"actionsHint": "Verify access and connect",
+			"actionsTitle": "Actions",
+			"badgeConnected": "Connected",
+			"badgeNotConnected": "Not connected",
+			"baseUrlHint": "https://gitlab.com, or the root URL of your instance",
+			"browse": "Browse",
+			"browseModalTitle": "Your projects",
+			"connect": "Connect",
+			"connectedActive": "Project connected and active",
+			"connectionStatus": "Connection status",
+			"currentToken": "stored",
+			"disconnect": "Disconnect",
+			"importDisabledHint": "Verify the project above to enable importing",
+			"importing": "Importing…",
+			"importIssues": "Import issues",
+			"importSectionTitle": "Import GitLab issues",
+			"loadingProjects": "Loading projects…",
+			"notConnectedHint": "No GitLab project connected",
+			"project": "Project",
+			"projectHint": "Linked GitLab project",
+			"projectPathHint": "Full path including any groups, e.g. group/subgroup/project",
+			"retry": "Retry",
+			"tokenHint": "Token with api scope and at least Developer on the project",
+			"tokenTypeHint": "How the token is sent. Access tokens use PRIVATE-TOKEN; an OAuth2 token uses Authorization.",
+			"update": "Update",
+			"verify": "Verify",
+			"webhookCopy": "Copy",
+			"webhookHide": "Hide",
+			"webhookSecretLabel": "Secret token (must match the one set on the webhook in GitLab)",
+			"webhookShow": "Show",
+			"webhookTitle": "Webhook"
 		},
 		"calendarFeeds": {
 			"title": "Calendar feeds",
@@ -1765,7 +2197,12 @@
 			"revokeConfirm": "Lenti ləğv et",
 			"revokeConfirmDescription": "Bu keçiddən istifadə edən təqvim tətbiqləri artıq yenilik almayacaq. Bunu geri qaytarmaq olmaz.",
 			"revokeConfirmTitle": "Bu lent ləğv edilsin?",
-			"revoking": "Ləğv edilir…"
+			"revoking": "Ləğv edilir…",
+			"createTitle": "Create a calendar feed",
+			"filterHint": "Include tasks with a start or due date. Select labels to include only tasks matching at least one, or leave empty to include all scheduled project tasks.",
+			"empty": "No calendar feeds yet.",
+			"feedUrl": "Calendar feed URL",
+			"copied": "Calendar feed link copied."
 		},
 		"invitationEmailFailed": "Invitation saved, but email delivery failed. Check SMTP settings and resend the invitation.",
 		"billing": {
@@ -1777,7 +2214,8 @@
 				"title": "Choose a plan"
 			},
 			"currentPlan": {
-				"title": "Current plan"
+				"title": "Current plan",
+				"subtitle": "Your workspace's active plan and billing status."
 			},
 			"disabled": "Billing isn't enabled on this instance. Self-hosted Kaneo includes every feature, free forever.",
 			"expiredCallout": {
@@ -1850,7 +2288,9 @@
 				"expiredTitle": "Your trial has ended",
 				"noDate": "Choose a plan below to continue after your trial.",
 				"badgeDaysLeft_one": "{{count}} gün qalıb",
-				"badgeDaysLeft_other": "{{count}} gün qalıb"
+				"badgeDaysLeft_other": "{{count}} gün qalıb",
+				"daysLeft_one": "You have {{count}} day left on your free trial. Choose a plan to continue without interruption.",
+				"daysLeft_other": "You have {{count}} days left on your free trial. Choose a plan to continue without interruption."
 			},
 			"trialCard": {
 				"activeDescription": "Upgrade anytime to keep your workspace after the trial.",
@@ -1867,7 +2307,8 @@
 			"checkoutSuccess": {
 				"title": "Abunə olduğunuz üçün təşəkkürlər",
 				"description": "Ödəniş alındı. Aşağıdakı plan təsdiqləndikdən sonra yenilənəcək."
-			}
+			},
+			"planName": "Kaneo Cloud {{plan}}"
 		},
 		"syncRules": {
 			"addLabel": "Add label",
@@ -1933,7 +2374,12 @@
 			"pausedSummary_other": "{{count}} tapşırığın sinxronlaşdırılması dayandı, çünki onlar artıq sinxronlaşdırma qaydalarına uyğun gəlmir.",
 			"providerToKaneo": "{{provider}} xidmətindən Kaneo-ya",
 			"reviewPaused": "Nəzərdən keçir",
-			"tasksLabelled": "Etiketi olan tapşırıqlar:"
+			"tasksLabelled": "Etiketi olan tapşırıqlar:",
+			"allSummary": "All of: {{labels}}",
+			"anySummary": "Any of: {{labels}}",
+			"filteredBadge": "Filtered by labels",
+			"pausedCount_one": "{{count}} paused link",
+			"pausedCount_other": "{{count}} paused links"
 		},
 		"advancedSettingsDescription": "İnteqrasiya sinxronlaşdırma qaydaları kimi əlavə idarəetmə elementlərini göstərir. Yalnız bu brauzerdə.",
 		"adminWorkspaces": {
@@ -1990,7 +2436,14 @@
 				"makeOwner": "Make owner",
 				"remove": "Remove from workspace",
 				"roleLabel": "Role for {{name}}",
-				"title": "Members of {{name}}"
+				"title": "Members of {{name}}",
+				"columns": {
+					"actions": "Actions",
+					"joined": "Joined",
+					"member": "Member",
+					"projects": "Projects",
+					"role": "Role"
+				}
 			},
 			"next": "Next",
 			"noOwner": "No owner",
@@ -2013,7 +2466,10 @@
 				"roleError": "Failed to update role",
 				"roleUpdated": "Role updated",
 				"transferError": "Failed to transfer ownership"
-			}
+			},
+			"instanceBadge": "Instance",
+			"workspaceCount_one": "{{count}} workspace",
+			"workspaceCount_other": "{{count}} workspaces"
 		},
 		"workspaceImport": {
 			"back": {
@@ -2295,7 +2751,8 @@
 				"taskDescriptionChanged": "Təsvir dəyişdikdə",
 				"taskPriorityChanged": "Prioritet dəyişdikdə",
 				"taskStatusChanged": "Vəziyyət dəyişdikdə",
-				"taskTitleChanged": "Başlıq dəyişdikdə"
+				"taskTitleChanged": "Başlıq dəyişdikdə",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"optional": "İstəyə bağlı",
 			"postWhen": "Bu hallarda paylaş",
@@ -2356,6 +2813,108 @@
 		},
 		"shared": {
 			"autosave": "Dəyişikliklər avtomatik yadda saxlanılır"
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "Əvvəlcə API açarı yaradın, sonra <YOUR_API_KEY> yer tutucusunu onunla əvəz edin.",
+			"authModeApiKey": "API açarı",
+			"authModeOauth": "OAuth",
+			"cardDescription": "Doğrulama rejimini seçin, sonra quraşdırma əmrini işlədin və ya konfiqurasiyanı agentinizə yapışdırın.",
+			"cardTitle": "Agent qoşun",
+			"copied": "Kopyalandı",
+			"copy": "Kopyala",
+			"createApiKey": "API açarı yarat",
+			"followUpLabel": "Sonra doğrulayın",
+			"installCommandLabel": "Quraşdırma əmri",
+			"manualConfigLabel": "Manual konfiqurasiya",
+			"oauthNote": "OAuth standartdır: ilk qoşulma agenti avtorizasiya etmək üçün Kaneo-nu brauzerinizdə açır, sonra token agentin özü tərəfindən idarə olunur.",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "bu instansiyanın daxili HTTP MCP son nöqtəsi",
+			"serverUrlLabel": "Server URL-i",
+			"subtitle": "Claude, Codex, Gemini və ya OpenCode kimi AI agentlərini daxili HTTP MCP serveri vasitəsilə bu Kaneo instansiyasına qoşun.",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"skills": "Bacarıqlar",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Bu əmrləri Kaneo repozitoriyasının kökündən işlədin, sonra agentinizi yenidən başladın.",
+			"cardTitle": "Kaneo bacarığını quraşdır",
+			"copied": "Kopyalandı",
+			"copy": "Kopyala",
+			"destinationLabel": "Təyinat",
+			"installCommandLabel": "Quraşdırma əmri",
+			"mcpRequirement": "Bacarıq MCP bağlantısına əsaslanır: əvvəlcə onu konfiqurasiya edin.",
+			"openMcpSettings": "MCP parametrlərini aç",
+			"pageTitle": "Bacarıqlar",
+			"projectScope": "layihə",
+			"skillUrlDescription": "agentlər üçün bu instans tərəfindən təqdim olunur",
+			"skillUrlLabel": "Bacarıq URL-i",
+			"subtitle": "Kaneo bacarığını quraşdırın ki, AI agentləri bu instansiyanın konvensiyalarına əməl etsin və MCP alətlərindən düzgün istifadə etsin.",
+			"title": "Agent bacarıqları",
+			"updateDescription": "Bacarıqlar diskdən oxunur: dəyişiklikləri almaq üçün Kaneo yeniləndikdən sonra qovluğu yenidən kopyalayın.",
+			"userScope": "istifadəçi",
+			"verifyLabel": "Yoxla"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopicsLabel": "Aşkar edilən mövzular",
+			"detectedTopics_one": "{{count}} topic detected",
+			"detectedTopics_other": "{{count}} topics detected",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"topicHint": "Topics are detected live while this dialog is open: send a message inside a topic and it appears in the list above. You can also type the id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -2378,7 +2937,8 @@
 				"navigate": "Keçid et",
 				"open": "Aç",
 				"close": "Bağla"
-			}
+			},
+			"voltTheme": "Volt theme"
 		},
 		"sidebar": {
 			"projects": "Layihələr",
@@ -2401,7 +2961,12 @@
 			"deleteConfirmDescription": "Bu, layihəni və bütün məlumatlarını həmişəlik siləcək. Bu əməliyyatı geri qaytara bilməzsiniz.",
 			"deletedToast": "Layihə silindi",
 			"deleteProject": "Layihəni sil",
-			"switcherLabel": "Layihəni və ya görünüşü dəyiş"
+			"switcherLabel": "Layihəni və ya görünüşü dəyiş",
+			"sortCompletion": "Completion",
+			"sortCustom": "Custom order",
+			"sortDate": "Date created",
+			"sortName": "Name",
+			"sortProjects": "Sort projects"
 		},
 		"search": {
 			"inputPlaceholder": "Tapşırıqları, layihələri və şərhləri axtar...",
@@ -2412,7 +2977,8 @@
 				"workspace": "İş sahələri",
 				"comment": "Şərhlər",
 				"activity": "Fəaliyyətlər",
-				"fallback": "Nəticələr"
+				"fallback": "Nəticələr",
+				"appointment": "Görüşlər"
 			}
 		},
 		"settingsLayout": {
@@ -2431,7 +2997,8 @@
 			"workspaces": "İş sahələri",
 			"switching": "Dəyişdirilir...",
 			"addWorkspace": "İş sahəsi əlavə et",
-			"selectWorkspace": "İş sahəsi seç"
+			"selectWorkspace": "İş sahəsi seç",
+			"sortWorkspaces": "Sort workspaces"
 		},
 		"page": {
 			"projectsTitle": "Layihələr",
@@ -2558,7 +3125,39 @@
 			"then": "sonra",
 			"or": "və ya",
 			"thenEllipsis": "sonra…"
-		}
+		},
+		"keyboardShortcuts": {
+			"title": "Klaviatura qısayolları",
+			"subtitle": "Klaviatura qısayolları ilə işinizi sürətləndirin",
+			"searchPlaceholder": "Qısayolları axtar...",
+			"footer": "Bağlamaq üçün <kbd>Escape</kbd> düyməsini basın",
+			"categories": {
+				"general": "Ümumi",
+				"create": "Yarat",
+				"views": "Görünüşlər",
+				"navigation": "Naviqasiya",
+				"quickSelect": "Sürətli seçim (açılan pəncərələrdə)"
+			},
+			"items": {
+				"openCommandPalette": "Əmr palitrasını aç",
+				"globalSearch": "Ümumi axtarış",
+				"toggleSidebar": "Yan paneli aç/bağla",
+				"showShortcuts": "Klaviatura qısayollarını göstər",
+				"closeModal": "Modal/açılan pəncərəni bağla",
+				"createTask": "Tapşırıq yarat",
+				"createProject": "Layihə yarat",
+				"createWorkspace": "İş sahəsi yarat",
+				"boardView": "Lövhə görünüşünə keç",
+				"listView": "Siyahı görünüşünə keç",
+				"backlogView": "Gözləyən tapşırıqlar görünüşünə keç",
+				"calendarView": "Təqvim görünüşünə keç",
+				"nextTask": "Növbəti tapşırıq",
+				"prevTask": "Əvvəlki tapşırıq",
+				"openTask": "Seçilmiş tapşırığı aç",
+				"quickSelectNumber": "Nömrəyə görə seçim et"
+			}
+		},
+		"notifications": "Bildirişlər"
 	},
 	"notifications": {
 		"newCount_one": "{{count}} yeni",
@@ -2613,6 +3212,15 @@
 				"title": "Vaxtın izlənməsi başladı",
 				"contentWithTask": "Tapşırıqda vaxtın izlənməsi başladı: {{taskTitle}}",
 				"contentWithoutTask": "Tapşırıqda vaxtın izlənməsi başladı"
+			},
+			"appointment_created": {
+				"content": "Görüş sizə təyin edildi: {{appointmentTitle}}",
+				"title": "Görüş sizə təyin edildi"
+			},
+			"appointment_updated": {
+				"contentAssignee": "Görüş sizə təyin edildi: {{appointmentTitle}}",
+				"contentRescheduled": "\"{{appointmentTitle}}\" görüşünün vaxtı dəyişdirildi.",
+				"title": "Görüş yeniləndi"
 			}
 		},
 		"inbox": {
@@ -2636,7 +3244,11 @@
 			"taskLoadError": "This task couldn’t be loaded.",
 			"actionError": "Gələnlər qutusu yenilənmədi. Yenidən cəhd edin.",
 			"readCleared": "Oxunmuş bildirişlər silindi"
-		}
+		},
+		"shortcuts": {
+			"open": "Bildirişləri aç"
+		},
+		"title": "Bildirişlər"
 	},
 	"activity": {
 		"assignedToSelf": "Tapşırığı özünə təyin etdi",
@@ -2744,11 +3356,14 @@
 				},
 				"mermaid": {
 					"renderFailed": "Mermaid diaqramını göstərmək mümkün olmadı"
-				}
+				},
+				"enterUrl": "URL daxil edin"
 			},
 			"importedFrom": "Imported from {{source}}",
 			"importedBy": "Imported by {{name}}",
-			"commentedOnForge": "{{forge}}-da şərh yazdı"
+			"commentedOnForge": "{{forge}}-da şərh yazdı",
+			"commentedOnGithub": "GitHub-da şərh yazdı",
+			"github": "GitHub"
 		},
 		"movedFromOtherProject": "moved task from another project to \"{{to}}\""
 	},
@@ -2901,8 +3516,11 @@
 				"saved": "Saved",
 				"saving": "Saving…",
 				"saveFailed": "Changes could not be saved",
-				"retrySave": "Retry"
-			}
+				"retrySave": "Retry",
+				"enterUrl": "URL daxil edin"
+			},
+			"customFieldUpdated": "Field updated",
+			"selectOption": "Select option"
 		},
 		"entity": {
 			"task": "Tapşırıq"
@@ -2954,7 +3572,8 @@
 			"startDate": "Başlama tarixi",
 			"noDate": "Tarix yoxdur",
 			"dates": "Tarixlər",
-			"project": "Layihə"
+			"project": "Layihə",
+			"end": "End"
 		},
 		"move": {
 			"title": "Tapşırığı köçür",
@@ -2980,11 +3599,19 @@
 			},
 			"dueDate": {
 				"updateError": "Tapşırığın son tarixini yeniləmək alınmadı",
-				"clear": "Tarixi təmizlə"
+				"clear": "Tarixi təmizlə",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "End time",
+				"updateSuccess": "Tapşırığın son tarixi uğurla yeniləndi"
 			},
 			"startDate": {
 				"updateError": "Tapşırığın başlama tarixini yeniləmək alınmadı",
-				"clear": "Başlama tarixini təmizlə"
+				"clear": "Başlama tarixini təmizlə",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time",
+				"updateSuccess": "Tapşırığın başlama tarixi uğurla yeniləndi"
 			},
 			"labels": {
 				"searchPlaceholder": "Etiketləri axtar...",
@@ -3005,7 +3632,9 @@
 					"rose": "Çəhrayı",
 					"crimson": "Tünd qırmızı"
 				},
-				"editLabels": "Etiketləri redaktə et"
+				"editLabels": "Etiketləri redaktə et",
+				"addSuccess": "Etiket əlavə edildi",
+				"removeSuccess": "Etiket çıxarıldı"
 			}
 		},
 		"backlog": {
@@ -3025,8 +3654,14 @@
 			"filters": {
 				"dueThisWeek": "Son tarixi bu həftə olan",
 				"dueNextWeek": "Son tarixi gələn həftə olan",
-				"noDueDate": "Son tarix yoxdur"
-			}
+				"noDueDate": "Son tarix yoxdur",
+				"priority": "Prioritet: {{name}}",
+				"assignee": "İcraçı: {{name}}",
+				"due": "Son tarix: {{date}}",
+				"label": "Etiket: {{name}}"
+			},
+			"filter": "Süzgəc",
+			"addFilter": "Süzgəc əlavə et..."
 		},
 		"sort": {
 			"direction": "İstiqamət",
@@ -3039,7 +3674,9 @@
 				"dueDate": "Son tarix",
 				"title": "Başlıq",
 				"number": "Tapşırıq nömrəsi"
-			}
+			},
+			"label": "Sırala",
+			"by": "Sıralama meyarı"
 		},
 		"boardFilters": {
 			"selectedCount": "{{count}} seçilib",
@@ -3061,7 +3698,14 @@
 			},
 			"allCustomFieldValues": "All values",
 			"noCustomFieldValues": "No custom field values",
-			"noValuesUsedYet": "No values used yet"
+			"noValuesUsedYet": "No values used yet",
+			"filterBy": "Süzmə meyarı",
+			"allStatuses": "Bütün vəziyyətlər",
+			"allPriorities": "Bütün prioritetlər",
+			"allAssignees": "Bütün icraçılar",
+			"allDueDates": "Bütün son tarixlər",
+			"allLabels": "Bütün etiketlər",
+			"all": "All"
 		},
 		"calendar": {
 			"pageTitle": "{{name}} – Təqvim",
@@ -3095,7 +3739,8 @@
 			"previousPeriod": "Previous period",
 			"nextPeriod": "Next period",
 			"periodStart": "Timeline start date",
-			"showTaskDates": "Show task dates"
+			"showTaskDates": "Show task dates",
+			"noTasksMatch": "\"{{query}}\" sorğusuna uyğun tarixi təyin edilmiş tapşırıq yoxdur"
 		},
 		"delete": {
 			"title": "Tapşırıq silinsin?",
@@ -3136,13 +3781,17 @@
 			"label": "Son tarix",
 			"clear": "Tarixi təmizlə",
 			"updateError": "Tapşırığın son tarixini yeniləmək alınmadı",
-			"clearError": "Son tarixi təmizləmək alınmadı"
+			"clearError": "Son tarixi təmizləmək alınmadı",
+			"updateSuccess": "Tapşırığın son tarixi uğurla yeniləndi",
+			"clearSuccess": "Tapşırığın son tarixi təmizləndi"
 		},
 		"labels": {
-			"empty": "Mövcud etiket yoxdur"
+			"empty": "Mövcud etiket yoxdur",
+			"label": "Etiketlər"
 		},
 		"update": {
-			"error": "Tapşırığı yeniləmək alınmadı"
+			"error": "Tapşırığı yeniləmək alınmadı",
+			"success": "Tapşırıq uğurla yeniləndi"
 		},
 		"contextMenu": {
 			"copyLink": "Keçidi kopyala",
@@ -3193,7 +3842,9 @@
 			"priorityPlaceholder": "Prioriteti təyin et…",
 			"assigneePlaceholder": "Təyin et…",
 			"labelPlaceholder": "Etiket əlavə et…",
-			"columnPlaceholder": "Sütuna köçür…"
+			"columnPlaceholder": "Sütuna köçür…",
+			"deleteConfirm": "{{count}} tapşırıq silinsin? Bu əməliyyat geri qaytarıla bilməz.",
+			"setDueDate": "Son tarix təyin et"
 		},
 		"editor": {
 			"table": {
@@ -3231,7 +3882,8 @@
 			"saveError": "{{field}} saxlanılmadı",
 			"moreFields_one": "Daha {{count}} sahə",
 			"moreFields_other": "Daha {{count}} sahə",
-			"manage": "Sahələri idarə et"
+			"manage": "Sahələri idarə et",
+			"ariaLabel": "Custom fields"
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
@@ -3293,6 +3945,63 @@
 			"startsOn": "Başlayır: {{date}}",
 			"beforeStart": "{{date}} başlama tarixindən əvvəldir",
 			"afterDue": "{{date}} son tarixdən sonradır"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "Etiketlər",
+			"noLabel": "No label",
+			"none": "No grouping"
+		},
+		"boardSearchPlaceholder": "Tapşırıqları axtar...",
+		"recurrence": {
+			"daily": "Daily",
+			"day_one": "day",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_one": "month",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_one": "week",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_one": "{{count}} day before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders fire before the start date and are delivered via the unified Telegram configuration.",
+			"hoursBefore_one": "{{count}} hour before",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_one": "{{count}} minute before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_one": "day",
+			"unitDay_other": "days",
+			"unitHour_one": "hour",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_one": "minute",
+			"unitMinute_other": "dəqiqə",
+			"unitWeek_one": "week",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_one": "{{count}} week before",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -3479,7 +4188,13 @@
 			"error": "Komanda üzvünü dəvət etmək alınmadı",
 			"createdTitle": "Dəvət yaradıldı",
 			"shareLinkDescription": "İş sahəsinə qoşula bilməsi üçün bu keçidi {{email}} ilə paylaşın.",
-			"done": "Hazırdır"
+			"done": "Hazırdır",
+			"noTeams": "No team covers this workspace yet.",
+			"scopeHint": "Limit the invitation to specific workspaces and projects. Untick everything to rely on teams only.",
+			"scopeLabel": "Workspaces and projects",
+			"scopeRequired": "Select at least one team, workspace or project.",
+			"teamsHint": "Teams keep applying after acceptance: editing a team updates its members' access.",
+			"teamsLabel": "Teams"
 		},
 		"membersTable": {
 			"emptyTitle": "Hələ komanda üzvü yoxdur",
@@ -3506,7 +4221,8 @@
 			"cancelInviteSuccess": "Dəvət uğurla ləğv edildi",
 			"cancelInviteError": "Dəvəti ləğv etmək alınmadı",
 			"roleUpdateSuccess": "Rol yeniləndi",
-			"roleUpdateError": "Rolu yeniləmək alınmadı"
+			"roleUpdateError": "Rolu yeniləmək alınmadı",
+			"ariaMemberActions": "Üzv əməliyyatları"
 		},
 		"projectAccess": {
 			"allProjects": "All projects",
@@ -3528,6 +4244,85 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"accessScope": {
+			"allProjects": "All projects",
+			"noProjects": "No projects in this workspace.",
+			"noWorkspaces": "You don't administer any workspace yet."
+		},
+		"accessTeams": {
+			"addMember": "Add",
+			"addMemberPlaceholder": "Add a workspace member",
+			"allProjects": "All projects",
+			"createTitle": "New team",
+			"created": "Team created",
+			"delete": "Delete",
+			"deleteDialogDescription": "Delete the team \"{{name}}\"? Members lose the access this team was the only source of. This action cannot be undone.",
+			"deleteDialogTitle": "Delete this team?",
+			"deleteError": "Failed to delete the team",
+			"deleted": "Team deleted",
+			"description": "Reusable access bundles: pick workspaces and projects, then assign the team to members or invitations.",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this team for?",
+			"edit": "Edit",
+			"editTitle": "Edit team",
+			"empty": "No teams yet",
+			"emptyDescription": "Create a team to grant scoped access at invitation time.",
+			"memberAdded": "Member added to the team",
+			"memberCount_one": "{{count}} member",
+			"memberCount_other": "{{count}} members",
+			"memberError": "Failed to update the team member",
+			"memberRemoved": "Member removed from the team",
+			"membersLabel": "Members",
+			"nameLabel": "Name",
+			"namePlaceholder": "Design team",
+			"newTeam": "New team",
+			"noMembers": "No members yet.",
+			"pageTitle": "Teams",
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects",
+			"removeMember": "Remove from the team",
+			"saveError": "Failed to save the team",
+			"scopeHint": "Projects selected here define everything the team can reach, including future invitations.",
+			"scopeLabel": "Access scope",
+			"title": "Teams",
+			"updated": "Team updated"
+		},
+		"inviteLinks": {
+			"copyFailed": "Avtomatik kopyalama alınmadı. Linki seçin və Ctrl+C basın.",
+			"copyIconAria": "Dəvət linkini kopyala",
+			"create": "Link yarat",
+			"createError": "Dəvət linki yaradıla bilmədi",
+			"createSuccess": "Dəvət linki yaradıldı",
+			"deleteError": "Dəvət linki ləğv edilə bilmədi",
+			"deleteSuccess": "Dəvət linki ləğv edildi",
+			"description": "Linki olan hər kəs bu iş sahəsinə üzv kimi qoşula bilər — e-poçt tələb olunmur.",
+			"empty": "Hələ paylaşıla bilən dəvət linki yoxdur.",
+			"expiry24h": "24 saat",
+			"expiry30d": "30 gün",
+			"expiry7d": "7 gün",
+			"expiryLabel": "Bitmə vaxtı",
+			"expiryNever": "Heç vaxt bitmir",
+			"join": "{{workspaceName}} sahəsinə qoşul",
+			"linkCopied": "Dəvət linki kopyalandı",
+			"maxUsesLabel": "Maks. istifadə",
+			"maxUsesUnlimited": "Limitsiz",
+			"never": "Heç vaxt bitmir",
+			"revokeIconAria": "Dəvət linkini ləğv et",
+			"title": "Paylaşıla bilən dəvət linkləri",
+			"uses": "{{used}}/{{max}} istifadə",
+			"usesUnlimited": "{{used}} istifadə",
+			"workspace": "İş sahəsi: {{workspaceName}}"
+		},
+		"memberAccess": {
+			"description": "Bu iş sahəsində {{name}} üçün birbaşa layihə girişi.",
+			"fullAccess": "Bu üzv artıq bütün iş sahəsinə girişə malikdir.",
+			"hint": "Birbaşa girişləri silmək üçün hər şeyin işarəsini götürün. Komanda və ya başqa giriş qalmazsa, üzv iş sahəsindən çıxarılır.",
+			"menuItem": "Girişi idarə et",
+			"save": "Girişi yadda saxla",
+			"saveError": "Üzvün girişini yeniləmək alınmadı",
+			"saveSuccess": "Üzvün girişi yeniləndi",
+			"title": "Girişi idarə et"
 		}
 	},
 	"publicProject": {
@@ -3776,6 +4571,179 @@
 			"composeLinkDescription": "The maintained compose.yml with persistent storage and health checks.",
 			"startLink": "Start and verify the services",
 			"startLinkDescription": "Start the stack, inspect its status, and check that the application is available."
+		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Təyin edilib",
+			"create": "Yarat",
+			"createTitle": "Yeni görüş",
+			"delete": "Sil",
+			"description": "Görüşlər tapşırıqlar kimi planlaşdırılır, lakin heç vaxt lövhədə və ya backlogda görünmür.",
+			"descriptionLabel": "Təsvir",
+			"editTitle": "Görüşü redaktə et",
+			"endLabel": "Bitmə",
+			"priorityLabel": "Prioritet",
+			"rangeError": "Bitmə başlanğıcdan sonra olmalıdır.",
+			"save": "Yadda saxla",
+			"startLabel": "Başlanğıc",
+			"titleLabel": "Başlıq",
+			"titlePlaceholder": "məs. Dizayn baxışı",
+			"unassigned": "Təyin edilməyib"
+		},
+		"empty": {
+			"description": "Görüşlər burada yaşayır, lövhədə və ya backlogda deyil.",
+			"title": "Hələ görüş yoxdur"
+		},
+		"loadError": "Görüşlər yüklənə bilmədi.",
+		"moveFromBacklog": "Görüşlərə köçür",
+		"newAppointment": "Yeni görüş",
+		"nextWeek": "Növbəti həftə",
+		"pageTitle": "Görüşlər · {{name}}",
+		"previousWeek": "Əvvəlki həftə",
+		"tab": "Görüşlər",
+		"toast": {
+			"created": "Görüş yaradıldı",
+			"deleted": "Görüş silindi",
+			"error": "Nəsə səhv getdi",
+			"moved": "Görüşlərə köçürüldü",
+			"updated": "Görüş yeniləndi"
+		},
+		"today": "Bugün",
+		"unscheduled": "Planlaşdırılmamış",
+		"weekHint": "Görüş əlavə etmək üçün boş yuvaya klikləyin; redaktə etmək üçün görüşə klikləyin."
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_one": "{{count}} sprint",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
+	},
+	"unified": {
+		"appointments": {
+			"count_one": "{{count}} görüş",
+			"count_other": "{{count}} görüş",
+			"emptyDescription": "Bütün layihələrinizdən görüşlər planlaşdırılan kimi burada görünəcək.",
+			"emptyTitle": "Hələ görüş yoxdur",
+			"unscheduled": "Planlaşdırılmamış"
+		},
+		"charts": {
+			"average": "Ortalama",
+			"backlog": "Backlog",
+			"byProject": "Layihəyə görə",
+			"completed": "Tamamlandı",
+			"created": "Yaradıldı",
+			"empty": "No task activity in the last 6 months.",
+			"noTasks": "Paylaşılacaq tapşırıq yoxdur.",
+			"other": "Digər",
+			"perUnit": "{{value}}/{{unit}}",
+			"period": "Dövr",
+			"periodSummary": "{{created}} yaradıldı · {{completed}} tamamlandı",
+			"rangeAll": "Bütün vaxt",
+			"rangeWeek": "1 həftə",
+			"range_one": "{{count}} ay",
+			"range_other": "{{count}} ay",
+			"statusDescription": "Bütün layihələrin tapşırıqlarının hazırkı vəziyyəti.",
+			"statusTitle": "Status bölgüsü",
+			"tasks": "Tasks",
+			"unassigned": "Təyin edilməyib",
+			"unit": "Vahid",
+			"unitDay": "gün",
+			"unitHint": "Finer units narrow the period to one that supports them.",
+			"unitHour": "saat",
+			"unitLabelDay": "Gün",
+			"unitLabelHour": "Saat",
+			"unitLabelMonth": "Ay",
+			"unitLabelWeek": "Həftə",
+			"unitMonth": "ay",
+			"unitWeek": "həftə",
+			"velocityDescription": "Bütün layihələr üzrə {{unit}} başına yaradılan və tamamlanan tapşırıqlar.",
+			"velocityTitle": "Sürət",
+			"workloadDescription": "Bütün layihələr üzrə təyin edilənə görə açıq lövhə tapşırıqları.",
+			"workloadEmpty": "Açıq iş təyin edilməyib.",
+			"workloadTitle": "İş yükü"
+		},
+		"consolidated": {
+			"backlogCount_one": "{{count}} task in backlog",
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_one": "{{count}} active task",
+			"tasksCount_other": "{{count}} active tasks"
+		},
+		"empty": {
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"description": "Projects from all your workspaces will show up here as soon as you create one.",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet",
+			"title": "No projects yet"
+		},
+		"links": {
+			"mcp": "MCP",
+			"skills": "Bacarıqlar"
+		},
+		"pageTitle": "All projects",
+		"section": {
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects"
+		},
+		"stats": {
+			"completion": "Completion",
+			"projects": "Projects",
+			"tasks": "Tasks"
+		},
+		"table": {
+			"progress": "Progress",
+			"tasks": "Tasks"
+		},
+		"tabs": {
+			"appointments": "Görüşlər",
+			"backlog": "Backlog",
+			"calendar": "Təqvim",
+			"charts": "Qrafiklər",
+			"gantt": "Qant",
+			"overview": "İcmal",
+			"tasks": "Tapşırıqlar"
 		}
 	}
 }

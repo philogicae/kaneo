@@ -1,5 +1,6 @@
 import {
   Bell,
+  Blocks,
   Building2,
   Code,
   CreditCard,
@@ -9,8 +10,10 @@ import {
   Settings,
   Shield,
   SlidersHorizontal,
+  Sparkles,
   Tag,
   User,
+  Users,
 } from "lucide-react";
 import projectIcons from "@/constants/project-icons";
 import type {
@@ -26,6 +29,7 @@ type BuildSettingsNavInput = {
   billingEnabled: boolean;
   canImport: boolean;
   hasAdminAccess: boolean;
+  canInviteUsers: boolean;
   projects: { id: string; name: string; icon?: string | null }[];
 };
 
@@ -64,6 +68,7 @@ export function buildSettingsNav({
   billingEnabled,
   canImport,
   hasAdminAccess,
+  canInviteUsers,
   projects,
 }: BuildSettingsNavInput): SettingsNav {
   return {
@@ -101,6 +106,18 @@ export function buildSettingsNav({
           to: "/dashboard/settings/account/developer",
           icon: Code,
         },
+        {
+          id: "mcp",
+          label: t("settings:mcp"),
+          to: "/dashboard/settings/account/mcp",
+          icon: Blocks,
+        },
+        {
+          id: "skills",
+          label: t("settings:skills"),
+          to: "/dashboard/settings/account/skills",
+          icon: Sparkles,
+        },
       ],
     },
     workspace: {
@@ -125,6 +142,16 @@ export function buildSettingsNav({
           to: "/dashboard/settings/workspace/labels",
           icon: Tag,
         },
+        ...(canInviteUsers
+          ? [
+              {
+                id: "workspace-teams",
+                label: t("team:accessTeams.pageTitle"),
+                to: "/dashboard/settings/workspace/teams",
+                icon: Users,
+              },
+            ]
+          : []),
         ...(canImport
           ? [
               {

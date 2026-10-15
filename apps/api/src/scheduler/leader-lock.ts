@@ -1,43 +1,34 @@
-import { randomUUID } from "node:crypto";
-import { sql } from "drizzle-orm";
-import db from "../database";
+import { withLease } from "../database/lease";
 
-const INSTANCE_ID = randomUUID();
+/** Signals that another holder owns the lease, so the caller can skip quietly. */
+class LeaseHeldError extends Error {
+  constructor(name: string) {
+    super(`Lease ${name} is held elsewhere`);
+    this.name = "LeaseHeldError";
+  }
+}
 
-export const SEAT_RECONCILIATION_LEASE = "seat-reconciliation";
-
-const DEFAULT_LEASE_MS = 15 * 60 * 1000;
-
+/**
+ * Run `run` while holding the named job lease, or return `whenHeldElsewhere`
+ * when another holder has it.
+ *
+ * Scheduled replay work uses this instead of `withLease` (which throws) because
+ * losing the lease race is the normal case for a single-instance deployment:
+ * the other holder is already doing the work.
+ */
 export async function withJobLease<T>(
   name: string,
   run: () => Promise<T>,
   whenHeldElsewhere: () => T,
-  leaseMs: number = DEFAULT_LEASE_MS,
+  leaseMs?: number,
 ): Promise<T> {
-  const expiresAt = new Date(Date.now() + leaseMs);
-
-  const claimed = await db.execute(sql`
-    INSERT INTO job_lease ("name", "owner", "expires_at")
-    VALUES (${name}, ${INSTANCE_ID}, ${expiresAt})
-    ON CONFLICT ("name") DO UPDATE
-      SET "owner" = EXCLUDED."owner", "expires_at" = EXCLUDED."expires_at"
-      WHERE job_lease."expires_at" < now()
-    RETURNING "name";
-  `);
-
-  if ((claimed.rowCount ?? 0) === 0) {
-    return whenHeldElsewhere();
-  }
-
   try {
-    return await run();
-  } finally {
-    await db
-      .execute(
-        sql`DELETE FROM job_lease WHERE "name" = ${name} AND "owner" = ${INSTANCE_ID};`,
-      )
-      .catch((error) => {
-        console.error(`Failed to release the ${name} lease`, error);
-      });
+    return await withLease(name, run, {
+      busy: () => new LeaseHeldError(name),
+      ...(leaseMs ? { leaseMs } : {}),
+    });
+  } catch (error) {
+    if (error instanceof LeaseHeldError) return whenHeldElsewhere();
+    throw error;
   }
 }

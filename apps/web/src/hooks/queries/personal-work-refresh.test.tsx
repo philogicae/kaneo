@@ -37,7 +37,7 @@ vi.mock("@/fetchers/activity/get-workspace-activities", () => ({
 }));
 
 vi.mock("@/fetchers/task/get-task", () => ({ default: mocks.task }));
-vi.mock("@/fetchers/activity/get-activites-by-task-id", () => ({
+vi.mock("@/fetchers/activity/get-activities-by-task-id", () => ({
   default: mocks.comments,
 }));
 vi.mock("@/fetchers/column/get-columns", () => ({ default: mocks.columns }));

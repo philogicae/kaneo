@@ -8,15 +8,31 @@ import {
 } from "lucide-react";
 import type { TaskLayout } from "@/store/user-preferences";
 
-export type ProjectView = "board" | "list" | "backlog" | "calendar" | "gantt";
+export type ProjectView =
+  | "board"
+  | "list"
+  | "backlog"
+  | "calendar"
+  | "gantt"
+  | "appointments"
+  | "roadmap";
 
-export type ProjectRoute = "board" | "backlog" | "calendar" | "gantt";
+export type ProjectRoute =
+  | "board"
+  | "backlog"
+  | "calendar"
+  | "gantt"
+  | "appointments"
+  | "roadmap";
 
 export const PROJECT_ROUTE_PATHS = {
   board: "/dashboard/workspace/$workspaceId/project/$projectId/board",
   backlog: "/dashboard/workspace/$workspaceId/project/$projectId/backlog",
   calendar: "/dashboard/workspace/$workspaceId/project/$projectId/calendar",
   gantt: "/dashboard/workspace/$workspaceId/project/$projectId/gantt",
+  appointments:
+    "/dashboard/workspace/$workspaceId/project/$projectId/appointments",
+  roadmap: "/dashboard/workspace/$workspaceId/project/$projectId/roadmap",
 } as const;
 
 export const PROJECT_VIEWS: ReadonlyArray<{

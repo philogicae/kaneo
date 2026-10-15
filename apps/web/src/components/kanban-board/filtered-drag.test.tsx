@@ -12,6 +12,10 @@ import type { TaskReorder } from "@/fetchers/task/reorder-tasks";
 import type { ProjectWithTasks } from "@/types/project";
 import KanbanBoard from "./index";
 
+vi.mock("@/lib/i18n", () => ({
+  i18n: { language: "en", t: (key: string) => key },
+}));
+
 const mocks = vi.hoisted(() => ({
   project: null as unknown,
   setProject: vi.fn(),

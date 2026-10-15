@@ -60,14 +60,13 @@ it("rolls back both writes after a successful notification insert, then retries 
   expect(await db.select().from(schema.notificationTable)).toHaveLength(1);
 });
 
-it("releases the reminder claim after PostgreSQL rejects the notification insert", async () => {
+it("releases the reminder claim after the database rejects the notification insert", async () => {
   await createReminderTask();
   m.fail = false;
-  await db.execute(sql`CREATE FUNCTION reject_reminder_notification() RETURNS trigger AS $$
-    BEGIN RAISE EXCEPTION 'test notification insert failure'; END;
-  $$ LANGUAGE plpgsql`);
-  await db.execute(sql`CREATE TRIGGER reject_reminder_notification BEFORE INSERT ON notification
-    FOR EACH ROW EXECUTE FUNCTION reject_reminder_notification()`);
+  // SQLite's RAISE(ABORT, ...) aborts the statement and rolls back its
+  // enclosing transaction, which is the constraint violation this test needs.
+  await db.run(sql`CREATE TRIGGER reject_reminder_notification BEFORE INSERT ON notification
+    BEGIN SELECT RAISE(ABORT, 'test notification insert failure'); END`);
   try {
     expect(await checkDueDateReminders()).toEqual({ degraded: true });
     expect(await db.select().from(schema.taskReminderSentTable)).toHaveLength(
@@ -75,10 +74,7 @@ it("releases the reminder claim after PostgreSQL rejects the notification insert
     );
     expect(await db.select().from(schema.notificationTable)).toHaveLength(0);
   } finally {
-    await db.execute(
-      sql`DROP TRIGGER reject_reminder_notification ON notification`,
-    );
-    await db.execute(sql`DROP FUNCTION reject_reminder_notification()`);
+    await db.run(sql`DROP TRIGGER reject_reminder_notification`);
   }
   expect(await checkDueDateReminders()).toEqual({ degraded: false });
   await checkDueDateReminders();
