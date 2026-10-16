@@ -30,7 +30,7 @@ export function ShortcutRow({
   isHighlighted,
 }: ShortcutRowProps) {
   return (
-    <li className="flex h-8 items-center justify-between gap-4 text-[13px] text-foreground/85">
+    <li className="flex h-8 items-center justify-between gap-4 text-[0.8125rem] text-foreground/85">
       <span className="min-w-0 truncate">
         <HighlightedLabel label={label} query={query} />
       </span>

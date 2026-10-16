@@ -53,7 +53,7 @@ export function OptionFieldEditor({
             placeholder={t("tasks:customFields.setValue", {
               field: field.name,
             })}
-            className="h-10 min-w-0 flex-1 bg-transparent px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+            className="h-10 min-w-0 flex-1 bg-transparent px-3 text-[0.8125rem] text-foreground outline-none placeholder:text-muted-foreground"
           />
           {field.required && (
             <span className="shrink-0 pe-3 text-muted-foreground text-xs">
@@ -72,7 +72,7 @@ export function OptionFieldEditor({
                 key={option}
                 value={option}
                 onClick={() => onToggle(option)}
-                className="flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-[13px] text-foreground outline-none data-highlighted:bg-accent"
+                className="flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-[0.8125rem] text-foreground outline-none data-highlighted:bg-accent"
               >
                 {multiple ? (
                   <CheckboxMark checked={isSelected} />
@@ -96,7 +96,7 @@ export function OptionFieldEditor({
           <button
             type="button"
             onClick={onClear}
-            className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-[13px] text-muted-foreground outline-none hover:bg-accent focus-visible:bg-accent"
+            className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-[0.8125rem] text-muted-foreground outline-none hover:bg-accent focus-visible:bg-accent"
           >
             <X aria-hidden="true" className="size-3.5" />
             {t("tasks:customFields.clear")}

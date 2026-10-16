@@ -35,7 +35,7 @@ export function TaskPullRequests({
 
   const single = pullRequests.length === 1 ? pullRequests[0] : null;
   const badgeClassName = cn(
-    "inline-flex h-5.5 items-center gap-1.5 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-muted",
+    "inline-flex h-5.5 items-center gap-1.5 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[0.625rem] font-medium text-muted-foreground transition-colors hover:bg-muted",
     className,
   );
 

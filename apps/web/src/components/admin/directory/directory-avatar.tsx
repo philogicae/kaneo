@@ -10,7 +10,7 @@ export function DirectoryAvatar({ name, image }: DirectoryAvatarProps) {
   return (
     <Avatar className="size-7 border bg-muted">
       {image ? <AvatarImage src={image} alt={name} /> : null}
-      <AvatarFallback className="text-[10px] font-semibold">
+      <AvatarFallback className="text-[0.625rem] font-semibold">
         {getInitials(name, "?")}
       </AvatarFallback>
     </Avatar>

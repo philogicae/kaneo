@@ -38,7 +38,9 @@ export function RepositoryPickerRow({
           className="size-3.5 shrink-0 text-muted-foreground"
         />
         <span className="min-w-0 flex-1 space-y-0.5">
-          <span className="block truncate font-mono text-[13px]">{name}</span>
+          <span className="block truncate font-mono text-[0.8125rem]">
+            {name}
+          </span>
           {meta ? (
             <span className="block truncate text-xs text-muted-foreground">
               {meta}

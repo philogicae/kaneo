@@ -25,8 +25,8 @@ export const columnVariants = cva(
     },
     variants: {
       isDropzoneOver: {
-        true: "",
-        false: "",
+        true: "shadow-md",
+        false: "border-border/70 hover:border-border/90",
       },
       backgroundImage: {
         true: "before:content-[''] before:absolute before:inset-0 before:rounded-[calc(var(--radius-xl)-1px)] before:pointer-events-none",
@@ -37,24 +37,22 @@ export const columnVariants = cva(
       {
         isDropzoneOver: false,
         backgroundImage: false,
-        class: "bg-board-lane",
+        class: "border bg-muted/40 shadow-xs/5 dark:bg-card/90",
       },
       {
         isDropzoneOver: true,
         backgroundImage: false,
-        class: "bg-board-lane ring-2 ring-board-card-ring",
+        class: "border bg-accent/60 border-ring/40 ring-2 ring-ring/30",
       },
       {
         isDropzoneOver: false,
         backgroundImage: true,
-        class:
-          "border border-border/70 bg-background shadow-md before:bg-muted before:dark:bg-card",
+        class: "bg-background before:bg-muted before:dark:bg-card shadow-md",
       },
       {
         isDropzoneOver: true,
         backgroundImage: true,
-        class:
-          "border border-border/70 bg-background ring-2 ring-focus/60 before:bg-accent/60",
+        class: "bg-background ring-2 ring-focus/60 before:bg-accent/60",
       },
     ],
   },
@@ -82,13 +80,13 @@ function Column({
         backgroundImage: !!background,
       })}
     >
-      <div className="shrink-0 pt-1 pr-2 pl-3">
+      <div className="shrink-0 border-b border-border/60 px-3 py-2">
         <ColumnHeader
           column={column}
           disableCollectionActions={disableCollectionActions}
         />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1.5 pt-1.5 pb-1.5 [-webkit-overflow-scrolling:touch]">
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2 [-webkit-overflow-scrolling:touch]">
         <ColumnDropzone
           column={column}
           activeTaskId={activeTaskId}

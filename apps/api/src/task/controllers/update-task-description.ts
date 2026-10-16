@@ -1,8 +1,10 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
-import { withLockedTask } from "./with-locked-task";
-import { taskTable } from "../../database/schema";
-import { publishTaskMutation } from "./task-mutation-effects";
+import db from "../../database";
+import { taskTable, userTable } from "../../database/schema";
+import { publishEvent } from "../../events";
+import createNotification from "../../notification/controllers/create-notification";
+import { parseMentionIds } from "../../utils/parse-mentions";
 
 async function updateTaskDescription({
   id,
@@ -13,28 +15,82 @@ async function updateTaskDescription({
   description: string;
   currentUserId: string;
 }) {
-  const { before: existingTask, after: updatedTask } = await withLockedTask(
-    id,
-    async (tx) => {
-      const [updatedTask] = await tx
-        .update(taskTable)
-        .set({ description })
-        .where(eq(taskTable.id, id))
-        .returning();
+  const existingTask = await db.query.taskTable.findFirst({
+    where: eq(taskTable.id, id),
+  });
 
-      if (!updatedTask) {
-        throw new HTTPException(500, {
-          message: "Failed to update task description",
-        });
-      }
+  if (!existingTask) {
+    throw new HTTPException(404, {
+      message: "Task not found",
+    });
+  }
 
-      return updatedTask;
-    },
+  const [updatedTask] = await db
+    .update(taskTable)
+    .set({ description })
+    .where(eq(taskTable.id, id))
+    .returning();
+
+  if (!updatedTask) {
+    throw new HTTPException(500, {
+      message: "Failed to update task description",
+    });
+  }
+
+  await publishEvent("task.description_changed", {
+    taskId: updatedTask.id,
+    projectId: updatedTask.projectId,
+    userId: currentUserId,
+    oldDescription: existingTask.description,
+    newDescription: description,
+    type: "description_changed",
+  });
+
+  // Notify members newly @mentioned by this edit (skip ones already mentioned
+  // in the previous description, and the editor themselves).
+  const alreadyMentioned = new Set(parseMentionIds(existingTask.description));
+  const newlyMentioned = parseMentionIds(description).filter(
+    (mentionedId) =>
+      mentionedId !== currentUserId && !alreadyMentioned.has(mentionedId),
   );
 
-  await publishTaskMutation(existingTask, updatedTask, currentUserId, {
-    fields: ["description"],
-  });
+  if (newlyMentioned.length > 0) {
+    const [editor] = await db
+      .select({ name: userTable.name })
+      .from(userTable)
+      .where(eq(userTable.id, currentUserId));
+
+    for (const mentionedId of newlyMentioned) {
+      await createNotification({
+        userId: mentionedId,
+        type: "task_mention",
+        eventData: {
+          taskTitle: updatedTask.title,
+          mentionerName: editor?.name ?? null,
+        },
+        resourceId: updatedTask.id,
+        resourceType: "task",
+      });
+    }
+
+    // Same dedicated mention event as comments, sourced from the task body.
+    const mentionedUsers = await db
+      .select({ name: userTable.name })
+      .from(userTable)
+      .where(inArray(userTable.id, newlyMentioned));
+
+    await publishEvent("task.mentioned", {
+      taskId: updatedTask.id,
+      projectId: updatedTask.projectId,
+      userId: currentUserId,
+      title: updatedTask.title,
+      source: "description",
+      mentionedUserIds: newlyMentioned,
+      mentionedUserNames: mentionedUsers
+        .map((mentioned) => mentioned.name)
+        .filter((name): name is string => Boolean(name)),
+    });
+  }
 
   return updatedTask;
 }

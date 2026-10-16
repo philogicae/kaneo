@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { usePendingInvitations } from "@/hooks/queries/invitation/use-pending-invitations";
 import useGetNotifications from "@/hooks/queries/notification/use-get-notifications";
 import useGetAssignedTasks from "@/hooks/queries/task/use-get-assigned-tasks";
@@ -44,7 +45,7 @@ export function NavMain() {
 
   const homeUrl = `/dashboard/workspace/${workspace.id}`;
   const unreadCount = notifications.filter(
-    (notification) => !notification.isRead,
+    (notification: { isRead: boolean | null }) => !notification.isRead,
   ).length;
 
   const navItems: NavItem[] = [
@@ -83,6 +84,8 @@ export function NavMain() {
   return (
     <SidebarGroup className="gap-1 p-2">
       <SidebarGroupContent>
+        {/* Workspace selector above the nav list; carries the sort and drag order. */}
+        <WorkspaceSwitcher />
         <SidebarMenu className="gap-0.5">
           {navItems.map((item) => (
             <SidebarMenuItem key={item.url}>
@@ -98,7 +101,7 @@ export function NavMain() {
                 {item.count ? (
                   <span
                     className={cn(
-                      "ml-auto flex h-4.5 min-w-4.5 shrink-0 items-center justify-center rounded-full px-1 text-[11px] tabular-nums",
+                      "ml-auto flex h-4.5 min-w-4.5 shrink-0 items-center justify-center rounded-full px-1 text-[0.6875rem] tabular-nums",
                       item.emphasizeCount
                         ? "bg-foreground font-semibold text-background"
                         : "font-medium text-muted-foreground",

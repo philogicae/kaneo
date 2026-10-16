@@ -12,7 +12,7 @@ type WorkspaceDirectoryRowProps = {
 };
 
 const CELL_CLASS =
-  "hidden shrink-0 text-[13px] text-muted-foreground tabular-nums sm:block";
+  "hidden shrink-0 text-[0.8125rem] text-muted-foreground tabular-nums sm:block";
 
 export function WorkspaceDirectoryRow({
   workspace,

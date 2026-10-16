@@ -27,13 +27,13 @@ export function PreviewTaskCard({
       }}
       className="flex flex-col gap-2.5 rounded-lg border border-border bg-background p-3 shadow-xs/5"
     >
-      <span className="font-mono text-[11px] text-muted-foreground">
+      <span className="font-mono text-[0.6875rem] text-muted-foreground">
         {ticket}
       </span>
-      <span className="font-medium text-[13px] text-foreground leading-[18px]">
+      <span className="font-medium text-[0.8125rem] text-foreground leading-[1.125rem]">
         {title}
       </span>
-      <span className="flex h-5 w-fit items-center gap-1 rounded-md border border-border px-1.5 text-[11px] text-muted-foreground">
+      <span className="flex h-5 w-fit items-center gap-1 rounded-md border border-border px-1.5 text-[0.6875rem] text-muted-foreground">
         <Minus className="size-3" />
         {t("tasks:priority.no-priority")}
       </span>

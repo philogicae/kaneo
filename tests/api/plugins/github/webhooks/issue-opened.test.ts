@@ -17,11 +17,24 @@ const mocks = vi.hoisted(() => {
 
   const insertedValues: Array<Record<string, unknown>> = [];
 
+  // The handler re-reads the integration row inside its transaction and awaits
+  // the chain directly, so the select mock is both chainable and awaitable.
+  const selectChain = () => {
+    const chain: Record<string, unknown> = {
+      from: () => chain,
+      where: () => chain,
+      // oxlint-disable-next-line unicorn/no-thenable -- drizzle awaits the select chain directly, so the mock has to be thenable to stand in for it.
+      then: (onFulfilled: (rows: unknown) => unknown) =>
+        Promise.resolve(mockLockedIntegration()).then((rows) =>
+          onFulfilled(rows),
+        ),
+    };
+    return chain;
+  };
+
   const mockDb = {
     transaction: async (run: (tx: unknown) => Promise<unknown>) => run(mockDb),
-    select: () => ({
-      from: () => ({ where: () => ({ for: mockLockedIntegration }) }),
-    }),
+    select: () => selectChain(),
     insert: () => ({
       values: (values: Record<string, unknown>) => {
         insertedValues.push(values);

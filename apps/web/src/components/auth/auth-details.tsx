@@ -20,7 +20,7 @@ export function AuthDetails({ rows }: { rows: AuthDetail[] }) {
             className={cn(
               "min-w-0 text-foreground",
               row.mono
-                ? "break-all font-mono text-[13px] leading-[18px]"
+                ? "break-all font-mono text-[0.8125rem] leading-[1.125rem]"
                 : "truncate text-sm",
             )}
           >

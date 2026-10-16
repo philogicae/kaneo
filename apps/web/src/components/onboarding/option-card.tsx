@@ -43,12 +43,12 @@ export function OptionCard({
         <span className="flex items-center gap-2">
           <span className="font-medium text-foreground text-sm">{title}</span>
           {badge ? (
-            <span className="rounded-md bg-accent px-1.5 py-px font-medium text-[11px] text-foreground">
+            <span className="rounded-md bg-accent px-1.5 py-px font-medium text-[0.6875rem] text-foreground">
               {badge}
             </span>
           ) : null}
         </span>
-        <span className="text-[13px] text-muted-foreground leading-[18px]">
+        <span className="text-[0.8125rem] text-muted-foreground leading-[1.125rem]">
           {description}
         </span>
       </span>

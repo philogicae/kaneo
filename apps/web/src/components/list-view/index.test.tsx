@@ -12,6 +12,21 @@ import type { DragEndEvent } from "@dnd-kit/core";
 import type { ProjectWithTasks } from "@/types/project";
 import ListView from "./index";
 
+vi.mock("@/hooks/use-keyboard-shortcuts", () => ({
+  KeyboardShortcutsProvider: ({ children }: { children: ReactNode }) =>
+    children,
+  useKeyboardShortcuts: () => ({
+    registerShortcut: vi.fn(),
+    unregisterShortcut: vi.fn(),
+    registerSequentialShortcut: vi.fn(),
+    unregisterSequentialShortcut: vi.fn(),
+    registerModifierShortcut: vi.fn(),
+    unregisterModifierShortcut: vi.fn(),
+    activePrefix: null,
+  }),
+  useRegisterShortcuts: vi.fn(),
+}));
+
 const queryClient = new QueryClient();
 
 function Providers({ children }: { children: ReactNode }) {

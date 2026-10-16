@@ -70,7 +70,7 @@ export default function TaskLayout({
                       <SidebarTrigger className="-ml-1 h-7 w-7 cursor-pointer text-foreground/85 hover:text-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="flex items-center gap-2 text-[10px]">
+                      <p className="flex items-center gap-2 text-[0.625rem]">
                         Toggle sidebar
                         <ShortcutKeys id="toggleSidebar" />
                       </p>

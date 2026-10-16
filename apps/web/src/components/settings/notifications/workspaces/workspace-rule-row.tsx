@@ -27,7 +27,7 @@ export function WorkspaceRuleRow({
     <>
       <SettingsRow
         icon={
-          <span className="text-[13px] font-semibold text-foreground">
+          <span className="text-[0.8125rem] font-semibold text-foreground">
             {initial}
           </span>
         }

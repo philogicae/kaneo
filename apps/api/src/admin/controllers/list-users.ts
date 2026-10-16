@@ -1,7 +1,10 @@
-import { count, desc, ilike, or } from "drizzle-orm";
+import { count, desc, or } from "drizzle-orm";
 import db from "../../database";
 import { userTable } from "../../database/schema";
-import { escapeLikePattern } from "../../search/like-pattern";
+import {
+  caseInsensitiveLike,
+  escapeLikePattern,
+} from "../../search/like-pattern";
 
 type ListUsersInput = {
   search?: string;
@@ -13,7 +16,10 @@ export async function listUsers({ search, page, limit }: ListUsersInput) {
   const term = search?.trim() ?? "";
   const pattern = `%${escapeLikePattern(term)}%`;
   const where = term
-    ? or(ilike(userTable.name, pattern), ilike(userTable.email, pattern))
+    ? or(
+        caseInsensitiveLike(userTable.name, pattern),
+        caseInsensitiveLike(userTable.email, pattern),
+      )
     : undefined;
 
   const [rows, [totalRow]] = await Promise.all([

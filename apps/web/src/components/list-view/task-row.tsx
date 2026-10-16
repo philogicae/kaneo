@@ -1,10 +1,17 @@
-import { useRestoreTaskFocus } from "@/components/project/task-view-keys/use-restore-task-focus";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useNavigate } from "@tanstack/react-router";
-import { Trash2Icon } from "lucide-react";
-import { type CSSProperties, useMemo, useState, memo } from "react";
+import { format } from "date-fns";
+import {
+  Calendar,
+  CalendarClock,
+  CalendarX,
+  GitMerge,
+  GitPullRequest,
+} from "lucide-react";
+import { type CSSProperties, memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useRestoreTaskFocus } from "@/components/project/task-view-keys/use-restore-task-focus";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -14,23 +21,36 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/preview-card";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
 import { useTaskHoverPrefetch } from "@/hooks/use-task-hover-prefetch";
 import { cn } from "@/lib/cn";
+import {
+  dueDateStatusColors,
+  getDueDateStatus,
+  isTaskCompleted,
+} from "@/lib/due-date-status";
+import { getInitials } from "@/lib/get-initials";
 import { isKeyboardFocus } from "@/lib/is-keyboard-focus";
 import { isOwnDomEvent } from "@/lib/is-own-dom-event";
-import { isTaskCompleted } from "@/lib/due-date-status";
+import { EASE_OUT_CSS } from "@/lib/motion";
+import { getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
+import { useUserPreferencesStore } from "@/store/user-preferences";
 import type Task from "@/types/task";
 import TaskCardContextMenuContent from "../kanban-board/task-card-context-menu/task-card-context-menu-content";
+import { TaskLabels } from "../kanban-board/task-labels";
 import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
-import { TaskRowBody } from "./task-row-body";
-import { EASE_OUT_CSS } from "@/lib/motion";
 
 type TaskRowProps = {
   task: Task;
@@ -55,6 +75,13 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
   const { project } = useProjectStore();
   const taskIsCompleted = isTaskCompleted(task.status, project?.columns);
   const { data: workspace } = useActiveWorkspace();
+  const {
+    showAssignees,
+    showPriority,
+    showDueDates,
+    showLabels,
+    showTaskNumbers,
+  } = useUserPreferencesStore();
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState<
     boolean | null
   >(null);
@@ -64,8 +91,6 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
     (state) => state.toggleSelection,
   );
   const selectRange = useBulkSelectionStore((state) => state.selectRange);
-  const setFocusedTask = useBulkSelectionStore((state) => state.setFocusedTask);
-  useRestoreTaskFocus(task.id, useBulkSelectionStore);
   const setSelectionAnchor = useBulkSelectionStore(
     (state) => state.setSelectionAnchor,
   );
@@ -75,8 +100,10 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
   const isTaskFocused = useBulkSelectionStore(
     (state) => state.focusedTaskId === task.id,
   );
-
+  const setFocusedTask = useBulkSelectionStore((state) => state.setFocusedTask);
+  useRestoreTaskFocus(task.id, useBulkSelectionStore);
   const hoverPrefetch = useTaskHoverPrefetch(task.id);
+
   const { data: workspaceUsers } = useGetActiveWorkspaceUsers(
     workspace?.id ?? "",
   );
@@ -87,13 +114,46 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
     );
   }, [workspaceUsers, task.userId]);
 
+  const pullRequests = useMemo(() => {
+    return (task.externalLinks ?? []).filter(
+      (link) => link.resourceType === "pull_request",
+    );
+  }, [task.externalLinks]);
+
+  const getPRInfo = (pr: (typeof pullRequests)[number]) => {
+    const isMerged = pr.metadata?.merged === true;
+    const isDraft = pr.metadata?.draft === true;
+
+    if (isMerged) {
+      return {
+        icon: <GitMerge className="h-3 w-3 text-info-foreground" />,
+        status: t("tasks:pr.merged"),
+        statusClass: "text-info-foreground",
+      };
+    }
+
+    if (isDraft) {
+      return {
+        icon: <GitPullRequest className="h-3 w-3 text-muted-foreground" />,
+        status: t("tasks:pr.draft"),
+        statusClass: "text-muted-foreground",
+      };
+    }
+
+    return {
+      icon: <GitPullRequest className="h-3 w-3 text-success-foreground" />,
+      status: t("tasks:pr.open"),
+      statusClass: "text-success-foreground",
+    };
+  };
+
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition: transition || `transform 200ms ${EASE_OUT_CSS}`,
     touchAction: isDragging ? "none" : "auto",
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     if (!project || !task || !isOwnDomEvent(e)) return;
     if (e.defaultPrevented) return;
 
@@ -128,16 +188,18 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.defaultPrevented || e.target !== e.currentTarget) return;
-    if (e.key === "Enter" && e.shiftKey) {
+    if (e.key === "Enter") {
+      handleClick(e);
       e.preventDefault();
-      selectRange(task.id);
+    } else {
+      listeners?.onKeyDown?.(e);
     }
   };
 
   const handleDeleteTask = async () => {
     try {
       await deleteTask(task.id);
-      toast.success(t("tasks:delete.success"), { icon: Trash2Icon });
+      toast.success(t("tasks:delete.success"));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : t("tasks:delete.error"),
@@ -149,13 +211,12 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
     <div
       ref={setNodeRef}
       style={style}
-      data-kaneo-sortable
       className={cn(
         "border-b border-border/50 transition-colors duration-150",
         isDragging && "opacity-50",
         isTaskSelected &&
           "bg-accent/60 shadow-sm ring-1 ring-inset ring-ring/30",
-        isTaskFocused && "ring-1 ring-board-card-focus ring-inset",
+        isTaskFocused && "ring-2 ring-inset ring-ring/50",
       )}
     >
       <ContextMenu
@@ -166,13 +227,12 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
         <ContextMenuTrigger asChild>
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- false positive for onClick and onKeyDown */}
           <div
+            data-task-id={task.id}
             onClick={handleClick}
             className={cn(
-              "group relative flex h-10 cursor-pointer items-center gap-3 px-3.5 outline-none transition-colors",
+              "group relative flex items-center gap-3 px-4 py-1.5 transition-colors cursor-pointer",
               isTaskSelected ? "bg-accent/45" : "hover:bg-accent/60",
             )}
-            data-task-id={task.id}
-            data-shortcut-surface
             {...attributes}
             {...listeners}
             {...hoverPrefetch}
@@ -182,14 +242,185 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
               setFocusedTask(isKeyboardFocus(event) ? task.id : null);
             }}
           >
-            <TaskRowBody
-              task={task}
-              projectSlug={projectSlug}
-              workspaceId={workspace?.id ?? ""}
-              isCompleted={taskIsCompleted}
-              assigneeName={assignee?.user?.name ?? task.assigneeName}
-              assigneeImage={assignee?.user?.image}
-            />
+            {showPriority && (
+              <div className="flex-shrink-0 first:[&_svg]:h-4 first:[&_svg]:w-4">
+                {getPriorityIcon(task.priority ?? "")}
+              </div>
+            )}
+
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 md:flex-row md:items-center md:gap-2">
+              {/* Line 1: number + title — the title wraps on two lines on
+                  mobile instead of being squeezed by the meta chips. */}
+              <div className="flex min-w-0 items-center gap-2 md:flex-1 md:gap-3">
+                {showTaskNumbers && (
+                  <div className="text-xs font-mono text-muted-foreground flex-shrink-0">
+                    {projectSlug}-{task.number}
+                  </div>
+                )}
+                <span className="min-w-0 flex-1 text-xs leading-snug break-words line-clamp-2 text-foreground md:truncate md:text-sm">
+                  {task.title}
+                </span>
+              </div>
+
+              {/* Labels and PR chips drop below the title on mobile and sit
+                  inline on desktop; due date and assignee trail them. */}
+              <div className="flex w-full flex-wrap items-center gap-1 md:w-auto md:flex-nowrap">
+                {showLabels && <TaskLabels labels={task.labels ?? []} />}
+
+                {pullRequests.length === 1 && (
+                  <HoverCard openDelay={200} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(pullRequests[0].url, "_blank");
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-sidebar text-[0.625rem] font-medium text-muted-foreground"
+                      >
+                        {getPRInfo(pullRequests[0]).icon}
+                        <span>#{pullRequests[0].externalId}</span>
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-72 p-3"
+                      side="bottom"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          {getPRInfo(pullRequests[0]).icon}
+                          <span>{getPRInfo(pullRequests[0]).status}</span>
+                          <span className="text-muted-foreground/50">•</span>
+                          <span>#{pullRequests[0].externalId}</span>
+                        </div>
+                        <p className="text-sm font-medium leading-snug">
+                          {pullRequests[0].title || t("tasks:pr.label")}
+                        </p>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
+
+                {pullRequests.length > 1 &&
+                  (() => {
+                    const hasOpen = pullRequests.some(
+                      (pr) => !pr.metadata?.merged && !pr.metadata?.draft,
+                    );
+                    const allMerged = pullRequests.every(
+                      (pr) => pr.metadata?.merged,
+                    );
+                    const iconColor = allMerged
+                      ? "text-info-foreground"
+                      : hasOpen
+                        ? "text-success-foreground"
+                        : "text-muted-foreground";
+
+                    return (
+                      <HoverCard openDelay={200} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-sidebar text-[0.625rem] font-medium text-muted-foreground"
+                          >
+                            <GitPullRequest
+                              className={`h-3 w-3 ${iconColor}`}
+                            />
+                            <span>
+                              {t("tasks:pr.count", {
+                                count: pullRequests.length,
+                              })}
+                            </span>
+                          </button>
+                        </HoverCardTrigger>
+                        <HoverCardContent
+                          className="w-auto min-w-56 max-w-96 p-1"
+                          side="bottom"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {pullRequests.map((pr, index) => {
+                            const prInfo = getPRInfo(pr);
+                            const repoMatch = pr.url.match(
+                              /github\.com\/([^/]+\/[^/]+)\/pull/,
+                            );
+                            const repoName = repoMatch ? repoMatch[1] : null;
+                            return (
+                              <div key={pr.id}>
+                                {index > 0 && (
+                                  <hr className="border-border my-1" />
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => window.open(pr.url, "_blank")}
+                                  className="w-full px-2 py-1.5 text-left hover:bg-muted/50 rounded transition-colors"
+                                >
+                                  <div className="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground">
+                                    {prInfo.icon}
+                                    <span>
+                                      {repoName}#{pr.externalId}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs leading-tight line-clamp-2 mt-0.5">
+                                    {pr.title || t("tasks:pr.label")}
+                                  </p>
+                                  <span className="text-[0.625rem] text-muted-foreground">
+                                    {prInfo.status}
+                                  </span>
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </HoverCardContent>
+                      </HoverCard>
+                    );
+                  })()}
+                {showDueDates && task.dueDate && (
+                  <div
+                    className={`ml-auto flex items-center gap-1 text-[0.625rem] px-2 py-1 rounded md:ml-0 ${dueDateStatusColors[getDueDateStatus(task.dueDate, taskIsCompleted)]}`}
+                  >
+                    {getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                      "overdue" && <CalendarX className="w-3 h-3" />}
+                    {getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                      "due-soon" && <CalendarClock className="w-3 h-3" />}
+                    {(getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                      "far-future" ||
+                      getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                        "no-due-date") && <Calendar className="w-3 h-3" />}
+                    <span>{format(new Date(task.dueDate), "MMM d")}</span>
+                  </div>
+                )}
+
+                {showAssignees && (
+                  <div className="flex-shrink-0">
+                    {task.userId ? (
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage
+                          src={
+                            assignee?.user?.image ?? task.assigneeImage ?? ""
+                          }
+                          alt={assignee?.user?.name || task.assigneeName || ""}
+                        />
+                        <AvatarFallback className="text-xs font-medium border border-border/30">
+                          {getInitials(
+                            assignee?.user?.name ?? task.assigneeName,
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <div
+                        className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center"
+                        title={t("tasks:assignee.unassigned")}
+                      >
+                        <span className="text-[0.625rem] font-medium text-muted-foreground">
+                          ?
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </ContextMenuTrigger>
 

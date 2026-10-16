@@ -53,11 +53,13 @@ export function InboxDetail({
           <div className="flex gap-2.5 rounded-lg bg-muted/50 px-3 py-2.5">
             <NotificationIcon type={notification.type} />
             <div className="flex min-w-0 flex-col gap-0.5">
-              <p className="font-medium text-[13px] text-foreground">
+              <p className="font-medium text-[0.8125rem] text-foreground">
                 {getNotificationTitle(notification, t)}
               </p>
               {content && (
-                <p className="text-[13px] text-muted-foreground">{content}</p>
+                <p className="text-[0.8125rem] text-muted-foreground">
+                  {content}
+                </p>
               )}
             </div>
           </div>

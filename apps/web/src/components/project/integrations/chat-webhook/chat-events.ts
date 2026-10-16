@@ -7,6 +7,7 @@ export type ChatEvents = {
   taskTitleChanged: boolean;
   taskDescriptionChanged: boolean;
   taskCommentCreated: boolean;
+  taskMentionCreated: boolean;
 };
 
 export const CHAT_EVENT_ITEMS: EventChecklistItem<keyof ChatEvents>[] = [
@@ -34,6 +35,10 @@ export const CHAT_EVENT_ITEMS: EventChecklistItem<keyof ChatEvents>[] = [
     id: "taskCommentCreated",
     labelKey: "settings:chatIntegrations.events.taskCommentCreated",
   },
+  {
+    id: "taskMentionCreated",
+    labelKey: "settings:chatIntegrations.events.taskMentionCreated",
+  },
 ];
 
 export function toChatEvents(events?: Partial<ChatEvents> | null): ChatEvents {
@@ -44,5 +49,6 @@ export function toChatEvents(events?: Partial<ChatEvents> | null): ChatEvents {
     taskTitleChanged: events?.taskTitleChanged ?? false,
     taskDescriptionChanged: events?.taskDescriptionChanged ?? false,
     taskCommentCreated: events?.taskCommentCreated ?? true,
+    taskMentionCreated: events?.taskMentionCreated ?? true,
   };
 }

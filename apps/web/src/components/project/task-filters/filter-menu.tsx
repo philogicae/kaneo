@@ -51,7 +51,7 @@ export function FilterMenu({ subjects, activeCount }: FilterMenuProps) {
         >
           <ListFilter />
           {activeCount > 0 && (
-            <span className="-top-1 -right-1 absolute inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-semibold text-background tabular-nums">
+            <span className="-top-1 -right-1 absolute inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[0.625rem] font-semibold text-background tabular-nums">
               {activeCount}
             </span>
           )}

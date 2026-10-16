@@ -40,7 +40,7 @@ export function InboxListItem({
           <span className="flex items-center gap-2">
             <span
               className={cn(
-                "min-w-0 flex-1 truncate text-[13px]",
+                "min-w-0 flex-1 truncate text-[0.8125rem]",
                 notification.isRead
                   ? "text-foreground/80"
                   : "font-semibold text-foreground",
@@ -72,7 +72,7 @@ export function InboxListItem({
           {content && (
             <span
               className={cn(
-                "truncate text-[13px]",
+                "truncate text-[0.8125rem]",
                 notification.isRead
                   ? "text-muted-foreground/80"
                   : "text-muted-foreground",

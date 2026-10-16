@@ -33,7 +33,7 @@ export function TextFieldEditor({
           event.preventDefault();
           onSubmit();
         }}
-        className="h-10 w-full bg-transparent px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+        className="h-10 w-full bg-transparent px-3 text-[0.8125rem] text-foreground outline-none placeholder:text-muted-foreground [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
       />
       <div className="flex items-center justify-between gap-2 border-border/80 border-t px-3 py-2 text-muted-foreground text-xs">
         <span>{field.required ? t("tasks:customFields.required") : null}</span>

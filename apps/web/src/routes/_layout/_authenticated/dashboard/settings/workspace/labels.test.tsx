@@ -190,9 +190,11 @@ describe("creating and editing labels", () => {
       within(dialog).getByLabelText("settings:workspaceLabels.nameLabel"),
       { target: { value: "  Design  " } },
     );
-    fireEvent.click(within(dialog).getByRole("button", { name: "Lavender" }));
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: /labelColors\.lavender/i }),
+    );
     expect(
-      within(dialog).getByRole("button", { name: "Lavender" }),
+      within(dialog).getByRole("button", { name: /labelColors\.lavender/i }),
     ).toHaveAttribute("aria-pressed", "true");
     expect(within(dialog).getByText("Design")).toBeInTheDocument();
     fireEvent.submit(form);

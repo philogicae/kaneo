@@ -1,30 +1,31 @@
 {
-	"name": "@kaneo/permissions",
-	"version": "0.0.0",
-	"private": true,
-	"type": "module",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		}
-	},
-	"license": "MIT",
-	"scripts": {
-		"build": "vp run compile",
-		"lint": "vp check .",
-		"test": "vp run test:run",
-		"test:watch": "vp test --config vitest.config.ts"
-	},
-	"dependencies": {
-		"better-auth": "1.6.26"
-	},
-	"devDependencies": {
-		"@kaneo/typescript-config": "workspace:*",
-		"typescript": "^7.0.2",
-		"vite": "catalog:",
-		"vite-plus": "catalog:"
-	}
+  "name": "@kaneo/permissions",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "vp run compile",
+    "lint": "vp check .",
+    "test": "vp run test:run",
+    "test:coverage": "vp run test:coverage:run",
+    "test:watch": "vp test --config vitest.config.ts"
+  },
+  "dependencies": {
+    "better-auth": "~1.6.30"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "catalog:",
+    "vite-plus": "catalog:",
+    "vite": "catalog:"
+  }
 }

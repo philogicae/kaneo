@@ -21,7 +21,7 @@ export function PausedLinksCallout({
         aria-hidden="true"
         className="size-3.5 shrink-0 fill-current text-warning-foreground"
       />
-      <p className="min-w-0 flex-1 text-[13px]">
+      <p className="min-w-0 flex-1 text-[0.8125rem]">
         {t("settings:syncRules.pausedSummary", { count })}
       </p>
       <Button

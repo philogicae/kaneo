@@ -15,8 +15,9 @@ import {
 async function listWorkspaces(userId: string) {
   const sortName = sql`lower(${workspaceTable.name})`;
 
+  // SQLite has no DISTINCT ON; keep the first row per workspace in this order.
   const rows = await db
-    .selectDistinctOn([sortName, workspaceTable.id], {
+    .select({
       ...workspaceColumns,
       ...workspaceAccessColumns,
     })
@@ -36,7 +37,14 @@ async function listWorkspaces(userId: string) {
       workspaceUserTable.id,
     );
 
-  return (await filterReadableWorkspaces(rows)).map(toWorkspaceResponse);
+  const seen = new Set<string>();
+  const distinct = rows.filter((row) => {
+    if (seen.has(row.id)) return false;
+    seen.add(row.id);
+    return true;
+  });
+
+  return (await filterReadableWorkspaces(distinct)).map(toWorkspaceResponse);
 }
 
 export default listWorkspaces;

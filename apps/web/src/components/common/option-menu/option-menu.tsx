@@ -79,7 +79,7 @@ export function OptionMenu({
           onKeyDown={(event) => {
             if (selectByNumber(event.key)) event.preventDefault();
           }}
-          className="h-full min-w-0 flex-1 bg-transparent px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-[0.8125rem] text-foreground outline-none placeholder:text-muted-foreground"
         />
         {inputHint && (
           <span className="shrink-0 pe-3 text-muted-foreground text-xs">
@@ -103,7 +103,7 @@ export function OptionMenu({
                   value={option}
                   aria-current={option.selected || undefined}
                   onClick={() => onSelect(option.value)}
-                  className="flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-[13px] text-foreground outline-none data-highlighted:bg-accent [&_svg]:size-3.5"
+                  className="flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-[0.8125rem] text-foreground outline-none data-highlighted:bg-accent [&_svg]:size-3.5"
                 >
                   {option.icon && (
                     <span className="inline-flex size-4 shrink-0 items-center justify-center">

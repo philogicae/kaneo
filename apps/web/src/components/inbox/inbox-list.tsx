@@ -94,7 +94,7 @@ export function InboxList({
               aria-pressed={filter === option.value}
               onClick={() => setFilter(option.value)}
               className={cn(
-                "flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-2.5 font-medium text-[13px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                "flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-2.5 font-medium text-[0.8125rem] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
                 filter === option.value
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground",

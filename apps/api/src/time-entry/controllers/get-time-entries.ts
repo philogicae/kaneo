@@ -2,8 +2,11 @@ import { eq } from "drizzle-orm";
 import db from "../../database";
 import { timeEntryTable, userTable } from "../../database/schema";
 
-async function getTimeEntriesByTaskId(taskId: string) {
-  const timeEntries = await db
+async function getTimeEntriesByTaskId(
+  taskId: string,
+  options: { limit?: number; offset?: number } = {},
+) {
+  const query = db
     .select({
       id: timeEntryTable.id,
       taskId: timeEntryTable.taskId,
@@ -19,9 +22,12 @@ async function getTimeEntriesByTaskId(taskId: string) {
     .from(timeEntryTable)
     .leftJoin(userTable, eq(timeEntryTable.userId, userTable.id))
     .where(eq(timeEntryTable.taskId, taskId))
-    .orderBy(timeEntryTable.startTime);
+    .orderBy(timeEntryTable.startTime)
+    // -1 disables the upper bound so an offset-only caller still gets a valid
+    // SQLite query (OFFSET alone is not valid without LIMIT).
+    .limit(options.limit ?? -1);
 
-  return timeEntries;
+  return options.offset !== undefined ? query.offset(options.offset) : query;
 }
 
 export default getTimeEntriesByTaskId;

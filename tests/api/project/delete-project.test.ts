@@ -34,7 +34,7 @@ function seed(backgroundObjectKey: string | null, assets: string[] = []) {
   };
   mocks.select
     .mockReturnValueOnce({
-      from: () => ({ where: () => ({ for: async () => [project] }) }),
+      from: () => ({ where: async () => [project] }),
     })
     .mockReturnValueOnce({
       from: () => ({

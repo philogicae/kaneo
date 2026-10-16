@@ -19,7 +19,7 @@ export function WorkspaceOwners({ owners }: WorkspaceOwnersProps) {
 
   return (
     <span
-      className="block min-w-0 truncate text-[13px]"
+      className="block min-w-0 truncate text-[0.8125rem]"
       title={owners.map((owner) => owner.email).join(", ")}
     >
       {owners.map((owner) => owner.name || owner.email).join(", ")}

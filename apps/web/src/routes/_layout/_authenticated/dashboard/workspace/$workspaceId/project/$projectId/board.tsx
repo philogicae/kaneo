@@ -1,25 +1,25 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import BoardToolbar from "@/components/board/board-toolbar";
 import ProjectLayout from "@/components/common/project-layout";
 import KanbanBoard from "@/components/kanban-board";
 import ListView from "@/components/list-view";
 import PageTitle from "@/components/page-title";
-import { DisplaySection } from "@/components/project/display/display-section";
-import { TaskDisplayOptions } from "@/components/project/display/task-display-options";
-import { ActiveFiltersBar } from "@/components/project/task-filters/active-filters-bar";
-import { ProjectToolbar } from "@/components/project/toolbar/project-toolbar";
-import { TaskCount } from "@/components/project/toolbar/task-count";
-import { useProjectTaskView } from "@/components/project/toolbar/use-project-task-view";
-import { LayoutSwitch } from "@/components/project/views/layout-switch";
+import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
+import { shortcuts } from "@/constants/shortcuts";
+import useGetCustomFieldFilterValues from "@/hooks/queries/custom-field/use-get-custom-field-filter-values";
+import useGetCustomFieldsByProject from "@/hooks/queries/custom-field/use-get-custom-fields-by-project";
+import useGetLabelsByWorkspace from "@/hooks/queries/label/use-get-labels-by-workspace";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
+import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
+import { useBoardGrouping } from "@/hooks/use-board-grouping";
 import { useBoardSort } from "@/hooks/use-board-sort";
-import { cn } from "@/lib/cn";
+import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { useTaskFiltersWithLabelsSupport } from "@/hooks/use-task-filters-with-labels-support";
 import { sortTasks } from "@/lib/sort-tasks";
-import { countColumnTasks } from "@/lib/task-filters/count-tasks";
-import { useBackgroundStore } from "@/store/background";
 import useProjectStore from "@/store/project";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
@@ -81,24 +81,39 @@ function RouteComponent() {
   const { projectId, workspaceId } = Route.useParams();
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
-  const {
-    data,
-    isError: boardError,
-    isFetching: boardFetching,
-    refetch: retryBoard,
-  } = useGetTasks(projectId);
+  const { data } = useGetTasks(projectId);
   const { project, setProject } = useProjectStore();
-  const viewMode = useUserPreferencesStore((state) => state.viewMode);
+  const { viewMode, setViewMode } = useUserPreferencesStore();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [boardSearchQuery, setBoardSearchQuery] = useState("");
+  const boardSearchInput = useRef<HTMLInputElement | null>(null);
   const { sort, setSort } = useBoardSort(projectId);
-  const { background } = useBackgroundStore();
-  const view = useProjectTaskView({
-    project,
-    projectId,
-    workspaceId,
-    scope: "board",
-  });
-  const { descriptionSearch, filters } = view;
+  const { groupBy, setGroupBy } = useBoardGrouping(projectId);
+
+  const { data: users } = useGetActiveWorkspaceUsers(workspaceId);
+  const { data: workspaceLabels = [] } = useGetLabelsByWorkspace(workspaceId);
+
+  const { data: rawCustomFields = [] } = useGetCustomFieldsByProject(projectId);
+
+  const { data: filterValuesData = [] } =
+    useGetCustomFieldFilterValues(projectId);
+
+  const customFieldDefinitions = useMemo<CustomFieldDefinition[]>(
+    () =>
+      rawCustomFields.map((f, index) => ({
+        ...f,
+        type: f.type as CustomFieldDefinition["type"],
+        options: Array.isArray(f.options) ? (f.options as string[]) : null,
+        position: index,
+      })),
+    [rawCustomFields],
+  );
+
+  const usedCustomFieldValues = useMemo<Record<string, string[]>>(() => {
+    return Object.fromEntries(
+      filterValuesData.map((f) => [f.fieldId, f.values]),
+    );
+  }, [filterValuesData]);
 
   const handleCloseTaskSheet = useCallback(() => {
     navigate({
@@ -108,14 +123,62 @@ function RouteComponent() {
     });
   }, [navigate]);
 
+  useRegisterShortcuts({
+    sequentialShortcuts: {
+      [shortcuts.view.prefix]: {
+        [shortcuts.view.board]: () => setViewMode("board"),
+        [shortcuts.view.list]: () => setViewMode("list"),
+        [shortcuts.view.calendar]: () =>
+          navigate({
+            to: "/dashboard/workspace/$workspaceId/project/$projectId/calendar",
+            params: { workspaceId, projectId },
+          }),
+        [shortcuts.view.gantt]: () =>
+          navigate({
+            to: "/dashboard/workspace/$workspaceId/project/$projectId/gantt",
+            params: { workspaceId, projectId },
+          }),
+        [shortcuts.view.backlog]: () =>
+          navigate({
+            to: "/dashboard/workspace/$workspaceId/project/$projectId/backlog",
+            params: { workspaceId, projectId },
+          }),
+      },
+    },
+  });
+
   useEffect(() => {
     if (data) {
       setProject(data);
     }
   }, [data, setProject]);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const isFindShortcut =
+        (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "f";
+
+      if (!isFindShortcut) return;
+
+      event.preventDefault();
+      boardSearchInput.current?.focus();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const {
+    filters,
+    updateFilter,
+    updateLabelFilter,
+    updateCustomFieldFilter,
+    filteredProject,
+    hasActiveFilters,
+    clearFilters,
+  } = useTaskFiltersWithLabelsSupport(project, projectId, boardSearchQuery);
+
   const sortedProject = useMemo(() => {
-    const filteredProject = filters.filteredProject;
     if (!filteredProject || sort.field === "position") return filteredProject;
     return {
       ...filteredProject,
@@ -124,117 +187,57 @@ function RouteComponent() {
         tasks: sortTasks(column.tasks, sort),
       })),
     };
-  }, [filters.filteredProject, sort]);
+  }, [filteredProject, sort]);
 
   return (
     <ProjectLayout
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="board"
-      toolbar={
-        <ProjectToolbar
-          view={view}
-          display={
-            <>
-              <DisplaySection>
-                <LayoutSwitch
-                  workspaceId={workspaceId}
-                  projectId={projectId}
-                  currentRoute="board"
-                  currentView={viewMode}
-                />
-              </DisplaySection>
-              <TaskDisplayOptions
-                projectId={projectId}
-                sort={sort}
-                onSortChange={setSort}
-                layout={viewMode === "board" ? "cards" : "rows"}
-                showBackgroundSwitch={
-                  viewMode === "board" && !!project?.backgroundVersion
-                }
-              />
-            </>
-          }
-        />
-      }
-      summary={
-        <TaskCount
-          shown={countColumnTasks(filters.filteredProject)}
-          total={countColumnTasks(project)}
-        />
-      }
-      filterBar={
-        <ActiveFiltersBar
-          subjects={view.subjects}
-          onClear={filters.clearFilters}
-        />
-      }
     >
       <PageTitle
         title={`${project?.name} · ${viewMode === "board" ? t("tasks:view.board") : t("tasks:view.list")}`}
         hideAppName
       />
       <div className="relative flex flex-col h-full min-h-0 overflow-hidden">
-        {descriptionSearch.isLoading && (
-          <p role="status" className="px-4 py-2 text-sm text-muted-foreground">
-            {t("tasks:descriptionSearchLoading")}
-          </p>
-        )}
-        {descriptionSearch.isError && (
-          <p role="alert" className="px-4 py-2 text-sm text-destructive">
-            {t("tasks:descriptionSearchError")}{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={() => void descriptionSearch.retry()}
-            >
-              {t("tasks:descriptionRetry")}
-            </button>
-          </p>
-        )}
+        <BoardToolbar
+          project={project}
+          filters={filters}
+          updateFilter={updateFilter}
+          updateLabelFilter={updateLabelFilter}
+          updateCustomFieldFilter={updateCustomFieldFilter}
+          clearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+          users={users}
+          workspaceLabels={workspaceLabels}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          sort={sort}
+          onSortChange={setSort}
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
+          customFieldDefinitions={customFieldDefinitions}
+          usedCustomFieldValues={usedCustomFieldValues}
+          searchQuery={boardSearchQuery}
+          onSearchChange={setBoardSearchQuery}
+          searchInputRef={boardSearchInput}
+        />
 
-        {boardError && (
-          <p role="alert" className="p-4 text-destructive">
-            {t("tasks:calendar.loadError")}{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={() => void retryBoard()}
-            >
-              {t("tasks:descriptionRetry")}
-            </button>
-          </p>
-        )}
-        <div
-          className={cn("flex h-full flex-1 overflow-hidden", {
-            "bg-background": !background,
-          })}
-        >
+        <div className="flex h-full flex-1 overflow-hidden bg-background">
           {sortedProject ? (
             viewMode === "board" ? (
               <KanbanBoard
                 project={sortedProject}
-                disableCollectionActions={boardFetching || boardError}
-                disableDragDrop={
-                  boardFetching ||
-                  boardError ||
-                  (sort.field !== "position" &&
-                    sort.field !== "number" &&
-                    sort.field !== "priority")
-                }
-                sortedByNumber={sort.field === "number"}
-                sortedByPriority={sort.field === "priority"}
+                sortActive={sort.field !== "position"}
+                groupActive={groupBy === "labels"}
               />
             ) : (
               <ListView
                 project={sortedProject}
-                disableCollectionActions={boardFetching || boardError}
-                disableDragDrop={
-                  boardFetching || boardError || sort.field !== "position"
-                }
+                sortActive={sort.field !== "position"}
               />
             )
-          ) : boardError ? null : (
+          ) : (
             <BoardSkeleton />
           )}
         </div>

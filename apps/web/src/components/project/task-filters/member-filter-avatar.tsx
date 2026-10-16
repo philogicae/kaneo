@@ -11,7 +11,7 @@ export function MemberFilterAvatar({
   return (
     <Avatar className="size-4">
       <AvatarImage src={image ?? ""} alt="" />
-      <AvatarFallback className="border border-border/30 text-[8px] font-medium">
+      <AvatarFallback className="border border-border/30 text-[0.5rem] font-medium">
         {getInitials(name)}
       </AvatarFallback>
     </Avatar>

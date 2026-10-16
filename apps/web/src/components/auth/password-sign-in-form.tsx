@@ -123,7 +123,7 @@ export function PasswordSignInForm({
                 {canResetPassword ? (
                   <Link
                     to="/auth/forgot-password"
-                    className="text-[13px] text-muted-foreground leading-4 underline decoration-muted-foreground/50 underline-offset-[3px] transition-colors hover:text-foreground"
+                    className="text-[0.8125rem] text-muted-foreground leading-4 underline decoration-muted-foreground/50 underline-offset-[3px] transition-colors hover:text-foreground"
                   >
                     {t("auth:passwordReset.forgotPassword")}
                   </Link>

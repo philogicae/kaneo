@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import db from "../../../database";
 import { labelTable } from "../../../database/schema";
 import {
@@ -63,9 +62,6 @@ export async function handleGiteaLabelCreated(
         color,
         workspaceId,
       })
-      .onConflictDoNothing({
-        target: [labelTable.workspaceId, labelTable.name],
-        where: sql`${labelTable.taskId} is null`,
-      });
+      .onConflictDoNothing();
   }
 }

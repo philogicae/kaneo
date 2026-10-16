@@ -155,7 +155,7 @@ function DeviceApprovePage() {
             <p className="text-muted-foreground text-xs">
               {t("auth:device.approve.matchCode")}
             </p>
-            <p className="font-mono text-[22px] text-foreground leading-7 tracking-[0.12em]">
+            <p className="font-mono text-[1.375rem] text-foreground leading-7 tracking-[0.12em]">
               {formatDeviceCode(userCode)}
             </p>
           </div>

@@ -1,13 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vite-plus/test";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import db, { schema } from "../../apps/api/src/database";
 import { createApp } from "../../apps/api/src/index";
 import { signUpWithSession } from "./helpers/auth-session";
@@ -197,68 +190,6 @@ describe("API integration: admin user removal", () => {
     expect(remaining).toHaveLength(1);
   });
 
-  describe("with billing enabled", () => {
-    const cloudEnv = {
-      KANEO_CLOUD: "true",
-      CREEM_API_KEY: "creem_test_dummy",
-      CREEM_WEBHOOK_SECRET: "whsec_dummy",
-    };
-    const saved: Record<string, string | undefined> = {};
-
-    beforeAll(() => {
-      for (const [key, value] of Object.entries(cloudEnv)) {
-        saved[key] = process.env[key];
-        process.env[key] = value;
-      }
-    });
-
-    afterAll(() => {
-      for (const key of Object.keys(cloudEnv)) {
-        if (saved[key] === undefined) {
-          delete process.env[key];
-        } else {
-          process.env[key] = saved[key];
-        }
-      }
-    });
-
-    it("refuses to remove the only member of a workspace with an active subscription", async () => {
-      const { app } = createApp();
-      const admin = await signUpWithSession(app, {
-        email: "admin@example.com",
-        name: "Instance Admin",
-        role: "admin",
-      });
-      const owner = await createWorkspaceMember({
-        role: "owner",
-        workspaceName: "Paid Space",
-      });
-      await seedCredentials(owner.user.id);
-      await db.insert(schema.workspaceBillingTable).values({
-        workspaceId: owner.workspace.id,
-        creemSubscriptionId: "sub_active",
-        creemProductId: "prod_1",
-        plan: "team",
-        status: "active",
-      });
-
-      const response = await removeUser(app, admin.cookies, owner.user.id);
-
-      expect(response.status).toBe(409);
-      expect(await response.text()).toMatch(
-        /Paid Space.* still has an active subscription/,
-      );
-      expect(await countRows(owner.user.id, owner.workspace.id)).toEqual({
-        users: 1,
-        sessions: 1,
-        accounts: 1,
-        workspaces: 1,
-      });
-      const memberships = await db
-        .select()
-        .from(schema.workspaceUserTable)
-        .where(eq(schema.workspaceUserTable.userId, owner.user.id));
-      expect(memberships).toHaveLength(1);
-    });
-  });
+  // This fork has no billing: a workspace row can never carry a paid
+  // subscription, so removing its last member is never blocked by one.
 });

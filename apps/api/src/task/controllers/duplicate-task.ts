@@ -14,14 +14,9 @@ import {
   userTable,
 } from "../../database/schema";
 import { publishEvent } from "../../events";
-import { projectAccessCondition } from "../../project-access/project-access-condition";
 import { contentReferencesAsset } from "../../storage/cleanup-assets";
 import { copyTaskAssetObject, deleteS3Object } from "../../storage/s3";
-import { filterUsersWithProjectAccess } from "../../project-access/filter-users-with-project-access";
-import {
-  filterAssignableUsers,
-  NOT_ASSIGNABLE,
-} from "../../utils/assert-assignable-user";
+import { assertAssignableUser } from "../../utils/assert-assignable-user";
 import {
   assertRequiredCustomFields,
   assertValidTaskStatus,
@@ -155,21 +150,8 @@ async function duplicateTask({
   }
 
   await assertValidTaskStatus(sourceTask.status, sourceTask.projectId);
-  let assigneeId = sourceTask.userId;
-  if (assigneeId) {
-    const members = await filterAssignableUsers(
-      [assigneeId],
-      project.workspaceId,
-    );
-    if (!members.has(assigneeId)) {
-      throw new HTTPException(403, { message: NOT_ASSIGNABLE });
-    }
-    const permitted = await filterUsersWithProjectAccess(
-      [assigneeId],
-      sourceTask.projectId,
-    );
-    if (!permitted.has(assigneeId)) assigneeId = null;
-  }
+  if (sourceTask.userId)
+    await assertAssignableUser(sourceTask.userId, sourceTask.projectId);
   const column = await db.query.columnTable.findFirst({
     where: and(
       eq(columnTable.projectId, sourceTask.projectId),
@@ -248,7 +230,6 @@ async function duplicateTask({
         eq(taskRelationTable.targetTaskId, sourceTask.id),
         eq(projectTable.workspaceId, project.workspaceId),
         eq(taskRelationTable.relationType, "subtask"),
-        projectAccessCondition(currentUserId, taskTable.projectId),
       ),
     );
 
@@ -288,7 +269,7 @@ async function duplicateTask({
         .values({
           id: duplicatedTaskId,
           projectId: sourceTask.projectId,
-          userId: assigneeId,
+          userId: sourceTask.userId,
           title: title?.trim() || sourceTask.title,
           status: sourceTask.status,
           columnId: column?.id ?? null,

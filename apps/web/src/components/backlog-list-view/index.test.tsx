@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,
   cleanup,
@@ -15,21 +13,11 @@ import {
   it,
   vi,
 } from "vite-plus/test";
-import { ShortcutTestWrapper } from "@/lib/shortcuts/shortcut-test-wrapper";
+import { KeyboardShortcutsProvider } from "@/hooks/use-keyboard-shortcuts";
 import useBacklogBulkSelectionStore from "@/store/backlog-bulk-selection";
 import type { ProjectWithTasks } from "@/types/project";
 import type Task from "@/types/task";
 import BacklogListView from "./index";
-
-const queryClient = new QueryClient();
-
-function Providers({ children }: { children: ReactNode }) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ShortcutTestWrapper>{children}</ShortcutTestWrapper>
-    </QueryClientProvider>
-  );
-}
 
 const { mountRow, unmountRow, renderRow, navigate } = vi.hoisted(() => ({
   mountRow: vi.fn(),
@@ -52,10 +40,7 @@ vi.mock("./backlog-task-row", async () => {
   };
 });
 
-vi.mock("@tanstack/react-router", () => ({
-  useNavigate: () => navigate,
-  useRouter: () => ({ preloadRoute: () => Promise.resolve() }),
-}));
+vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigate }));
 vi.mock("@/hooks/mutations/task/use-update-task", () => ({
   useUpdateTask: () => ({ mutate: vi.fn() }),
 }));
@@ -118,7 +103,7 @@ afterEach(cleanup);
 describe("backlog row lifecycle", () => {
   it("mounts each row once and preserves the other section when collapsing and expanding", () => {
     render(<BacklogListView project={project} />, {
-      wrapper: Providers,
+      wrapper: KeyboardShortcutsProvider,
     });
     expect(mountRow).toHaveBeenCalledTimes(totalTaskCount);
     expect(unmountRow).not.toHaveBeenCalled();
@@ -152,22 +137,25 @@ describe("backlog row lifecycle", () => {
 
   it("does not render the list again on selection or keyboard focus changes", () => {
     render(<BacklogListView project={project} />, {
-      wrapper: Providers,
+      wrapper: KeyboardShortcutsProvider,
     });
     renderRow.mockClear();
     mountRow.mockClear();
 
-    const focused = () => useBacklogBulkSelectionStore.getState().focusedTaskId;
     act(() =>
       useBacklogBulkSelectionStore.getState().toggleSelection("planned-0"),
     );
-    fireEvent.keyDown(document.body, { key: "j", code: "KeyJ" });
-    expect(focused()).toBe("planned-0");
-    fireEvent.keyDown(document.body, { key: "ArrowDown", code: "ArrowDown" });
-    expect(focused()).toBe("planned-1");
-    expect(navigate).not.toHaveBeenCalled();
-
-    fireEvent.keyDown(document.body, { key: "Enter", code: "Enter" });
+    fireEvent.keyDown(document.body, { key: "j" });
+    expect(navigate).toHaveBeenLastCalledWith({
+      to: ".",
+      search: { taskId: "planned-0" },
+    });
+    fireEvent.keyDown(document.body, { key: "j" });
+    expect(navigate).toHaveBeenLastCalledWith({
+      to: ".",
+      search: { taskId: "planned-1" },
+    });
+    fireEvent.keyDown(document.body, { key: "Enter" });
     expect(navigate).toHaveBeenLastCalledWith({
       to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
       params: {
@@ -176,20 +164,11 @@ describe("backlog row lifecycle", () => {
         taskId: "planned-1",
       },
     });
-
-    fireEvent.keyDown(document.body, { key: "k", code: "KeyK" });
-    expect(focused()).toBe("planned-0");
-    fireEvent.keyDown(document.body, { key: " ", code: "Space" });
+    fireEvent.keyDown(document.body, { key: "k" });
     expect(navigate).toHaveBeenLastCalledWith({
       to: ".",
       search: { taskId: "planned-0" },
-      replace: false,
     });
-
-    fireEvent.keyDown(document.body, { key: "x", code: "KeyX" });
-    expect(
-      useBacklogBulkSelectionStore.getState().selectedTaskIds.has("planned-0"),
-    ).toBe(false);
     expect(renderRow).not.toHaveBeenCalled();
     expect(mountRow).not.toHaveBeenCalled();
     expect(unmountRow).not.toHaveBeenCalled();
@@ -197,7 +176,7 @@ describe("backlog row lifecycle", () => {
 
   it("preserves rows when opening task creation or receiving updated task data", () => {
     const { rerender } = render(<BacklogListView project={project} />, {
-      wrapper: Providers,
+      wrapper: KeyboardShortcutsProvider,
     });
     const archivedRow = screen.getByLabelText("archived-0");
     mountRow.mockClear();

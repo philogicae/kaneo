@@ -46,7 +46,7 @@ export function MyTasksList({
     <div className="flex flex-col">
       {groups.map((group) => (
         <section key={group.id}>
-          <h2 className="flex h-9 items-center gap-2 border-border/50 border-b bg-muted/40 px-5 text-[13px]">
+          <h2 className="flex h-9 items-center gap-2 border-border/50 border-b bg-muted/40 px-5 text-[0.8125rem]">
             <span
               className={cn(
                 "font-semibold",

@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import db from "../../../database";
 import { labelTable, projectTable } from "../../../database/schema";
 import { findAllIntegrationsByRepo } from "../services/task-service";
@@ -57,9 +57,6 @@ export async function handleLabelCreated(payload: LabelCreatedPayload) {
         color,
         workspaceId: project.workspaceId,
       })
-      .onConflictDoNothing({
-        target: [labelTable.workspaceId, labelTable.name],
-        where: sql`${labelTable.taskId} is null`,
-      });
+      .onConflictDoNothing();
   }
 }

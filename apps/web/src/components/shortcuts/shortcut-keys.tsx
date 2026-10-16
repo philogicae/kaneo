@@ -56,7 +56,7 @@ export function ShortcutKeys({
   const capProps = { size, tone, isHighlighted };
   const word = cn(
     "text-muted-foreground/80",
-    size === "md" ? "text-xs" : "text-[11px]",
+    size === "md" ? "text-xs" : "text-[0.6875rem]",
   );
 
   return (

@@ -41,7 +41,7 @@ export function SubtasksHoverList({
           total={subtasks.length}
           size={14}
         />
-        <span className="font-medium text-[13px] text-foreground">
+        <span className="font-medium text-[0.8125rem] text-foreground">
           {t("tasks:subtasks.title")}
         </span>
         <span className="truncate text-muted-foreground text-xs">
@@ -67,12 +67,12 @@ export function SubtasksHoverList({
               <span className="flex size-3.5 shrink-0 items-center justify-center [&_svg]:size-3.5">
                 {getColumnIcon(subtask.status, subtask.isCompleted)}
               </span>
-              <span className="w-13 shrink-0 truncate font-mono text-[11px] text-muted-foreground">
+              <span className="w-13 shrink-0 truncate font-mono text-[0.6875rem] text-muted-foreground">
                 {displayIdOf(subtask.projectId, subtask.number)}
               </span>
               <span
                 className={cn(
-                  "min-w-0 flex-1 truncate text-[13px]",
+                  "min-w-0 flex-1 truncate text-[0.8125rem]",
                   subtask.isCompleted
                     ? "text-muted-foreground line-through"
                     : "text-foreground",

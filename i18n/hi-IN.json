@@ -10,7 +10,9 @@
 			"markAllRead": "सभी पढ़ा हुआ करें",
 			"remove": "निकालें",
 			"reset": "रीसेट करें",
-			"filter": "फ़िल्टर"
+			"filter": "फ़िल्टर",
+			"clearAllFilters": "सभी फ़िल्टर साफ़ करें",
+			"save": "Save"
 		},
 		"a11y": {
 			"toggleSidebar": "साइडबार टॉगल करें"
@@ -148,7 +150,14 @@
 					"amber": "एम्बर",
 					"terracotta": "टेराकोटा",
 					"rose": "गुलाब",
-					"crimson": "किरमिज़ी"
+					"crimson": "किरमिज़ी",
+					"cyan": "सियान",
+					"emerald": "पन्ना",
+					"fuchsia": "फ्यूशिया",
+					"indigo": "नील",
+					"lime": "नींबू",
+					"ocean": "महासागर",
+					"sky": "आकाश"
 				},
 				"statusLoadError": "Project statuses couldn’t be loaded."
 			}
@@ -160,6 +169,20 @@
 				"apply": "लिंक लागू करें",
 				"remove": "लिंक हटाएँ"
 			}
+		},
+		"boolean": {
+			"false": "False",
+			"notSet": "Not Set",
+			"true": "True",
+			"undefined": "Undefined"
+		},
+		"formats": {
+			"never": "कभी नहीं"
+		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
 		}
 	},
 	"auth": {
@@ -558,6 +581,50 @@
 				"description": "इसकी समीक्षा करने के लिए आप तुरंत यहीं वापस आएँगे।",
 				"submit": "साइन इन करें"
 			}
+		},
+		"cloud": {
+			"signUp": {
+				"title": "आगे क्या होगा",
+				"description": "अपना खाता बनाने के बाद, आप एक वर्कस्पेस का नाम रखेंगे। वहाँ से आप एक प्रोजेक्ट जोड़कर टास्क लिखना शुरू कर सकते हैं।"
+			},
+			"onboarding": {
+				"title": "वर्कस्पेस क्या है",
+				"description": "वर्कस्पेस में आपके प्रोजेक्ट, उनके टास्क और वे लोग होते हैं जिनके साथ आप काम करते हैं। सेटअप होने के बाद टीम के सदस्यों को आमंत्रित करें।"
+			},
+			"invite": {
+				"description": "Everyone in a workspace sees the same boards and gets live updates as tasks move. Roles control who can change what.",
+				"title": "Work better together"
+			},
+			"plan": {
+				"description": "Every plan includes unlimited projects and tasks, automatic backups, and updates. Cancel anytime from billing settings.",
+				"title": "Try everything first"
+			}
+		},
+		"inviteLink": {
+			"errorTitle": "आमंत्रण लिंक त्रुटि",
+			"errors": {
+				"accept": "वर्कस्पेस से जुड़ना विफल",
+				"load": "आमंत्रण लिंक का विवरण लोड नहीं हो सका।"
+			},
+			"invalidTitle": "अमान्य आमंत्रण लिंक",
+			"joinPrompt": "आपके पास <workspaceName>{{workspaceName}}</workspaceName> से जुड़ने का आमंत्रण लिंक है।",
+			"linkExpired": "आमंत्रण लिंक समाप्त",
+			"loading": "आमंत्रण लिंक लोड हो रहा है...",
+			"pageTitleAccept": "वर्कस्पेस से जुड़ें",
+			"pageTitleError": "आमंत्रण लिंक त्रुटि",
+			"pageTitleInvalid": "अमान्य आमंत्रण लिंक",
+			"signedInAs": "<email>{{email}}</email> के रूप में साइन इन",
+			"signedOutPrompt": "वर्कस्पेस से जुड़ने के लिए खाता बनाएँ या साइन इन करें।",
+			"title": "वर्कस्पेस से जुड़ें!"
+		},
+		"signUpForm": {
+			"fullName": "पूरा नाम",
+			"namePlaceholder": "राहुल शर्मा",
+			"failedSignUp": "साइन अप विफल",
+			"accountCreated": "खाता सफलतापूर्वक बनाया गया",
+			"passwordTooShort": "पासवर्ड बहुत छोटा है",
+			"creatingAccount": "खाता बना रहे हैं...",
+			"createAccount": "खाता बनाएँ"
 		}
 	},
 	"settings": {
@@ -580,7 +647,8 @@
 			"updateError": "प्रोफ़ाइल अपडेट करने में विफल",
 			"validation": {
 				"nameRequired": "नाम आवश्यक है",
-				"nameShort": "नाम कम से कम 2 अक्षरों का होना चाहिए"
+				"nameShort": "नाम कम से कम 2 अक्षरों का होना चाहिए",
+				"invalidEmail": "अमान्य ईमेल पता"
 			},
 			"avatar": {
 				"hint": "चौकोर छवियाँ सबसे अच्छी दिखती हैं।",
@@ -589,7 +657,9 @@
 				"removeSuccess": "Profile picture removed",
 				"updateError": "Failed to update profile picture",
 				"updateSuccess": "Profile picture updated",
-				"upload": "अपलोड करें"
+				"upload": "अपलोड करें",
+				"change": "Change avatar",
+				"edit": "Change your profile picture"
 			},
 			"deleteAccount": {
 				"confirm": "Delete account",
@@ -601,9 +671,13 @@
 				"sectionTitle": "Danger zone",
 				"success": "Your account has been deleted",
 				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"sessionTooOld": "For security, sign out and sign back in before deleting your account.",
+				"sectionSubtitle": "Permanent actions that affect your whole account."
 			},
-			"emailHint": "आप इसी पते से साइन इन करते हैं।"
+			"emailHint": "आप इसी पते से साइन इन करते हैं।",
+			"sectionSubtitle": "अपनी प्रोफ़ाइल और खाता विवरण प्रबंधित करें।",
+			"emailPlaceholder": "अपना ईमेल दर्ज करें",
+			"updateSuccess": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई"
 		},
 		"notificationsPage": {
 			"pageTitle": "सूचनाएँ",
@@ -724,7 +798,46 @@
 			"stopSendingDescription": "इस वर्कस्पेस की सूचनाएँ केवल Kaneo में दिखेंगी।",
 			"stopSendingTitle": "{{workspaceName}} से भेजना बंद करें?",
 			"workspacesDescription": "चुनें कि कौन से वर्कस्पेस और प्रोजेक्ट आपके चैनल उपयोग कर सकते हैं।",
-			"workspacesTitle": "वर्कस्पेस"
+			"workspacesTitle": "वर्कस्पेस",
+			"accountEmailHint": "ईमेल डिलीवरी हमेशा साइन-इन खाते के ईमेल पर जाती है।",
+			"accountEmailLabel": "खाते का ईमेल",
+			"allProjectsDescription": "इस वर्कस्पेस के हर प्रोजेक्ट से सूचनाएँ वितरित करें।",
+			"createRule": "नियम बनाएँ",
+			"emailChannelHintDisabled": "पहले ईमेल को वैश्विक रूप से कॉन्फ़िगर और सक्षम करें।",
+			"emailChannelHintEnabled": "मिलान वर्कस्पेस सूचनाएँ ईमेल से भेजें।",
+			"emailDescription": "सूचनाओं के लिए अपने खाते के ईमेल का उपयोग करें।",
+			"gotifyChannelHintDisabled": "पहले Gotify को वैश्विक रूप से कॉन्फ़िगर और सक्षम करें।",
+			"gotifyChannelHintEnabled": "मिलान वर्कस्पेस सूचनाएँ Gotify पर भेजें।",
+			"integrationNotConfigured": "कॉन्फ़िगर नहीं किया गया",
+			"integrationsDiscordDescription": "हर प्रोजेक्ट अपने कार्य अपडेट अपने Discord वेबहुक पर भेजता है। चैनल और इवेंट संपादित करने के लिए प्रोजेक्ट खोलें।",
+			"integrationsDiscordTitle": "Discord इंटीग्रेशन",
+			"integrationsSlackDescription": "हर प्रोजेक्ट अपने कार्य अपडेट अपने Slack इनकमिंग वेबहुक पर भेजता है। चैनल और इवेंट संपादित करने के लिए प्रोजेक्ट खोलें।",
+			"integrationsSlackTitle": "Slack इंटीग्रेशन",
+			"ntfyChannelHintDisabled": "पहले ntfy को वैश्विक रूप से कॉन्फ़िगर और सक्षम करें।",
+			"ntfyChannelHintEnabled": "मिलान वर्कस्पेस सूचनाएँ ntfy पर भेजें।",
+			"projectScope": "प्रोजेक्ट स्कोप",
+			"projectScopeDescription": "सभी प्रोजेक्ट डिफ़ॉल्ट रूप से शामिल हैं। यदि इस वर्कस्पेस को केवल चयनित प्रोजेक्ट से सूचनाएँ भेजनी चाहिए तो सीमित करें।",
+			"recipientHint": "टिप्पणियों और स्थिति में बदलाव की सूचनाएँ आपको सौंपे गए कार्यों के लिए मिलती हैं। उल्लेख की सूचना चुने गए सदस्य को मिलती है। अपनी टिप्पणियों, उल्लेखों और स्थिति में बदलाव की सूचनाएँ आपको नहीं मिलतीं।",
+			"reminderLeadTimeHint": "1 घंटे से 30 दिन पहले तक। अतिदेय सूचनाएँ अलग से भेजी जाती हैं।",
+			"reminderLeadTimeUnitDays": "दिन",
+			"reminderLeadTimeUnitHours": "घंटे",
+			"removeRule": "नियम हटाएँ",
+			"selectedProjects": "चयनित प्रोजेक्ट",
+			"selectedProjectsDescription": "केवल चुने गए प्रोजेक्ट से सूचनाएँ वितरित करें।",
+			"tabDiscord": "Discord",
+			"tabGeneral": "सामान्य",
+			"tabSlack": "Slack",
+			"tabTelegram": "Telegram",
+			"webhookChannelHintDisabled": "पहले वेबहुक को वैश्विक रूप से कॉन्फ़िगर और सक्षम करें।",
+			"webhookChannelHintEnabled": "मिलान वर्कस्पेस सूचनाएँ अपने वेबहुक पर भेजें।",
+			"workspaceCardHint": "चुनें कि यह वर्कस्पेस खाता सूचनाओं के लिए कौन से चैनल उपयोग कर सकता है।",
+			"workspaceCardLabelEmail": "ईमेल",
+			"workspaceCardLabelGotify": "Gotify",
+			"workspaceCardLabelNtfy": "ntfy",
+			"workspaceCardLabelWebhook": "कस्टम वेबहुक",
+			"workspaceEnabledLabel": "{{workspaceName}} के लिए सूचनाएँ सक्षम करें",
+			"workspaceRulesDescription": "अपने वैश्विक चैनल पुनः उपयोग करें, फिर तय करें कि कौन से वर्कस्पेस और प्रोजेक्ट खाता सूचनाएँ भेज सकते हैं।",
+			"workspaceRulesTitle": "वर्कस्पेस डिलीवरी नियम"
 		},
 		"preferencesPage": {
 			"title": "प्राथमिकताएँ",
@@ -760,7 +873,19 @@
 			"priority": "प्राथमिकता",
 			"projectBackgrounds": "Project backgrounds",
 			"projectBackgroundsDescription": "प्रोजेक्ट द्वारा अपने बोर्ड के पीछे सेट की गई छवि दिखाएँ।",
-			"advancedTitle": "उन्नत"
+			"advancedTitle": "उन्नत",
+			"appearanceSubtitle": "दृश्य सेटिंग और लेआउट प्राथमिकताएँ।",
+			"assigneesDescription": "दिखाएँ कि कार्य किसे सौंपे गए हैं",
+			"dueDatesDescription": "कार्य की समय सीमा दिखाएँ",
+			"interfaceSize": "इंटरफ़ेस आकार",
+			"interfaceSizeDecrease": "इंटरफ़ेस आकार घटाएँ",
+			"interfaceSizeIncrease": "इंटरफ़ेस आकार बढ़ाएँ",
+			"labelsDescription": "कार्य लेबल और टैग दिखाएँ",
+			"languageDescription": "अपनी पसंदीदा इंटरफ़ेस भाषा चुनें",
+			"priorityDescription": "प्राथमिकता संकेतक दिखाएँ",
+			"taskNumbersDescription": "कार्य ID और संख्याएँ दिखाएँ",
+			"themeDescription": "अपनी पसंदीदा रंग योजना चुनें",
+			"themeVolt": "वोल्ट"
 		},
 		"developerPage": {
 			"pageTitle": "API कुंजियाँ",
@@ -772,7 +897,10 @@
 			"keysNote": "कुंजी वह सब कर सकती है जो आप कर सकते हैं। जिन कुंजियों का अब उपयोग नहीं करते, उन्हें हटा दें।",
 			"keysTitle": "कुंजियाँ",
 			"loadError": "API कुंजियाँ लोड नहीं हो सकीं। कृपया पुनः प्रयास करें।",
-			"newKey": "नई कुंजी"
+			"newKey": "नई कुंजी",
+			"apiKeysCardTitle": "API कुंजियाँ",
+			"apiKeysCardDescription": "Kaneo तक प्रोग्रामेटिक पहुँच के लिए API कुंजियाँ बनाएँ और प्रबंधित करें।",
+			"createApiKey": "API कुंजी बनाएँ"
 		},
 		"apiKey": {
 			"createdModal": {
@@ -781,7 +909,12 @@
 				"copy": "कॉपी करें",
 				"copied": "कॉपी किया",
 				"done": "हो गया",
-				"copyError": "कुंजी कॉपी नहीं हो सकी। इसे चुनें और मैन्युअल रूप से कॉपी करें।"
+				"copyError": "कुंजी कॉपी नहीं हो सकी। इसे चुनें और मैन्युअल रूप से कॉपी करें।",
+				"yourApiKey": "आपकी API कुंजी",
+				"toastCopied": "API कुंजी क्लिपबोर्ड पर कॉपी की गई",
+				"alertTitle": "सफल! आपकी API कुंजी बनाई गई है",
+				"alertDescription": "इस कुंजी को अभी कॉपी करें। आप इसे दोबारा नहीं देख पाएँगे।",
+				"copyToContinue": "जारी रखने के लिए कुंजी कॉपी करें"
 			},
 			"table": {
 				"deleteConfirmTitle": "“{{name}}” हटाएँ?",
@@ -789,7 +922,19 @@
 				"delete": "कुंजी हटाएँ",
 				"deleting": "हटाया जा रहा है…",
 				"toastDeleted": "API कुंजी हटाई गई",
-				"toastDeleteError": "API कुंजी हटाई नहीं जा सकी"
+				"toastDeleteError": "API कुंजी हटाई नहीं जा सकी",
+				"loading": "API कुंजियाँ लोड हो रही हैं...",
+				"empty": "अभी तक कोई API कुंजी नहीं। शुरू करने के लिए एक बनाएँ।",
+				"columnName": "नाम",
+				"columnKey": "कुंजी",
+				"columnCreated": "बनाया गया",
+				"columnExpires": "समाप्ति",
+				"columnActions": "कार्रवाइयाँ",
+				"unnamedKey": "अनाम कुंजी",
+				"expiredBadge": "समाप्त {{label}}",
+				"deleteFallbackName": "यह API कुंजी",
+				"deleteAria": "{{name}} हटाएँ",
+				"deleteAriaFallback": "API कुंजी"
 			},
 			"createDialog": {
 				"title": "नई API कुंजी",
@@ -808,8 +953,11 @@
 				"failedCreate": "API कुंजी नहीं बन सकी",
 				"validation": {
 					"nameRequired": "नाम दर्ज करें",
-					"nameShort": "कम से कम 3 अक्षर उपयोग करें"
-				}
+					"nameShort": "कम से कम 3 अक्षर उपयोग करें",
+					"expirationRequired": "समाप्ति आवश्यक है"
+				},
+				"expirationPlaceholder": "समाप्ति चुनें",
+				"expirationDescription": "चुनें कि यह API कुंजी कितने समय तक वैध रहे। कभी नहीं एक बिना स्वचालित समाप्ति की कुंजी बनाएगा।"
 			},
 			"row": {
 				"actions": "{{name}} के लिए कार्रवाइयाँ",
@@ -854,10 +1002,16 @@
 				"dialogTitle": "स्वामित्व स्थानांतरित करें?",
 				"dialogDescription": "{{name}} {{workspace}} के एकमात्र मालिक बन जाएँगे। आपकी एडमिन पहुँच बनी रहेगी, लेकिन वर्कस्पेस हटाने या उसे फिर से स्थानांतरित करने जैसी केवल मालिक को उपलब्ध क्षमताएँ आप खो देंगे।",
 				"transferring": "स्थानांतरित हो रहा है…",
-				"confirm": "स्वामित्व स्थानांतरित करें"
+				"confirm": "स्वामित्व स्थानांतरित करें",
+				"subtitle": "यह वर्कस्पेस किसी अन्य सदस्य को सौंपें। आपकी भूमिका घटकर एडमिन हो जाएगी और आप केवल मालिक को उपलब्ध क्षमताएँ खो देंगे।"
 			},
 			"ownershipSubtitle": "यह केवल मालिक को दिखता है।",
-			"ownershipTitle": "स्वामित्व"
+			"ownershipTitle": "स्वामित्व",
+			"workspaceInfoSubtitle": "अपने वर्कस्पेस का विवरण और प्राथमिकताएँ कॉन्फ़िगर करें।",
+			"nameHint": "आपके वर्कस्पेस का नाम",
+			"descriptionHint": "आपके वर्कस्पेस का संक्षिप्त विवरण",
+			"dangerZoneSubtitle": "अपरिवर्तनीय और विनाशकारी कार्रवाइयाँ।",
+			"toastUpdated": "वर्कस्पेस सफलतापूर्वक अपडेट किया गया"
 		},
 		"workspaceRoles": {
 			"pageTitle": "भूमिकाएँ",
@@ -1102,7 +1256,9 @@
 			"rowActions": "{{name}} के लिए कार्रवाइयाँ",
 			"sectionDescription": "किसी लेबल का नाम या रंग बदलने से उसका उपयोग करने वाले सभी कार्य अपडेट हो जाते हैं।",
 			"sectionTitle": "वर्कस्पेस लेबल",
-			"subtitleWithWorkspace": "लेबल {{workspaceName}} के सभी प्रोजेक्ट में साझा होते हैं।"
+			"subtitleWithWorkspace": "लेबल {{workspaceName}} के सभी प्रोजेक्ट में साझा होते हैं।",
+			"cardDescription": "कार्यों को असाइन किए जा सकने वाले लेबल प्रबंधित करें।",
+			"empty": "अभी तक कोई लेबल नहीं। शुरू करने के लिए अपना पहला लेबल बनाएँ।"
 		},
 		"projectGeneral": {
 			"pageTitle": "प्रोजेक्ट सेटिंग",
@@ -1158,7 +1314,16 @@
 			"moveDialogTitle": "दूसरे वर्कस्पेस में ले जाएँ?",
 			"moveTargetLabel": "वर्कस्पेस",
 			"moving": "ले जाया जा रहा है...",
-			"tasksTitle": "कार्य"
+			"tasksTitle": "कार्य",
+			"projectInfoSubtitle": "अपने प्रोजेक्ट का विवरण और प्राथमिकताएँ कॉन्फ़िगर करें।",
+			"projectNameHint": "आपके प्रोजेक्ट का नाम",
+			"descriptionHint": "आपके प्रोजेक्ट का संक्षिप्त विवरण",
+			"dangerZoneSubtitle": "अपरिवर्तनीय और विनाशकारी कार्रवाइयाँ।",
+			"toastUpdated": "प्रोजेक्ट सफलतापूर्वक अपडेट किया गया",
+			"importExportTasks": "आयात/निर्यात",
+			"importExportTasksDescription": "कार्यों को आयात और निर्यात करें।",
+			"moveModalDescription": "इससे प्रोजेक्ट \"{{name}}\" और उसके सभी कार्य \"{{workspace}}\" में चले जाएँगे। जो कार्य उन लोगों को सौंपे गए हैं जो उस वर्कस्पेस के सदस्य नहीं हैं, उनका असाइनमेंट हटा दिया जाएगा, और इस प्रोजेक्ट की सूचना सदस्यताएँ हटा दी जाएँगी।",
+			"moveModalTitle": "प्रोजेक्ट ले जाएँ?"
 		},
 		"projectIntegrations": {
 			"pageTitle": "एकीकरण",
@@ -1207,7 +1372,10 @@
 			"offNote": "सार्वजनिक लिंक बंद करने पर वह तुरंत काम करना बंद कर देता है।",
 			"on": "चालू",
 			"openPublicPage": "सार्वजनिक पेज खोलें",
-			"thisWorkspace": "इस वर्कस्पेस"
+			"thisWorkspace": "इस वर्कस्पेस",
+			"sectionSubtitle": "सार्वजनिक पहुँच टॉगल करें और सार्वजनिक URL साझा करें।",
+			"publicUrlHint": "प्रोजेक्ट सार्वजनिक होने पर यह लिंक साझा करें",
+			"copiedToast": "कॉपी किया"
 		},
 		"projectWorkflow": {
 			"pageTitle": "वर्कफ़्लो सेटिंग",
@@ -1216,7 +1384,9 @@
 			"columnsTitle": "कॉलम",
 			"columnsDescription": "क्रम बदलने के लिए खींचें। पूर्ण कॉलम के कार्य पूरे माने जाते हैं।",
 			"automationTitle": "ऑटोमेशन",
-			"automationDescription": "कनेक्ट की गई रिपॉज़िटरी में कुछ होने पर लिंक किया गया कार्य ले जाएँ।"
+			"automationDescription": "कनेक्ट की गई रिपॉज़िटरी में कुछ होने पर लिंक किया गया कार्य ले जाएँ।",
+			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
+			"customFieldsTitle": "Custom Fields"
 		},
 		"projectSwitcher": {
 			"selectProject": "प्रोजेक्ट चुनें",
@@ -1240,7 +1410,19 @@
 			"deleteTitle": "“{{name}}” हटाएँ?",
 			"doneHeader": "पूर्ण",
 			"dragAria": "{{name}} का क्रम बदलें",
-			"reorderError": "कॉलम का क्रम बदलने में विफल"
+			"reorderError": "कॉलम का क्रम बदलने में विफल",
+			"toastCreated": "कॉलम बनाया गया",
+			"toastRenamed": "कॉलम का नाम बदला गया",
+			"toastFinalOn": "कॉलम को अंतिम चिह्नित किया गया",
+			"toastFinalOff": "कॉलम का अंतिम चिह्न हटाया गया",
+			"toastIconUpdated": "कॉलम आइकन अपडेट किया गया",
+			"toastDeleted": "कॉलम हटाया गया",
+			"loading": "कॉलम लोड हो रहे हैं...",
+			"doneColumnTooltip": "इसे Done कॉलम मानें",
+			"doneColumn": "Done कॉलम",
+			"on": "चालू",
+			"off": "बंद",
+			"add": "जोड़ें"
 		},
 		"githubIntegration": {
 			"toast": {
@@ -1255,7 +1437,11 @@
 				"importError": "Issues आयात करने में विफल",
 				"commentOnEnabled": "Kaneo नई issues पर कार्य लिंक के साथ टिप्पणी करेगा",
 				"commentOnDisabled": "नई issues पर कार्य लिंक टिप्पणियाँ बंद हैं",
-				"settingsUpdateError": "GitHub एकीकरण अपडेट करने में विफल"
+				"settingsUpdateError": "GitHub एकीकरण अपडेट करने में विफल",
+				"installedOk": "GitHub App सही ढंग से इंस्टॉल है!",
+				"installedMissingPerms": "GitHub App इंस्टॉल है लेकिन आवश्यक अनुमतियाँ नहीं हैं",
+				"needsInstallOnRepo": "GitHub App को इस रिपॉज़िटरी पर इंस्टॉल करना होगा",
+				"repoNotFound": "रिपॉज़िटरी नहीं मिली या पहुँच योग्य नहीं"
 			},
 			"commentTaskLinkTitle": "नए इश्यू पर Kaneo लिंक की टिप्पणी करें",
 			"commentTaskLinkHint": "ताकि GitHub पर लोग सीधे कार्य तक पहुँच सकें।",
@@ -1278,12 +1464,51 @@
 			"verifyNotInstalled": "Kaneo GitHub App इस रिपॉज़िटरी पर इंस्टॉल नहीं है।",
 			"verifyReady": "Kaneo GitHub App ज़रूरी अनुमतियों के साथ इंस्टॉल है।",
 			"workflowHint": "पुल रिक्वेस्ट खुलने या मर्ज होने पर कार्य आगे बढ़ाने के लिए देखें:",
-			"workflowLink": "वर्कफ़्लो"
+			"workflowLink": "वर्कफ़्लो",
+			"validation": {
+				"ownerRequired": "रिपॉज़िटरी मालिक आवश्यक है",
+				"ownerInvalid": "अमान्य रिपॉज़िटरी मालिक प्रारूप",
+				"nameRequired": "रिपॉज़िटरी नाम आवश्यक है",
+				"nameInvalid": "अमान्य रिपॉज़िटरी नाम प्रारूप"
+			},
+			"connectionStatus": "कनेक्शन स्थिति",
+			"connectedActive": "रिपॉज़िटरी जुड़ी और सक्रिय",
+			"notConnectedHint": "कोई रिपॉज़िटरी जुड़ी नहीं",
+			"badgeConnected": "जुड़ा हुआ",
+			"badgeNotConnected": "जुड़ा नहीं",
+			"repository": "रिपॉज़िटरी",
+			"repositoryHint": "जुड़ी GitHub रिपॉज़िटरी",
+			"appStatusTitle": "GitHub App स्थिति",
+			"appStatusHint": "इंस्टॉलेशन और अनुमतियाँ स्थिति",
+			"statusProperlyConfigured": "सही ढंग से कॉन्फ़िगर किया गया",
+			"statusMissingPermissions": "अनुमतियाँ नहीं हैं",
+			"statusNotInstalled": "इंस्टॉल नहीं है",
+			"ownerLabel": "रिपॉज़िटरी मालिक",
+			"ownerHint": "GitHub उपयोगकर्ता नाम या संगठन",
+			"ownerPlaceholder": "जैसे, octocat",
+			"repoNameLabel": "रिपॉज़िटरी नाम",
+			"repoNameHint": "रिपॉज़िटरी का नाम",
+			"repoNamePlaceholder": "जैसे, my-project",
+			"actionsTitle": "कार्रवाइयाँ",
+			"actionsHint": "अपना रिपॉज़िटरी कनेक्शन प्रबंधित करें",
+			"browse": "ब्राउज़ करें",
+			"verify": "सत्यापित करें",
+			"update": "अपडेट करें",
+			"connect": "कनेक्ट करें",
+			"disconnect": "डिस्कनेक्ट करें",
+			"missingPermissionsLabel": "अनुपलब्ध अनुमतियाँ:",
+			"importSectionTitle": "GitHub Issues आयात करें",
+			"importing": "आयात हो रहा है...",
+			"importIssues": "Issues आयात करें"
 		},
 		"giteaIntegration": {
 			"validation": {
 				"baseUrlRequired": "Gitea बेस URL आवश्यक है",
-				"baseUrlInvalid": "एक वैध URL दर्ज करें (जैसे https://gitea.example.com)"
+				"baseUrlInvalid": "एक वैध URL दर्ज करें (जैसे https://gitea.example.com)",
+				"ownerRequired": "रिपॉज़िटरी मालिक आवश्यक है",
+				"ownerInvalid": "अमान्य रिपॉज़िटरी मालिक प्रारूप",
+				"nameRequired": "रिपॉज़िटरी नाम आवश्यक है",
+				"nameInvalid": "अमान्य रिपॉज़िटरी नाम प्रारूप"
 			},
 			"toast": {
 				"verifyError": "Gitea पहुँच सत्यापित करने में विफल",
@@ -1296,7 +1521,16 @@
 				"importError": "Issues आयात करने में विफल",
 				"commentOnEnabled": "Kaneo नई issues पर कार्य लिंक के साथ टिप्पणी करेगा",
 				"commentOnDisabled": "नई issues पर कार्य लिंक टिप्पणियाँ बंद हैं",
-				"settingsUpdateError": "Gitea एकीकरण अपडेट करने में विफल"
+				"settingsUpdateError": "Gitea एकीकरण अपडेट करने में विफल",
+				"verifyOk": "Gitea टोकन इस रिपॉज़िटरी तक पहुँच सकता है",
+				"verifyWarning": "टोकन अनुमतियाँ या रिपॉज़िटरी पहुँच जाँचें",
+				"repoNotFound": "रिपॉज़िटरी नहीं मिली या पहुँच योग्य नहीं",
+				"tokenRequired": "व्यक्तिगत एक्सेस टोकन आवश्यक है",
+				"tokenRequiredVerify": "सत्यापित करने के लिए टोकन दर्ज करें",
+				"secretCopied": "कॉपी किया",
+				"unableToCopySecret": "सीक्रेट कॉपी करने में असमर्थ",
+				"notGiteaInstance": "यह URL किसी Gitea इंस्टेंस की ओर इंगित नहीं करता",
+				"redirected": "Gitea URL पुनः निर्देशित किया गया (आमतौर पर HTTPS पर). अंतिम URL सीधे उपयोग करें।"
 			},
 			"commentTaskLinkTitle": "नए इश्यू पर Kaneo लिंक की टिप्पणी करें",
 			"commentTaskLinkHint": "ताकि Gitea पर लोग सीधे कार्य तक पहुँच सकें।",
@@ -1311,7 +1545,40 @@
 			"browseNeedsCredentials": "ब्राउज़ करने के लिए Gitea URL और टोकन दर्ज करें।",
 			"browseEmpty": "इस टोकन से कोई रिपॉज़िटरी नहीं दिखती।",
 			"chooseRepositoryDescription": "owner/name लिखें या सूची से चुनें।",
-			"webhookEvents": "पुश, पुल रिक्वेस्ट, इश्यू, इश्यू कमेंट और क्रिएट इवेंट चालू करें।"
+			"webhookEvents": "पुश, पुल रिक्वेस्ट, इश्यू, इश्यू कमेंट और क्रिएट इवेंट चालू करें।",
+			"webhookShow": "दिखाएँ",
+			"webhookHide": "छिपाएँ",
+			"webhookCopy": "कॉपी करें",
+			"connectionStatus": "कनेक्शन स्थिति",
+			"connectedActive": "रिपॉज़िटरी जुड़ी और सक्रिय",
+			"notConnectedHint": "कोई Gitea रिपॉज़िटरी जुड़ी नहीं",
+			"badgeConnected": "जुड़ा हुआ",
+			"badgeNotConnected": "जुड़ा नहीं",
+			"repository": "रिपॉज़िटरी",
+			"repositoryHint": "लिंक की गई Gitea रिपॉज़िटरी",
+			"webhookTitle": "वेबहुक",
+			"webhookSecretLabel": "सीक्रेट (Gitea में वेबहुक सीक्रेट से मेल खाना चाहिए)",
+			"baseUrlHint": "आपके Gitea इंस्टेंस का रूट URL",
+			"tokenHint": "repo और issues एक्सेस वाला टोकन",
+			"currentToken": "संग्रहित",
+			"ownerLabel": "मालिक",
+			"ownerHint": "उपयोगकर्ता या संगठन का नाम",
+			"repoNameLabel": "रिपॉज़िटरी नाम",
+			"repoNameHint": "केवल रिपॉज़िटरी नाम (मालिक नहीं)",
+			"actionsTitle": "कार्रवाइयाँ",
+			"actionsHint": "पहुँच सत्यापित करें और कनेक्ट करें",
+			"browse": "ब्राउज़ करें",
+			"verify": "सत्यापित करें",
+			"update": "अपडेट करें",
+			"connect": "कनेक्ट करें",
+			"disconnect": "डिस्कनेक्ट करें",
+			"importSectionTitle": "Gitea issues आयात करें",
+			"importing": "आयात हो रहा है…",
+			"importIssues": "Issues आयात करें",
+			"browseModalTitle": "आपकी रिपॉज़िटरीज़",
+			"searchRepos": "खोजें…",
+			"loadingRepos": "रिपॉज़िटरीज़ लोड हो रही हैं…",
+			"retry": "पुनः प्रयास करें"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1329,7 +1596,28 @@
 			"webhookPlaceholder": "https://hooks.slack.com/services/...",
 			"webhookHint": "Slack में एक इनकमिंग वेबहुक बनाएँ और उसे यहाँ चिपकाएँ।",
 			"connect": "Slack कनेक्ट करें",
-			"update": "Slack अपडेट करें"
+			"update": "Slack अपडेट करें",
+			"channelHint": "आपके संदर्भ के लिए वैकल्पिक लेबल।",
+			"channelLabel": "चैनल का नाम",
+			"channelPlaceholder": "#team-updates",
+			"connected": "जुड़ा हुआ",
+			"connectionHint": "Slack इनकमिंग वेबहुक URL चिपकाएँ और चुनें कि कौन से कार्य इवेंट पोस्ट होने चाहिए।",
+			"connectionTitle": "Slack वेबहुक कनेक्शन",
+			"disconnect": "डिस्कनेक्ट करें",
+			"events": {
+				"taskCommentCreated": "नई टिप्पणियाँ",
+				"taskCreated": "नए कार्य",
+				"taskDescriptionChanged": "विवरण परिवर्तन",
+				"taskMentionCreated": "कार्य विवरण या टिप्पणियों में उल्लेख",
+				"taskPriorityChanged": "प्राथमिकता परिवर्तन",
+				"taskStatusChanged": "स्थिति परिवर्तन",
+				"taskTitleChanged": "शीर्षक परिवर्तन"
+			},
+			"eventsHint": "चुनें कि कौन से प्रोजेक्ट परिवर्तन Slack पर पोस्ट होने चाहिए।",
+			"eventsTitle": "इवेंट सूचनाएँ",
+			"paused": "रुका हुआ",
+			"saveChanges": "परिवर्तन सहेजें",
+			"webhookLabel": "इनकमिंग वेबहुक URL"
 		},
 		"discordIntegration": {
 			"validation": {
@@ -1347,7 +1635,28 @@
 			"webhookPlaceholder": "https://discord.com/api/webhooks/...",
 			"webhookHint": "Discord में एक चैनल वेबहुक बनाएँ और उसे यहाँ चिपकाएँ।",
 			"connect": "Discord कनेक्ट करें",
-			"update": "Discord अपडेट करें"
+			"update": "Discord अपडेट करें",
+			"channelHint": "आपके संदर्भ के लिए वैकल्पिक लेबल।",
+			"channelLabel": "चैनल का नाम",
+			"channelPlaceholder": "#team-updates",
+			"connected": "जुड़ा हुआ",
+			"connectionHint": "Discord वेबहुक URL चिपकाएँ और चुनें कि कौन से कार्य इवेंट पोस्ट होने चाहिए।",
+			"connectionTitle": "Discord वेबहुक कनेक्शन",
+			"disconnect": "डिस्कनेक्ट करें",
+			"events": {
+				"taskCommentCreated": "नई टिप्पणियाँ",
+				"taskCreated": "नए कार्य",
+				"taskDescriptionChanged": "विवरण परिवर्तन",
+				"taskMentionCreated": "कार्य विवरण या टिप्पणियों में उल्लेख",
+				"taskPriorityChanged": "प्राथमिकता परिवर्तन",
+				"taskStatusChanged": "स्थिति परिवर्तन",
+				"taskTitleChanged": "शीर्षक परिवर्तन"
+			},
+			"eventsHint": "चुनें कि कौन से प्रोजेक्ट परिवर्तन Discord पर पोस्ट होने चाहिए।",
+			"eventsTitle": "इवेंट सूचनाएँ",
+			"paused": "रुका हुआ",
+			"saveChanges": "परिवर्तन सहेजें",
+			"webhookLabel": "वेबहुक URL"
 		},
 		"genericWebhookIntegration": {
 			"validation": {
@@ -1391,7 +1700,14 @@
 			"disconnectDescription": "Kaneo इवेंट भेजना बंद कर देगा और सहेजा गया एंडपॉइंट और सीक्रेट हटा देगा।",
 			"disconnectTitle": "वेबहुक डिस्कनेक्ट करें?",
 			"reminderLeadTimeAfter": "घंटे पहले, कार्य की नियत तारीख से",
-			"reminderLeadTimeBefore": "अनुस्मारक भेजें"
+			"reminderLeadTimeBefore": "अनुस्मारक भेजें",
+			"connectionTitle": "आउटगोइंग वेबहुक कनेक्शन",
+			"connectionHint": "कार्य इवेंट JSON के रूप में अपने एंडपॉइंट पर भेजें।",
+			"connected": "जुड़ा हुआ",
+			"paused": "रुका हुआ",
+			"eventsHint": "चुनें कि कौन से प्रोजेक्ट परिवर्तन आउटगोइंग वेबहुक ट्रिगर करें।",
+			"saveChanges": "परिवर्तन सहेजें",
+			"disconnect": "डिस्कनेक्ट करें"
 		},
 		"telegramIntegration": {
 			"validation": {
@@ -1420,7 +1736,29 @@
 			"chatLabelPlaceholder": "इंजीनियरिंग अपडेट",
 			"connect": "Telegram कनेक्ट करें",
 			"botTokenSavedPlaceholder": "सहेजा गया। बदलने के लिए नया टोकन चिपकाएँ।",
-			"loadError": "Telegram सेटिंग लोड नहीं हो सकीं।"
+			"loadError": "Telegram सेटिंग लोड नहीं हो सकीं।",
+			"chatIdHint": "Telegram चैट ID या चैनल यूज़रनेम दर्ज करें।",
+			"chatLabelHint": "Kaneo के अंदर आपके संदर्भ के लिए वैकल्पिक लेबल।",
+			"connected": "जुड़ा हुआ",
+			"connectionHint": "प्रोजेक्ट कार्य अपडेट चैट या टॉपिक में भेजने के लिए Telegram बॉट टोकन और चैट ID का उपयोग करें।",
+			"connectionTitle": "Telegram बॉट कनेक्शन",
+			"disconnect": "डिस्कनेक्ट करें",
+			"events": {
+				"appointmentCreated": "नए अपॉइंटमेंट",
+				"appointmentUpdated": "अपॉइंटमेंट बदलाव",
+				"taskCommentCreated": "नई टिप्पणियाँ",
+				"taskCreated": "नए कार्य",
+				"taskDescriptionChanged": "विवरण परिवर्तन",
+				"taskMentionCreated": "कार्य विवरण या टिप्पणियों में उल्लेख",
+				"taskPriorityChanged": "प्राथमिकता परिवर्तन",
+				"taskStatusChanged": "स्थिति परिवर्तन",
+				"taskTitleChanged": "शीर्षक परिवर्तन"
+			},
+			"eventsHint": "चुनें कि कौन से प्रोजेक्ट परिवर्तन Telegram पर पोस्ट होने चाहिए।",
+			"eventsTitle": "इवेंट सूचनाएँ",
+			"paused": "रुका हुआ",
+			"saveChanges": "परिवर्तन सहेजें",
+			"threadIdHint": "वैकल्पिक। Telegram समूहों के अंदर फ़ोरम टॉपिक के लिए इसका उपयोग करें।"
 		},
 		"repositoryBrowser": {
 			"title": "रिपॉज़िटरी चुनें",
@@ -1439,7 +1777,14 @@
 			"missingOne": "कोई नहीं दिख रही?",
 			"searching": "खोजा जा रहा है…",
 			"updated": "अपडेट: {{time}}",
-			"useRepository": "रिपॉज़िटरी उपयोग करें"
+			"useRepository": "रिपॉज़िटरी उपयोग करें",
+			"footerSummary": "{{installationCount}} इंस्टॉलेशन में {{repoCount}} रिपॉज़िटरीज़",
+			"manageInstallations": "इंस्टॉलेशन प्रबंधित करें",
+			"updatedPrefix": "अपडेट किया गया",
+			"relativeJustNow": "अभी",
+			"relativeMinutesAgo": "{{count}} मिनट पहले",
+			"relativeHoursAgo": "{{count}} घंटे पहले",
+			"relativeDaysAgo": "{{count}} दिन पहले"
 		},
 		"tasksImportExport": {
 			"exportTasks": "कार्य निर्यात करें",
@@ -1477,7 +1822,17 @@
 			"dontMove": "न ले जाएँ",
 			"emptyDescription": "ऑटोमेशन के लिए कनेक्ट की गई GitHub, Gitea या GitLab रिपॉज़िटरी चाहिए।",
 			"emptyTitle": "कोई कनेक्ट की गई रिपॉज़िटरी नहीं",
-			"openIntegrations": "एकीकरण खोलें"
+			"openIntegrations": "एकीकरण खोलें",
+			"loading": "लोड हो रहा है...",
+			"createColumnsFirst": "ऑटोमेशन नियम कॉन्फ़िगर करने के लिए पहले कॉलम बनाएँ।",
+			"githubHeading": "GitHub",
+			"githubHint": "जब GitHub इवेंट होता है, तो लिंक किए गए कार्य को कॉलम में ले जाएँ।",
+			"giteaHeading": "Gitea",
+			"giteaHint": "जब Gitea वेबहुक इवेंट होता है, तो लिंक किए गए कार्य को कॉलम में ले जाएँ।",
+			"selectColumnPlaceholder": "कॉलम चुनें...",
+			"toastUpdated": "वर्कफ़्लो नियम अपडेट किया गया",
+			"gitlabHeading": "GitLab",
+			"gitlabHint": "When a GitLab webhook event occurs, move the linked task to a column."
 		},
 		"externalLinks": {
 			"resources": "संसाधन",
@@ -1511,7 +1866,27 @@
 				"webhookInvalid": "Enter a valid Mattermost webhook URL"
 			},
 			"webhookHint": "Mattermost में एक इनकमिंग वेबहुक बनाएँ और उसे यहाँ चिपकाएँ।",
-			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/...",
+			"channelHint": "Optional label for your reference. Mattermost controls the actual destination channel from the webhook setup.",
+			"channelLabel": "Channel name",
+			"channelPlaceholder": "#team-updates",
+			"connected": "Connected",
+			"connectionHint": "Paste a Mattermost incoming webhook URL and choose which task events should be posted.",
+			"connectionTitle": "Mattermost webhook connection",
+			"disconnect": "Disconnect",
+			"events": {
+				"taskCommentCreated": "New comments",
+				"taskCreated": "New tasks",
+				"taskDescriptionChanged": "Description changes",
+				"taskPriorityChanged": "Priority changes",
+				"taskStatusChanged": "Status changes",
+				"taskTitleChanged": "Title changes"
+			},
+			"eventsHint": "Choose which project changes should post to Mattermost.",
+			"eventsTitle": "Event notifications",
+			"paused": "Paused",
+			"saveChanges": "Save changes",
+			"webhookLabel": "Incoming webhook URL"
 		},
 		"customFields": {
 			"createError": "Failed to create custom field.",
@@ -1576,7 +1951,19 @@
 			"typeLocked": "फ़ील्ड बनने के बाद उसका प्रकार नहीं बदला जा सकता।",
 			"unchecked": "अनचेक",
 			"updateError": "कस्टम फ़ील्ड सहेजने में विफल।",
-			"updateSuccess": "कस्टम फ़ील्ड सहेजी गई।"
+			"updateSuccess": "कस्टम फ़ील्ड सहेजी गई।",
+			"addButton": "Add",
+			"defaultValuePlaceholder": "Default value",
+			"deleteButton": "Delete",
+			"empty": "No custom fields configured yet.",
+			"loading": "Loading custom fields...",
+			"noOptionsPlaceholder": "No options",
+			"optionsPlaceholder": "Options separated by commas",
+			"typePlaceholder": "Select field type",
+			"availableOptions": "Available options",
+			"defaultValues": "{{count}} default(s)",
+			"multiple": "Multiple",
+			"options": "{{count}} option(s)"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -1653,7 +2040,10 @@
 				"updated": "User updated",
 				"updateError": "Failed to update user"
 			},
-			"you": "आप"
+			"you": "आप",
+			"instanceBadge": "Instance",
+			"userCount_one": "{{count}} registered user",
+			"userCount_other": "{{count}} registered users"
 		},
 		"security": "Security",
 		"securityPage": {
@@ -1686,7 +2076,8 @@
 			"dialogDescription": "कम से कम 8 अक्षर, मौजूदा पासवर्ड से अलग।",
 			"dialogTitle": "पासवर्ड बदलें",
 			"passwordHint": "कम से कम 8 अक्षरों का ऐसा पासवर्ड उपयोग करें जो आप कहीं और उपयोग नहीं करते।",
-			"passwordTitle": "पासवर्ड"
+			"passwordTitle": "पासवर्ड",
+			"sectionSubtitle": "Change the password you use to sign in."
 		},
 		"gitlabIntegration": {
 			"baseUrlLabel": "GitLab URL",
@@ -1709,7 +2100,16 @@
 				"updated": "GitLab integration saved",
 				"updateError": "Failed to save GitLab integration",
 				"verifyError": "Failed to verify GitLab access",
-				"verifyFirst": "Verify access failed. Check URL, token, and project path"
+				"verifyFirst": "Verify access failed. Check URL, token, and project path",
+				"notGitlabInstance": "The URL does not point to a GitLab instance",
+				"projectNotFound": "Project not found or not accessible",
+				"redirected": "GitLab URL redirected (usually to HTTPS). Use the final URL directly.",
+				"secretCopied": "Copied",
+				"tokenRequired": "Access token is required",
+				"tokenRequiredVerify": "Enter a token to verify",
+				"unableToCopySecret": "Unable to copy secret",
+				"verifyOk": "GitLab token can access this project",
+				"verifyWarning": "Check token permissions or project access"
 			},
 			"tokenLabel": "Access token",
 			"tokenPlaceholder": "Paste token",
@@ -1720,7 +2120,8 @@
 			"validation": {
 				"baseUrlInvalid": "Enter a valid URL (e.g. https://gitlab.com)",
 				"baseUrlRequired": "GitLab base URL is required",
-				"pathInvalid": "Enter the full path, e.g. group/project"
+				"pathInvalid": "Enter the full path, e.g. group/project",
+				"pathRequired": "Project path is required"
 			},
 			"webhookHint": "यह वेबहुक प्रोजेक्ट सेटिंग में जोड़ें ताकि बदलाव Kaneo में वापस आएँ।",
 			"loadProjectsError": "प्रोजेक्ट लोड नहीं हो सके।",
@@ -1729,7 +2130,38 @@
 			"chooseProjectDescription": "उसका पाथ लिखें या सूची से चुनें।",
 			"noSearchMatchTitle": "कोई मेल खाता प्रोजेक्ट नहीं",
 			"useProject": "प्रोजेक्ट उपयोग करें",
-			"webhookEvents": "पुश, इश्यू, कमेंट और मर्ज रिक्वेस्ट इवेंट चालू करें।"
+			"webhookEvents": "पुश, इश्यू, कमेंट और मर्ज रिक्वेस्ट इवेंट चालू करें।",
+			"actionsHint": "Verify access and connect",
+			"actionsTitle": "Actions",
+			"badgeConnected": "Connected",
+			"badgeNotConnected": "Not connected",
+			"baseUrlHint": "https://gitlab.com, or the root URL of your instance",
+			"browse": "Browse",
+			"browseModalTitle": "Your projects",
+			"connect": "Connect",
+			"connectedActive": "Project connected and active",
+			"connectionStatus": "Connection status",
+			"currentToken": "stored",
+			"disconnect": "Disconnect",
+			"importDisabledHint": "Verify the project above to enable importing",
+			"importing": "Importing…",
+			"importIssues": "Import issues",
+			"importSectionTitle": "Import GitLab issues",
+			"loadingProjects": "Loading projects…",
+			"notConnectedHint": "No GitLab project connected",
+			"project": "Project",
+			"projectHint": "Linked GitLab project",
+			"projectPathHint": "Full path including any groups, e.g. group/subgroup/project",
+			"retry": "Retry",
+			"tokenHint": "Token with api scope and at least Developer on the project",
+			"tokenTypeHint": "How the token is sent. Access tokens use PRIVATE-TOKEN; an OAuth2 token uses Authorization.",
+			"update": "Update",
+			"verify": "Verify",
+			"webhookCopy": "Copy",
+			"webhookHide": "Hide",
+			"webhookSecretLabel": "Secret token (must match the one set on the webhook in GitLab)",
+			"webhookShow": "Show",
+			"webhookTitle": "Webhook"
 		},
 		"calendarFeeds": {
 			"title": "Calendar feeds",
@@ -1765,7 +2197,12 @@
 			"revokeConfirm": "फ़ीड निरस्त करें",
 			"revokeConfirmDescription": "इस लिंक का उपयोग करने वाले कैलेंडर ऐप को अपडेट मिलना बंद हो जाएगा। इसे पूर्ववत नहीं किया जा सकता।",
 			"revokeConfirmTitle": "यह फ़ीड निरस्त करें?",
-			"revoking": "निरस्त किया जा रहा है…"
+			"revoking": "निरस्त किया जा रहा है…",
+			"createTitle": "Create a calendar feed",
+			"filterHint": "Include tasks with a start or due date. Select labels to include only tasks matching at least one, or leave empty to include all scheduled project tasks.",
+			"empty": "No calendar feeds yet.",
+			"feedUrl": "Calendar feed URL",
+			"copied": "Calendar feed link copied."
 		},
 		"invitationEmailFailed": "Invitation saved, but email delivery failed. Check SMTP settings and resend the invitation.",
 		"billing": {
@@ -1777,7 +2214,8 @@
 				"title": "Choose a plan"
 			},
 			"currentPlan": {
-				"title": "Current plan"
+				"title": "Current plan",
+				"subtitle": "Your workspace's active plan and billing status."
 			},
 			"disabled": "Billing isn't enabled on this instance. Self-hosted Kaneo includes every feature, free forever.",
 			"expiredCallout": {
@@ -1850,7 +2288,9 @@
 				"expiredTitle": "Your trial has ended",
 				"noDate": "Choose a plan below to continue after your trial.",
 				"badgeDaysLeft_one": "{{count}} दिन बचा",
-				"badgeDaysLeft_other": "{{count}} दिन बचे"
+				"badgeDaysLeft_other": "{{count}} दिन बचे",
+				"daysLeft_one": "You have {{count}} day left on your free trial. Choose a plan to continue without interruption.",
+				"daysLeft_other": "You have {{count}} days left on your free trial. Choose a plan to continue without interruption."
 			},
 			"trialCard": {
 				"activeDescription": "Upgrade anytime to keep your workspace after the trial.",
@@ -1867,7 +2307,8 @@
 			"checkoutSuccess": {
 				"title": "सदस्यता लेने के लिए धन्यवाद",
 				"description": "भुगतान प्राप्त हुआ। पुष्टि होते ही नीचे दी गई योजना अपडेट हो जाएगी।"
-			}
+			},
+			"planName": "Kaneo Cloud {{plan}}"
 		},
 		"syncRules": {
 			"addLabel": "Add label",
@@ -1933,7 +2374,12 @@
 			"pausedSummary_other": "{{count}} कार्यों का सिंक रुक गया क्योंकि वे अब सिंक नियमों से मेल नहीं खाते।",
 			"providerToKaneo": "{{provider}} से Kaneo में",
 			"reviewPaused": "समीक्षा करें",
-			"tasksLabelled": "इन लेबल वाले कार्य:"
+			"tasksLabelled": "इन लेबल वाले कार्य:",
+			"allSummary": "All of: {{labels}}",
+			"anySummary": "Any of: {{labels}}",
+			"filteredBadge": "Filtered by labels",
+			"pausedCount_one": "{{count}} paused link",
+			"pausedCount_other": "{{count}} paused links"
 		},
 		"advancedSettingsDescription": "अतिरिक्त नियंत्रण दिखाता है, जैसे एकीकरण के सिंक नियम। केवल इस ब्राउज़र पर।",
 		"adminWorkspaces": {
@@ -1990,7 +2436,14 @@
 				"makeOwner": "Make owner",
 				"remove": "Remove from workspace",
 				"roleLabel": "Role for {{name}}",
-				"title": "Members of {{name}}"
+				"title": "Members of {{name}}",
+				"columns": {
+					"actions": "Actions",
+					"joined": "Joined",
+					"member": "Member",
+					"projects": "Projects",
+					"role": "Role"
+				}
 			},
 			"next": "Next",
 			"noOwner": "No owner",
@@ -2013,7 +2466,10 @@
 				"roleError": "Failed to update role",
 				"roleUpdated": "Role updated",
 				"transferError": "Failed to transfer ownership"
-			}
+			},
+			"instanceBadge": "Instance",
+			"workspaceCount_one": "{{count}} workspace",
+			"workspaceCount_other": "{{count}} workspaces"
 		},
 		"workspaceImport": {
 			"back": {
@@ -2295,7 +2751,8 @@
 				"taskDescriptionChanged": "विवरण बदले",
 				"taskPriorityChanged": "प्राथमिकता बदले",
 				"taskStatusChanged": "स्थिति बदले",
-				"taskTitleChanged": "शीर्षक बदले"
+				"taskTitleChanged": "शीर्षक बदले",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"optional": "वैकल्पिक",
 			"postWhen": "कब पोस्ट करें",
@@ -2356,6 +2813,108 @@
 		},
 		"shared": {
 			"autosave": "बदलाव अपने आप सहेजे जाते हैं"
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "पहले एक API कुंजी बनाएँ, फिर <YOUR_API_KEY> प्लेसहोल्डर को उससे बदलें।",
+			"authModeApiKey": "API कुंजी",
+			"authModeOauth": "OAuth",
+			"cardDescription": "प्रमाणीकरण मोड चुनें, फिर इंस्टॉल कमांड चलाएँ या कॉन्फ़िगरेशन अपने एजेंट में पेस्ट करें।",
+			"cardTitle": "एजेंट कनेक्ट करें",
+			"copied": "कॉपी किया गया",
+			"copy": "कॉपी करें",
+			"createApiKey": "API कुंजी बनाएँ",
+			"followUpLabel": "फिर प्रमाणित करें",
+			"installCommandLabel": "इंस्टॉल कमांड",
+			"manualConfigLabel": "मैन्युअल कॉन्फ़िगरेशन",
+			"oauthNote": "OAuth डिफ़ॉल्ट है: पहला कनेक्शन एजेंट को अधिकृत करने के लिए आपके ब्राउज़र में Kaneo खोलता है, फिर टोकन एजेंट स्वयं प्रबंधित करता है।",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "इस इंस्टेंस का अंतर्निहित HTTP MCP एंडपॉइंट",
+			"serverUrlLabel": "सर्वर URL",
+			"subtitle": "Claude, Codex, Gemini या OpenCode जैसे AI एजेंट को अंतर्निहित HTTP MCP सर्वर के माध्यम से इस Kaneo इंस्टेंस से कनेक्ट करें।",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"skills": "स्किल्स",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "इन कमांड को अपने Kaneo चेकआउट की जड़ से चलाएँ, फिर अपने एजेंट को पुनः आरंभ करें।",
+			"cardTitle": "Kaneo स्किल इंस्टॉल करें",
+			"copied": "कॉपी किया गया",
+			"copy": "कॉपी करें",
+			"destinationLabel": "गंतव्य",
+			"installCommandLabel": "इंस्टॉल कमांड",
+			"mcpRequirement": "यह स्किल MCP कनेक्शन पर आधारित है: पहले उसे कॉन्फ़िगर करें।",
+			"openMcpSettings": "MCP सेटिंग्स खोलें",
+			"pageTitle": "स्किल्स",
+			"projectScope": "प्रोजेक्ट",
+			"skillUrlDescription": "इस इंस्टेंस द्वारा एजेंट्स के लिए उपलब्ध",
+			"skillUrlLabel": "स्किल URL",
+			"subtitle": "Kaneo स्किल इंस्टॉल करें ताकि AI एजेंट इस इंस्टेंस के सम्मेलनों का पालन करें और MCP टूल्स का सही उपयोग करें।",
+			"title": "एजेंट स्किल्स",
+			"updateDescription": "स्किल्स डिस्क से पढ़े जाते हैं: बदलाव लागू करने के लिए Kaneo अपडेट के बाद फ़ोल्डर को फिर से कॉपी करें।",
+			"userScope": "उपयोगकर्ता",
+			"verifyLabel": "सत्यापित करें"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopicsLabel": "पता लगाए गए विषय",
+			"detectedTopics_one": "{{count}} topic detected",
+			"detectedTopics_other": "{{count}} topics detected",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"topicHint": "The Telegram Bot API cannot list forum topics, so enter the topic id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -2378,7 +2937,8 @@
 				"navigate": "नेविगेट करें",
 				"open": "खोलें",
 				"close": "बंद करें"
-			}
+			},
+			"voltTheme": "वोल्ट थीम"
 		},
 		"sidebar": {
 			"projects": "प्रोजेक्ट",
@@ -2401,7 +2961,12 @@
 			"deleteConfirmDescription": "यह प्रोजेक्ट और इसका सभी डेटा स्थायी रूप से हटा दिया जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।",
 			"deletedToast": "प्रोजेक्ट हटाया गया",
 			"deleteProject": "प्रोजेक्ट हटाएँ",
-			"switcherLabel": "प्रोजेक्ट या व्यू बदलें"
+			"switcherLabel": "प्रोजेक्ट या व्यू बदलें",
+			"sortCompletion": "प्रगति",
+			"sortCustom": "कस्टम क्रम",
+			"sortDate": "बनाने की तारीख",
+			"sortName": "नाम",
+			"sortProjects": "प्रोजेक्ट क्रमबद्ध करें"
 		},
 		"search": {
 			"inputPlaceholder": "कार्य, प्रोजेक्ट, टिप्पणियाँ खोजें...",
@@ -2412,7 +2977,8 @@
 				"workspace": "वर्कस्पेस",
 				"comment": "टिप्पणियाँ",
 				"activity": "गतिविधियाँ",
-				"fallback": "परिणाम"
+				"fallback": "परिणाम",
+				"appointment": "अपॉइंटमेंट"
 			}
 		},
 		"settingsLayout": {
@@ -2431,7 +2997,8 @@
 			"workspaces": "वर्कस्पेस",
 			"switching": "बदल रहे हैं...",
 			"addWorkspace": "वर्कस्पेस जोड़ें",
-			"selectWorkspace": "वर्कस्पेस चुनें"
+			"selectWorkspace": "वर्कस्पेस चुनें",
+			"sortWorkspaces": "कार्यक्षेत्र क्रमबद्ध करें"
 		},
 		"page": {
 			"projectsTitle": "प्रोजेक्ट",
@@ -2558,7 +3125,39 @@
 			"then": "फिर",
 			"or": "या",
 			"thenEllipsis": "फिर…"
-		}
+		},
+		"keyboardShortcuts": {
+			"title": "कीबोर्ड शॉर्टकट",
+			"subtitle": "कीबोर्ड शॉर्टकट से अपने कार्यप्रवाह को तेज़ करें",
+			"searchPlaceholder": "शॉर्टकट खोजें...",
+			"footer": "बंद करने के लिए <kbd>Escape</kbd> दबाएँ",
+			"categories": {
+				"general": "सामान्य",
+				"create": "बनाएँ",
+				"views": "दृश्य",
+				"navigation": "नेविगेशन",
+				"quickSelect": "त्वरित चयन (पॉपओवर में)"
+			},
+			"items": {
+				"openCommandPalette": "कमांड पैलेट खोलें",
+				"globalSearch": "वैश्विक खोज",
+				"toggleSidebar": "साइडबार टॉगल करें",
+				"showShortcuts": "कीबोर्ड शॉर्टकट दिखाएँ",
+				"closeModal": "मोडल/पॉपओवर बंद करें",
+				"createTask": "कार्य बनाएँ",
+				"createProject": "प्रोजेक्ट बनाएँ",
+				"createWorkspace": "वर्कस्पेस बनाएँ",
+				"boardView": "बोर्ड दृश्य पर स्विच करें",
+				"listView": "सूची दृश्य पर स्विच करें",
+				"backlogView": "बैकलॉग दृश्य पर स्विच करें",
+				"nextTask": "अगला कार्य",
+				"prevTask": "पिछला कार्य",
+				"openTask": "चयनित कार्य खोलें",
+				"quickSelectNumber": "संख्या द्वारा विकल्प चुनें",
+				"calendarView": "कैलेंडर दृश्य पर जाएँ"
+			}
+		},
+		"notifications": "सूचनाएँ"
 	},
 	"notifications": {
 		"newCount_one": "{{count}} नई",
@@ -2613,6 +3212,15 @@
 				"title": "समय ट्रैकिंग शुरू",
 				"contentWithTask": "कार्य पर समय ट्रैकिंग शुरू: {{taskTitle}}",
 				"contentWithoutTask": "एक कार्य पर समय ट्रैकिंग शुरू"
+			},
+			"appointment_created": {
+				"content": "आपको अपॉइंटमेंट सौंपा गया: {{appointmentTitle}}",
+				"title": "आपको अपॉइंटमेंट सौंपा गया"
+			},
+			"appointment_updated": {
+				"contentAssignee": "आपको अपॉइंटमेंट सौंपा गया: {{appointmentTitle}}",
+				"contentRescheduled": "\"{{appointmentTitle}}\" अपॉइंटमेंट फिर से शेड्यूल किया गया।",
+				"title": "अपॉइंटमेंट अपडेट हुआ"
 			}
 		},
 		"inbox": {
@@ -2636,7 +3244,11 @@
 			"taskLoadError": "This task couldn’t be loaded.",
 			"actionError": "आपका इनबॉक्स अपडेट नहीं हो सका। फिर से कोशिश करें।",
 			"readCleared": "पढ़ी गई सूचनाएँ हटा दी गईं"
-		}
+		},
+		"shortcuts": {
+			"open": "सूचनाएँ खोलें"
+		},
+		"title": "सूचनाएँ"
 	},
 	"activity": {
 		"assignedToSelf": "कार्य खुद को सौंपा",
@@ -2744,11 +3356,14 @@
 				},
 				"mermaid": {
 					"renderFailed": "Mermaid डायग्राम प्रस्तुत नहीं किया जा सका"
-				}
+				},
+				"enterUrl": "URL दर्ज करें"
 			},
 			"importedFrom": "Imported from {{source}}",
 			"importedBy": "Imported by {{name}}",
-			"commentedOnForge": "{{forge}} पर टिप्पणी की"
+			"commentedOnForge": "{{forge}} पर टिप्पणी की",
+			"commentedOnGithub": "GitHub पर टिप्पणी की",
+			"github": "GitHub"
 		},
 		"movedFromOtherProject": "moved task from another project to \"{{to}}\""
 	},
@@ -2901,8 +3516,11 @@
 				"saved": "Saved",
 				"saving": "Saving…",
 				"saveFailed": "Changes could not be saved",
-				"retrySave": "Retry"
-			}
+				"retrySave": "Retry",
+				"enterUrl": "URL दर्ज करें"
+			},
+			"customFieldUpdated": "Field updated",
+			"selectOption": "Select option"
 		},
 		"entity": {
 			"task": "कार्य"
@@ -2954,7 +3572,8 @@
 			"startDate": "शुरू की तारीख",
 			"noDate": "कोई तारीख नहीं",
 			"dates": "तारीखें",
-			"project": "प्रोजेक्ट"
+			"project": "प्रोजेक्ट",
+			"end": "End"
 		},
 		"move": {
 			"title": "कार्य ले जाएँ",
@@ -2980,11 +3599,19 @@
 			},
 			"dueDate": {
 				"updateError": "कार्य की नियत तारीख अपडेट करने में विफल",
-				"clear": "तारीख साफ़ करें"
+				"clear": "तारीख साफ़ करें",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Due time",
+				"updateSuccess": "कार्य की नियत तारीख सफलतापूर्वक अपडेट की गई"
 			},
 			"startDate": {
 				"updateError": "कार्य की शुरू तारीख अपडेट करने में विफल",
-				"clear": "शुरू तारीख साफ़ करें"
+				"clear": "शुरू तारीख साफ़ करें",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time",
+				"updateSuccess": "कार्य की शुरू तारीख सफलतापूर्वक अपडेट की गई"
 			},
 			"labels": {
 				"searchPlaceholder": "लेबल खोजें...",
@@ -3005,7 +3632,9 @@
 					"rose": "गुलाब",
 					"crimson": "किरमिज़ी"
 				},
-				"editLabels": "लेबल संपादित करें"
+				"editLabels": "लेबल संपादित करें",
+				"addSuccess": "लेबल जोड़ा गया",
+				"removeSuccess": "लेबल हटाया गया"
 			}
 		},
 		"backlog": {
@@ -3025,8 +3654,14 @@
 			"filters": {
 				"dueThisWeek": "इस सप्ताह देय",
 				"dueNextWeek": "अगले सप्ताह देय",
-				"noDueDate": "कोई नियत तारीख नहीं"
-			}
+				"noDueDate": "कोई नियत तारीख नहीं",
+				"priority": "प्राथमिकता: {{name}}",
+				"assignee": "सौंपा गया: {{name}}",
+				"due": "देय: {{date}}",
+				"label": "लेबल: {{name}}"
+			},
+			"filter": "फ़िल्टर",
+			"addFilter": "फ़िल्टर जोड़ें..."
 		},
 		"sort": {
 			"direction": "दिशा",
@@ -3039,7 +3674,9 @@
 				"dueDate": "नियत तारीख",
 				"title": "शीर्षक",
 				"number": "कार्य संख्या"
-			}
+			},
+			"label": "क्रमबद्ध करें",
+			"by": "इसके अनुसार"
 		},
 		"boardFilters": {
 			"selectedCount": "{{count}} चयनित",
@@ -3061,7 +3698,14 @@
 			},
 			"allCustomFieldValues": "All values",
 			"noCustomFieldValues": "No custom field values",
-			"noValuesUsedYet": "No values used yet"
+			"noValuesUsedYet": "No values used yet",
+			"filterBy": "इसके अनुसार फ़िल्टर करें",
+			"allStatuses": "सभी स्थितियाँ",
+			"allPriorities": "सभी प्राथमिकताएँ",
+			"allAssignees": "सभी सौंपे गए",
+			"allDueDates": "सभी नियत तारीखें",
+			"allLabels": "सभी लेबल",
+			"all": "All"
 		},
 		"gantt": {
 			"searchPlaceholder": "शेड्यूल किए गए टिकट खोजें...",
@@ -3081,7 +3725,8 @@
 			"previousPeriod": "Previous period",
 			"nextPeriod": "Next period",
 			"periodStart": "Timeline start date",
-			"showTaskDates": "Show task dates"
+			"showTaskDates": "Show task dates",
+			"noTasksMatch": "\"{{query}}\" से मेल खाने वाले कोई शेड्यूल किए गए कार्य नहीं"
 		},
 		"delete": {
 			"title": "कार्य हटाएँ?",
@@ -3127,13 +3772,17 @@
 			"label": "नियत तारीख",
 			"clear": "तारीख साफ़ करें",
 			"updateError": "कार्य की नियत तारीख अपडेट करने में विफल",
-			"clearError": "नियत तारीख साफ़ करने में विफल"
+			"clearError": "नियत तारीख साफ़ करने में विफल",
+			"updateSuccess": "कार्य की नियत तारीख सफलतापूर्वक अपडेट की गई",
+			"clearSuccess": "कार्य की नियत तारीख साफ़ की गई"
 		},
 		"labels": {
-			"empty": "कोई लेबल उपलब्ध नहीं"
+			"empty": "कोई लेबल उपलब्ध नहीं",
+			"label": "लेबल"
 		},
 		"update": {
-			"error": "कार्य अपडेट करने में विफल"
+			"error": "कार्य अपडेट करने में विफल",
+			"success": "कार्य सफलतापूर्वक अपडेट किया गया"
 		},
 		"contextMenu": {
 			"copyLink": "लिंक कॉपी करें",
@@ -3184,7 +3833,9 @@
 			"priorityPlaceholder": "प्राथमिकता सेट करें…",
 			"assigneePlaceholder": "असाइन करें…",
 			"labelPlaceholder": "लेबल जोड़ें…",
-			"columnPlaceholder": "कॉलम में ले जाएँ…"
+			"columnPlaceholder": "कॉलम में ले जाएँ…",
+			"deleteConfirm": "{{count}} कार्य हटाएँ? यह कार्रवाई पूर्ववत नहीं की जा सकती।",
+			"setDueDate": "नियत तारीख सेट करें"
 		},
 		"editor": {
 			"table": {
@@ -3231,7 +3882,8 @@
 			"saveError": "{{field}} सहेजा नहीं जा सका",
 			"moreFields_one": "{{count}} और फ़ील्ड",
 			"moreFields_other": "{{count}} और फ़ील्ड",
-			"manage": "फ़ील्ड प्रबंधित करें"
+			"manage": "फ़ील्ड प्रबंधित करें",
+			"ariaLabel": "Custom fields"
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
@@ -3293,6 +3945,63 @@
 			"startsOn": "शुरुआत: {{date}}",
 			"beforeStart": "{{date}} प्रारंभ तारीख से पहले है",
 			"afterDue": "{{date}} नियत तारीख के बाद है"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "लेबल",
+			"noLabel": "No label",
+			"none": "No grouping"
+		},
+		"boardSearchPlaceholder": "टिकट खोजें...",
+		"recurrence": {
+			"daily": "Daily",
+			"day_one": "day",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_one": "month",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_one": "week",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_one": "{{count}} day before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders are delivered via the unified Telegram configuration.",
+			"hoursBefore_one": "{{count}} hour before",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_one": "{{count}} minute before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_one": "day",
+			"unitDay_other": "days",
+			"unitHour_one": "hour",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_one": "minute",
+			"unitMinute_other": "मिनट",
+			"unitWeek_one": "week",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_one": "{{count}} week before",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -3479,7 +4188,13 @@
 			"error": "टीम सदस्य आमंत्रित करने में विफल",
 			"createdTitle": "निमंत्रण बनाया गया",
 			"shareLinkDescription": "यह लिंक {{email}} के साथ साझा करें ताकि वे वर्कस्पेस में शामिल हो सकें।",
-			"done": "हो गया"
+			"done": "हो गया",
+			"noTeams": "No team covers this workspace yet.",
+			"scopeHint": "Limit the invitation to specific workspaces and projects. Untick everything to rely on teams only.",
+			"scopeLabel": "Workspaces and projects",
+			"scopeRequired": "Select at least one team, workspace or project.",
+			"teamsHint": "Teams keep applying after acceptance: editing a team updates its members' access.",
+			"teamsLabel": "Teams"
 		},
 		"membersTable": {
 			"emptyTitle": "अभी तक कोई टीम सदस्य नहीं",
@@ -3506,7 +4221,8 @@
 			"cancelInviteSuccess": "निमंत्रण सफलतापूर्वक रद्द किया गया",
 			"cancelInviteError": "निमंत्रण रद्द करने में विफल",
 			"roleUpdateSuccess": "भूमिका अपडेट की गई",
-			"roleUpdateError": "भूमिका अपडेट करने में विफल"
+			"roleUpdateError": "भूमिका अपडेट करने में विफल",
+			"ariaMemberActions": "सदस्य क्रियाएँ"
 		},
 		"projectAccess": {
 			"allProjects": "All projects",
@@ -3528,6 +4244,85 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"accessScope": {
+			"allProjects": "All projects",
+			"noProjects": "No projects in this workspace.",
+			"noWorkspaces": "You don't administer any workspace yet."
+		},
+		"accessTeams": {
+			"addMember": "Add",
+			"addMemberPlaceholder": "Add a workspace member",
+			"allProjects": "All projects",
+			"createTitle": "New team",
+			"created": "Team created",
+			"delete": "Delete",
+			"deleteDialogDescription": "Delete the team \"{{name}}\"? Members lose the access this team was the only source of. This action cannot be undone.",
+			"deleteDialogTitle": "Delete this team?",
+			"deleteError": "Failed to delete the team",
+			"deleted": "Team deleted",
+			"description": "Reusable access bundles: pick workspaces and projects, then assign the team to members or invitations.",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this team for?",
+			"edit": "Edit",
+			"editTitle": "Edit team",
+			"empty": "No teams yet",
+			"emptyDescription": "Create a team to grant scoped access at invitation time.",
+			"memberAdded": "Member added to the team",
+			"memberCount_one": "{{count}} member",
+			"memberCount_other": "{{count}} members",
+			"memberError": "Failed to update the team member",
+			"memberRemoved": "Member removed from the team",
+			"membersLabel": "Members",
+			"nameLabel": "Name",
+			"namePlaceholder": "Design team",
+			"newTeam": "New team",
+			"noMembers": "No members yet.",
+			"pageTitle": "Teams",
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects",
+			"removeMember": "Remove from the team",
+			"saveError": "Failed to save the team",
+			"scopeHint": "Projects selected here define everything the team can reach, including future invitations.",
+			"scopeLabel": "Access scope",
+			"title": "Teams",
+			"updated": "Team updated"
+		},
+		"inviteLinks": {
+			"copyFailed": "स्वतः कॉपी नहीं हो सका। लिंक चुनें और Ctrl+C दबाएँ।",
+			"copyIconAria": "आमंत्रण लिंक कॉपी करें",
+			"create": "लिंक बनाएँ",
+			"createError": "आमंत्रण लिंक बनाने में विफल",
+			"createSuccess": "आमंत्रण लिंक बनाया गया",
+			"deleteError": "आमंत्रण लिंक रद्द करने में विफल",
+			"deleteSuccess": "आमंत्रण लिंक रद्द किया गया",
+			"description": "लिंक वाला कोई भी व्यक्ति सदस्य के रूप में इस वर्कस्पेस से जुड़ सकता है — ईमेल आवश्यक नहीं।",
+			"empty": "अभी कोई साझा करने योग्य आमंत्रण लिंक नहीं।",
+			"expiry24h": "24 घंटे",
+			"expiry30d": "30 दिन",
+			"expiry7d": "7 दिन",
+			"expiryLabel": "समाप्ति",
+			"expiryNever": "कभी समाप्त नहीं होता",
+			"join": "{{workspaceName}} से जुड़ें",
+			"linkCopied": "आमंत्रण लिंक कॉपी किया गया",
+			"maxUsesLabel": "अधिकतम उपयोग",
+			"maxUsesUnlimited": "असीमित",
+			"never": "कभी समाप्त नहीं होता",
+			"revokeIconAria": "आमंत्रण लिंक रद्द करें",
+			"title": "साझा करने योग्य आमंत्रण लिंक",
+			"uses": "{{used}}/{{max}} उपयोग",
+			"usesUnlimited": "{{used}} उपयोग",
+			"workspace": "वर्कस्पेस: {{workspaceName}}"
+		},
+		"memberAccess": {
+			"description": "इस कार्यक्षेत्र में {{name}} के लिए सीधी परियोजना पहुँच।",
+			"fullAccess": "इस सदस्य के पास पहले से पूरे कार्यक्षेत्र की पहुँच है।",
+			"hint": "सीधी पहुँच हटाने के लिए सब कुछ अनचेक करें। कोई टीम या अन्य पहुँच न बचने पर सदस्य कार्यक्षेत्र छोड़ देगा।",
+			"menuItem": "पहुँच प्रबंधित करें",
+			"save": "पहुँच सहेजें",
+			"saveError": "सदस्य की पहुँच अपडेट नहीं हो सकी",
+			"saveSuccess": "सदस्य की पहुँच अपडेट हुई",
+			"title": "पहुँच प्रबंधित करें"
 		}
 	},
 	"publicProject": {
@@ -3776,6 +4571,179 @@
 			"composeLinkDescription": "The maintained compose.yml with persistent storage and health checks.",
 			"startLink": "Start and verify the services",
 			"startLinkDescription": "Start the stack, inspect its status, and check that the application is available."
+		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "असाइन किया गया",
+			"create": "बनाएँ",
+			"createTitle": "नई अपॉइंटमेंट",
+			"delete": "हटाएँ",
+			"description": "अपॉइंटमेंट कार्यों की तरह निर्धारित होती हैं, लेकिन बोर्ड या बैकलॉग में कभी नहीं दिखतीं।",
+			"descriptionLabel": "विवरण",
+			"editTitle": "अपॉइंटमेंट संपादित करें",
+			"endLabel": "समाप्ति",
+			"priorityLabel": "प्राथमिकता",
+			"rangeError": "समाप्ति शुरुआत के बाद होनी चाहिए।",
+			"save": "सहेजें",
+			"startLabel": "शुरुआत",
+			"titleLabel": "शीर्षक",
+			"titlePlaceholder": "जैसे डिज़ाइन समीक्षा",
+			"unassigned": "असाइन नहीं किया गया"
+		},
+		"empty": {
+			"description": "अपॉइंटमेंट यहाँ रहती हैं, बोर्ड या बैकलॉग में नहीं।",
+			"title": "अभी कोई अपॉइंटमेंट नहीं"
+		},
+		"loadError": "अपॉइंटमेंट लोड नहीं हो सकीं।",
+		"moveFromBacklog": "अपॉइंटमेंट में ले जाएँ",
+		"newAppointment": "नई अपॉइंटमेंट",
+		"nextWeek": "अगला सप्ताह",
+		"pageTitle": "अपॉइंटमेंट · {{name}}",
+		"previousWeek": "पिछला सप्ताह",
+		"tab": "अपॉइंटमेंट",
+		"toast": {
+			"created": "अपॉइंटमेंट बनाई गई",
+			"deleted": "अपॉइंटमेंट हटाई गई",
+			"error": "कुछ गलत हो गया",
+			"moved": "अपॉइंटमेंट में ले जाया गया",
+			"updated": "अपॉइंटमेंट अपडेट हुई"
+		},
+		"today": "आज",
+		"unscheduled": "अनिर्धारित",
+		"weekHint": "अपॉइंटमेंट जोड़ने के लिए खाली स्लॉट पर क्लिक करें; संपादित करने के लिए अपॉइंटमेंट पर क्लिक करें।"
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_one": "{{count}} sprint",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
+	},
+	"unified": {
+		"appointments": {
+			"count_one": "{{count}} अपॉइंटमेंट",
+			"count_other": "{{count}} अपॉइंटमेंट",
+			"emptyDescription": "आपके सभी प्रोजेक्ट के अपॉइंटमेंट शेड्यूल होते ही यहाँ दिखेंगे।",
+			"emptyTitle": "अभी कोई अपॉइंटमेंट नहीं",
+			"unscheduled": "अनिर्धारित"
+		},
+		"charts": {
+			"average": "औसत",
+			"backlog": "बैकलॉग",
+			"byProject": "परियोजना के अनुसार",
+			"completed": "पूरे हुए",
+			"created": "बनाए गए",
+			"empty": "पिछले 6 महीनों में कोई कार्य गतिविधि नहीं।",
+			"noTasks": "वितरित करने के लिए कोई कार्य नहीं।",
+			"other": "अन्य",
+			"perUnit": "{{value}}/{{unit}}",
+			"period": "अवधि",
+			"periodSummary": "{{created}} बनाए गए · {{completed}} पूरे हुए",
+			"rangeAll": "पूरा समय",
+			"rangeWeek": "1 सप्ताह",
+			"range_one": "{{count}} माह",
+			"range_other": "{{count}} माह",
+			"statusDescription": "सभी परियोजनाओं के कार्य वर्तमान में कहाँ हैं।",
+			"statusTitle": "स्थिति विभाजन",
+			"tasks": "कार्य",
+			"unassigned": "असाइन नहीं किया गया",
+			"unit": "इकाई",
+			"unitDay": "दिन",
+			"unitHint": "Finer units narrow the period to one that supports them.",
+			"unitHour": "घंटा",
+			"unitLabelDay": "दिन",
+			"unitLabelHour": "घंटा",
+			"unitLabelMonth": "माह",
+			"unitLabelWeek": "सप्ताह",
+			"unitMonth": "माह",
+			"unitWeek": "सप्ताह",
+			"velocityDescription": "सभी परियोजनाओं में प्रति {{unit}} बनाए और पूरे किए गए कार्य।",
+			"velocityTitle": "वेग",
+			"workloadDescription": "सभी परियोजनाओं में प्रति असाइनी खुले बोर्ड कार्य।",
+			"workloadEmpty": "कोई खुला कार्य असाइन नहीं है।",
+			"workloadTitle": "कार्यभार"
+		},
+		"consolidated": {
+			"backlogCount_one": "{{count}} task in backlog",
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_one": "{{count}} active task",
+			"tasksCount_other": "{{count}} active tasks"
+		},
+		"empty": {
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"description": "जैसे ही आप कोई प्रोजेक्ट बनाएंगे, आपके सभी कार्यक्षेत्रों के प्रोजेक्ट यहाँ दिखाई देंगे।",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet",
+			"title": "अभी कोई प्रोजेक्ट नहीं"
+		},
+		"links": {
+			"mcp": "MCP",
+			"skills": "स्किल्स"
+		},
+		"pageTitle": "सभी प्रोजेक्ट",
+		"section": {
+			"projectCount_one": "{{count}} प्रोजेक्ट",
+			"projectCount_other": "{{count}} प्रोजेक्ट"
+		},
+		"stats": {
+			"completion": "पूर्णता",
+			"projects": "प्रोजेक्ट",
+			"tasks": "कार्य"
+		},
+		"table": {
+			"progress": "प्रगति",
+			"tasks": "कार्य"
+		},
+		"tabs": {
+			"appointments": "अपॉइंटमेंट",
+			"backlog": "Backlog",
+			"calendar": "कैलेंडर",
+			"charts": "चार्ट",
+			"gantt": "गैंट",
+			"overview": "अवलोकन",
+			"tasks": "कार्य"
 		}
 	}
 }

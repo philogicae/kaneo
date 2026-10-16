@@ -1,37 +1,41 @@
 ---
-title: "Deploy on Railway"
-description: "Deploy the Railway template, configure sign-in, and check the instance."
+title: Railway
+description: Deploy this fork to Railway from the repository, with a persistent volume for the libSQL database.
 ---
 
-The [Kaneo Railway template](https://railway.com/deploy/kaneo) provisions PostgreSQL, a Kaneo API service, and a web service. This template uses separate API and web images, unlike the bundled Docker Compose guide.
+This fork runs as a **single container** with a local libSQL database, so a Railway deployment is one service plus a volume. There is no PostgreSQL plugin and no separate web service.
 
-## Deploy the template
+## Deploy from the repository
 
-1. Open the template and sign in to Railway.
-2. Review the services, persistent database volume, and environment references.
-3. Generate a secret with `openssl rand -hex 32` and set it as `AUTH_SECRET` on the API service.
-4. Deploy and wait for the services to become healthy.
+1. Create a Railway project and choose **Deploy from GitHub repo**, selecting this fork.
+2. Railway detects `Dockerfile.kaneo` as the build file.
+3. Add a **volume** mounted at `/app/data` — it holds `kaneo.db` and its WAL/SHM sidecars.
+4. Set the service's public port to **5173** and generate a domain.
+5. Set the environment variables:
 
-The template supplies the database connection and service URL references. Keep those references rather than replacing them with literal example credentials.
+```env
+KANEO_CLIENT_URL=https://your-domain.example
+AUTH_SECRET=                             # openssl rand -hex 32
+```
 
-## Open Kaneo
+`KANEO_API_URL` defaults to `KANEO_CLIENT_URL/api`, so one public domain is enough: the container proxies `/api` requests to the internal API process.
 
-Open the public web URL and create the initial administrator account. Make a project and task to check the API connection.
+6. Deploy. The health check is `GET /api/health` on port 5173.
 
-If you add custom domains, update the public URL settings on the services that consume them. The browser must reach the public API URL; Railway's private service hostname is for server-to-server traffic.
+## Post-deployment setup
 
-## Add the features you need
+1. Open the public URL and create the first account.
+2. Configure a custom domain if you want one.
+3. Optionally set up SSO, object storage, or the MCP endpoint — see the [environment variables](/core/installation/environment-variables).
 
-Configure optional settings on the API service, then redeploy affected services:
+## Notes
 
-- [Email](/core/installation/environment-variables#smtp-configuration) for invitations and account notifications.
-- [Sign-in providers](/core/social-providers/custom-oauth) for your identity provider.
-- [File storage](/core/installation/object-storage-and-image-uploads) for task attachments.
+- The volume is required: without it, the database is recreated on every deploy.
+- Railway's usual `PORT` variable is not used; the container always listens on 5173 (nginx front, bundled API behind it).
+- For backups, read or copy `kaneo.db` (plus its `-wal`/`-shm` sidecars) from the mounted volume.
 
-## Keep it running
+## Related
 
-Review Railway's service logs when a health check fails. For browser failures, check the public API URL and allowed origins before redeploying.
-
-Set up database and storage backups using [Backups and recovery](/core/operations/backups) as a checklist. Record the deployed versions and read the [upgrade guide](/core/operations/upgrades) before changing images.
-
-For connection, sign-in, and upload problems, see [Troubleshooting](/core/operations/troubleshooting).
+- [The compose file](/core/installation/docker-compose)
+- [Environment variables](/core/installation/environment-variables)
+- [Reverse proxy with nginx](/core/reverse-proxy/nginx)

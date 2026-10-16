@@ -98,7 +98,7 @@ export function ShortcutsPanel() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={t("navigation:shortcuts.searchPlaceholder")}
                 aria-label={t("navigation:shortcuts.searchPlaceholder")}
-                className="h-full min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
+                className="h-full min-w-0 flex-1 bg-transparent text-[0.8125rem] outline-none placeholder:text-muted-foreground"
               />
               {query.trim() && (
                 <span

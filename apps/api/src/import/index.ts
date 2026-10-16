@@ -1,4 +1,3 @@
-import { requireEntitlement } from "../billing/require-entitlement-middleware";
 import {
   apiRouter,
   type BaseVariables,
@@ -43,11 +42,7 @@ const listImportSourceProjectsRoute = createRoute({
   summary: "List projects in an import source",
   description:
     "Sign in to PLANKA, Plane, Linear, Jira, Trello or another Kaneo instance and list the projects that can be imported. The credentials are used only for this request; they are never stored, logged, or returned.",
-  middleware: [
-    workspaceAccess.fromBody(),
-    importPermission,
-    requireEntitlement,
-  ] as const,
+  middleware: [workspaceAccess.fromBody(), importPermission] as const,
   request: {
     body: {
       required: true,
@@ -81,11 +76,7 @@ const startImportRunRoute = createRoute({
   summary: "Start an import",
   description:
     "Import the selected source projects into the workspace as new Kaneo projects. The import runs in the background; poll getImportRun for progress. The credentials are held in memory only while the import runs; they are never stored, logged, or returned. Imported tasks do not send notifications or trigger integrations.",
-  middleware: [
-    workspaceAccess.fromBody(),
-    importPermission,
-    requireEntitlement,
-  ] as const,
+  middleware: [workspaceAccess.fromBody(), importPermission] as const,
   request: {
     body: {
       required: true,

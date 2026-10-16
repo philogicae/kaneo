@@ -32,7 +32,7 @@ export function useBulkOptions(actions: BulkActions) {
       icon: (
         <Avatar className="size-4">
           <AvatarImage src={member.image ?? ""} alt="" />
-          <AvatarFallback className="text-[8px]">
+          <AvatarFallback className="text-[0.5rem]">
             {getInitials(member.name)}
           </AvatarFallback>
         </Avatar>

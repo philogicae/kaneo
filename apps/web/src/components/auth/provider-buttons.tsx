@@ -67,7 +67,7 @@ export function ProviderButtons({
               </span>
             </Button>
             {isLastUsed ? (
-              <span className="pointer-events-none absolute -top-2 -right-1.5 flex h-4 items-center rounded-sm border border-foreground/50 bg-background px-1 font-medium text-[11px] text-foreground leading-4">
+              <span className="pointer-events-none absolute -top-2 -right-1.5 flex h-4 items-center rounded-sm border border-foreground/50 bg-background px-1 font-medium text-[0.6875rem] text-foreground leading-4">
                 {t("auth:signIn.lastUsed")}
               </span>
             ) : null}

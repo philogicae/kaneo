@@ -22,7 +22,7 @@ export function BulkCountChip({ count, onClear }: BulkCountChipProps) {
           <button
             type="button"
             onClick={onClear}
-            className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg bg-accent ps-2.5 pe-1.5 font-medium text-[13px] text-foreground outline-none transition-colors hover:bg-accent/70 focus-visible:ring-2 focus-visible:ring-ring max-sm:h-9"
+            className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg bg-accent ps-2.5 pe-1.5 font-medium text-[0.8125rem] text-foreground outline-none transition-colors hover:bg-accent/70 focus-visible:ring-2 focus-visible:ring-ring max-sm:h-9"
           />
         }
       >

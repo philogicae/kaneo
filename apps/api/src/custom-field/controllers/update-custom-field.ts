@@ -19,8 +19,9 @@ async function updateCustomField(id: string, input: CustomFieldUpdateInput) {
       .select()
       .from(customFieldDefinitionTable)
       .where(eq(customFieldDefinitionTable.id, id))
-      .limit(1)
-      .for("update");
+      .limit(1);
+    // SQLite serialises writers, so the surrounding transaction is the lock
+    // that a Postgres `for update` row lock would provide here.
 
     if (!field) {
       throw new HTTPException(404, { message: "Custom field not found" });

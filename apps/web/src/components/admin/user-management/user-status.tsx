@@ -9,7 +9,7 @@ export function UserStatus({ isDeactivated }: UserStatusProps) {
   const { t } = useTranslation();
 
   return (
-    <span className="flex items-center gap-1.5 text-[13px]">
+    <span className="flex items-center gap-1.5 text-[0.8125rem]">
       <span
         aria-hidden="true"
         className={cn(

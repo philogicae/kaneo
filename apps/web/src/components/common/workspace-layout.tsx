@@ -47,7 +47,7 @@ export default function WorkspaceLayout({
                   <SidebarTrigger className="-ml-1 h-6 w-6" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="flex items-center gap-2 text-[10px]">
+                  <p className="flex items-center gap-2 text-[0.625rem]">
                     {t("navigation:settingsLayout.toggleSidebar")}
                     <ShortcutKeys id="toggleSidebar" />
                   </p>

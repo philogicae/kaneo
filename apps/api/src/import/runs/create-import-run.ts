@@ -1,5 +1,4 @@
 import type { ImportSourceId } from "@kaneo/importers";
-import { sql } from "drizzle-orm";
 import db from "../../database";
 import { importRunTable } from "../../database/schema";
 import type { ImportRunProject } from "../import-run-project";
@@ -19,9 +18,6 @@ export async function createImportRun({
   projects: ImportRunProject[];
 }) {
   return db.transaction(async (tx) => {
-    await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(hashtext('import-run'), hashtext(${workspaceId}))`,
-    );
     await assertNoRunningImport(workspaceId, tx);
 
     const [run] = await tx

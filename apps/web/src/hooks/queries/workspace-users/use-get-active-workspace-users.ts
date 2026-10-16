@@ -1,10 +1,47 @@
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import getActiveWorkspaceUsers from "@/fetchers/workspace-user/get-active-workspace-users";
+import getProjectMembers from "@/fetchers/workspace-user/get-project-members";
+import type { WorkspaceUsersPayload } from "@/types/workspace-user";
 
-export function useGetActiveWorkspaceUsers(workspaceId: string) {
-  return useQuery({
-    queryKey: ["active-workspace-users", workspaceId],
-    queryFn: () => getActiveWorkspaceUsers({ workspaceId }),
+// Inside a project route the list narrows to the members who can open that
+// project, so no picker offers a scoped member work they would be refused on.
+// Outside a project route (or with an explicit projectId) the caller decides.
+export function useGetActiveWorkspaceUsers(
+  workspaceId: string,
+  projectId?: string,
+) {
+  const params = useParams({ strict: false }) as { projectId?: string };
+  const scopedProjectId = projectId ?? params.projectId;
+
+  return useQuery<WorkspaceUsersPayload>({
+    queryKey: [
+      "active-workspace-users",
+      workspaceId,
+      scopedProjectId ?? "workspace",
+    ],
+    queryFn: async () => {
+      if (!scopedProjectId)
+        return await getActiveWorkspaceUsers({ workspaceId });
+      const members = await getProjectMembers({
+        workspaceId,
+        projectId: scopedProjectId,
+      });
+      return {
+        members: members.map((member) => ({
+          userId: member.id,
+          role: member.role,
+          user: {
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            image: member.image,
+          },
+        })),
+      };
+    },
     enabled: !!workspaceId,
   });
 }
+
+export default useGetActiveWorkspaceUsers;

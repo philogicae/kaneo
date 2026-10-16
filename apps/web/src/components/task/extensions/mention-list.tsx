@@ -62,7 +62,7 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
           >
             <Avatar className="h-5 w-5">
               <AvatarImage src={item.image ?? ""} alt={item.label} />
-              <AvatarFallback className="text-[9px] font-medium">
+              <AvatarFallback className="text-[0.5625rem] font-medium">
                 {getInitials(item.label)}
               </AvatarFallback>
             </Avatar>

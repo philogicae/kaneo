@@ -36,10 +36,10 @@ export function SyncRulesSummary({ provider, data }: SyncRulesSummaryProps) {
           key={row.key}
           className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
         >
-          <dt className="text-[13px] text-muted-foreground sm:w-40 sm:shrink-0">
+          <dt className="text-[0.8125rem] text-muted-foreground sm:w-40 sm:shrink-0">
             {row.label}
           </dt>
-          <dd className="flex min-w-0 flex-wrap items-center gap-1.5 text-[13px]">
+          <dd className="flex min-w-0 flex-wrap items-center gap-1.5 text-[0.8125rem]">
             <RuleValue
               rule={row.rule}
               labels={data.labels}

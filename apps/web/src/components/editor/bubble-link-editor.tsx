@@ -53,7 +53,7 @@ export function BubbleLinkEditor({
             onClose();
           }
         }}
-        className="h-7 w-56 min-w-0 bg-transparent px-1 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+        className="h-7 w-56 min-w-0 bg-transparent px-1 text-[0.8125rem] text-foreground outline-none placeholder:text-muted-foreground"
       />
       <Button
         type="button"

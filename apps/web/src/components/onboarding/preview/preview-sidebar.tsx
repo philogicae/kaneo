@@ -15,7 +15,7 @@ type PreviewSidebarProps = {
 };
 
 const rowClassName =
-  "flex h-7 items-center gap-2 rounded-md px-2 text-[13px] text-sidebar-foreground transition-[background-color,box-shadow] duration-300";
+  "flex h-7 items-center gap-2 rounded-md px-2 text-[0.8125rem] text-sidebar-foreground transition-[background-color,box-shadow] duration-300";
 
 export function PreviewSidebar({
   workspaceName,
@@ -37,10 +37,10 @@ export function PreviewSidebar({
           focus === "workspace" ? previewFocusClassName : "bg-accent",
         )}
       >
-        <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-foreground font-semibold text-[11px] text-background">
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-foreground font-semibold text-[0.6875rem] text-background">
           {initial}
         </span>
-        <span className="truncate font-medium text-[13px] text-foreground">
+        <span className="truncate font-medium text-[0.8125rem] text-foreground">
           {workspaceName}
         </span>
         {focus === "workspace" ? (

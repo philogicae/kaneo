@@ -25,6 +25,7 @@ export const telegramFormSchema = z.object({
     taskTitleChanged: z.boolean(),
     taskDescriptionChanged: z.boolean(),
     taskCommentCreated: z.boolean(),
+    taskMentionCreated: z.boolean(),
   }),
 });
 

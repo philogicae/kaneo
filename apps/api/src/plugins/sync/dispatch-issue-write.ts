@@ -41,8 +41,7 @@ export async function dispatchIssueWrite<T>(
                 ),
               ),
             )
-            .orderBy(labelTable.id)
-            .for("share");
+            .orderBy(labelTable.id);
         }
         if (
           !(await canSyncTask(link.taskId, integration.id, tx, expectedConfig))

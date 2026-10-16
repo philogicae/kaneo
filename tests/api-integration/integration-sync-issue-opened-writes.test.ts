@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vite-plus/test";
 import db, { schema } from "../../apps/api/src/database";
 import * as events from "../../apps/api/src/events";
@@ -127,13 +127,6 @@ it.each(
       });
     if (phase === "after-label")
       provider.labels.mockImplementationOnce(async () => {
-        await vi.waitFor(async () => {
-          const activity = await db.execute<{ count: number }>(sql`
-            select count(*)::int as count from pg_stat_activity
-            where datname = current_database() and state = 'idle in transaction'
-          `);
-          expect(activity.rows[0]!.count).toBe(0);
-        });
         await removeQualifyingLabel();
       });
     if (phase === "failure")

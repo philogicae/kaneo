@@ -165,7 +165,7 @@ export function PublicTaskDetailModal({
                         src={task.assigneeImage ?? ""}
                         alt={task.assigneeName ?? ""}
                       />
-                      <AvatarFallback className="text-[10px]">
+                      <AvatarFallback className="text-[0.625rem]">
                         {getInitials(task.assigneeName)}
                       </AvatarFallback>
                     </Avatar>

@@ -27,7 +27,7 @@ export function TaskActivity({
       aria-label={t("tasks:detail.activity")}
       className={cn("flex flex-col gap-1", className)}
     >
-      <h2 className="flex h-7 items-center pb-1 font-medium text-[13px] text-foreground">
+      <h2 className="flex h-7 items-center pb-1 font-medium text-[0.8125rem] text-foreground">
         {t("tasks:detail.activity")}
       </h2>
 

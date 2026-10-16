@@ -10,7 +10,9 @@
 			"markAllRead": "Marcar tudo como lido",
 			"remove": "Remover",
 			"reset": "Redefinir",
-			"filter": "Filtrar"
+			"filter": "Filtrar",
+			"clearAllFilters": "Limpar todos os filtros",
+			"save": "Save"
 		},
 		"a11y": {
 			"toggleSidebar": "Alternar barra lateral"
@@ -148,7 +150,14 @@
 					"amber": "Âmbar",
 					"terracotta": "Terracota",
 					"rose": "Rosa",
-					"crimson": "Carmesim"
+					"crimson": "Carmesim",
+					"cyan": "Ciano",
+					"emerald": "Esmeralda",
+					"fuchsia": "Fúcsia",
+					"indigo": "Índigo",
+					"lime": "Limão",
+					"ocean": "Oceano",
+					"sky": "Céu"
 				},
 				"statusLoadError": "Project statuses couldn’t be loaded."
 			}
@@ -160,6 +169,20 @@
 				"apply": "Aplicar link",
 				"remove": "Remover link"
 			}
+		},
+		"boolean": {
+			"false": "False",
+			"notSet": "Not Set",
+			"true": "True",
+			"undefined": "Undefined"
+		},
+		"formats": {
+			"never": "Nunca"
+		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
 		}
 	},
 	"auth": {
@@ -563,6 +586,50 @@
 				"description": "Você voltará para cá logo em seguida para revisá-lo.",
 				"submit": "Entrar"
 			}
+		},
+		"cloud": {
+			"signUp": {
+				"title": "O que acontece depois",
+				"description": "Depois de criar sua conta, você vai dar um nome a um espaço de trabalho. A partir daí, pode adicionar um projeto e começar a escrever tarefas."
+			},
+			"onboarding": {
+				"title": "O que é um espaço de trabalho",
+				"description": "Um espaço de trabalho reúne seus projetos, as tarefas deles e as pessoas com quem você trabalha. Convide colegas quando estiver configurado."
+			},
+			"invite": {
+				"description": "Everyone in a workspace sees the same boards and gets live updates as tasks move. Roles control who can change what.",
+				"title": "Work better together"
+			},
+			"plan": {
+				"description": "Every plan includes unlimited projects and tasks, automatic backups, and updates. Cancel anytime from billing settings.",
+				"title": "Try everything first"
+			}
+		},
+		"inviteLink": {
+			"errorTitle": "Erro no link de convite",
+			"errors": {
+				"accept": "Falha ao entrar no workspace",
+				"load": "Falha ao carregar os detalhes do link de convite."
+			},
+			"invalidTitle": "Link de convite inválido",
+			"joinPrompt": "Você tem um link de convite para entrar em <workspaceName>{{workspaceName}}</workspaceName>.",
+			"linkExpired": "Link de convite expirado",
+			"loading": "Carregando o link de convite...",
+			"pageTitleAccept": "Entrar no workspace",
+			"pageTitleError": "Erro no link de convite",
+			"pageTitleInvalid": "Link de convite inválido",
+			"signedInAs": "Conectado como <email>{{email}}</email>",
+			"signedOutPrompt": "Crie uma conta ou faça login para entrar no workspace.",
+			"title": "Entre no workspace!"
+		},
+		"signUpForm": {
+			"fullName": "Nome completo",
+			"namePlaceholder": "João da Silva",
+			"failedSignUp": "Falha ao criar conta",
+			"accountCreated": "Conta criada com sucesso",
+			"passwordTooShort": "A senha é muito curta",
+			"creatingAccount": "Criando conta...",
+			"createAccount": "Criar conta"
 		}
 	},
 	"settings": {
@@ -585,7 +652,8 @@
 			"updateError": "Falha ao atualizar perfil",
 			"validation": {
 				"nameRequired": "O nome é obrigatório",
-				"nameShort": "O nome deve ter pelo menos 2 caracteres"
+				"nameShort": "O nome deve ter pelo menos 2 caracteres",
+				"invalidEmail": "Endereço de e-mail inválido"
 			},
 			"avatar": {
 				"hint": "Imagens quadradas ficam melhores.",
@@ -594,7 +662,9 @@
 				"removeSuccess": "Profile picture removed",
 				"updateError": "Failed to update profile picture",
 				"updateSuccess": "Profile picture updated",
-				"upload": "Enviar"
+				"upload": "Enviar",
+				"change": "Change avatar",
+				"edit": "Change your profile picture"
 			},
 			"deleteAccount": {
 				"confirm": "Delete account",
@@ -606,9 +676,13 @@
 				"sectionTitle": "Danger zone",
 				"success": "Your account has been deleted",
 				"title": "Delete account",
-				"sessionTooOld": "For security, sign out and sign back in before deleting your account."
+				"sessionTooOld": "For security, sign out and sign back in before deleting your account.",
+				"sectionSubtitle": "Permanent actions that affect your whole account."
 			},
-			"emailHint": "Você entra com este endereço."
+			"emailHint": "Você entra com este endereço.",
+			"sectionSubtitle": "Gerencie seu perfil e os detalhes da conta.",
+			"emailPlaceholder": "Digite seu e-mail",
+			"updateSuccess": "Perfil atualizado com sucesso"
 		},
 		"notificationsPage": {
 			"pageTitle": "Notificações",
@@ -732,7 +806,46 @@
 			"stopSendingDescription": "As notificações deste espaço de trabalho só aparecerão no Kaneo.",
 			"stopSendingTitle": "Parar de enviar de {{workspaceName}}?",
 			"workspacesDescription": "Escolha quais espaços de trabalho e projetos podem usar seus canais.",
-			"workspacesTitle": "Espaços de trabalho"
+			"workspacesTitle": "Espaços de trabalho",
+			"accountEmailHint": "O envio por e-mail sempre vai para o e-mail da conta conectada.",
+			"accountEmailLabel": "E-mail da conta",
+			"allProjectsDescription": "Entregar notificações de todos os projetos deste espaço de trabalho.",
+			"createRule": "Criar regra",
+			"emailChannelHintDisabled": "Configure e ative o e-mail globalmente primeiro.",
+			"emailChannelHintEnabled": "Enviar notificações correspondentes do espaço de trabalho por e-mail.",
+			"emailDescription": "Use o e-mail da sua conta como destino das notificações.",
+			"gotifyChannelHintDisabled": "Configure e ative o Gotify globalmente primeiro.",
+			"gotifyChannelHintEnabled": "Enviar notificações correspondentes do espaço de trabalho para o Gotify.",
+			"integrationNotConfigured": "Não configurado",
+			"integrationsDiscordDescription": "Cada projeto publica as atualizações das tarefas no próprio webhook do Discord. Expanda um projeto para editar o canal e os eventos.",
+			"integrationsDiscordTitle": "Integrações do Discord",
+			"integrationsSlackDescription": "Cada projeto publica as atualizações das tarefas no próprio webhook de entrada do Slack. Expanda um projeto para editar o canal e os eventos.",
+			"integrationsSlackTitle": "Integrações do Slack",
+			"ntfyChannelHintDisabled": "Configure e ative o ntfy globalmente primeiro.",
+			"ntfyChannelHintEnabled": "Enviar notificações correspondentes do espaço de trabalho para o ntfy.",
+			"projectScope": "Escopo do projeto",
+			"projectScopeDescription": "Todos os projetos são incluídos por padrão. Restrinja se este espaço de trabalho deve enviar notificações apenas de projetos selecionados.",
+			"recipientHint": "Comentários e alterações de status notificam você sobre tarefas atribuídas a você. Menções notificam o membro selecionado. Seus próprios comentários, menções e alterações de status não enviam notificações a você.",
+			"reminderLeadTimeHint": "Entre 1 hora e 30 dias antes. Notificações de atraso são enviadas separadamente.",
+			"reminderLeadTimeUnitDays": "Dias",
+			"reminderLeadTimeUnitHours": "Horas",
+			"removeRule": "Remover regra",
+			"selectedProjects": "Projetos selecionados",
+			"selectedProjectsDescription": "Entregar notificações somente dos projetos escolhidos.",
+			"tabDiscord": "Discord",
+			"tabGeneral": "Geral",
+			"tabSlack": "Slack",
+			"tabTelegram": "Telegram",
+			"webhookChannelHintDisabled": "Configure e ative o webhook globalmente primeiro.",
+			"webhookChannelHintEnabled": "Enviar notificações correspondentes do espaço de trabalho para o seu webhook.",
+			"workspaceCardHint": "Escolha quais canais este espaço de trabalho pode usar para notificações da conta.",
+			"workspaceCardLabelEmail": "E-mail",
+			"workspaceCardLabelGotify": "Gotify",
+			"workspaceCardLabelNtfy": "ntfy",
+			"workspaceCardLabelWebhook": "Webhook personalizado",
+			"workspaceEnabledLabel": "Ativar notificações para {{workspaceName}}",
+			"workspaceRulesDescription": "Reutilize seus canais globais e decida quais espaços de trabalho e projetos podem enviar notificações da conta.",
+			"workspaceRulesTitle": "Regras de envio do espaço de trabalho"
 		},
 		"preferencesPage": {
 			"title": "Preferências",
@@ -768,7 +881,19 @@
 			"priority": "Prioridade",
 			"projectBackgrounds": "Project backgrounds",
 			"projectBackgroundsDescription": "Mostrar a imagem que um projeto define atrás do quadro.",
-			"advancedTitle": "Avançado"
+			"advancedTitle": "Avançado",
+			"appearanceSubtitle": "Configurações visuais e preferências de layout.",
+			"assigneesDescription": "Mostrar quem está atribuído às tarefas",
+			"dueDatesDescription": "Exibir prazos das tarefas",
+			"interfaceSize": "Tamanho da interface",
+			"interfaceSizeDecrease": "Diminuir o tamanho da interface",
+			"interfaceSizeIncrease": "Aumentar o tamanho da interface",
+			"labelsDescription": "Mostrar etiquetas e marcadores das tarefas",
+			"languageDescription": "Escolha o idioma preferido da interface",
+			"priorityDescription": "Exibir indicadores de prioridade",
+			"taskNumbersDescription": "Mostrar IDs e números das tarefas",
+			"themeDescription": "Escolha seu esquema de cores preferido",
+			"themeVolt": "Volt"
 		},
 		"developerPage": {
 			"pageTitle": "Chaves de API",
@@ -780,7 +905,10 @@
 			"keysNote": "Uma chave pode fazer tudo o que você pode. Exclua as chaves que não usa mais.",
 			"keysTitle": "Chaves",
 			"loadError": "Não foi possível carregar as chaves de API. Tente novamente.",
-			"newKey": "Nova chave"
+			"newKey": "Nova chave",
+			"apiKeysCardTitle": "Chaves de API",
+			"apiKeysCardDescription": "Crie e gerencie chaves de API para acesso programático ao Kaneo.",
+			"createApiKey": "Criar chave de API"
 		},
 		"apiKey": {
 			"createdModal": {
@@ -789,7 +917,12 @@
 				"copy": "Copiar",
 				"copied": "Copiado",
 				"done": "Concluído",
-				"copyError": "Não foi possível copiar a chave. Selecione-a e copie manualmente."
+				"copyError": "Não foi possível copiar a chave. Selecione-a e copie manualmente.",
+				"yourApiKey": "Sua chave de API",
+				"toastCopied": "Chave de API copiada para a área de transferência",
+				"alertTitle": "Sucesso! Sua chave de API foi criada",
+				"alertDescription": "Copie esta chave agora. Você não poderá vê-la novamente.",
+				"copyToContinue": "Copie a chave para continuar"
 			},
 			"table": {
 				"deleteConfirmTitle": "Excluir “{{name}}”?",
@@ -797,7 +930,19 @@
 				"delete": "Excluir chave",
 				"deleting": "Excluindo…",
 				"toastDeleted": "Chave de API excluída",
-				"toastDeleteError": "Não foi possível excluir a chave de API"
+				"toastDeleteError": "Não foi possível excluir a chave de API",
+				"loading": "Carregando chaves de API...",
+				"empty": "Ainda não há chaves de API. Crie uma para começar.",
+				"columnName": "Nome",
+				"columnKey": "Chave",
+				"columnCreated": "Criada",
+				"columnExpires": "Expira",
+				"columnActions": "Ações",
+				"unnamedKey": "Chave sem nome",
+				"expiredBadge": "Expirada {{label}}",
+				"deleteFallbackName": "esta chave de API",
+				"deleteAria": "Excluir {{name}}",
+				"deleteAriaFallback": "chave de API"
 			},
 			"createDialog": {
 				"title": "Nova chave de API",
@@ -816,8 +961,11 @@
 				"failedCreate": "Não foi possível criar a chave de API",
 				"validation": {
 					"nameRequired": "Digite um nome",
-					"nameShort": "Use pelo menos 3 caracteres"
-				}
+					"nameShort": "Use pelo menos 3 caracteres",
+					"expirationRequired": "A expiração é obrigatória"
+				},
+				"expirationPlaceholder": "Selecionar expiração",
+				"expirationDescription": "Escolha por quanto tempo esta chave de API deve permanecer válida. \"Nunca\" criará uma chave sem expiração automática."
 			},
 			"row": {
 				"actions": "Ações para {{name}}",
@@ -862,10 +1010,16 @@
 				"dialogTitle": "Transferir propriedade?",
 				"dialogDescription": "{{name}} se tornará o único proprietário de {{workspace}}. Você manterá o acesso de administrador, mas perderá as permissões exclusivas de proprietário, como excluir o espaço de trabalho ou transferi-lo novamente.",
 				"transferring": "Transferindo…",
-				"confirm": "Transferir propriedade"
+				"confirm": "Transferir propriedade",
+				"subtitle": "Transfira este espaço de trabalho para outro membro. Você será rebaixado a administrador e perderá as permissões exclusivas de proprietário."
 			},
 			"ownershipSubtitle": "Só o proprietário vê isto.",
-			"ownershipTitle": "Propriedade"
+			"ownershipTitle": "Propriedade",
+			"workspaceInfoSubtitle": "Configure os detalhes e preferências do seu espaço de trabalho.",
+			"nameHint": "O nome do seu espaço de trabalho",
+			"descriptionHint": "Uma breve descrição do seu espaço de trabalho",
+			"dangerZoneSubtitle": "Ações irreversíveis e destrutivas.",
+			"toastUpdated": "Espaço de trabalho atualizado com sucesso"
 		},
 		"workspaceRoles": {
 			"pageTitle": "Funções",
@@ -1111,7 +1265,9 @@
 			"rowActions": "Ações para {{name}}",
 			"sectionDescription": "Renomear uma etiqueta ou mudar a cor dela atualiza todas as tarefas que a usam.",
 			"sectionTitle": "Etiquetas do espaço de trabalho",
-			"subtitleWithWorkspace": "As etiquetas são compartilhadas por todos os projetos de {{workspaceName}}."
+			"subtitleWithWorkspace": "As etiquetas são compartilhadas por todos os projetos de {{workspaceName}}.",
+			"cardDescription": "Gerencie as etiquetas que podem ser atribuídas às tarefas.",
+			"empty": "Ainda não há etiquetas. Crie sua primeira etiqueta para começar."
 		},
 		"projectGeneral": {
 			"pageTitle": "Configurações do projeto",
@@ -1167,7 +1323,16 @@
 			"moveDialogTitle": "Mover para outro espaço de trabalho?",
 			"moveTargetLabel": "Espaço de trabalho",
 			"moving": "Movendo...",
-			"tasksTitle": "Tarefas"
+			"tasksTitle": "Tarefas",
+			"projectInfoSubtitle": "Configure os detalhes e preferências do seu projeto.",
+			"projectNameHint": "O nome do seu projeto",
+			"descriptionHint": "Uma breve descrição do seu projeto",
+			"dangerZoneSubtitle": "Ações irreversíveis e destrutivas.",
+			"toastUpdated": "Projeto atualizado com sucesso",
+			"importExportTasks": "Importar/Exportar",
+			"importExportTasksDescription": "Importe e exporte tarefas.",
+			"moveModalDescription": "Isso moverá o projeto \"{{name}}\" e todas as suas tarefas para \"{{workspace}}\". As tarefas atribuídas a pessoas que não são membros desse espaço de trabalho ficarão sem responsável, e as inscrições de notificação deste projeto serão removidas.",
+			"moveModalTitle": "Mover projeto?"
 		},
 		"projectIntegrations": {
 			"pageTitle": "Integrações",
@@ -1216,7 +1381,10 @@
 			"offNote": "Ao desativar o link público, ele para de funcionar imediatamente.",
 			"on": "Ativado",
 			"openPublicPage": "Abrir página pública",
-			"thisWorkspace": "seu espaço de trabalho"
+			"thisWorkspace": "seu espaço de trabalho",
+			"sectionSubtitle": "Alterne o acesso público e compartilhe a URL pública.",
+			"publicUrlHint": "Compartilhe este link se o projeto for público",
+			"copiedToast": "Copiado"
 		},
 		"projectWorkflow": {
 			"pageTitle": "Configurações de fluxo de trabalho",
@@ -1225,7 +1393,9 @@
 			"columnsTitle": "Colunas",
 			"columnsDescription": "Arraste para reordenar. Tarefas em uma coluna de concluído contam como concluídas.",
 			"automationTitle": "Automações",
-			"automationDescription": "Mova uma tarefa vinculada quando algo acontecer em um repositório conectado."
+			"automationDescription": "Mova uma tarefa vinculada quando algo acontecer em um repositório conectado.",
+			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
+			"customFieldsTitle": "Custom Fields"
 		},
 		"projectSwitcher": {
 			"selectProject": "Selecionar projeto",
@@ -1249,7 +1419,19 @@
 			"deleteTitle": "Excluir “{{name}}”?",
 			"doneHeader": "Concluído",
 			"dragAria": "Reordenar {{name}}",
-			"reorderError": "Falha ao reordenar as colunas"
+			"reorderError": "Falha ao reordenar as colunas",
+			"toastCreated": "Coluna criada",
+			"toastRenamed": "Coluna renomeada",
+			"toastFinalOn": "Coluna marcada como final",
+			"toastFinalOff": "Coluna desmarcada como final",
+			"toastIconUpdated": "Ícone da coluna atualizado",
+			"toastDeleted": "Coluna excluída",
+			"loading": "Carregando colunas...",
+			"doneColumnTooltip": "Tratar isto como uma coluna de concluído",
+			"doneColumn": "Coluna de concluído",
+			"on": "Ativado",
+			"off": "Desativado",
+			"add": "Adicionar"
 		},
 		"githubIntegration": {
 			"toast": {
@@ -1264,7 +1446,11 @@
 				"importError": "Falha ao importar issues",
 				"commentOnEnabled": "O Kaneo comentará com um link da tarefa em novas issues",
 				"commentOnDisabled": "Os comentários com link da tarefa em novas issues estão desativados",
-				"settingsUpdateError": "Falha ao atualizar a integração com o GitHub"
+				"settingsUpdateError": "Falha ao atualizar a integração com o GitHub",
+				"installedOk": "O GitHub App está instalado corretamente!",
+				"installedMissingPerms": "O GitHub App está instalado, mas faltam permissões necessárias",
+				"needsInstallOnRepo": "O GitHub App precisa ser instalado neste repositório",
+				"repoNotFound": "Repositório não encontrado ou inacessível"
 			},
 			"commentTaskLinkTitle": "Comentar um link do Kaneo em novas issues",
 			"commentTaskLinkHint": "Para que as pessoas no GitHub possam ir direto para a tarefa.",
@@ -1287,12 +1473,51 @@
 			"verifyNotInstalled": "O GitHub App do Kaneo não está instalado neste repositório.",
 			"verifyReady": "O GitHub App do Kaneo está instalado com as permissões necessárias.",
 			"workflowHint": "Mova tarefas quando pull requests forem abertos ou mesclados em",
-			"workflowLink": "Fluxo de trabalho"
+			"workflowLink": "Fluxo de trabalho",
+			"validation": {
+				"ownerRequired": "O proprietário do repositório é obrigatório",
+				"ownerInvalid": "Formato de proprietário do repositório inválido",
+				"nameRequired": "O nome do repositório é obrigatório",
+				"nameInvalid": "Formato de nome de repositório inválido"
+			},
+			"connectionStatus": "Status da conexão",
+			"connectedActive": "Repositório conectado e ativo",
+			"notConnectedHint": "Nenhum repositório conectado",
+			"badgeConnected": "Conectado",
+			"badgeNotConnected": "Não conectado",
+			"repository": "Repositório",
+			"repositoryHint": "Repositório do GitHub conectado",
+			"appStatusTitle": "Status do GitHub App",
+			"appStatusHint": "Status da instalação e permissões",
+			"statusProperlyConfigured": "Configurado corretamente",
+			"statusMissingPermissions": "Faltam permissões",
+			"statusNotInstalled": "Não instalado",
+			"ownerLabel": "Proprietário do repositório",
+			"ownerHint": "Nome de usuário ou organização do GitHub",
+			"ownerPlaceholder": "ex.: octocat",
+			"repoNameLabel": "Nome do repositório",
+			"repoNameHint": "O nome do repositório",
+			"repoNamePlaceholder": "ex.: meu-projeto",
+			"actionsTitle": "Ações",
+			"actionsHint": "Gerencie a conexão do seu repositório",
+			"browse": "Procurar",
+			"verify": "Verificar",
+			"update": "Atualizar",
+			"connect": "Conectar",
+			"disconnect": "Desconectar",
+			"missingPermissionsLabel": "Permissões faltando:",
+			"importSectionTitle": "Importar issues do GitHub",
+			"importing": "Importando...",
+			"importIssues": "Importar issues"
 		},
 		"giteaIntegration": {
 			"validation": {
 				"baseUrlRequired": "A URL base do Gitea é obrigatória",
-				"baseUrlInvalid": "Digite uma URL válida (ex.: https://gitea.exemplo.com)"
+				"baseUrlInvalid": "Digite uma URL válida (ex.: https://gitea.exemplo.com)",
+				"ownerRequired": "O proprietário do repositório é obrigatório",
+				"ownerInvalid": "Formato de proprietário do repositório inválido",
+				"nameRequired": "O nome do repositório é obrigatório",
+				"nameInvalid": "Formato de nome de repositório inválido"
 			},
 			"toast": {
 				"verifyError": "Falha ao verificar o acesso ao Gitea",
@@ -1305,7 +1530,16 @@
 				"importError": "Falha ao importar issues",
 				"commentOnEnabled": "O Kaneo comentará com um link da tarefa em novas issues",
 				"commentOnDisabled": "Os comentários com link da tarefa em novas issues estão desativados",
-				"settingsUpdateError": "Falha ao atualizar a integração com o Gitea"
+				"settingsUpdateError": "Falha ao atualizar a integração com o Gitea",
+				"verifyOk": "O token do Gitea pode acessar este repositório",
+				"verifyWarning": "Verifique as permissões do token ou o acesso ao repositório",
+				"repoNotFound": "Repositório não encontrado ou inacessível",
+				"tokenRequired": "O token de acesso pessoal é obrigatório",
+				"tokenRequiredVerify": "Digite um token para verificar",
+				"secretCopied": "Copiado",
+				"unableToCopySecret": "Não foi possível copiar o segredo",
+				"notGiteaInstance": "The URL does not point to a Gitea instance",
+				"redirected": "Gitea URL redirected (usually to HTTPS). Use the final URL directly."
 			},
 			"commentTaskLinkTitle": "Comentar um link do Kaneo em novas issues",
 			"commentTaskLinkHint": "Para que as pessoas no Gitea possam ir direto para a tarefa.",
@@ -1320,7 +1554,40 @@
 			"browseNeedsCredentials": "Informe a URL do Gitea e um token para procurar.",
 			"browseEmpty": "Este token não tem acesso a nenhum repositório.",
 			"chooseRepositoryDescription": "Digite owner/name ou escolha um da lista.",
-			"webhookEvents": "Ative os eventos de push, pull request, issue, comentário de issue e create."
+			"webhookEvents": "Ative os eventos de push, pull request, issue, comentário de issue e create.",
+			"webhookShow": "Mostrar",
+			"webhookHide": "Ocultar",
+			"webhookCopy": "Copiar",
+			"connectionStatus": "Status da conexão",
+			"connectedActive": "Repositório conectado e ativo",
+			"notConnectedHint": "Nenhum repositório do Gitea conectado",
+			"badgeConnected": "Conectado",
+			"badgeNotConnected": "Não conectado",
+			"repository": "Repositório",
+			"repositoryHint": "Repositório do Gitea vinculado",
+			"webhookTitle": "Webhook",
+			"webhookSecretLabel": "Segredo (deve corresponder ao segredo do webhook no Gitea)",
+			"baseUrlHint": "URL raiz da sua instância do Gitea",
+			"tokenHint": "Token com acesso a repositórios e issues",
+			"currentToken": "armazenado",
+			"ownerLabel": "Proprietário",
+			"ownerHint": "Nome de usuário ou organização",
+			"repoNameLabel": "Nome do repositório",
+			"repoNameHint": "Somente o nome do repositório (sem o proprietário)",
+			"actionsTitle": "Ações",
+			"actionsHint": "Verifique o acesso e conecte",
+			"browse": "Procurar",
+			"verify": "Verificar",
+			"update": "Atualizar",
+			"connect": "Conectar",
+			"disconnect": "Desconectar",
+			"importSectionTitle": "Importar issues do Gitea",
+			"importing": "Importando…",
+			"importIssues": "Importar issues",
+			"browseModalTitle": "Seus repositórios",
+			"searchRepos": "Buscar…",
+			"loadingRepos": "Carregando repositórios…",
+			"retry": "Tentar novamente"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1338,7 +1605,28 @@
 			"webhookPlaceholder": "https://hooks.slack.com/services/...",
 			"webhookHint": "Crie um webhook de entrada no Slack e cole-o aqui.",
 			"connect": "Conectar Slack",
-			"update": "Atualizar Slack"
+			"update": "Atualizar Slack",
+			"channelHint": "Rótulo opcional apenas para sua referência. O Slack controla o canal de destino real a partir da configuração do webhook.",
+			"channelLabel": "Nome do canal",
+			"channelPlaceholder": "#atualizacoes-equipe",
+			"connected": "Conectado",
+			"connectionHint": "Cole a URL de um webhook de entrada do Slack e escolha quais eventos de tarefa devem ser publicados.",
+			"connectionTitle": "Conexão do webhook do Slack",
+			"disconnect": "Desconectar",
+			"events": {
+				"taskCommentCreated": "Novos comentários",
+				"taskCreated": "Novas tarefas",
+				"taskDescriptionChanged": "Mudanças de descrição",
+				"taskMentionCreated": "Menções no corpo da tarefa ou em comentários",
+				"taskPriorityChanged": "Mudanças de prioridade",
+				"taskStatusChanged": "Mudanças de status",
+				"taskTitleChanged": "Mudanças de título"
+			},
+			"eventsHint": "Escolha quais alterações do projeto devem ser publicadas no Slack.",
+			"eventsTitle": "Notificações de eventos",
+			"paused": "Pausado",
+			"saveChanges": "Salvar alterações",
+			"webhookLabel": "URL do webhook de entrada"
 		},
 		"discordIntegration": {
 			"validation": {
@@ -1356,7 +1644,28 @@
 			"webhookPlaceholder": "https://discord.com/api/webhooks/...",
 			"webhookHint": "Crie um webhook de canal no Discord e cole-o aqui.",
 			"connect": "Conectar Discord",
-			"update": "Atualizar Discord"
+			"update": "Atualizar Discord",
+			"channelHint": "Rótulo opcional apenas para sua referência. O Discord controla o canal de destino real a partir da configuração do webhook.",
+			"channelLabel": "Nome do canal",
+			"channelPlaceholder": "#atualizacoes-equipe",
+			"connected": "Conectado",
+			"connectionHint": "Cole a URL de um webhook do Discord e escolha quais eventos de tarefa devem ser publicados.",
+			"connectionTitle": "Conexão do webhook do Discord",
+			"disconnect": "Desconectar",
+			"events": {
+				"taskCommentCreated": "Novos comentários",
+				"taskCreated": "Novas tarefas",
+				"taskDescriptionChanged": "Mudanças de descrição",
+				"taskMentionCreated": "Menções no corpo da tarefa ou em comentários",
+				"taskPriorityChanged": "Mudanças de prioridade",
+				"taskStatusChanged": "Mudanças de status",
+				"taskTitleChanged": "Mudanças de título"
+			},
+			"eventsHint": "Escolha quais alterações do projeto devem ser publicadas no Discord.",
+			"eventsTitle": "Notificações de eventos",
+			"paused": "Pausado",
+			"saveChanges": "Salvar alterações",
+			"webhookLabel": "URL do webhook"
 		},
 		"genericWebhookIntegration": {
 			"validation": {
@@ -1400,7 +1709,14 @@
 			"disconnectDescription": "O Kaneo deixa de enviar eventos e remove o endpoint e o segredo salvos.",
 			"disconnectTitle": "Desconectar webhook?",
 			"reminderLeadTimeAfter": "horas antes do vencimento de uma tarefa",
-			"reminderLeadTimeBefore": "Enviar lembretes"
+			"reminderLeadTimeBefore": "Enviar lembretes",
+			"connectionTitle": "Conexão de webhook de saída",
+			"connectionHint": "Envie eventos de tarefas para seu próprio endpoint como JSON. Um cabeçalho X-Kaneo-Signature assinado é incluído quando um segredo é configurado.",
+			"connected": "Conectado",
+			"paused": "Pausado",
+			"eventsHint": "Escolha quais alterações do projeto devem acionar webhooks de saída.",
+			"saveChanges": "Salvar alterações",
+			"disconnect": "Desconectar"
 		},
 		"telegramIntegration": {
 			"validation": {
@@ -1429,7 +1745,29 @@
 			"chatLabelPlaceholder": "Atualizações de Engenharia",
 			"connect": "Conectar Telegram",
 			"botTokenSavedPlaceholder": "Salvo. Cole um novo token para substituí-lo.",
-			"loadError": "Não foi possível carregar as configurações do Telegram."
+			"loadError": "Não foi possível carregar as configurações do Telegram.",
+			"chatIdHint": "Digite o ID do chat do Telegram ou o nome de usuário do canal onde as atualizações devem ser publicadas.",
+			"chatLabelHint": "Rótulo opcional apenas para sua referência dentro do Kaneo.",
+			"connected": "Conectado",
+			"connectionHint": "Use um token de bot do Telegram e um ID de chat para enviar atualizações de tarefas do projeto a um chat ou tópico.",
+			"connectionTitle": "Conexão do bot do Telegram",
+			"disconnect": "Desconectar",
+			"events": {
+				"appointmentCreated": "Novos compromissos",
+				"appointmentUpdated": "Alterações em compromissos",
+				"taskCommentCreated": "Novos comentários",
+				"taskCreated": "Novas tarefas",
+				"taskDescriptionChanged": "Mudanças de descrição",
+				"taskMentionCreated": "Menções no corpo da tarefa ou em comentários",
+				"taskPriorityChanged": "Mudanças de prioridade",
+				"taskStatusChanged": "Mudanças de status",
+				"taskTitleChanged": "Mudanças de título"
+			},
+			"eventsHint": "Escolha quais alterações do projeto devem ser publicadas no Telegram.",
+			"eventsTitle": "Notificações de eventos",
+			"paused": "Pausado",
+			"saveChanges": "Salvar alterações",
+			"threadIdHint": "Opcional. Use isto para tópicos de fórum dentro de grupos do Telegram."
 		},
 		"repositoryBrowser": {
 			"title": "Escolha um repositório",
@@ -1448,7 +1786,14 @@
 			"missingOne": "Falta algum?",
 			"searching": "Buscando…",
 			"updated": "Atualizado {{time}}",
-			"useRepository": "Usar repositório"
+			"useRepository": "Usar repositório",
+			"footerSummary": "{{repoCount}} repositórios em {{installationCount}} instalações",
+			"manageInstallations": "Gerenciar instalações",
+			"updatedPrefix": "Atualizado",
+			"relativeJustNow": "agora mesmo",
+			"relativeMinutesAgo": "há {{count}}m",
+			"relativeHoursAgo": "há {{count}}h",
+			"relativeDaysAgo": "há {{count}}d"
 		},
 		"tasksImportExport": {
 			"exportTasks": "Exportar tarefas",
@@ -1486,7 +1831,17 @@
 			"dontMove": "Não mover",
 			"emptyDescription": "As automações precisam de um repositório conectado do GitHub, Gitea ou GitLab.",
 			"emptyTitle": "Nenhum repositório conectado",
-			"openIntegrations": "Abrir integrações"
+			"openIntegrations": "Abrir integrações",
+			"loading": "Carregando...",
+			"createColumnsFirst": "Crie colunas primeiro para configurar regras de automação.",
+			"githubHeading": "GitHub",
+			"githubHint": "Quando um evento do GitHub ocorrer, mova a tarefa vinculada para uma coluna.",
+			"giteaHeading": "Gitea",
+			"giteaHint": "Quando um evento de webhook do Gitea ocorrer, mova a tarefa vinculada para uma coluna.",
+			"selectColumnPlaceholder": "Selecionar coluna...",
+			"toastUpdated": "Regra de fluxo de trabalho atualizada",
+			"gitlabHeading": "GitLab",
+			"gitlabHint": "When a GitLab webhook event occurs, move the linked task to a column."
 		},
 		"externalLinks": {
 			"resources": "Recursos",
@@ -1520,7 +1875,27 @@
 				"webhookInvalid": "Enter a valid Mattermost webhook URL"
 			},
 			"webhookHint": "Crie um webhook de entrada no Mattermost e cole-o aqui.",
-			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/...",
+			"channelHint": "Optional label for your reference. Mattermost controls the actual destination channel from the webhook setup.",
+			"channelLabel": "Channel name",
+			"channelPlaceholder": "#team-updates",
+			"connected": "Connected",
+			"connectionHint": "Paste a Mattermost incoming webhook URL and choose which task events should be posted.",
+			"connectionTitle": "Mattermost webhook connection",
+			"disconnect": "Disconnect",
+			"events": {
+				"taskCommentCreated": "New comments",
+				"taskCreated": "New tasks",
+				"taskDescriptionChanged": "Description changes",
+				"taskPriorityChanged": "Priority changes",
+				"taskStatusChanged": "Status changes",
+				"taskTitleChanged": "Title changes"
+			},
+			"eventsHint": "Choose which project changes should post to Mattermost.",
+			"eventsTitle": "Event notifications",
+			"paused": "Paused",
+			"saveChanges": "Save changes",
+			"webhookLabel": "Incoming webhook URL"
 		},
 		"customFields": {
 			"createError": "Failed to create custom field.",
@@ -1585,7 +1960,19 @@
 			"typeLocked": "O tipo não pode ser alterado depois que o campo é criado.",
 			"unchecked": "Desmarcado",
 			"updateError": "Falha ao salvar o campo personalizado.",
-			"updateSuccess": "Campo personalizado salvo."
+			"updateSuccess": "Campo personalizado salvo.",
+			"addButton": "Add",
+			"defaultValuePlaceholder": "Default value",
+			"deleteButton": "Delete",
+			"empty": "No custom fields configured yet.",
+			"loading": "Loading custom fields...",
+			"noOptionsPlaceholder": "No options",
+			"optionsPlaceholder": "Options separated by commas",
+			"typePlaceholder": "Select field type",
+			"availableOptions": "Available options",
+			"defaultValues": "{{count}} default(s)",
+			"multiple": "Multiple",
+			"options": "{{count}} option(s)"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -1663,7 +2050,11 @@
 				"updated": "User updated",
 				"updateError": "Failed to update user"
 			},
-			"you": "Você"
+			"you": "Você",
+			"instanceBadge": "Instance",
+			"userCount_many": "{{count}} registered users",
+			"userCount_one": "{{count}} registered user",
+			"userCount_other": "{{count}} registered users"
 		},
 		"security": "Security",
 		"securityPage": {
@@ -1696,7 +2087,8 @@
 			"dialogDescription": "Pelo menos 8 caracteres, diferente da atual.",
 			"dialogTitle": "Alterar senha",
 			"passwordHint": "Use pelo menos 8 caracteres que você não usa em nenhum outro lugar.",
-			"passwordTitle": "Senha"
+			"passwordTitle": "Senha",
+			"sectionSubtitle": "Change the password you use to sign in."
 		},
 		"gitlabIntegration": {
 			"baseUrlLabel": "GitLab URL",
@@ -1719,7 +2111,16 @@
 				"updated": "GitLab integration saved",
 				"updateError": "Failed to save GitLab integration",
 				"verifyError": "Failed to verify GitLab access",
-				"verifyFirst": "Verify access failed. Check URL, token, and project path"
+				"verifyFirst": "Verify access failed. Check URL, token, and project path",
+				"notGitlabInstance": "The URL does not point to a GitLab instance",
+				"projectNotFound": "Project not found or not accessible",
+				"redirected": "GitLab URL redirected (usually to HTTPS). Use the final URL directly.",
+				"secretCopied": "Copied",
+				"tokenRequired": "Access token is required",
+				"tokenRequiredVerify": "Enter a token to verify",
+				"unableToCopySecret": "Unable to copy secret",
+				"verifyOk": "GitLab token can access this project",
+				"verifyWarning": "Check token permissions or project access"
 			},
 			"tokenLabel": "Access token",
 			"tokenPlaceholder": "Paste token",
@@ -1730,7 +2131,8 @@
 			"validation": {
 				"baseUrlInvalid": "Enter a valid URL (e.g. https://gitlab.com)",
 				"baseUrlRequired": "GitLab base URL is required",
-				"pathInvalid": "Enter the full path, e.g. group/project"
+				"pathInvalid": "Enter the full path, e.g. group/project",
+				"pathRequired": "Project path is required"
 			},
 			"webhookHint": "Adicione este webhook nas configurações do projeto para que as alterações voltem ao Kaneo.",
 			"loadProjectsError": "Não foi possível carregar os projetos.",
@@ -1739,7 +2141,38 @@
 			"chooseProjectDescription": "Digite o caminho ou escolha um da lista.",
 			"noSearchMatchTitle": "Nenhum projeto correspondente",
 			"useProject": "Usar projeto",
-			"webhookEvents": "Ative os eventos de push, issue, comentário e merge request."
+			"webhookEvents": "Ative os eventos de push, issue, comentário e merge request.",
+			"actionsHint": "Verify access and connect",
+			"actionsTitle": "Actions",
+			"badgeConnected": "Connected",
+			"badgeNotConnected": "Not connected",
+			"baseUrlHint": "https://gitlab.com, or the root URL of your instance",
+			"browse": "Browse",
+			"browseModalTitle": "Your projects",
+			"connect": "Connect",
+			"connectedActive": "Project connected and active",
+			"connectionStatus": "Connection status",
+			"currentToken": "stored",
+			"disconnect": "Disconnect",
+			"importDisabledHint": "Verify the project above to enable importing",
+			"importing": "Importing…",
+			"importIssues": "Import issues",
+			"importSectionTitle": "Import GitLab issues",
+			"loadingProjects": "Loading projects…",
+			"notConnectedHint": "No GitLab project connected",
+			"project": "Project",
+			"projectHint": "Linked GitLab project",
+			"projectPathHint": "Full path including any groups, e.g. group/subgroup/project",
+			"retry": "Retry",
+			"tokenHint": "Token with api scope and at least Developer on the project",
+			"tokenTypeHint": "How the token is sent. Access tokens use PRIVATE-TOKEN; an OAuth2 token uses Authorization.",
+			"update": "Update",
+			"verify": "Verify",
+			"webhookCopy": "Copy",
+			"webhookHide": "Hide",
+			"webhookSecretLabel": "Secret token (must match the one set on the webhook in GitLab)",
+			"webhookShow": "Show",
+			"webhookTitle": "Webhook"
 		},
 		"calendarFeeds": {
 			"title": "Calendar feeds",
@@ -1775,7 +2208,12 @@
 			"revokeConfirm": "Revogar feed",
 			"revokeConfirmDescription": "Os apps de calendário que usam este link deixam de receber atualizações. Isso não pode ser desfeito.",
 			"revokeConfirmTitle": "Revogar este feed?",
-			"revoking": "Revogando…"
+			"revoking": "Revogando…",
+			"createTitle": "Create a calendar feed",
+			"filterHint": "Include tasks with a start or due date. Select labels to include only tasks matching at least one, or leave empty to include all scheduled project tasks.",
+			"empty": "No calendar feeds yet.",
+			"feedUrl": "Calendar feed URL",
+			"copied": "Calendar feed link copied."
 		},
 		"invitationEmailFailed": "Invitation saved, but email delivery failed. Check SMTP settings and resend the invitation.",
 		"billing": {
@@ -1787,7 +2225,8 @@
 				"title": "Choose a plan"
 			},
 			"currentPlan": {
-				"title": "Current plan"
+				"title": "Current plan",
+				"subtitle": "Your workspace's active plan and billing status."
 			},
 			"disabled": "Billing isn't enabled on this instance. Self-hosted Kaneo includes every feature, free forever.",
 			"expiredCallout": {
@@ -1862,7 +2301,10 @@
 				"noDate": "Choose a plan below to continue after your trial.",
 				"badgeDaysLeft_many": "{{count}} dias restantes",
 				"badgeDaysLeft_one": "{{count}} dia restante",
-				"badgeDaysLeft_other": "{{count}} dias restantes"
+				"badgeDaysLeft_other": "{{count}} dias restantes",
+				"daysLeft_many": "You have {{count}} days left on your free trial. Choose a plan to continue without interruption.",
+				"daysLeft_one": "You have {{count}} day left on your free trial. Choose a plan to continue without interruption.",
+				"daysLeft_other": "You have {{count}} days left on your free trial. Choose a plan to continue without interruption."
 			},
 			"trialCard": {
 				"activeDescription": "Upgrade anytime to keep your workspace after the trial.",
@@ -1880,7 +2322,8 @@
 			"checkoutSuccess": {
 				"title": "Obrigado pela assinatura",
 				"description": "Pagamento recebido. O plano abaixo será atualizado assim que for confirmado."
-			}
+			},
+			"planName": "Kaneo Cloud {{plan}}"
 		},
 		"syncRules": {
 			"addLabel": "Add label",
@@ -1947,7 +2390,13 @@
 			"pausedSummary_other": "{{count}} tarefas pararam de sincronizar porque não correspondem mais às regras de sincronização.",
 			"providerToKaneo": "{{provider}} para Kaneo",
 			"reviewPaused": "Revisar",
-			"tasksLabelled": "Tarefas com a etiqueta"
+			"tasksLabelled": "Tarefas com a etiqueta",
+			"allSummary": "All of: {{labels}}",
+			"anySummary": "Any of: {{labels}}",
+			"filteredBadge": "Filtered by labels",
+			"pausedCount_many": "{{count}} paused links",
+			"pausedCount_one": "{{count}} paused link",
+			"pausedCount_other": "{{count}} paused links"
 		},
 		"advancedSettingsDescription": "Mostra controles extras, como regras de sincronização das integrações. Só neste navegador.",
 		"adminWorkspaces": {
@@ -2005,7 +2454,14 @@
 				"makeOwner": "Make owner",
 				"remove": "Remove from workspace",
 				"roleLabel": "Role for {{name}}",
-				"title": "Members of {{name}}"
+				"title": "Members of {{name}}",
+				"columns": {
+					"actions": "Actions",
+					"joined": "Joined",
+					"member": "Member",
+					"projects": "Projects",
+					"role": "Role"
+				}
 			},
 			"next": "Next",
 			"noOwner": "No owner",
@@ -2029,7 +2485,11 @@
 				"roleError": "Failed to update role",
 				"roleUpdated": "Role updated",
 				"transferError": "Failed to transfer ownership"
-			}
+			},
+			"instanceBadge": "Instance",
+			"workspaceCount_many": "{{count}} workspaces",
+			"workspaceCount_one": "{{count}} workspace",
+			"workspaceCount_other": "{{count}} workspaces"
 		},
 		"workspaceImport": {
 			"back": {
@@ -2337,7 +2797,8 @@
 				"taskDescriptionChanged": "A descrição muda",
 				"taskPriorityChanged": "A prioridade muda",
 				"taskStatusChanged": "O status muda",
-				"taskTitleChanged": "O título muda"
+				"taskTitleChanged": "O título muda",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"optional": "Opcional",
 			"postWhen": "Publicar quando",
@@ -2398,6 +2859,109 @@
 		},
 		"shared": {
 			"autosave": "As alterações são salvas automaticamente"
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "Crie uma chave de API primeiro e depois substitua o placeholder <YOUR_API_KEY> por ela.",
+			"authModeApiKey": "Chave de API",
+			"authModeOauth": "OAuth",
+			"cardDescription": "Escolha um modo de autenticação e depois execute o comando de instalação ou cole a configuração no seu agente.",
+			"cardTitle": "Conectar um agente",
+			"copied": "Copiado",
+			"copy": "Copiar",
+			"createApiKey": "Criar uma chave de API",
+			"followUpLabel": "Depois, autentique-se",
+			"installCommandLabel": "Comando de instalação",
+			"manualConfigLabel": "Configuração manual",
+			"oauthNote": "O OAuth é o padrão: a primeira conexão abre o Kaneo no seu navegador para autorizar o agente e, depois, o token é gerenciado pelo próprio agente.",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "endpoint MCP HTTP integrado desta instância",
+			"serverUrlLabel": "URL do servidor",
+			"subtitle": "Conecte agentes de IA como Claude, Codex, Gemini ou OpenCode a esta instância do Kaneo através do servidor MCP HTTP integrado.",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"skills": "Habilidades",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Execute estes comandos a partir da raiz do seu checkout do Kaneo e depois reinicie seu agente.",
+			"cardTitle": "Instalar a habilidade do Kaneo",
+			"copied": "Copiado",
+			"copy": "Copiar",
+			"destinationLabel": "Destino",
+			"installCommandLabel": "Comando de instalação",
+			"mcpRequirement": "A habilidade depende da conexão MCP: configure-a primeiro.",
+			"openMcpSettings": "Abrir configurações de MCP",
+			"pageTitle": "Habilidades",
+			"projectScope": "projeto",
+			"skillUrlDescription": "servido por esta instância para agentes",
+			"skillUrlLabel": "URL da habilidade",
+			"subtitle": "Instale a habilidade do Kaneo para que agentes de IA sigam as convenções desta instância e usem as ferramentas MCP corretamente.",
+			"title": "Habilidades de agentes",
+			"updateDescription": "As habilidades são lidas do disco: copie a pasta novamente após atualizar o Kaneo para aplicar as mudanças.",
+			"userScope": "usuário",
+			"verifyLabel": "Verificar"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopicsLabel": "Tópicos detectados",
+			"detectedTopics_many": "{{count}} topics detected",
+			"detectedTopics_one": "{{count}} topic detected",
+			"detectedTopics_other": "{{count}} topics detected",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"topicHint": "The Telegram Bot API cannot list forum topics, so enter the topic id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -2420,7 +2984,8 @@
 				"navigate": "Navegar",
 				"open": "Abrir",
 				"close": "Fechar"
-			}
+			},
+			"voltTheme": "Tema Volt"
 		},
 		"sidebar": {
 			"projects": "Projetos",
@@ -2443,7 +3008,12 @@
 			"deleteConfirmDescription": "Isso removerá permanentemente o projeto e todos os seus dados. Você não pode desfazer esta ação.",
 			"deletedToast": "Projeto excluído",
 			"deleteProject": "Excluir projeto",
-			"switcherLabel": "Trocar de projeto ou visualização"
+			"switcherLabel": "Trocar de projeto ou visualização",
+			"sortCompletion": "Progresso",
+			"sortCustom": "Ordem personalizada",
+			"sortDate": "Data de criação",
+			"sortName": "Nome",
+			"sortProjects": "Ordenar projetos"
 		},
 		"search": {
 			"inputPlaceholder": "Buscar tarefas, projetos, comentários...",
@@ -2454,7 +3024,8 @@
 				"workspace": "Espaços de trabalho",
 				"comment": "Comentários",
 				"activity": "Atividades",
-				"fallback": "Resultados"
+				"fallback": "Resultados",
+				"appointment": "Compromissos"
 			}
 		},
 		"settingsLayout": {
@@ -2473,7 +3044,8 @@
 			"workspaces": "Espaços de trabalho",
 			"switching": "Alternando...",
 			"addWorkspace": "Adicionar espaço de trabalho",
-			"selectWorkspace": "Selecionar espaço de trabalho"
+			"selectWorkspace": "Selecionar espaço de trabalho",
+			"sortWorkspaces": "Ordenar espaços"
 		},
 		"page": {
 			"projectsTitle": "Projetos",
@@ -2601,7 +3173,39 @@
 			"then": "depois",
 			"or": "ou",
 			"thenEllipsis": "depois…"
-		}
+		},
+		"keyboardShortcuts": {
+			"title": "Atalhos de teclado",
+			"subtitle": "Acelere seu fluxo de trabalho com atalhos de teclado",
+			"searchPlaceholder": "Buscar atalhos...",
+			"footer": "Pressione <kbd>Escape</kbd> para fechar",
+			"categories": {
+				"general": "Geral",
+				"create": "Criar",
+				"views": "Visualizações",
+				"navigation": "Navegação",
+				"quickSelect": "Seleção rápida (em pop-ups)"
+			},
+			"items": {
+				"openCommandPalette": "Abrir paleta de comandos",
+				"globalSearch": "Busca global",
+				"toggleSidebar": "Alternar barra lateral",
+				"showShortcuts": "Mostrar atalhos de teclado",
+				"closeModal": "Fechar modal/pop-up",
+				"createTask": "Criar tarefa",
+				"createProject": "Criar projeto",
+				"createWorkspace": "Criar espaço de trabalho",
+				"boardView": "Mudar para visualização em quadro",
+				"listView": "Mudar para visualização em lista",
+				"backlogView": "Mudar para visualização de backlog",
+				"nextTask": "Próxima tarefa",
+				"prevTask": "Tarefa anterior",
+				"openTask": "Abrir tarefa selecionada",
+				"quickSelectNumber": "Selecionar opção por número",
+				"calendarView": "Mudar para visualização de calendário"
+			}
+		},
+		"notifications": "Notificações"
 	},
 	"notifications": {
 		"newCount_one": "{{count}} nova",
@@ -2659,6 +3263,15 @@
 				"title": "Registro de tempo iniciado",
 				"contentWithTask": "Registro de tempo iniciado na tarefa: {{taskTitle}}",
 				"contentWithoutTask": "Registro de tempo iniciado em uma tarefa"
+			},
+			"appointment_created": {
+				"content": "Você foi atribuído ao compromisso: {{appointmentTitle}}",
+				"title": "Compromisso atribuído a você"
+			},
+			"appointment_updated": {
+				"contentAssignee": "Você foi atribuído ao compromisso: {{appointmentTitle}}",
+				"contentRescheduled": "O compromisso \"{{appointmentTitle}}\" foi remarcado.",
+				"title": "Compromisso atualizado"
 			}
 		},
 		"newCount_many": "{{count}} novas",
@@ -2683,7 +3296,11 @@
 			"taskLoadError": "This task couldn’t be loaded.",
 			"actionError": "Não foi possível atualizar sua caixa de entrada. Tente novamente.",
 			"readCleared": "Notificações lidas excluídas"
-		}
+		},
+		"shortcuts": {
+			"open": "Abrir notificações"
+		},
+		"title": "Notificações"
 	},
 	"activity": {
 		"assignedToSelf": "atribuiu a tarefa a si mesmo",
@@ -2791,11 +3408,14 @@
 				},
 				"mermaid": {
 					"renderFailed": "Mermaid diagram couldn't be rendered"
-				}
+				},
+				"enterUrl": "Digite a URL"
 			},
 			"importedFrom": "Imported from {{source}}",
 			"importedBy": "Imported by {{name}}",
-			"commentedOnForge": "comentou no {{forge}}"
+			"commentedOnForge": "comentou no {{forge}}",
+			"commentedOnGithub": "comentou no GitHub",
+			"github": "GitHub"
 		},
 		"movedFromOtherProject": "moved task from another project to \"{{to}}\""
 	},
@@ -2948,8 +3568,11 @@
 				"saved": "Saved",
 				"saving": "Saving…",
 				"saveFailed": "Changes could not be saved",
-				"retrySave": "Retry"
-			}
+				"retrySave": "Retry",
+				"enterUrl": "Digite a URL"
+			},
+			"customFieldUpdated": "Field updated",
+			"selectOption": "Select option"
 		},
 		"entity": {
 			"task": "Tarefa"
@@ -3001,7 +3624,8 @@
 			"startDate": "Data de início",
 			"noDate": "Sem data",
 			"dates": "Datas",
-			"project": "Projeto"
+			"project": "Projeto",
+			"end": "End"
 		},
 		"move": {
 			"title": "Mover tarefa",
@@ -3027,11 +3651,19 @@
 			},
 			"dueDate": {
 				"updateError": "Falha ao atualizar a data de vencimento da tarefa",
-				"clear": "Limpar data"
+				"clear": "Limpar data",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Due time",
+				"updateSuccess": "Data de vencimento da tarefa atualizada com sucesso"
 			},
 			"startDate": {
 				"updateError": "Falha ao atualizar a data de início da tarefa",
-				"clear": "Limpar data de início"
+				"clear": "Limpar data de início",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time",
+				"updateSuccess": "Data de início da tarefa atualizada com sucesso"
 			},
 			"labels": {
 				"searchPlaceholder": "Buscar etiquetas...",
@@ -3052,7 +3684,9 @@
 					"rose": "Rosa",
 					"crimson": "Carmesim"
 				},
-				"editLabels": "Editar etiquetas"
+				"editLabels": "Editar etiquetas",
+				"addSuccess": "Etiqueta adicionada",
+				"removeSuccess": "Etiqueta removida"
 			}
 		},
 		"backlog": {
@@ -3072,8 +3706,14 @@
 			"filters": {
 				"dueThisWeek": "Vence esta semana",
 				"dueNextWeek": "Vence na próxima semana",
-				"noDueDate": "Sem data de vencimento"
-			}
+				"noDueDate": "Sem data de vencimento",
+				"priority": "Prioridade: {{name}}",
+				"assignee": "Responsável: {{name}}",
+				"due": "Vencimento: {{date}}",
+				"label": "Etiqueta: {{name}}"
+			},
+			"filter": "Filtrar",
+			"addFilter": "Adicionar filtro..."
 		},
 		"sort": {
 			"direction": "Direção",
@@ -3086,7 +3726,9 @@
 				"dueDate": "Data de vencimento",
 				"title": "Título",
 				"number": "Número da tarefa"
-			}
+			},
+			"label": "Ordenar",
+			"by": "Ordenar por"
 		},
 		"boardFilters": {
 			"selectedCount": "{{count}} selecionado(s)",
@@ -3108,7 +3750,14 @@
 			},
 			"allCustomFieldValues": "All values",
 			"noCustomFieldValues": "No custom field values",
-			"noValuesUsedYet": "No values used yet"
+			"noValuesUsedYet": "No values used yet",
+			"filterBy": "Filtrar por",
+			"allStatuses": "Todos os status",
+			"allPriorities": "Todas as prioridades",
+			"allAssignees": "Todos os responsáveis",
+			"allDueDates": "Todas as datas de vencimento",
+			"allLabels": "Todas as etiquetas",
+			"all": "All"
 		},
 		"gantt": {
 			"searchPlaceholder": "Buscar tickets agendados...",
@@ -3128,7 +3777,8 @@
 			"previousPeriod": "Previous period",
 			"nextPeriod": "Next period",
 			"periodStart": "Timeline start date",
-			"showTaskDates": "Show task dates"
+			"showTaskDates": "Show task dates",
+			"noTasksMatch": "Nenhuma tarefa agendada corresponde a \"{{query}}\""
 		},
 		"delete": {
 			"title": "Excluir tarefa?",
@@ -3176,13 +3826,17 @@
 			"label": "Data de vencimento",
 			"clear": "Limpar data",
 			"updateError": "Falha ao atualizar a data de vencimento da tarefa",
-			"clearError": "Falha ao limpar a data de vencimento"
+			"clearError": "Falha ao limpar a data de vencimento",
+			"updateSuccess": "Data de vencimento da tarefa atualizada com sucesso",
+			"clearSuccess": "Data de vencimento da tarefa removida"
 		},
 		"labels": {
-			"empty": "Nenhuma etiqueta disponível"
+			"empty": "Nenhuma etiqueta disponível",
+			"label": "Etiquetas"
 		},
 		"update": {
-			"error": "Falha ao atualizar tarefa"
+			"error": "Falha ao atualizar tarefa",
+			"success": "Tarefa atualizada com sucesso"
 		},
 		"contextMenu": {
 			"copyLink": "Copiar link",
@@ -3234,7 +3888,9 @@
 			"priorityPlaceholder": "Definir prioridade…",
 			"assigneePlaceholder": "Atribuir a…",
 			"labelPlaceholder": "Adicionar etiqueta…",
-			"columnPlaceholder": "Mover para a coluna…"
+			"columnPlaceholder": "Mover para a coluna…",
+			"deleteConfirm": "Excluir {{count}} tarefas? Esta ação não pode ser desfeita.",
+			"setDueDate": "Definir data de vencimento"
 		},
 		"editor": {
 			"table": {
@@ -3283,7 +3939,8 @@
 			"moreFields_one": "Mais {{count}} campo",
 			"moreFields_many": "Mais {{count}} campos",
 			"moreFields_other": "Mais {{count}} campos",
-			"manage": "Gerenciar campos"
+			"manage": "Gerenciar campos",
+			"ariaLabel": "Custom fields"
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
@@ -3350,6 +4007,74 @@
 			"startsOn": "Começa em {{date}}",
 			"beforeStart": "{{date}} é antes da data de início",
 			"afterDue": "{{date}} é depois do prazo"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "Etiquetas",
+			"noLabel": "No label",
+			"none": "No grouping"
+		},
+		"boardSearchPlaceholder": "Buscar tickets...",
+		"recurrence": {
+			"daily": "Daily",
+			"day_many": "days",
+			"day_one": "day",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_many": "months",
+			"month_one": "month",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_many": "weeks",
+			"week_one": "week",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_many": "{{count}} days before",
+			"daysBefore_one": "{{count}} day before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders are delivered via the unified Telegram configuration.",
+			"hoursBefore_many": "{{count}} hours before",
+			"hoursBefore_one": "{{count}} hour before",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_many": "{{count}} minutes before",
+			"minutesBefore_one": "{{count}} minute before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_many": "days",
+			"unitDay_one": "day",
+			"unitDay_other": "days",
+			"unitHour_many": "hours",
+			"unitHour_one": "hour",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_many": "minutes",
+			"unitMinute_one": "minute",
+			"unitMinute_other": "minutos",
+			"unitWeek_many": "weeks",
+			"unitWeek_one": "week",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_many": "{{count}} weeks before",
+			"weeksBefore_one": "{{count}} week before",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -3540,7 +4265,13 @@
 			"error": "Falha ao convidar membro da equipe",
 			"createdTitle": "Convite criado",
 			"shareLinkDescription": "Compartilhe este link com {{email}} para que ele possa entrar no espaço de trabalho.",
-			"done": "Concluído"
+			"done": "Concluído",
+			"noTeams": "No team covers this workspace yet.",
+			"scopeHint": "Limit the invitation to specific workspaces and projects. Untick everything to rely on teams only.",
+			"scopeLabel": "Workspaces and projects",
+			"scopeRequired": "Select at least one team, workspace or project.",
+			"teamsHint": "Teams keep applying after acceptance: editing a team updates its members' access.",
+			"teamsLabel": "Teams"
 		},
 		"membersTable": {
 			"emptyTitle": "Ainda não há membros na equipe",
@@ -3567,7 +4298,8 @@
 			"cancelInviteSuccess": "Convite cancelado com sucesso",
 			"cancelInviteError": "Falha ao cancelar convite",
 			"roleUpdateSuccess": "Função atualizada",
-			"roleUpdateError": "Falha ao atualizar função"
+			"roleUpdateError": "Falha ao atualizar função",
+			"ariaMemberActions": "Ações do membro"
 		},
 		"projectAccess": {
 			"allProjects": "All projects",
@@ -3590,6 +4322,87 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"accessScope": {
+			"allProjects": "All projects",
+			"noProjects": "No projects in this workspace.",
+			"noWorkspaces": "You don't administer any workspace yet."
+		},
+		"accessTeams": {
+			"addMember": "Add",
+			"addMemberPlaceholder": "Add a workspace member",
+			"allProjects": "All projects",
+			"createTitle": "New team",
+			"created": "Team created",
+			"delete": "Delete",
+			"deleteDialogDescription": "Delete the team \"{{name}}\"? Members lose the access this team was the only source of. This action cannot be undone.",
+			"deleteDialogTitle": "Delete this team?",
+			"deleteError": "Failed to delete the team",
+			"deleted": "Team deleted",
+			"description": "Reusable access bundles: pick workspaces and projects, then assign the team to members or invitations.",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this team for?",
+			"edit": "Edit",
+			"editTitle": "Edit team",
+			"empty": "No teams yet",
+			"emptyDescription": "Create a team to grant scoped access at invitation time.",
+			"memberAdded": "Member added to the team",
+			"memberCount_many": "{{count}} members",
+			"memberCount_one": "{{count}} member",
+			"memberCount_other": "{{count}} members",
+			"memberError": "Failed to update the team member",
+			"memberRemoved": "Member removed from the team",
+			"membersLabel": "Members",
+			"nameLabel": "Name",
+			"namePlaceholder": "Design team",
+			"newTeam": "New team",
+			"noMembers": "No members yet.",
+			"pageTitle": "Teams",
+			"projectCount_many": "{{count}} projects",
+			"projectCount_one": "{{count}} project",
+			"projectCount_other": "{{count}} projects",
+			"removeMember": "Remove from the team",
+			"saveError": "Failed to save the team",
+			"scopeHint": "Projects selected here define everything the team can reach, including future invitations.",
+			"scopeLabel": "Access scope",
+			"title": "Teams",
+			"updated": "Team updated"
+		},
+		"inviteLinks": {
+			"copyFailed": "Não foi possível copiar automaticamente. Selecione o link e pressione Ctrl+C.",
+			"copyIconAria": "Copiar o link de convite",
+			"create": "Criar link",
+			"createError": "Falha ao criar o link de convite",
+			"createSuccess": "Link de convite criado",
+			"deleteError": "Falha ao revogar o link de convite",
+			"deleteSuccess": "Link de convite revogado",
+			"description": "Qualquer pessoa com o link pode entrar neste workspace como membro — sem necessidade de e-mail.",
+			"empty": "Ainda não há links de convite compartilháveis.",
+			"expiry24h": "24 horas",
+			"expiry30d": "30 dias",
+			"expiry7d": "7 dias",
+			"expiryLabel": "Expiração",
+			"expiryNever": "Nunca expira",
+			"join": "Entrar em {{workspaceName}}",
+			"linkCopied": "Link de convite copiado",
+			"maxUsesLabel": "Usos máximos",
+			"maxUsesUnlimited": "Ilimitado",
+			"never": "Nunca expira",
+			"revokeIconAria": "Revogar o link de convite",
+			"title": "Links de convite compartilháveis",
+			"uses": "{{used}}/{{max}} usos",
+			"usesUnlimited": "{{used}} usos",
+			"workspace": "Workspace: {{workspaceName}}"
+		},
+		"memberAccess": {
+			"description": "Acesso direto a projetos de {{name}} neste espaço de trabalho.",
+			"fullAccess": "Este membro já tem acesso total ao espaço de trabalho.",
+			"hint": "Desmarque tudo para remover os acessos diretos. O membro sai do espaço de trabalho se nenhuma equipe ou outro acesso permanecer.",
+			"menuItem": "Gerenciar acesso",
+			"save": "Salvar acesso",
+			"saveError": "Falha ao atualizar o acesso do membro",
+			"saveSuccess": "Acesso do membro atualizado",
+			"title": "Gerenciar acesso"
 		}
 	},
 	"publicProject": {
@@ -3838,6 +4651,185 @@
 			"composeLinkDescription": "The maintained compose.yml with persistent storage and health checks.",
 			"startLink": "Start and verify the services",
 			"startLinkDescription": "Start the stack, inspect its status, and check that the application is available."
+		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "Atribuído",
+			"create": "Criar",
+			"createTitle": "Novo compromisso",
+			"delete": "Excluir",
+			"description": "Compromissos são agendados como tarefas, mas nunca aparecem no quadro nem no backlog.",
+			"descriptionLabel": "Descrição",
+			"editTitle": "Editar compromisso",
+			"endLabel": "Fim",
+			"priorityLabel": "Prioridade",
+			"rangeError": "O fim deve ser posterior ao início.",
+			"save": "Salvar",
+			"startLabel": "Início",
+			"titleLabel": "Título",
+			"titlePlaceholder": "ex. Revisão de design",
+			"unassigned": "Não atribuído"
+		},
+		"empty": {
+			"description": "Compromissos ficam aqui, não no quadro nem no backlog.",
+			"title": "Nenhum compromisso ainda"
+		},
+		"loadError": "Não foi possível carregar os compromissos.",
+		"moveFromBacklog": "Mover para compromissos",
+		"newAppointment": "Novo compromisso",
+		"nextWeek": "Próxima semana",
+		"pageTitle": "Compromissos · {{name}}",
+		"previousWeek": "Semana anterior",
+		"tab": "Compromissos",
+		"toast": {
+			"created": "Compromisso criado",
+			"deleted": "Compromisso excluído",
+			"error": "Algo deu errado",
+			"moved": "Movido para compromissos",
+			"updated": "Compromisso atualizado"
+		},
+		"today": "Hoje",
+		"unscheduled": "Não agendado",
+		"weekHint": "Clique em um espaço vazio para adicionar um compromisso; clique em um para editá-lo."
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_many": "{{count}} sprints",
+		"sprints_one": "{{count}} sprint",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
+	},
+	"unified": {
+		"appointments": {
+			"count_many": "{{count}} appointments",
+			"count_one": "{{count}} compromisso",
+			"count_other": "{{count}} compromissos",
+			"emptyDescription": "Os compromissos de todos os seus projetos aparecerão aqui assim que forem agendados.",
+			"emptyTitle": "Ainda não há compromissos",
+			"unscheduled": "Não agendado"
+		},
+		"charts": {
+			"average": "Média",
+			"backlog": "Backlog",
+			"byProject": "Por projeto",
+			"completed": "Concluídas",
+			"created": "Criadas",
+			"empty": "Nenhuma atividade de tarefas nos últimos 6 meses.",
+			"noTasks": "Nenhuma tarefa para distribuir.",
+			"other": "Outros",
+			"perUnit": "{{value}}/{{unit}}",
+			"period": "Período",
+			"periodSummary": "{{created}} criadas · {{completed}} concluídas",
+			"rangeAll": "Todo o período",
+			"rangeWeek": "1 semana",
+			"range_many": "{{count}} months",
+			"range_one": "{{count}} mês",
+			"range_other": "{{count}} meses",
+			"statusDescription": "Onde estão atualmente as tarefas de todos os projetos.",
+			"statusTitle": "Distribuição por status",
+			"tasks": "Tarefas",
+			"unassigned": "Não atribuído",
+			"unit": "Unidade",
+			"unitDay": "dia",
+			"unitHint": "Finer units narrow the period to one that supports them.",
+			"unitHour": "hora",
+			"unitLabelDay": "Dia",
+			"unitLabelHour": "Hora",
+			"unitLabelMonth": "Mês",
+			"unitLabelWeek": "Semana",
+			"unitMonth": "mês",
+			"unitWeek": "semana",
+			"velocityDescription": "Tarefas criadas e concluídas por {{unit}} em todos os projetos.",
+			"velocityTitle": "Velocidade",
+			"workloadDescription": "Tarefas de quadro abertas por responsável, em todos os projetos.",
+			"workloadEmpty": "Nenhum trabalho aberto atribuído.",
+			"workloadTitle": "Carga de trabalho"
+		},
+		"consolidated": {
+			"backlogCount_many": "{{count}} tasks in backlog",
+			"backlogCount_one": "{{count}} task in backlog",
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_many": "{{count}} active tasks",
+			"tasksCount_one": "{{count}} active task",
+			"tasksCount_other": "{{count}} active tasks"
+		},
+		"empty": {
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"description": "Assim que você criar um projeto, os de todos os seus espaços de trabalho aparecerão aqui.",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet",
+			"title": "Ainda não há projetos"
+		},
+		"links": {
+			"mcp": "MCP",
+			"skills": "Habilidades"
+		},
+		"pageTitle": "Todos os projetos",
+		"section": {
+			"projectCount_many": "{{count}} projetos",
+			"projectCount_one": "{{count}} projeto",
+			"projectCount_other": "{{count}} projetos"
+		},
+		"stats": {
+			"completion": "Conclusão",
+			"projects": "Projetos",
+			"tasks": "Tarefas"
+		},
+		"table": {
+			"progress": "Progresso",
+			"tasks": "Tarefas"
+		},
+		"tabs": {
+			"appointments": "Compromissos",
+			"backlog": "Backlog",
+			"calendar": "Calendário",
+			"charts": "Gráficos",
+			"gantt": "Gantt",
+			"overview": "Visão geral",
+			"tasks": "Tarefas"
 		}
 	}
 }

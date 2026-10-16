@@ -4,13 +4,13 @@ import { canSyncTask } from "../../sync/eligibility";
 import { createIssueWrite } from "../../sync/dispatch-issue-write";
 import { and, eq } from "drizzle-orm";
 import db from "../../../database";
-import { publishEvent } from "../../../events";
 import {
   columnTable,
   integrationTable,
   projectTable,
   taskTable,
 } from "../../../database/schema";
+import { publishEvent } from "../../../events";
 import { claimTaskNumber } from "../../../task/controllers/claim-task-numbers";
 import type { GitHubConfig } from "../config";
 import { createExternalLink, findExternalLink } from "../services/link-manager";
@@ -35,7 +35,6 @@ type IssueOpenedPayload = {
     labels?: Array<string | { name?: string; color?: string }>;
     user: { login: string } | null;
   };
-  installation?: { id: number };
   repository: {
     id: number;
     owner: { login: string };
@@ -63,9 +62,12 @@ export async function handleIssueOpened(
     return;
   }
 
-  const integrations = (await findAllIntegrationsByRepo(payload)).filter(
-    (integration) => !integrationId || integration.id === integrationId,
-  );
+  const integrations = (
+    await findAllIntegrationsByRepo({
+      owner: repository.owner.login,
+      repo: repository.name,
+    })
+  ).filter((integration) => !integrationId || integration.id === integrationId);
 
   if (integrations.length === 0) {
     return;
@@ -86,17 +88,18 @@ export async function handleIssueOpened(
       const [current] = await tx
         .select()
         .from(integrationTable)
-        .where(eq(integrationTable.id, integration.id))
-        .for("update");
+        .where(eq(integrationTable.id, integration.id));
       if (!current?.isActive || current.config !== integration.config)
         return null;
+
       const existingLink = await findExternalLink(
         integration.id,
         "issue",
-        String(issue.number),
+        issue.number.toString(),
         tx,
       );
       if (existingLink) return null;
+
       const targetStatus = await resolveTargetStatus(
         projectId,
         closed ? "issue_closed" : "issue_opened",
@@ -118,6 +121,7 @@ export async function handleIssueOpened(
           orderBy: (column, { asc }) => [asc(column.position)],
         });
       const number = await claimTaskNumber(projectId, tx);
+
       const [task] = await tx
         .insert(taskTable)
         .values({
@@ -137,7 +141,7 @@ export async function handleIssueOpened(
           taskId: task.id,
           integrationId: integration.id,
           resourceType: "issue",
-          externalId: String(issue.number),
+          externalId: issue.number.toString(),
           url: issue.html_url,
           title: issue.title,
           metadata: {

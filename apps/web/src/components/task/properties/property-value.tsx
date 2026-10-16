@@ -17,7 +17,7 @@ export function PropertyValue({
     <button
       type="button"
       className={cn(
-        "group/value flex h-7.5 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-left font-medium text-[13px] text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-accent data-popup-open:bg-accent disabled:cursor-default disabled:hover:bg-transparent [&_svg]:size-3.5 [&_svg]:shrink-0",
+        "group/value flex h-7.5 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-left font-medium text-[0.8125rem] text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-accent data-popup-open:bg-accent disabled:cursor-default disabled:hover:bg-transparent [&_svg]:size-3.5 [&_svg]:shrink-0",
         className,
       )}
       {...props}

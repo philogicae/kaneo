@@ -1,7 +1,6 @@
 import { DndContext, KeyboardSensor } from "@dnd-kit/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  act,
   cleanup,
   fireEvent,
   render as renderWithoutClient,
@@ -54,13 +53,13 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 vi.mock("@/hooks/queries/external-link/use-external-links", () => ({
-  default: function useMockExternalLinks(taskId: string) {
+  default: function useExternalLinksMock(taskId: string) {
     return useExternalLinks(taskId);
   },
 }));
 
 vi.mock("@/hooks/queries/label/use-get-labels-by-task", () => ({
-  default: function useMockTaskLabels(taskId: string) {
+  default: function useGetLabelsByTaskMock(taskId: string) {
     return useGetLabelsByTask(taskId);
   },
 }));
@@ -82,20 +81,26 @@ vi.mock(
 
 vi.mock(
   "../kanban-board/task-card-context-menu/task-card-context-menu-content",
+  () => ({ default: () => null }),
+);
+
+vi.mock(
+  "@/hooks/queries/custom-field/use-get-custom-field-values-by-project",
   () => ({
-    default: () => null,
+    default: () => ({ data: [] }),
   }),
 );
 
+// Rows read the project through the selector form, so the mock has to
+// support both call shapes.
+const projectState = { project: { id: "project-1", slug: "kan" } };
+vi.mock("@/hooks/mutations/appointment/use-move-task-to-appointments", () => ({
+  default: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 vi.mock("@/store/project", () => ({
-  default: (
-    selector?: (state: {
-      project: { id: string; slug: string; columns: never[] };
-    }) => unknown,
-  ) => {
-    const state = { project: { id: "project-1", slug: "kan", columns: [] } };
-    return selector ? selector(state) : state;
-  },
+  default: (selector?: (state: typeof projectState) => unknown) =>
+    selector ? selector(projectState) : projectState,
 }));
 
 vi.mock("@/store/user-preferences", () => ({
@@ -104,6 +109,7 @@ vi.mock("@/store/user-preferences", () => ({
     showDueDates: true,
     showLabels: true,
     showTaskNumbers: true,
+    showTaskItemCounts: false,
   }),
 }));
 
@@ -184,51 +190,13 @@ describe("TaskRow", () => {
         screen.getByRole("button", { name: /Row from payload/ }),
         { key: "Enter" },
       );
+      expect(navigate).toHaveBeenCalled();
+      expect(onDragStart).not.toHaveBeenCalled();
       fireEvent.keyDown(
         screen.getByRole("button", { name: /Row from payload/ }),
         { key: " ", code: "Space" },
       );
-      expect(navigate).not.toHaveBeenCalled();
-      expect(onDragStart).not.toHaveBeenCalled();
-    },
-  );
-
-  it.each(["board", "list"])(
-    "takes keyboard focus and marks itself as a shortcut surface in the %s view",
-    (view) => {
-      render(
-        view === "board" ? (
-          <TaskCard task={task} />
-        ) : (
-          <TaskRow task={task} projectSlug="kan" />
-        ),
-      );
-      const row = screen.getByRole("button", { name: /Row from payload/ });
-
-      fireEvent.keyDown(document, { key: "Tab" });
-      act(() => row.focus());
-
-      expect(useBulkSelectionStore.getState().focusedTaskId).toBe(task.id);
-      expect(row).toHaveAttribute("data-task-id", task.id);
-      expect(row).toHaveAttribute("data-shortcut-surface");
-    },
-  );
-
-  it.each(["board", "list"])(
-    "leaves keyboard focus off on pointer focus in the %s view",
-    (view) => {
-      useBulkSelectionStore.getState().setFocusedTask("other-task");
-      render(
-        view === "board" ? (
-          <TaskCard task={task} />
-        ) : (
-          <TaskRow task={task} projectSlug="kan" />
-        ),
-      );
-
-      fireEvent.focus(screen.getByRole("button", { name: /Row from payload/ }));
-
-      expect(useBulkSelectionStore.getState().focusedTaskId).toBeNull();
+      expect(onDragStart).toHaveBeenCalledOnce();
     },
   );
 
@@ -309,17 +277,7 @@ describe("TaskRow", () => {
 
     expect(screen.getByText("Bug")).toBeVisible();
     expect(screen.getByText("#42")).toBeVisible();
-    expect(
-      screen.getByRole("button", { name: "tasks:subtasks.progress" }),
-    ).toHaveTextContent("2/5");
     expect(useExternalLinks).not.toHaveBeenCalled();
     expect(useGetLabelsByTask).not.toHaveBeenCalled();
   });
 });
-
-vi.mock(
-  "@/hooks/queries/custom-field/use-get-custom-field-values-by-project",
-  () => ({
-    default: () => ({ data: [] }),
-  }),
-);

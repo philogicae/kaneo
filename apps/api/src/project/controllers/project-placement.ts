@@ -1,19 +1,10 @@
-import { and, eq, max, ne, sql } from "drizzle-orm";
+import { and, eq, max, ne } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import type db from "../../database";
 import { projectTable } from "../../database/schema";
 import { findProjectKeyConflict, projectKeyTakenMessage } from "../project-key";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
-
-export async function lockProjectOrdering(
-  tx: Transaction,
-  workspaceId: string,
-) {
-  await tx.execute(
-    sql`SELECT pg_advisory_xact_lock(1524, hashtext(${workspaceId}))`,
-  );
-}
 
 export async function assertProjectKeyAvailable(
   tx: Transaction,

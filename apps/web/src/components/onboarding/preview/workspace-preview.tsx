@@ -68,7 +68,7 @@ export function WorkspacePreview({
     >
       <div className="absolute top-[76px] left-[72px] flex items-center gap-2">
         <span className="size-1.5 rounded-full bg-success shadow-[0_0_0_3px_--theme(--color-success/25%)]" />
-        <span className="font-mono text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
+        <span className="font-mono text-[0.6875rem] text-muted-foreground uppercase tracking-[0.06em]">
           {label}
         </span>
       </div>
@@ -91,7 +91,7 @@ export function WorkspacePreview({
           showMembers={showMembers}
         />
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-s-xl border border-border border-e-0 bg-background">
-          <div className="flex h-11 shrink-0 items-center gap-2.5 border-border border-b px-4 text-[13px] text-muted-foreground">
+          <div className="flex h-11 shrink-0 items-center gap-2.5 border-border border-b px-4 text-[0.8125rem] text-muted-foreground">
             <PanelLeft className="size-3.5" />
             <span className="h-3.5 w-px bg-border" />
             <span className="truncate">{workspaceName}</span>

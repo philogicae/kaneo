@@ -34,7 +34,7 @@ export function TaskReferenceRow({
         type="button"
         onClick={onOpen}
         className={cn(
-          "min-w-0 flex-1 text-left text-[13px] outline-none focus-visible:underline max-sm:line-clamp-2 sm:truncate",
+          "min-w-0 flex-1 text-left text-[0.8125rem] outline-none focus-visible:underline max-sm:line-clamp-2 sm:truncate",
           done
             ? "text-muted-foreground line-through"
             : "text-foreground/85 group-hover:text-foreground",

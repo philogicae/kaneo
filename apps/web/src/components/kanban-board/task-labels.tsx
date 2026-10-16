@@ -23,7 +23,7 @@ export function TaskLabels({
         <span
           key={label.id}
           data-slot="task-label"
-          className="flex max-w-full min-w-0 items-center gap-1.5 font-medium text-[10px] text-foreground/85"
+          className="flex max-w-full min-w-0 items-center gap-1.5 font-medium text-[0.625rem] text-foreground/85"
         >
           <span
             aria-hidden="true"

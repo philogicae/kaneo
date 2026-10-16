@@ -107,7 +107,7 @@ export function UserDirectoryRow({
         className={cn(
           CELL_CLASS,
           USER_DIRECTORY_COLUMNS.joined,
-          "text-[13px] text-muted-foreground tabular-nums",
+          "text-[0.8125rem] text-muted-foreground tabular-nums",
         )}
       >
         {formatDateMedium(user.createdAt)}

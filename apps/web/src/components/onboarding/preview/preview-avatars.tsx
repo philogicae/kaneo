@@ -28,7 +28,7 @@ export function PreviewAvatars({
     id: `seat-${position}`,
   }));
   const avatar =
-    "-ms-1.5 flex size-4 items-center justify-center rounded-full border-[1.5px] border-sidebar font-semibold text-[7px] first:ms-0";
+    "-ms-1.5 flex size-4 items-center justify-center rounded-full border-[1.5px] border-sidebar font-semibold text-[0.4375rem] first:ms-0";
 
   return (
     <span className="ms-auto flex" aria-hidden="true">

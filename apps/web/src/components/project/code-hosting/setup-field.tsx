@@ -19,7 +19,7 @@ export function SetupField({
 }: SetupFieldProps) {
   return (
     <div className={cn("min-w-0 space-y-1.5", className)}>
-      <Label htmlFor={htmlFor} className="text-[13px] font-medium">
+      <Label htmlFor={htmlFor} className="text-[0.8125rem] font-medium">
         {label}
       </Label>
       {children}

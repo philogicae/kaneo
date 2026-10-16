@@ -1,5 +1,4 @@
 import { createHmac } from "node:crypto";
-import * as Sentry from "@sentry/node";
 import { sendOutboundRequest } from "../../utils/outbound-request";
 
 type GenericWebhookPayload = Record<string, unknown>;
@@ -9,11 +8,6 @@ export async function postToGenericWebhook(
   payload: GenericWebhookPayload,
   secret?: string,
 ): Promise<void> {
-  Sentry.addBreadcrumb({
-    category: "integration",
-    level: "info",
-    data: { integration: "generic-webhook" },
-  });
   const body = JSON.stringify(payload);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -25,6 +19,8 @@ export async function postToGenericWebhook(
       .digest("hex");
   }
 
+  // The destination is validated and the response body never enters an error:
+  // the URL and body are both operator- or webhook-controlled.
   await sendOutboundRequest(
     webhookUrl,
     { headers, body },

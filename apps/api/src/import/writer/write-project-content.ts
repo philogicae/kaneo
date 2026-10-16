@@ -58,7 +58,7 @@ export async function writeProjectContent(
     await tx
       .update(projectTable)
       .set({
-        lastTaskNumber: sql`GREATEST(${projectTable.lastTaskNumber}, ${lastNumber})`,
+        lastTaskNumber: sql`MAX(${projectTable.lastTaskNumber}, ${lastNumber})`,
       })
       .where(eq(projectTable.id, projectId));
   }

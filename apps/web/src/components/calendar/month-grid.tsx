@@ -35,7 +35,7 @@ export default function MonthGrid({
         {weekdayTemplate.map((day) => (
           <div
             key={`weekday-${day.toISOString()}`}
-            className="border-r border-border/60 px-1 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+            className="border-r border-border/60 px-1 py-2 text-center text-[0.6875rem] font-medium uppercase tracking-wide text-muted-foreground"
           >
             {formatDate(day, { weekday: "short" })}
           </div>
@@ -75,7 +75,7 @@ export default function MonthGrid({
                 >
                   <span
                     className={cn(
-                      "flex size-5 items-center justify-center rounded-full text-[11px] font-medium",
+                      "flex size-5 items-center justify-center rounded-full text-[0.6875rem] font-medium",
                       !isSameMonth(day, visibleMonth) &&
                         "text-muted-foreground/60",
                       isToday(day) && "bg-primary text-primary-foreground",

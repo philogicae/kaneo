@@ -2,8 +2,11 @@ import { and, asc, eq, isNotNull } from "drizzle-orm";
 import db from "../../database";
 import { activityTable, userTable } from "../../database/schema";
 
-async function getComments(taskId: string) {
-  const comments = await db
+async function getComments(
+  taskId: string,
+  options: { limit?: number; offset?: number } = {},
+) {
+  const query = db
     .select({
       id: activityTable.id,
       taskId: activityTable.taskId,
@@ -24,7 +27,15 @@ async function getComments(taskId: string) {
         isNotNull(activityTable.content),
       ),
     )
-    .orderBy(asc(activityTable.createdAt));
+    .orderBy(asc(activityTable.createdAt))
+    // -1 disables the upper bound so an offset-only caller still gets a valid
+    // SQLite query (OFFSET alone is not valid without LIMIT).
+    .limit(options.limit ?? -1);
+
+  const comments =
+    options.offset !== undefined
+      ? await query.offset(options.offset)
+      : await query;
 
   return comments.map((c) => ({
     id: c.id,

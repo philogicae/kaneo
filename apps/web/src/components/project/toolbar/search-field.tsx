@@ -45,7 +45,7 @@ export function SearchField({
             event.currentTarget.blur();
           }
         }}
-        className="[&_[data-slot=input]]:h-7 [&_[data-slot=input]]:pr-7 [&_[data-slot=input]]:pl-8 [&_[data-slot=input]]:text-[13px] [&_[data-slot=input]]:leading-7"
+        className="[&_[data-slot=input]]:h-7 [&_[data-slot=input]]:pr-7 [&_[data-slot=input]]:pl-8 [&_[data-slot=input]]:text-[0.8125rem] [&_[data-slot=input]]:leading-7"
       />
       {value && (
         <Button

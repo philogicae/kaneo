@@ -24,7 +24,6 @@ export async function saveSyncRules(
       projectId,
       authorizedWorkspaceId,
       tx,
-      true,
     );
     const [current] = await tx
       .select()
@@ -34,8 +33,7 @@ export async function saveSyncRules(
           eq(integrationTable.id, integration.id),
           eq(integrationTable.config, integration.config),
         ),
-      )
-      .for("update");
+      );
     if (!current)
       throw new HTTPException(409, {
         message: "Integration changed; preview again before saving",

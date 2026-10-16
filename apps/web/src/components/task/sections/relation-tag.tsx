@@ -30,7 +30,7 @@ export function RelationTag({ kind }: { kind: RelationKind }) {
   return (
     <span
       className={cn(
-        "inline-flex h-5 shrink-0 items-center gap-1.25 rounded-[5px] px-1.75 font-medium text-[11px]",
+        "inline-flex h-5 shrink-0 items-center gap-1.25 rounded-[5px] px-1.75 font-medium text-[0.6875rem]",
         tone.className,
       )}
     >

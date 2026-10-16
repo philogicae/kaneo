@@ -19,7 +19,7 @@ export function assigneeMenuOptions(
     {
       value: "",
       label: unassignedLabel,
-      icon: <UnassignedAvatar className="size-4 text-[8px]" />,
+      icon: <UnassignedAvatar className="size-4 text-[0.5rem]" />,
       selected: current !== undefined && !current,
     },
     ...members.map((member) => ({
@@ -28,7 +28,7 @@ export function assigneeMenuOptions(
       icon: (
         <Avatar className="size-4">
           <AvatarImage src={member.image ?? ""} alt="" />
-          <AvatarFallback className="text-[8px]">
+          <AvatarFallback className="text-[0.5rem]">
             {getInitials(member.name)}
           </AvatarFallback>
         </Avatar>

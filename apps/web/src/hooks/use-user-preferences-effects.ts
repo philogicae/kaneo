@@ -2,23 +2,21 @@ import { useEffect } from "react";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
 export function useUserPreferencesEffects() {
-  const { compactMode } = useUserPreferencesStore();
+  const { uiScale } = useUserPreferencesStore();
 
   useEffect(() => {
     const root = document.documentElement;
 
-    if (compactMode) {
-      root.classList.add("compact-mode");
-    } else {
-      root.classList.remove("compact-mode");
-    }
+    // The preference multiplies the CSS base (see index.css) instead of
+    // replacing it, so a user scale stacks with the shipped density.
+    root.style.setProperty("--ui-scale", String(uiScale));
 
     return () => {
-      root.classList.remove("compact-mode");
+      root.style.removeProperty("--ui-scale");
     };
-  }, [compactMode]);
+  }, [uiScale]);
 
   return {
-    compactMode,
+    uiScale,
   };
 }

@@ -26,7 +26,7 @@ export function AuthPage({
                 className="size-10 shrink-0 rounded-lg border border-border"
               />
               <div className="flex flex-col gap-1.5">
-                <h1 className="font-semibold text-[22px] text-foreground leading-7 tracking-[-0.02em]">
+                <h1 className="font-semibold text-[1.375rem] text-foreground leading-7 tracking-[-0.02em]">
                   {title}
                 </h1>
                 {description ? (

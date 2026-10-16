@@ -16,6 +16,7 @@ import {
   ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
 import { useUpdateTaskDueDate } from "@/hooks/mutations/task/use-update-task-due-date";
+import { applyDatePreservingTime } from "@/lib/task-datetime";
 import { toast } from "@/lib/toast";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 import type Task from "@/types/task";
@@ -34,11 +35,22 @@ export function DueDateSubmenu({ task }: { task: Task }) {
     try {
       await updateTaskDueDate({
         ...task,
-        dueDate: date?.toISOString() ?? null,
+        dueDate: date
+          ? applyDatePreservingTime(value ?? undefined, date).toISOString()
+          : null,
       });
+      toast.success(
+        date
+          ? t("tasks:dueDate.updateSuccess")
+          : t("tasks:dueDate.clearSuccess"),
+      );
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : t("tasks:dueDate.updateError"),
+        error instanceof Error
+          ? error.message
+          : date
+            ? t("tasks:dueDate.updateError")
+            : t("tasks:dueDate.clearError"),
       );
     }
   };

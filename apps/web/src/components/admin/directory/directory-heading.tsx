@@ -16,7 +16,7 @@ export function DirectoryHeading({
     <span className="flex items-center gap-2">
       {title}
       {count !== undefined ? (
-        <span className="text-[13px] font-normal text-muted-foreground tabular-nums">
+        <span className="text-[0.8125rem] font-normal text-muted-foreground tabular-nums">
           {count}
         </span>
       ) : null}

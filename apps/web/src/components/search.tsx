@@ -41,7 +41,7 @@ export default function Search() {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="flex items-center gap-2 text-[10px]">
+            <p className="flex items-center gap-2 text-[0.625rem]">
               {t("navigation:commandPalette.search")}
               <ShortcutKeys id="openSearch" />
             </p>

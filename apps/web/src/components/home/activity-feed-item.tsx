@@ -28,17 +28,17 @@ export function ActivityFeedItem({
           src={activity.userImage ?? activity.externalUserAvatar ?? ""}
           alt=""
         />
-        <AvatarFallback className="border border-border/30 font-medium text-[10px]">
+        <AvatarFallback className="border border-border/30 font-medium text-[0.625rem]">
           {getInitials(actorName)}
         </AvatarFallback>
       </Avatar>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="text-[13px] text-muted-foreground leading-[18px]">
+        <p className="text-[0.8125rem] text-muted-foreground leading-[1.125rem]">
           <span className="font-medium text-foreground">{actorName}</span>{" "}
           {describeActivity(activity, t)}
         </p>
         {activity.type === "comment" && activity.excerpt && (
-          <p className="line-clamp-3 wrap-break-word rounded-lg bg-muted/70 px-2.5 py-2 text-[13px] text-foreground/85 leading-[18px]">
+          <p className="line-clamp-3 wrap-break-word rounded-lg bg-muted/70 px-2.5 py-2 text-[0.8125rem] text-foreground/85 leading-[1.125rem]">
             {activity.excerpt}
           </p>
         )}

@@ -1,10 +1,17 @@
-import { useRestoreTaskFocus } from "@/components/project/task-view-keys/use-restore-task-focus";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useNavigate } from "@tanstack/react-router";
-import { Trash2Icon } from "lucide-react";
+import { format } from "date-fns";
+import {
+  Calendar,
+  CalendarClock,
+  CalendarX,
+  SlidersHorizontal,
+} from "lucide-react";
 import { type CSSProperties, memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useRestoreTaskFocus } from "@/components/project/task-view-keys/use-restore-task-focus";
+import { TaskProgressBadges } from "@/components/task/task-progress-badges";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -14,23 +21,38 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/preview-card";
+import useMoveTaskToAppointments from "@/hooks/mutations/appointment/use-move-task-to-appointments";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
+import useGetCustomFieldValuesByProject from "@/hooks/queries/custom-field/use-get-custom-field-values-by-project";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
 import { useTaskHoverPrefetch } from "@/hooks/use-task-hover-prefetch";
 import { cn } from "@/lib/cn";
+import {
+  dueDateStatusColors,
+  getDueDateStatus,
+  isTaskCompleted,
+} from "@/lib/due-date-status";
+import { getInitials } from "@/lib/get-initials";
 import { isKeyboardFocus } from "@/lib/is-keyboard-focus";
 import { isOwnDomEvent } from "@/lib/is-own-dom-event";
-import { isTaskCompleted } from "@/lib/due-date-status";
+import { EASE_OUT_CSS } from "@/lib/motion";
+import { getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import useBacklogBulkSelectionStore from "@/store/backlog-bulk-selection";
 import useProjectStore from "@/store/project";
+import { useUserPreferencesStore } from "@/store/user-preferences";
 import type Task from "@/types/task";
 import TaskCardContextMenuContent from "../kanban-board/task-card-context-menu/task-card-context-menu-content";
+import { TaskLabels } from "../kanban-board/task-labels";
 import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
-import { TaskRowBody } from "../list-view/task-row-body";
-import { EASE_OUT_CSS } from "@/lib/motion";
 
 type BacklogTaskRowProps = {
   task: Task;
@@ -41,6 +63,19 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
 }: BacklogTaskRowProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { mutateAsync: moveTaskToAppointments } = useMoveTaskToAppointments();
+  const handleMoveToAppointments = async (moveTask: Task) => {
+    try {
+      await moveTaskToAppointments({
+        taskId: moveTask.id,
+        projectId: moveTask.projectId,
+      });
+      toast.success(t("appointments:toast.moved"));
+    } catch {
+      toast.error(t("appointments:toast.error"));
+    }
+  };
+
   const {
     attributes,
     listeners,
@@ -58,7 +93,17 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
   const projectColumns = useProjectStore((state) => state.project?.columns);
   const taskIsCompleted = isTaskCompleted(task.status, projectColumns);
   const { data: workspace } = useActiveWorkspace();
-  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const {
+    showAssignees,
+    showPriority,
+    showDueDates,
+    showLabels,
+    showTaskNumbers,
+  } = useUserPreferencesStore();
+  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState<
+    boolean | null
+  >(null);
+  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
   const { mutateAsync: deleteTask } = useDeleteTask();
   const toggleSelection = useBacklogBulkSelectionStore(
     (state) => state.toggleSelection,
@@ -66,10 +111,6 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
   const selectRange = useBacklogBulkSelectionStore(
     (state) => state.selectRange,
   );
-  const setFocusedTask = useBacklogBulkSelectionStore(
-    (state) => state.setFocusedTask,
-  );
-  useRestoreTaskFocus(task.id, useBacklogBulkSelectionStore);
   const setSelectionAnchor = useBacklogBulkSelectionStore(
     (state) => state.setSelectionAnchor,
   );
@@ -79,8 +120,12 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
   const isTaskFocused = useBacklogBulkSelectionStore(
     (state) => state.focusedTaskId === task.id,
   );
-
+  const setFocusedTask = useBacklogBulkSelectionStore(
+    (state) => state.setFocusedTask,
+  );
+  useRestoreTaskFocus(task.id, useBacklogBulkSelectionStore);
   const hoverPrefetch = useTaskHoverPrefetch(task.id);
+
   const { data: workspaceUsers } = useGetActiveWorkspaceUsers(
     workspace?.id ?? "",
   );
@@ -91,13 +136,29 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
     );
   }, [workspaceUsers, task.userId]);
 
+  const { data: projectCustomFieldValues = [] } =
+    useGetCustomFieldValuesByProject(task.projectId);
+
+  const customFieldValues = useMemo(
+    () => projectCustomFieldValues.filter((field) => field.taskId === task.id),
+    [projectCustomFieldValues, task.id],
+  );
+
+  const activeCustomFieldValues = useMemo(
+    () =>
+      customFieldValues.filter(
+        (field) => field.value !== null && field.value !== "",
+      ),
+    [customFieldValues],
+  );
+
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition: transition || `transform 200ms ${EASE_OUT_CSS}`,
     touchAction: isDragging ? "none" : "auto",
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     if (!projectId || !task || !isOwnDomEvent(e)) return;
     if (e.defaultPrevented) return;
 
@@ -132,16 +193,18 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.defaultPrevented || e.target !== e.currentTarget) return;
-    if (e.key === "Enter" && e.shiftKey) {
+    if (e.key === "Enter") {
+      handleClick(e);
       e.preventDefault();
-      selectRange(task.id);
+    } else {
+      listeners?.onKeyDown?.(e);
     }
   };
 
   const handleDeleteTask = async () => {
     try {
       await deleteTask(task.id);
-      toast.success(t("tasks:delete.success"), { icon: Trash2Icon });
+      toast.success(t("tasks:delete.success"));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : t("tasks:delete.error"),
@@ -153,26 +216,28 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
     <div
       ref={setNodeRef}
       style={style}
-      data-kaneo-sortable
       className={cn(
         "border-b border-border/50 transition-colors duration-150",
         isDragging && "opacity-50",
         isTaskSelected &&
           "bg-accent/60 shadow-sm ring-1 ring-inset ring-ring/30",
-        isTaskFocused && "ring-1 ring-board-card-focus ring-inset",
+        isTaskFocused && "ring-2 ring-inset ring-ring/50",
       )}
     >
-      <ContextMenu>
+      <ContextMenu
+        onOpenChange={(open) => {
+          if (open) setHasOpenedMenu(true);
+        }}
+      >
         <ContextMenuTrigger asChild>
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- false positive for onClick and onKeyDown */}
           <div
+            data-task-id={task.id}
             onClick={handleClick}
             className={cn(
-              "group relative flex h-10 cursor-pointer items-center gap-3 px-3.5 outline-none transition-colors",
+              "group relative flex items-center gap-3 px-4 py-1.5 transition-colors cursor-pointer",
               isTaskSelected ? "bg-accent/45" : "hover:bg-accent/60",
             )}
-            data-task-id={task.id}
-            data-shortcut-surface
             {...attributes}
             {...listeners}
             {...hoverPrefetch}
@@ -182,19 +247,120 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
               setFocusedTask(isKeyboardFocus(event) ? task.id : null);
             }}
           >
-            <TaskRowBody
-              task={task}
-              projectSlug={projectSlug}
-              workspaceId={workspace?.id ?? ""}
-              isCompleted={taskIsCompleted}
-              assigneeName={assignee?.user?.name ?? task.assigneeName}
-              assigneeImage={assignee?.user?.image}
-              showPullRequests={false}
-            />
+            {showPriority && (
+              <div className="flex-shrink-0 first:[&_svg]:h-4 first:[&_svg]:w-4">
+                {getPriorityIcon(task.priority ?? "")}
+              </div>
+            )}
+            {showTaskNumbers && (
+              <div className="text-xs font-mono text-muted-foreground flex-shrink-0">
+                {projectSlug}-{task.number}
+              </div>
+            )}
+
+            <div className="flex-1 min-w-0 flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-between w-full">
+                <span className="text-sm text-foreground truncate">
+                  {task.title}
+                </span>
+                <div className="flex items-center gap-1">
+                  <TaskProgressBadges task={task} />
+                  {showLabels && <TaskLabels labels={task.labels ?? []} />}
+                </div>
+              </div>
+            </div>
+
+            {showDueDates && task.dueDate && (
+              <div
+                className={`flex items-center gap-1 text-[0.625rem] px-2 py-1 rounded flex-shrink-0 ${dueDateStatusColors[getDueDateStatus(task.dueDate, taskIsCompleted)]}`}
+              >
+                {getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                  "overdue" && <CalendarX className="w-3 h-3" />}
+                {getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                  "due-soon" && <CalendarClock className="w-3 h-3" />}
+                {(getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                  "far-future" ||
+                  getDueDateStatus(task.dueDate, taskIsCompleted) ===
+                    "no-due-date") && <Calendar className="w-3 h-3" />}
+                <span>{format(new Date(task.dueDate), "MMM d")}</span>
+              </div>
+            )}
+
+            {activeCustomFieldValues.length > 0 && (
+              <HoverCard openDelay={200} closeDelay={100}>
+                <HoverCardTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 rounded border border-border/70 bg-muted/55 px-2 py-1 text-[0.625rem] font-medium text-muted-foreground cursor-default focus:outline-none focus:ring-2 focus:ring-ring/50 focus:ring-offset-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    aria-label={t("tasks:customFields.ariaLabel", {
+                      count: activeCustomFieldValues.length,
+                    })}
+                  >
+                    <SlidersHorizontal className="w-3 h-3" />
+                    <span>{activeCustomFieldValues.length}</span>
+                  </button>
+                </HoverCardTrigger>
+                <HoverCardContent
+                  className="w-fit p-2.5"
+                  side="bottom"
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
+                  <div className="space-y-1.5">
+                    {activeCustomFieldValues.map((field) => (
+                      <div
+                        key={field.id}
+                        className="flex items-center justify-between gap-2 text-xs"
+                      >
+                        <span className="font-medium text-muted-foreground truncate">
+                          {field.fieldName}
+                        </span>
+                        <span className="text-foreground truncate max-w-24">
+                          {field.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            )}
+
+            {showAssignees && (
+              <div className="flex-shrink-0">
+                {task.userId ? (
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage
+                      src={assignee?.user?.image ?? ""}
+                      alt={assignee?.user?.name || ""}
+                    />
+                    <AvatarFallback className="text-xs font-medium border border-border/30">
+                      {getInitials(assignee?.user?.name ?? task.assigneeName)}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <div
+                    className="w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center"
+                    title={t("tasks:assignee.unassigned")}
+                  >
+                    <span className="text-[0.625rem] font-medium text-muted-foreground">
+                      ?
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </ContextMenuTrigger>
 
-        {projectId && workspace && (
+        {hasOpenedMenu && projectId && workspace && (
           <TaskCardContextMenuContent
             task={task}
             taskCardContext={{
@@ -203,39 +369,42 @@ const BacklogTaskRow = memo(function BacklogTaskRow({
               workspaceSlug: workspace.slug,
             }}
             onDeleteClick={() => setIsDeleteTaskModalOpen(true)}
+            onMoveToAppointments={handleMoveToAppointments}
           />
         )}
       </ContextMenu>
 
-      <AlertDialog
-        open={isDeleteTaskModalOpen}
-        onOpenChange={setIsDeleteTaskModalOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("tasks:delete.title")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("tasks:delete.description")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" size="sm" />}>
-              {t("common:actions.cancel")}
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleDeleteTask}
-                />
-              }
-            >
-              {t("tasks:delete.action")}
-            </AlertDialogClose>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {isDeleteTaskModalOpen !== null && (
+        <AlertDialog
+          open={isDeleteTaskModalOpen}
+          onOpenChange={setIsDeleteTaskModalOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t("tasks:delete.title")}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("tasks:delete.description")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogClose render={<Button variant="outline" size="sm" />}>
+                {t("common:actions.cancel")}
+              </AlertDialogClose>
+              <AlertDialogClose
+                render={
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleDeleteTask}
+                  />
+                }
+              >
+                {t("tasks:delete.action")}
+              </AlertDialogClose>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 });

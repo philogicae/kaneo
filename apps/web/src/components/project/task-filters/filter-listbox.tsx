@@ -72,7 +72,7 @@ export function FilterListbox({
             highlighted && element ? { entry: highlighted, element } : null,
           );
         }}
-        className="h-10 w-full border-border/80 border-b bg-transparent px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+        className="h-10 w-full border-border/80 border-b bg-transparent px-3 text-[0.8125rem] text-foreground outline-none placeholder:text-muted-foreground"
       />
       <Autocomplete.Empty className="px-3 text-muted-foreground text-xs not-empty:py-5">
         {emptyLabel}

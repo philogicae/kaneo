@@ -40,11 +40,6 @@ describe("API integration: project backgrounds", () => {
   beforeEach(async () => {
     await resetTestDatabase();
     await initializeWebSocketAdapter();
-    vi.stubEnv("S3_ENDPOINT", "https://storage.example.test");
-    vi.stubEnv("S3_BUCKET", "test-backgrounds");
-    vi.stubEnv("S3_ACCESS_KEY_ID", "test-key");
-    vi.stubEnv("S3_SECRET_ACCESS_KEY", "test-secret");
-    vi.stubEnv("S3_KEY_PREFIX", "");
   });
   afterEach(async () => {
     await shutdownWebSocketAdapter();
@@ -66,16 +61,29 @@ describe("API integration: project backgrounds", () => {
       "other-session",
       owner.workspace.id,
     );
-    const key = `workspace/${owner.workspace.id}/project/${project.id}/backgrounds/background-v1`;
     try {
-      const finalized = await app.request(
-        `/api/project/${project.id}/background-upload/finalize`,
-        jsonRequest("POST", {
-          key,
-          version: "v1",
+      // The browser never talks to a storage provider: it reserves a
+      // same-origin upload URL, then POSTs the bytes to it.
+      const reserved = await app.request(
+        `/api/project/${project.id}/background`,
+        jsonRequest("PUT", {
           contentType: "image/png",
           size: 12,
+          version: "v1",
         }),
+      );
+      expect(reserved.status).toBe(200);
+      const upload = (await reserved.json()) as { uploadUrl: string };
+      const finalized = await app.request(
+        new URL(upload.uploadUrl).pathname + new URL(upload.uploadUrl).search,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "image/png",
+            "x-background-version": "v1",
+          },
+          body: new Uint8Array(12),
+        },
       );
       expect(finalized.status).toBe(200);
       await vi.waitFor(() =>
@@ -143,17 +151,16 @@ describe("API integration: project backgrounds", () => {
     const { app } = createApp();
     for (const [path, init] of [
       [
-        `/api/project/${project.id}/background-upload`,
-        jsonRequest("PUT", { contentType: "image/png", size: 12 }),
-      ],
-      [
-        `/api/project/${project.id}/background-upload/finalize`,
-        jsonRequest("POST", {
-          key: "key",
-          version: "v1",
+        `/api/project/${project.id}/background`,
+        jsonRequest("PUT", {
           contentType: "image/png",
           size: 12,
+          version: "v1",
         }),
+      ],
+      [
+        `/api/project/${project.id}/background/blob?key=key`,
+        { method: "POST", headers: { "content-type": "image/png" } },
       ],
       [`/api/project/${project.id}/background`, { method: "DELETE" }],
     ] as const)

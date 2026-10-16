@@ -49,7 +49,7 @@ export function TaskSheetHeader({
           aria-hidden="true"
           className="size-4 shrink-0 text-muted-foreground max-sm:hidden"
         />
-        <span className="truncate font-medium text-[13px] text-muted-foreground">
+        <span className="truncate font-medium text-[0.8125rem] text-muted-foreground">
           {project?.name}
         </span>
         {project?.slug && task?.number != null && (
@@ -60,7 +60,7 @@ export function TaskSheetHeader({
             />
             <span
               aria-hidden="true"
-              className="text-[13px] text-muted-foreground/60 sm:hidden"
+              className="text-[0.8125rem] text-muted-foreground/60 sm:hidden"
             >
               /
             </span>

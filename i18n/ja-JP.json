@@ -10,7 +10,9 @@
 			"markAllRead": "すべて既読にする",
 			"remove": "削除",
 			"reset": "リセット",
-			"filter": "フィルター"
+			"filter": "フィルター",
+			"clearAllFilters": "すべてのフィルターをクリア",
+			"save": "Save"
 		},
 		"a11y": {
 			"toggleSidebar": "サイドバーを切り替え"
@@ -148,7 +150,14 @@
 					"amber": "アンバー",
 					"terracotta": "テラコッタ",
 					"rose": "ローズ",
-					"crimson": "クリムゾン"
+					"crimson": "クリムゾン",
+					"cyan": "シアン",
+					"emerald": "エメラルド",
+					"fuchsia": "フクシア",
+					"indigo": "藍",
+					"lime": "ライム",
+					"ocean": "海",
+					"sky": "空"
 				},
 				"statusLoadError": "Project statuses couldn’t be loaded."
 			}
@@ -160,6 +169,20 @@
 				"apply": "リンクを適用",
 				"remove": "リンクを削除"
 			}
+		},
+		"boolean": {
+			"false": "False",
+			"notSet": "Not Set",
+			"true": "True",
+			"undefined": "Undefined"
+		},
+		"formats": {
+			"never": "無期限"
+		},
+		"notFound": {
+			"backToDashboard": "Back to dashboard",
+			"description": "The page you are looking for does not exist or has moved.",
+			"title": "Page not found"
 		}
 	},
 	"auth": {
@@ -553,6 +576,50 @@
 				"description": "サインイン後すぐにこのページに戻り、内容を確認できます。",
 				"submit": "サインイン"
 			}
+		},
+		"cloud": {
+			"signUp": {
+				"title": "次のステップ",
+				"description": "アカウントを作成したら、ワークスペースに名前を付けます。その後、プロジェクトを追加してタスクを書き始められます。"
+			},
+			"onboarding": {
+				"title": "ワークスペースとは",
+				"description": "ワークスペースには、プロジェクト、そのタスク、一緒に働くメンバーがまとまります。準備ができたらチームメンバーを招待しましょう。"
+			},
+			"invite": {
+				"description": "Everyone in a workspace sees the same boards and gets live updates as tasks move. Roles control who can change what.",
+				"title": "Work better together"
+			},
+			"plan": {
+				"description": "Every plan includes unlimited projects and tasks, automatic backups, and updates. Cancel anytime from billing settings.",
+				"title": "Try everything first"
+			}
+		},
+		"inviteLink": {
+			"errorTitle": "招待リンクエラー",
+			"errors": {
+				"accept": "ワークスペースに参加できませんでした",
+				"load": "招待リンクの詳細を読み込めませんでした。"
+			},
+			"invalidTitle": "無効な招待リンク",
+			"joinPrompt": "<workspaceName>{{workspaceName}}</workspaceName> に参加する招待リンクがあります。",
+			"linkExpired": "招待リンクの有効期限切れ",
+			"loading": "招待リンクを読み込み中...",
+			"pageTitleAccept": "ワークスペースに参加",
+			"pageTitleError": "招待リンクエラー",
+			"pageTitleInvalid": "無効な招待リンク",
+			"signedInAs": "<email>{{email}}</email> としてサインイン中",
+			"signedOutPrompt": "ワークスペースに参加するにはアカウントを作成するかサインインしてください。",
+			"title": "ワークスペースに参加しましょう！"
+		},
+		"signUpForm": {
+			"fullName": "名前",
+			"namePlaceholder": "山田 太郎",
+			"failedSignUp": "アカウント作成に失敗しました",
+			"accountCreated": "アカウントを作成しました",
+			"passwordTooShort": "パスワードが短すぎます",
+			"creatingAccount": "アカウント作成中...",
+			"createAccount": "アカウントを作成"
 		}
 	},
 	"settings": {
@@ -575,7 +642,8 @@
 			"updateError": "プロフィールの更新に失敗しました",
 			"validation": {
 				"nameRequired": "名前は必須です",
-				"nameShort": "名前は2文字以上で入力してください"
+				"nameShort": "名前は2文字以上で入力してください",
+				"invalidEmail": "有効なメールアドレスを入力してください"
 			},
 			"avatar": {
 				"hint": "正方形の画像がおすすめです。",
@@ -584,7 +652,9 @@
 				"updateError": "プロフィール画像の更新に失敗しました",
 				"removeSuccess": "プロフィール画像を削除しました",
 				"removeError": "プロフィール画像の削除に失敗しました",
-				"upload": "アップロード"
+				"upload": "アップロード",
+				"edit": "プロフィール画像を変更",
+				"change": "プロフィール画像を変更"
 			},
 			"deleteAccount": {
 				"sectionTitle": "危険な操作",
@@ -596,9 +666,13 @@
 				"confirm": "アカウントを削除",
 				"success": "アカウントを削除しました",
 				"error": "アカウントの削除に失敗しました",
-				"sessionTooOld": "セキュリティのため、アカウントを削除する前に一度サインアウトして再サインインしてください。"
+				"sessionTooOld": "セキュリティのため、アカウントを削除する前に一度サインアウトして再サインインしてください。",
+				"sectionSubtitle": "アカウント全体に影響する取り消し不可能な操作です。"
 			},
-			"emailHint": "このアドレスでサインインします。"
+			"emailHint": "このアドレスでサインインします。",
+			"sectionSubtitle": "プロフィールおよびアカウントの詳細を管理します。",
+			"emailPlaceholder": "メールアドレスを入力",
+			"updateSuccess": "プロフィールを更新しました"
 		},
 		"notificationsPage": {
 			"pageTitle": "通知",
@@ -716,7 +790,46 @@
 			"stopSendingDescription": "このワークスペースからの通知は Kaneo 内にのみ表示されます。",
 			"stopSendingTitle": "{{workspaceName}} からの送信を停止しますか？",
 			"workspacesDescription": "チャンネルを使用できるワークスペースとプロジェクトを選択します。",
-			"workspacesTitle": "ワークスペース"
+			"workspacesTitle": "ワークスペース",
+			"accountEmailHint": "メール通知は常にサインイン中のアカウントのメールアドレスに送信されます。",
+			"accountEmailLabel": "アカウントのメールアドレス",
+			"allProjectsDescription": "このワークスペース内のすべてのプロジェクトから通知を配信します。",
+			"createRule": "ルールを作成",
+			"emailChannelHintDisabled": "最初に全体設定でメールを設定して有効にしてください。",
+			"emailChannelHintEnabled": "該当するワークスペースの通知をメールで送信します。",
+			"emailDescription": "アカウントのメールアドレスを通知の送信先として使用します。",
+			"gotifyChannelHintDisabled": "最初に全体設定で Gotify を設定して有効にしてください。",
+			"gotifyChannelHintEnabled": "該当するワークスペースの通知を Gotify に送信します。",
+			"integrationNotConfigured": "未設定",
+			"integrationsDiscordDescription": "各プロジェクトはタスクの更新を専用の Discord Webhook に送信します。プロジェクトを展開してチャンネルとイベントを編集できます。",
+			"integrationsDiscordTitle": "Discord 連携",
+			"integrationsSlackDescription": "各プロジェクトはタスクの更新を専用の Slack 受信 Webhook に送信します。プロジェクトを展開してチャンネルとイベントを編集できます。",
+			"integrationsSlackTitle": "Slack 連携",
+			"ntfyChannelHintDisabled": "最初に全体設定で ntfy を設定して有効にしてください。",
+			"ntfyChannelHintEnabled": "該当するワークスペースの通知を ntfy に送信します。",
+			"projectScope": "プロジェクトの対象範囲",
+			"projectScopeDescription": "デフォルトではすべてのプロジェクトが含まれます。特定のプロジェクトからの通知のみを受信したい場合は絞り込んでください。",
+			"recipientHint": "自分に割り当てられたタスクへのコメントやステータスの変更が通知されます。メンションは選択したメンバーに通知されます。自分のコメント、メンション、ステータスの変更は自分には通知されません。",
+			"reminderLeadTimeHint": "期限の1時間前から30日前までの間で設定できます。期限切れ通知は個別に送信されます。",
+			"reminderLeadTimeUnitDays": "日",
+			"reminderLeadTimeUnitHours": "時間",
+			"removeRule": "ルールを削除",
+			"selectedProjects": "選択したプロジェクト",
+			"selectedProjectsDescription": "選択したプロジェクトからの通知のみを配信します。",
+			"tabDiscord": "Discord",
+			"tabGeneral": "一般",
+			"tabSlack": "Slack",
+			"tabTelegram": "Telegram",
+			"webhookChannelHintDisabled": "最初に全体設定で Webhook を設定して有効にしてください。",
+			"webhookChannelHintEnabled": "該当するワークスペースの通知を Webhook に送信します。",
+			"workspaceCardHint": "このワークスペースのアカウント通知で使用するチャンネルを選択します。",
+			"workspaceCardLabelEmail": "メール",
+			"workspaceCardLabelGotify": "Gotify",
+			"workspaceCardLabelNtfy": "ntfy",
+			"workspaceCardLabelWebhook": "カスタム Webhook",
+			"workspaceEnabledLabel": "{{workspaceName}} の通知を有効にする",
+			"workspaceRulesDescription": "全体設定のチャンネルを使用し、ワークスペースやプロジェクトごとに通知の送信条件を設定します。",
+			"workspaceRulesTitle": "ワークスペースの配信ルール"
 		},
 		"preferencesPage": {
 			"title": "環境設定",
@@ -752,7 +865,19 @@
 			"priority": "優先度",
 			"projectBackgrounds": "Project backgrounds",
 			"projectBackgroundsDescription": "プロジェクトがボードの背景に設定した画像を表示します。",
-			"advancedTitle": "詳細設定"
+			"advancedTitle": "詳細設定",
+			"appearanceSubtitle": "外観とレイアウトの設定を行います。",
+			"assigneesDescription": "タスクの担当者を表示します",
+			"dueDatesDescription": "タスクの期限を表示します",
+			"interfaceSize": "インターフェースサイズ",
+			"interfaceSizeDecrease": "インターフェースサイズを縮小",
+			"interfaceSizeIncrease": "インターフェースサイズを拡大",
+			"labelsDescription": "タスクのラベルとタグを表示します",
+			"languageDescription": "表示言語を選択してください",
+			"priorityDescription": "優先度インジケーターを表示します",
+			"taskNumbersDescription": "タスク ID と番号を表示します",
+			"themeDescription": "お好みのカラースキームを選択してください",
+			"themeVolt": "ボルト"
 		},
 		"developerPage": {
 			"pageTitle": "APIキー",
@@ -764,7 +889,10 @@
 			"keysNote": "キーはあなたができることをすべて実行できます。使わなくなったキーは削除してください。",
 			"keysTitle": "キー",
 			"loadError": "APIキーを読み込めませんでした。もう一度お試しください。",
-			"newKey": "新しいキー"
+			"newKey": "新しいキー",
+			"apiKeysCardTitle": "APIキー",
+			"apiKeysCardDescription": "Kaneo にプログラムからアクセスするための API キーを作成・管理します。",
+			"createApiKey": "APIキーを作成"
 		},
 		"apiKey": {
 			"createdModal": {
@@ -773,7 +901,12 @@
 				"copy": "コピー",
 				"copied": "コピー完了",
 				"done": "完了",
-				"copyError": "キーをコピーできませんでした。選択して手動でコピーしてください。"
+				"copyError": "キーをコピーできませんでした。選択して手動でコピーしてください。",
+				"yourApiKey": "APIキー",
+				"toastCopied": "APIキーをクリップボードにコピーしました",
+				"alertTitle": "APIキーを作成しました",
+				"alertDescription": "このキーを今すぐコピーしてください。再度表示することはできません。",
+				"copyToContinue": "キーをコピーして続行"
 			},
 			"table": {
 				"deleteConfirmTitle": "「{{name}}」を削除しますか？",
@@ -781,7 +914,19 @@
 				"delete": "キーを削除",
 				"deleting": "削除しています…",
 				"toastDeleted": "APIキーを削除しました",
-				"toastDeleteError": "APIキーを削除できませんでした"
+				"toastDeleteError": "APIキーを削除できませんでした",
+				"loading": "APIキーを読み込み中...",
+				"empty": "APIキーはまだありません。作成して始めましょう。",
+				"columnName": "名前",
+				"columnKey": "キー",
+				"columnCreated": "作成日時",
+				"columnExpires": "有効期限",
+				"columnActions": "操作",
+				"unnamedKey": "名称未設定のキー",
+				"expiredBadge": "期限切れ {{label}}",
+				"deleteFallbackName": "このAPIキー",
+				"deleteAria": "{{name}} を削除",
+				"deleteAriaFallback": "APIキー"
 			},
 			"createDialog": {
 				"title": "新しいAPIキー",
@@ -800,8 +945,11 @@
 				"failedCreate": "APIキーを作成できませんでした",
 				"validation": {
 					"nameRequired": "名前を入力してください",
-					"nameShort": "3 文字以上で入力してください"
-				}
+					"nameShort": "3 文字以上で入力してください",
+					"expirationRequired": "有効期限を選択してください"
+				},
+				"expirationPlaceholder": "有効期限を選択",
+				"expirationDescription": "この API キーの有効期間を選択してください。「無期限」を選択すると、自動失効しないキーが作成されます。"
 			},
 			"row": {
 				"actions": "{{name}} の操作",
@@ -846,10 +994,16 @@
 				"dialogTitle": "所有権を譲渡しますか？",
 				"dialogDescription": "{{name}} が {{workspace}} の唯一のオーナーになります。管理者権限は維持されますが、ワークスペースの削除や再度の譲渡などオーナー限定の権限は失われます。",
 				"transferring": "譲渡中...",
-				"confirm": "所有権を譲渡"
+				"confirm": "所有権を譲渡",
+				"subtitle": "このワークスペースを他のメンバーに引き継ぎます。あなたの権限は管理者に変更され、オーナー専用の操作権限を失います。"
 			},
 			"ownershipSubtitle": "オーナーにのみ表示されます。",
-			"ownershipTitle": "オーナー権限"
+			"ownershipTitle": "オーナー権限",
+			"workspaceInfoSubtitle": "ワークスペースの詳細と基本設定を管理します。",
+			"nameHint": "ワークスペースの名前",
+			"descriptionHint": "ワークスペースの簡単な説明",
+			"dangerZoneSubtitle": "取り消し不可能な破壊的操作です。",
+			"toastUpdated": "ワークスペースを更新しました"
 		},
 		"workspaceRoles": {
 			"pageTitle": "ロール",
@@ -1093,7 +1247,9 @@
 			"rowActions": "{{name}} の操作",
 			"sectionDescription": "ラベルの名前や色を変更すると、そのラベルを使用しているすべてのタスクに反映されます。",
 			"sectionTitle": "ワークスペースのラベル",
-			"subtitleWithWorkspace": "ラベルは {{workspaceName}} のすべてのプロジェクトで共有されます。"
+			"subtitleWithWorkspace": "ラベルは {{workspaceName}} のすべてのプロジェクトで共有されます。",
+			"cardDescription": "タスクに割り当て可能なラベルを管理します。",
+			"empty": "ラベルはまだありません。最初のラベルを作成して始めましょう。"
 		},
 		"projectGeneral": {
 			"pageTitle": "プロジェクト設定",
@@ -1149,7 +1305,16 @@
 			"moveDialogTitle": "別のワークスペースに移動しますか？",
 			"moveTargetLabel": "ワークスペース",
 			"moving": "移動しています...",
-			"tasksTitle": "タスク"
+			"tasksTitle": "タスク",
+			"projectInfoSubtitle": "プロジェクトの詳細と基本設定を行います。",
+			"projectNameHint": "プロジェクトの名前",
+			"descriptionHint": "プロジェクトの簡単な説明",
+			"dangerZoneSubtitle": "取り消し不可能な破壊的操作です。",
+			"toastUpdated": "プロジェクトを更新しました",
+			"importExportTasks": "インポート/エクスポート",
+			"importExportTasksDescription": "タスクのインポートとエクスポートを行います。",
+			"moveModalDescription": "This will move the project \"{{name}}\" and all of its tasks to \"{{workspace}}\". Tasks assigned to people who aren't members of that workspace will be unassigned, and notification subscriptions for this project will be cleared.",
+			"moveModalTitle": "Move Project?"
 		},
 		"projectIntegrations": {
 			"pageTitle": "連携",
@@ -1198,7 +1363,10 @@
 			"offNote": "公開リンクをオフにすると、すぐに使用できなくなります。",
 			"on": "オン",
 			"openPublicPage": "公開ページを開く",
-			"thisWorkspace": "このワークスペース"
+			"thisWorkspace": "このワークスペース",
+			"sectionSubtitle": "公開アクセスを切り替え、公開 URL を共有します。",
+			"publicUrlHint": "プロジェクトが公開されている場合、このリンクを共有できます",
+			"copiedToast": "コピーしました"
 		},
 		"projectWorkflow": {
 			"pageTitle": "ワークフロー設定",
@@ -1207,7 +1375,9 @@
 			"columnsTitle": "カラム",
 			"columnsDescription": "ドラッグして並べ替えます。完了カラムのタスクは完了として扱われます。",
 			"automationTitle": "自動化",
-			"automationDescription": "接続済みのリポジトリでイベントが発生したときに、リンクされたタスクを移動します。"
+			"automationDescription": "接続済みのリポジトリでイベントが発生したときに、リンクされたタスクを移動します。",
+			"customFieldsDescription": "Manage the custom fields for this project. Drag  to reorder.",
+			"customFieldsTitle": "Custom Fields"
 		},
 		"projectSwitcher": {
 			"selectProject": "プロジェクトを選択",
@@ -1231,7 +1401,19 @@
 			"deleteTitle": "「{{name}}」を削除しますか？",
 			"doneHeader": "完了",
 			"dragAria": "{{name}} を並べ替え",
-			"reorderError": "カラムの並べ替えに失敗しました"
+			"reorderError": "カラムの並べ替えに失敗しました",
+			"toastCreated": "カラムを作成しました",
+			"toastRenamed": "カラム名を変更しました",
+			"toastFinalOn": "カラムを完了カラムに設定しました",
+			"toastFinalOff": "カラムの完了設定を解除しました",
+			"toastIconUpdated": "カラムアイコンを更新しました",
+			"toastDeleted": "カラムを削除しました",
+			"loading": "カラムを読み込み中...",
+			"doneColumnTooltip": "これを完了カラムとして扱います",
+			"doneColumn": "完了カラム",
+			"on": "オン",
+			"off": "オフ",
+			"add": "追加"
 		},
 		"githubIntegration": {
 			"toast": {
@@ -1246,7 +1428,11 @@
 				"importError": "Issue のインポートに失敗しました",
 				"commentOnEnabled": "新しい Issue に Kaneo がタスクリンク付きのコメントを投稿します",
 				"commentOnDisabled": "新しい Issue へのタスクリンクのコメント投稿をオフにしました",
-				"settingsUpdateError": "GitHub 連携の更新に失敗しました"
+				"settingsUpdateError": "GitHub 連携の更新に失敗しました",
+				"installedOk": "GitHub App が正しくインストールされています！",
+				"installedMissingPerms": "GitHub App はインストールされていますが、必要な権限が不足しています",
+				"needsInstallOnRepo": "このリポジトリに GitHub App をインストールする必要があります",
+				"repoNotFound": "リポジトリが見つからないか、アクセスできません"
 			},
 			"commentTaskLinkTitle": "新しい Issue に Kaneo のリンクをコメントする",
 			"commentTaskLinkHint": "GitHub 上のユーザーがタスクにすぐ移動できるようにします。",
@@ -1269,12 +1455,51 @@
 			"verifyNotInstalled": "Kaneo GitHub App がこのリポジトリにインストールされていません。",
 			"verifyReady": "Kaneo GitHub App は必要な権限でインストールされています。",
 			"workflowHint": "プルリクエストのオープンやマージでタスクを移動するには",
-			"workflowLink": "ワークフロー"
+			"workflowLink": "ワークフロー",
+			"validation": {
+				"ownerRequired": "リポジトリのオーナーは必須です",
+				"ownerInvalid": "リポジトリのオーナーの形式が無効です",
+				"nameRequired": "リポジトリ名は必須です",
+				"nameInvalid": "リポジトリ名の形式が無効です"
+			},
+			"connectionStatus": "接続ステータス",
+			"connectedActive": "リポジトリが接続され、アクティブです",
+			"notConnectedHint": "接続されているリポジトリはありません",
+			"badgeConnected": "接続済み",
+			"badgeNotConnected": "未接続",
+			"repository": "リポジトリ",
+			"repositoryHint": "接続されている GitHub リポジトリ",
+			"appStatusTitle": "GitHub App ステータス",
+			"appStatusHint": "インストールおよび権限のステータス",
+			"statusProperlyConfigured": "適切に設定されています",
+			"statusMissingPermissions": "権限が不足しています",
+			"statusNotInstalled": "未インストール",
+			"ownerLabel": "リポジトリオーナー",
+			"ownerHint": "GitHub のユーザー名または組織名",
+			"ownerPlaceholder": "例: octocat",
+			"repoNameLabel": "リポジトリ名",
+			"repoNameHint": "リポジトリ名",
+			"repoNamePlaceholder": "例: my-project",
+			"actionsTitle": "操作",
+			"actionsHint": "リポジトリの接続を管理します",
+			"browse": "参照",
+			"verify": "検証",
+			"update": "更新",
+			"connect": "接続",
+			"disconnect": "接続解除",
+			"missingPermissionsLabel": "不足している権限:",
+			"importSectionTitle": "GitHub Issue のインポート",
+			"importing": "インポート中...",
+			"importIssues": "Issue をインポート"
 		},
 		"giteaIntegration": {
 			"validation": {
 				"baseUrlRequired": "Gitea のベース URL は必須です",
-				"baseUrlInvalid": "有効な URL を入力してください (例: https://gitea.example.com)"
+				"baseUrlInvalid": "有効な URL を入力してください (例: https://gitea.example.com)",
+				"ownerRequired": "リポジトリのオーナーは必須です",
+				"ownerInvalid": "リポジトリのオーナーの形式が無効です",
+				"nameRequired": "リポジトリ名は必須です",
+				"nameInvalid": "リポジトリ名の形式が無効です"
 			},
 			"toast": {
 				"verifyError": "Gitea へのアクセスの検証に失敗しました",
@@ -1287,7 +1512,16 @@
 				"importError": "Issue のインポートに失敗しました",
 				"commentOnEnabled": "新しい Issue に Kaneo がタスクリンク付きのコメントを投稿します",
 				"commentOnDisabled": "新しい Issue へのタスクリンクのコメント投稿をオフにしました",
-				"settingsUpdateError": "Gitea 連携の更新に失敗しました"
+				"settingsUpdateError": "Gitea 連携の更新に失敗しました",
+				"verifyOk": "Gitea トークンはこのリポジトリにアクセスできます",
+				"verifyWarning": "トークンの権限またはリポジトリへのアクセス権を確認してください",
+				"repoNotFound": "リポジトリが見つからないか、アクセスできません",
+				"redirected": "Gitea URL がリダイレクトされました（通常は HTTPS へ）。最終的な URL を直接入力してください。",
+				"notGiteaInstance": "この URL は Gitea インスタンスを指していません",
+				"tokenRequired": "Personal Access Token は必須です",
+				"tokenRequiredVerify": "検証するトークンを入力してください",
+				"secretCopied": "コピーしました",
+				"unableToCopySecret": "シークレットをコピーできませんでした"
 			},
 			"commentTaskLinkTitle": "新しい Issue に Kaneo のリンクをコメントする",
 			"commentTaskLinkHint": "Gitea 上のユーザーがタスクにすぐ移動できるようにします。",
@@ -1302,7 +1536,40 @@
 			"browseNeedsCredentials": "参照するには Gitea の URL とトークンを入力してください。",
 			"browseEmpty": "このトークンで参照できるリポジトリがありません。",
 			"chooseRepositoryDescription": "owner/name を入力するか、一覧から選択してください。",
-			"webhookEvents": "プッシュ、プルリクエスト、Issue、Issue コメント、作成の各イベントを有効にしてください。"
+			"webhookEvents": "プッシュ、プルリクエスト、Issue、Issue コメント、作成の各イベントを有効にしてください。",
+			"webhookShow": "表示",
+			"webhookHide": "非表示",
+			"webhookCopy": "コピー",
+			"connectionStatus": "接続ステータス",
+			"connectedActive": "リポジトリが接続され、アクティブです",
+			"notConnectedHint": "接続されている Gitea リポジトリはありません",
+			"badgeConnected": "接続済み",
+			"badgeNotConnected": "未接続",
+			"repository": "リポジトリ",
+			"repositoryHint": "リンクされた Gitea リポジトリ",
+			"webhookTitle": "Webhook",
+			"webhookSecretLabel": "シークレット (Gitea の Webhook シークレットと一致する必要があります)",
+			"baseUrlHint": "Gitea インスタンスのルート URL",
+			"tokenHint": "リポジトリおよび Issue へのアクセス権を持つトークン",
+			"currentToken": "保存済み",
+			"ownerLabel": "オーナー",
+			"ownerHint": "ユーザー名または組織名",
+			"repoNameLabel": "リポジトリ名",
+			"repoNameHint": "リポジトリ名のみ (オーナー名は含めない)",
+			"actionsTitle": "操作",
+			"actionsHint": "アクセスを検証して接続します",
+			"browse": "参照",
+			"verify": "検証",
+			"update": "更新",
+			"connect": "接続",
+			"disconnect": "接続解除",
+			"importSectionTitle": "Gitea Issue のインポート",
+			"importing": "インポート中...",
+			"importIssues": "Issue をインポート",
+			"browseModalTitle": "マイリポジトリ",
+			"searchRepos": "検索...",
+			"loadingRepos": "リポジトリを読み込み中...",
+			"retry": "再試行"
 		},
 		"slackIntegration": {
 			"validation": {
@@ -1320,7 +1587,28 @@
 			"webhookPlaceholder": "https://hooks.slack.com/services/...",
 			"webhookHint": "Slack で Incoming Webhook を作成し、ここに貼り付けてください。",
 			"connect": "Slack に接続",
-			"update": "Slack を更新"
+			"update": "Slack を更新",
+			"channelHint": "参照用の任意のラベルです。実際の送信先チャンネルは Slack の Webhook 設定で制御されます。",
+			"channelLabel": "チャンネル名",
+			"channelPlaceholder": "#team-updates",
+			"connected": "接続済み",
+			"connectionHint": "Slack の Incoming Webhook URL を貼り付け、投稿するタスクイベントを選択します。",
+			"connectionTitle": "Slack Webhook 接続",
+			"disconnect": "接続解除",
+			"events": {
+				"taskCommentCreated": "新しいコメント",
+				"taskCreated": "タスクの新規作成",
+				"taskDescriptionChanged": "説明の変更",
+				"taskMentionCreated": "タスク本文またはコメントでのメンション",
+				"taskPriorityChanged": "優先度の変更",
+				"taskStatusChanged": "ステータスの変更",
+				"taskTitleChanged": "タイトルの変更"
+			},
+			"eventsHint": "Slack に投稿するプロジェクトの変更を選択します。",
+			"eventsTitle": "イベント通知",
+			"paused": "一時停止中",
+			"saveChanges": "変更を保存",
+			"webhookLabel": "Incoming Webhook URL"
 		},
 		"discordIntegration": {
 			"validation": {
@@ -1338,7 +1626,28 @@
 			"webhookPlaceholder": "https://discord.com/api/webhooks/...",
 			"webhookHint": "Discord でチャンネルの Webhook を作成し、ここに貼り付けてください。",
 			"connect": "Discord に接続",
-			"update": "Discord を更新"
+			"update": "Discord を更新",
+			"channelHint": "参照用の任意のラベルです。実際の送信先チャンネルは Discord の Webhook 設定で制御されます。",
+			"channelLabel": "チャンネル名",
+			"channelPlaceholder": "#team-updates",
+			"connected": "接続済み",
+			"connectionHint": "Discord の Webhook URL を貼り付け、投稿するタスクイベントを選択します。",
+			"connectionTitle": "Discord Webhook 接続",
+			"disconnect": "接続解除",
+			"events": {
+				"taskCommentCreated": "新しいコメント",
+				"taskCreated": "タスクの新規作成",
+				"taskDescriptionChanged": "説明の変更",
+				"taskMentionCreated": "タスク本文またはコメントでのメンション",
+				"taskPriorityChanged": "優先度の変更",
+				"taskStatusChanged": "ステータスの変更",
+				"taskTitleChanged": "タイトルの変更"
+			},
+			"eventsHint": "Discord に投稿するプロジェクトの変更を選択します。",
+			"eventsTitle": "イベント通知",
+			"paused": "一時停止中",
+			"saveChanges": "変更を保存",
+			"webhookLabel": "Webhook URL"
 		},
 		"genericWebhookIntegration": {
 			"validation": {
@@ -1382,7 +1691,14 @@
 			"disconnectDescription": "Kaneo はイベントの送信を停止し、保存済みのエンドポイントとシークレットを削除します。",
 			"disconnectTitle": "Webhook との接続を解除しますか？",
 			"reminderLeadTimeAfter": "時間前にリマインダーを送信",
-			"reminderLeadTimeBefore": "タスクの期限の"
+			"reminderLeadTimeBefore": "タスクの期限の",
+			"connectionTitle": "送信 Webhook 接続",
+			"connectionHint": "タスクイベントを JSON として独自のエンドポイントに送信します。シークレットが設定されている場合、署名された X-Kaneo-Signature ヘッダーが含まれます。",
+			"connected": "接続済み",
+			"paused": "一時停止中",
+			"eventsHint": "送信 Webhook をトリガーするプロジェクトの変更を選択します。",
+			"saveChanges": "変更を保存",
+			"disconnect": "接続解除"
 		},
 		"telegramIntegration": {
 			"validation": {
@@ -1411,7 +1727,29 @@
 			"chatLabelPlaceholder": "開発チームの更新",
 			"connect": "Telegram に接続",
 			"botTokenSavedPlaceholder": "保存済みです。置き換えるには新しいトークンを貼り付けてください。",
-			"loadError": "Telegram の設定を読み込めませんでした。"
+			"loadError": "Telegram の設定を読み込めませんでした。",
+			"chatIdHint": "更新を投稿する Telegram のチャット ID またはチャンネルのユーザー名を入力します。",
+			"chatLabelHint": "Kaneo 内での参照用の任意のラベルです。",
+			"connected": "接続済み",
+			"connectionHint": "Telegram ボットのトークンとチャット ID を使用して、プロジェクトのタスク更新をチャットまたはトピックに送信します。",
+			"connectionTitle": "Telegram ボット接続",
+			"disconnect": "接続解除",
+			"events": {
+				"appointmentCreated": "新しい予定",
+				"appointmentUpdated": "予定の変更",
+				"taskCommentCreated": "新しいコメント",
+				"taskCreated": "タスクの新規作成",
+				"taskDescriptionChanged": "説明の変更",
+				"taskMentionCreated": "タスク本文またはコメントでのメンション",
+				"taskPriorityChanged": "優先度の変更",
+				"taskStatusChanged": "ステータスの変更",
+				"taskTitleChanged": "タイトルの変更"
+			},
+			"eventsHint": "Telegram に投稿するプロジェクトの変更を選択します。",
+			"eventsTitle": "イベント通知",
+			"paused": "一時停止中",
+			"saveChanges": "変更を保存",
+			"threadIdHint": "任意。Telegram グループ内のフォーラムトピックに使用します。"
 		},
 		"repositoryBrowser": {
 			"title": "リポジトリを選択",
@@ -1430,7 +1768,14 @@
 			"missingOne": "見つかりませんか？",
 			"searching": "検索しています…",
 			"updated": "更新: {{time}}",
-			"useRepository": "このリポジトリを使用"
+			"useRepository": "このリポジトリを使用",
+			"footerSummary": "{{installationCount}} 件のインストール全体で {{repoCount}} 個のリポジトリ",
+			"manageInstallations": "インストールを管理",
+			"updatedPrefix": "最終更新:",
+			"relativeJustNow": "たった今",
+			"relativeMinutesAgo": "{{count}}分前",
+			"relativeHoursAgo": "{{count}}時間前",
+			"relativeDaysAgo": "{{count}}日前"
 		},
 		"tasksImportExport": {
 			"exportTasks": "タスクをエクスポート",
@@ -1468,7 +1813,17 @@
 			"dontMove": "移動しない",
 			"emptyDescription": "自動化には、接続済みの GitHub、Gitea、GitLab のいずれかのリポジトリが必要です。",
 			"emptyTitle": "接続済みのリポジトリがありません",
-			"openIntegrations": "連携を開く"
+			"openIntegrations": "連携を開く",
+			"loading": "読み込み中...",
+			"createColumnsFirst": "自動化ルールを設定するには、先にカラムを作成してください。",
+			"githubHeading": "GitHub",
+			"githubHint": "GitHub イベントが発生したときに、リンクされたタスクをカラムに移動します。",
+			"giteaHeading": "Gitea",
+			"giteaHint": "Gitea の Webhook イベントが発生したときに、リンクされたタスクをカラムに移動します。",
+			"selectColumnPlaceholder": "カラムを選択...",
+			"toastUpdated": "ワークフロールールを更新しました",
+			"gitlabHeading": "GitLab",
+			"gitlabHint": "When a GitLab webhook event occurs, move the linked task to a column."
 		},
 		"externalLinks": {
 			"resources": "リソース",
@@ -1502,7 +1857,27 @@
 				"webhookInvalid": "Enter a valid Mattermost webhook URL"
 			},
 			"webhookHint": "Mattermost で Incoming Webhook を作成し、ここに貼り付けてください。",
-			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/..."
+			"webhookPlaceholder": "https://your-mattermost-server.com/hooks/...",
+			"channelHint": "Optional label for your reference. Mattermost controls the actual destination channel from the webhook setup.",
+			"channelLabel": "Channel name",
+			"channelPlaceholder": "#team-updates",
+			"connected": "Connected",
+			"connectionHint": "Paste a Mattermost incoming webhook URL and choose which task events should be posted.",
+			"connectionTitle": "Mattermost webhook connection",
+			"disconnect": "Disconnect",
+			"events": {
+				"taskCommentCreated": "New comments",
+				"taskCreated": "New tasks",
+				"taskDescriptionChanged": "Description changes",
+				"taskPriorityChanged": "Priority changes",
+				"taskStatusChanged": "Status changes",
+				"taskTitleChanged": "Title changes"
+			},
+			"eventsHint": "Choose which project changes should post to Mattermost.",
+			"eventsTitle": "Event notifications",
+			"paused": "Paused",
+			"saveChanges": "Save changes",
+			"webhookLabel": "Incoming webhook URL"
 		},
 		"customFields": {
 			"createError": "Failed to create custom field.",
@@ -1567,7 +1942,19 @@
 			"typeLocked": "フィールドの作成後は種類を変更できません。",
 			"unchecked": "チェックなし",
 			"updateError": "カスタムフィールドを保存できませんでした。",
-			"updateSuccess": "カスタムフィールドを保存しました。"
+			"updateSuccess": "カスタムフィールドを保存しました。",
+			"addButton": "Add",
+			"defaultValuePlaceholder": "Default value",
+			"deleteButton": "Delete",
+			"empty": "No custom fields configured yet.",
+			"loading": "Loading custom fields...",
+			"noOptionsPlaceholder": "No options",
+			"optionsPlaceholder": "Options separated by commas",
+			"typePlaceholder": "Select field type",
+			"availableOptions": "Available options",
+			"defaultValues": "{{count}} default(s)",
+			"multiple": "Multiple",
+			"options": "{{count}} option(s)"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -1643,7 +2030,9 @@
 				"updated": "User updated",
 				"updateError": "Failed to update user"
 			},
-			"you": "あなた"
+			"you": "あなた",
+			"instanceBadge": "Instance",
+			"userCount_other": "{{count}} registered users"
 		},
 		"security": "Security",
 		"securityPage": {
@@ -1676,7 +2065,8 @@
 			"dialogDescription": "8 文字以上で、現在のパスワードとは異なるものにしてください。",
 			"dialogTitle": "パスワードを変更",
 			"passwordHint": "ほかで使っていない 8 文字以上のパスワードを使用してください。",
-			"passwordTitle": "パスワード"
+			"passwordTitle": "パスワード",
+			"sectionSubtitle": "Change the password you use to sign in."
 		},
 		"gitlabIntegration": {
 			"baseUrlLabel": "GitLab URL",
@@ -1699,7 +2089,16 @@
 				"updated": "GitLab integration saved",
 				"updateError": "Failed to save GitLab integration",
 				"verifyError": "Failed to verify GitLab access",
-				"verifyFirst": "Verify access failed. Check URL, token, and project path"
+				"verifyFirst": "Verify access failed. Check URL, token, and project path",
+				"notGitlabInstance": "The URL does not point to a GitLab instance",
+				"projectNotFound": "Project not found or not accessible",
+				"redirected": "GitLab URL redirected (usually to HTTPS). Use the final URL directly.",
+				"secretCopied": "Copied",
+				"tokenRequired": "Access token is required",
+				"tokenRequiredVerify": "Enter a token to verify",
+				"unableToCopySecret": "Unable to copy secret",
+				"verifyOk": "GitLab token can access this project",
+				"verifyWarning": "Check token permissions or project access"
 			},
 			"tokenLabel": "Access token",
 			"tokenPlaceholder": "Paste token",
@@ -1710,7 +2109,8 @@
 			"validation": {
 				"baseUrlInvalid": "Enter a valid URL (e.g. https://gitlab.com)",
 				"baseUrlRequired": "GitLab base URL is required",
-				"pathInvalid": "Enter the full path, e.g. group/project"
+				"pathInvalid": "Enter the full path, e.g. group/project",
+				"pathRequired": "Project path is required"
 			},
 			"webhookHint": "変更が Kaneo に反映されるよう、プロジェクトの設定でこの Webhook を追加してください。",
 			"loadProjectsError": "プロジェクトを読み込めませんでした。",
@@ -1719,7 +2119,38 @@
 			"chooseProjectDescription": "パスを入力するか、一覧から選択してください。",
 			"noSearchMatchTitle": "一致するプロジェクトがありません",
 			"useProject": "このプロジェクトを使用",
-			"webhookEvents": "プッシュ、Issue、コメント、マージリクエストの各イベントを有効にしてください。"
+			"webhookEvents": "プッシュ、Issue、コメント、マージリクエストの各イベントを有効にしてください。",
+			"actionsHint": "Verify access and connect",
+			"actionsTitle": "Actions",
+			"badgeConnected": "Connected",
+			"badgeNotConnected": "Not connected",
+			"baseUrlHint": "https://gitlab.com, or the root URL of your instance",
+			"browse": "Browse",
+			"browseModalTitle": "Your projects",
+			"connect": "Connect",
+			"connectedActive": "Project connected and active",
+			"connectionStatus": "Connection status",
+			"currentToken": "stored",
+			"disconnect": "Disconnect",
+			"importDisabledHint": "Verify the project above to enable importing",
+			"importing": "Importing…",
+			"importIssues": "Import issues",
+			"importSectionTitle": "Import GitLab issues",
+			"loadingProjects": "Loading projects…",
+			"notConnectedHint": "No GitLab project connected",
+			"project": "Project",
+			"projectHint": "Linked GitLab project",
+			"projectPathHint": "Full path including any groups, e.g. group/subgroup/project",
+			"retry": "Retry",
+			"tokenHint": "Token with api scope and at least Developer on the project",
+			"tokenTypeHint": "How the token is sent. Access tokens use PRIVATE-TOKEN; an OAuth2 token uses Authorization.",
+			"update": "Update",
+			"verify": "Verify",
+			"webhookCopy": "Copy",
+			"webhookHide": "Hide",
+			"webhookSecretLabel": "Secret token (must match the one set on the webhook in GitLab)",
+			"webhookShow": "Show",
+			"webhookTitle": "Webhook"
 		},
 		"calendarFeeds": {
 			"title": "Calendar feeds",
@@ -1755,7 +2186,12 @@
 			"revokeConfirm": "フィードを無効化",
 			"revokeConfirmDescription": "このリンクを使用しているカレンダーアプリは更新を受け取れなくなります。この操作は取り消せません。",
 			"revokeConfirmTitle": "このフィードを無効にしますか？",
-			"revoking": "無効化しています…"
+			"revoking": "無効化しています…",
+			"createTitle": "Create a calendar feed",
+			"filterHint": "Include tasks with a start or due date. Select labels to include only tasks matching at least one, or leave empty to include all scheduled project tasks.",
+			"empty": "No calendar feeds yet.",
+			"feedUrl": "Calendar feed URL",
+			"copied": "Calendar feed link copied."
 		},
 		"invitationEmailFailed": "Invitation saved, but email delivery failed. Check SMTP settings and resend the invitation.",
 		"billing": {
@@ -1767,7 +2203,8 @@
 				"title": "Choose a plan"
 			},
 			"currentPlan": {
-				"title": "Current plan"
+				"title": "Current plan",
+				"subtitle": "Your workspace's active plan and billing status."
 			},
 			"disabled": "Billing isn't enabled on this instance. Self-hosted Kaneo includes every feature, free forever.",
 			"expiredCallout": {
@@ -1838,7 +2275,8 @@
 				"expiredDescription": "Subscribe to a plan below to keep creating and editing. Your data stays safe and exportable in the meantime.",
 				"expiredTitle": "Your trial has ended",
 				"noDate": "Choose a plan below to continue after your trial.",
-				"badgeDaysLeft_other": "残り {{count}} 日"
+				"badgeDaysLeft_other": "残り {{count}} 日",
+				"daysLeft_other": "You have {{count}} days left on your free trial. Choose a plan to continue without interruption."
 			},
 			"trialCard": {
 				"activeDescription": "Upgrade anytime to keep your workspace after the trial.",
@@ -1854,7 +2292,8 @@
 			"checkoutSuccess": {
 				"title": "ご登録ありがとうございます",
 				"description": "お支払いを受け付けました。確認され次第、下のプランが更新されます。"
-			}
+			},
+			"planName": "Kaneo Cloud {{plan}}"
 		},
 		"syncRules": {
 			"addLabel": "Add label",
@@ -1919,7 +2358,11 @@
 			"pausedSummary_other": "{{count}} 件のタスクが同期ルールに一致しなくなったため、同期を停止しました。",
 			"providerToKaneo": "{{provider}} → Kaneo",
 			"reviewPaused": "確認",
-			"tasksLabelled": "次のラベルのタスク:"
+			"tasksLabelled": "次のラベルのタスク:",
+			"allSummary": "All of: {{labels}}",
+			"anySummary": "Any of: {{labels}}",
+			"filteredBadge": "Filtered by labels",
+			"pausedCount_other": "{{count}} paused links"
 		},
 		"advancedSettingsDescription": "連携の同期ルールなど、追加のコントロールを表示します。このブラウザーにのみ適用されます。",
 		"adminWorkspaces": {
@@ -1975,7 +2418,14 @@
 				"makeOwner": "Make owner",
 				"remove": "Remove from workspace",
 				"roleLabel": "Role for {{name}}",
-				"title": "Members of {{name}}"
+				"title": "Members of {{name}}",
+				"columns": {
+					"actions": "Actions",
+					"joined": "Joined",
+					"member": "Member",
+					"projects": "Projects",
+					"role": "Role"
+				}
 			},
 			"next": "Next",
 			"noOwner": "No owner",
@@ -1997,7 +2447,9 @@
 				"roleError": "Failed to update role",
 				"roleUpdated": "Role updated",
 				"transferError": "Failed to transfer ownership"
-			}
+			},
+			"instanceBadge": "Instance",
+			"workspaceCount_other": "{{count}} workspaces"
 		},
 		"workspaceImport": {
 			"back": {
@@ -2253,7 +2705,8 @@
 				"taskDescriptionChanged": "説明が変更されたとき",
 				"taskPriorityChanged": "優先度が変更されたとき",
 				"taskStatusChanged": "ステータスが変更されたとき",
-				"taskTitleChanged": "タイトルが変更されたとき"
+				"taskTitleChanged": "タイトルが変更されたとき",
+				"taskMentionCreated": "Mentions in task body or comments"
 			},
 			"optional": "任意",
 			"postWhen": "投稿するタイミング",
@@ -2314,6 +2767,107 @@
 		},
 		"shared": {
 			"autosave": "変更は自動的に保存されます"
+		},
+		"mcp": "MCP",
+		"mcpPage": {
+			"apiKeyNote": "先に API キーを作成し、<YOUR_API_KEY> プレースホルダーをそれに置き換えてください。",
+			"authModeApiKey": "API キー",
+			"authModeOauth": "OAuth",
+			"cardDescription": "認証方式を選び、インストールコマンドを実行するか設定をエージェントに貼り付けます。",
+			"cardTitle": "エージェントを接続",
+			"copied": "コピーしました",
+			"copy": "コピー",
+			"createApiKey": "API キーを作成",
+			"followUpLabel": "次に認証",
+			"installCommandLabel": "インストールコマンド",
+			"manualConfigLabel": "手動設定",
+			"oauthNote": "OAuth が既定です。初回接続時にブラウザで Kaneo を開いてエージェントを承認し、その後トークンはエージェント自身が管理します。",
+			"pageTitle": "MCP",
+			"serverUrlDescription": "このインスタンスの組み込み HTTP MCP エンドポイント",
+			"serverUrlLabel": "サーバー URL",
+			"subtitle": "Claude、Codex、Gemini、OpenCode などの AI エージェントを、組み込み HTTP MCP サーバー経由でこの Kaneo インスタンスに接続します。",
+			"title": "MCP (Model Context Protocol)"
+		},
+		"skills": "スキル",
+		"skillsPage": {
+			"adminScope": "admin",
+			"cardDescription": "Kaneo リポジトリのルートでこれらのコマンドを実行し、エージェントを再起動してください。",
+			"cardTitle": "Kaneo スキルをインストール",
+			"copied": "コピーしました",
+			"copy": "コピー",
+			"destinationLabel": "保存先",
+			"installCommandLabel": "インストールコマンド",
+			"mcpRequirement": "このスキルは MCP 接続を前提としています。先に設定してください。",
+			"openMcpSettings": "MCP 設定を開く",
+			"pageTitle": "スキル",
+			"projectScope": "プロジェクト",
+			"skillUrlDescription": "このインスタンスがエージェント向けに配信",
+			"skillUrlLabel": "スキルの URL",
+			"subtitle": "Kaneo スキルをインストールすると、AI エージェントがこのインスタンスの規約に従い、MCP ツールを正しく使用します。",
+			"title": "エージェントスキル",
+			"updateDescription": "スキルはディスクから読み込まれます。Kaneo 更新後はフォルダーを再コピーして変更を反映してください。",
+			"userScope": "ユーザー",
+			"verifyLabel": "検証"
+		},
+		"telegramUnified": {
+			"accountHint": "{{count}} bot(s) connected to your account",
+			"addBot": "Add bot",
+			"addBotDescription": "Register a Telegram bot token for this workspace.",
+			"addChat": "Add chat",
+			"addChatDescription": "Attach a chat, group, or channel the bot can post to.",
+			"addRule": "Add rule",
+			"addRuleDescription": "Route notifications to this chat, optionally into a forum topic.",
+			"allProjects": "All projects",
+			"allWorkspaces": "All workspaces",
+			"botName": "Bot name (optional)",
+			"botNamePlaceholder": "Kaneo bot",
+			"botToken": "Bot token",
+			"botTokenKeepHint": "Leave empty to keep the current token",
+			"cardDescription": "Bots belong to your account. Add a bot, attach chats, then route notifications to workspaces and projects.",
+			"cardTitle": "Telegram bots",
+			"chatId": "Chat ID",
+			"chatLabel": "Label (optional)",
+			"chatLabelPlaceholder": "Ops chat",
+			"compatibilityNote": "The per-project Telegram integration (project options) still works for projects no rule covers; a matching unified rule supersedes it, so covered projects never get duplicates.",
+			"deleteBot": "Delete bot",
+			"deleteChat": "Delete chat",
+			"detectedTopicsLabel": "検出されたトピック",
+			"detectedTopics_other": "{{count}} topics detected",
+			"editBot": "Edit bot",
+			"editBotDescription": "Rename the bot or rotate its token. Leave the token empty to keep the current one.",
+			"editChat": "Edit chat",
+			"editChatDescription": "Change the chat id or its label.",
+			"editRule": "Edit rule",
+			"editRuleDescription": "Change this chat's workspace scope and forum topic. Saving replaces the routing rules this workspace has on the chat.",
+			"editRuleScopeHint": "Editing the scope of this workspace's rules on this chat.",
+			"emptyChats": "No chat attached to this bot yet.",
+			"emptyWorkspace": "No Telegram bot configured yet. Add a bot, attach a chat, then create routing rules.",
+			"isForumHint": " (forum: a topic id is required)",
+			"pageTitle": "Telegram notifications",
+			"ruleActive": "Rule active",
+			"ruleProjects": "Projects",
+			"ruleWorkspaces": "Workspaces",
+			"save": "Save",
+			"scopeIncomplete": "Pick projects or 'All projects' for each selected workspace",
+			"sidebarLabel": "Telegram",
+			"subtitle": "Configure bots, chats, and notification rules in one place. Rules supersede the per-project Telegram integration.",
+			"title": "Telegram notifications",
+			"toastDeleted": "Deleted",
+			"toastError": "Something went wrong",
+			"toastSaved": "Saved",
+			"topicDiscoveryUnavailable": "Topic auto-discovery is unavailable for this bot (a webhook or another app is probably consuming it). Enter the topic ID manually.",
+			"topicHint": "The Telegram Bot API cannot list forum topics, so enter the topic id manually. Leave empty to post in the chat.",
+			"topicId": "Topic ID (optional)",
+			"topicIdPlaceholder": "Forum topic id",
+			"topicsOnlyInGroups": "Forum topics only exist in groups: this chat is a plain chat, so notifications always go to the chat itself.",
+			"unknownProject": "Unknown project",
+			"unnamedBot": "Unnamed bot",
+			"verify": "Verify",
+			"verifyBotGroupsDisabled": "This bot cannot be invited to new groups (privacy mode in @BotFather). Chats it is already in keep receiving notifications; add it manually to new ones.",
+			"verifyBotOk": "Bot verified: {{username}}",
+			"verifyChatMembershipOk": "Bot can post in this chat ({{status}})",
+			"verifyChatOk": "Chat verified: {{title}}{{forum}}",
+			"wholeWorkspace": "Entire workspace"
 		}
 	},
 	"navigation": {
@@ -2336,7 +2890,8 @@
 				"navigate": "移動",
 				"open": "開く",
 				"close": "閉じる"
-			}
+			},
+			"voltTheme": "ボルトテーマ"
 		},
 		"sidebar": {
 			"projects": "プロジェクト",
@@ -2359,7 +2914,12 @@
 			"deleteConfirmDescription": "これにより、プロジェクトとそのすべてのデータが完全に削除されます。この操作は取り消せません。",
 			"deletedToast": "プロジェクトを削除しました",
 			"deleteProject": "プロジェクトを削除",
-			"switcherLabel": "プロジェクトまたはビューを切り替え"
+			"switcherLabel": "プロジェクトまたはビューを切り替え",
+			"sortCompletion": "進捗率",
+			"sortCustom": "カスタム順",
+			"sortDate": "作成日",
+			"sortName": "名前",
+			"sortProjects": "プロジェクトを並べ替え"
 		},
 		"search": {
 			"inputPlaceholder": "タスク、プロジェクト、コメントを検索...",
@@ -2370,7 +2930,8 @@
 				"workspace": "ワークスペース",
 				"comment": "コメント",
 				"activity": "アクティビティ",
-				"fallback": "検索結果"
+				"fallback": "検索結果",
+				"appointment": "予定"
 			}
 		},
 		"settingsLayout": {
@@ -2389,7 +2950,8 @@
 			"workspaces": "ワークスペース",
 			"switching": "切り替え中...",
 			"addWorkspace": "ワークスペースを追加",
-			"selectWorkspace": "ワークスペースを選択"
+			"selectWorkspace": "ワークスペースを選択",
+			"sortWorkspaces": "ワークスペースを並べ替え"
 		},
 		"page": {
 			"projectsTitle": "プロジェクト",
@@ -2515,7 +3077,39 @@
 			"then": "次に",
 			"or": "または",
 			"thenEllipsis": "次に…"
-		}
+		},
+		"keyboardShortcuts": {
+			"title": "キーボードショートカット",
+			"subtitle": "キーボードショートカットで作業を効率化",
+			"searchPlaceholder": "ショートカットを検索...",
+			"footer": "<kbd>Escape</kbd> で閉じる",
+			"categories": {
+				"general": "一般",
+				"create": "作成",
+				"views": "ビュー",
+				"navigation": "ナビゲーション",
+				"quickSelect": "クイック選択 (ポップオーバー内)"
+			},
+			"items": {
+				"openCommandPalette": "コマンドパレットを開く",
+				"globalSearch": "全体検索",
+				"toggleSidebar": "サイドバーを切り替え",
+				"showShortcuts": "キーボードショートカットを表示",
+				"closeModal": "モーダル/ポップオーバーを閉じる",
+				"createTask": "タスクを作成",
+				"createProject": "プロジェクトを作成",
+				"createWorkspace": "ワークスペースを作成",
+				"boardView": "ボードビューに切り替え",
+				"listView": "リストビューに切り替え",
+				"backlogView": "バックログビューに切り替え",
+				"calendarView": "カレンダービューに切り替え",
+				"nextTask": "次のタスク",
+				"prevTask": "前のタスク",
+				"openTask": "選択したタスクを開く",
+				"quickSelectNumber": "番号で項目を選択"
+			}
+		},
+		"notifications": "通知"
 	},
 	"notifications": {
 		"newCount_other": "{{count}} 件の新着",
@@ -2566,6 +3160,15 @@
 				"title": "時間計測を開始しました",
 				"contentWithTask": "タスク「{{taskTitle}}」の時間計測を開始しました",
 				"contentWithoutTask": "タスクの時間計測を開始しました"
+			},
+			"appointment_created": {
+				"content": "予定があなたに割り当てられました: {{appointmentTitle}}",
+				"title": "予定があなたに割り当てられました"
+			},
+			"appointment_updated": {
+				"contentAssignee": "予定があなたに割り当てられました: {{appointmentTitle}}",
+				"contentRescheduled": "予定「{{appointmentTitle}}」の日時が変更されました。",
+				"title": "予定が更新されました"
 			}
 		},
 		"inbox": {
@@ -2589,7 +3192,11 @@
 			"taskLoadError": "This task couldn’t be loaded.",
 			"actionError": "受信トレイを更新できませんでした。もう一度お試しください。",
 			"readCleared": "既読の通知を削除しました"
-		}
+		},
+		"shortcuts": {
+			"open": "通知を開く"
+		},
+		"title": "通知"
 	},
 	"activity": {
 		"assignedToSelf": "がタスクを自分に割り当てました",
@@ -2697,11 +3304,14 @@
 				},
 				"mermaid": {
 					"renderFailed": "Mermaid ダイアグラムを描画できませんでした"
-				}
+				},
+				"enterUrl": "URLを入力"
 			},
 			"importedFrom": "Imported from {{source}}",
 			"importedBy": "Imported by {{name}}",
-			"commentedOnForge": "{{forge}} でコメント"
+			"commentedOnForge": "{{forge}} でコメント",
+			"commentedOnGithub": "GitHub でコメント",
+			"github": "GitHub"
 		},
 		"movedFromOtherProject": "moved task from another project to \"{{to}}\""
 	},
@@ -2854,8 +3464,11 @@
 				"saved": "Saved",
 				"saving": "Saving…",
 				"saveFailed": "Changes could not be saved",
-				"retrySave": "Retry"
-			}
+				"retrySave": "Retry",
+				"enterUrl": "URLを入力"
+			},
+			"customFieldUpdated": "Field updated",
+			"selectOption": "Select option"
 		},
 		"entity": {
 			"task": "タスク"
@@ -2907,7 +3520,8 @@
 			"startDate": "開始日",
 			"noDate": "日付なし",
 			"dates": "日付",
-			"project": "プロジェクト"
+			"project": "プロジェクト",
+			"end": "End"
 		},
 		"move": {
 			"title": "タスクを移動",
@@ -2933,11 +3547,19 @@
 			},
 			"dueDate": {
 				"updateError": "期限の更新に失敗しました",
-				"clear": "日付をクリア"
+				"clear": "日付をクリア",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Due time",
+				"updateSuccess": "期限を更新しました"
 			},
 			"startDate": {
 				"updateError": "開始日の更新に失敗しました",
-				"clear": "開始日をクリア"
+				"clear": "開始日をクリア",
+				"apply": "Apply",
+				"cancel": "Cancel",
+				"timeLabel": "Start time",
+				"updateSuccess": "開始日を更新しました"
 			},
 			"labels": {
 				"searchPlaceholder": "ラベルを検索...",
@@ -2958,7 +3580,9 @@
 					"rose": "ローズ",
 					"crimson": "クリムゾン"
 				},
-				"editLabels": "ラベルを編集"
+				"editLabels": "ラベルを編集",
+				"addSuccess": "ラベルを追加しました",
+				"removeSuccess": "ラベルを削除しました"
 			}
 		},
 		"backlog": {
@@ -2978,8 +3602,14 @@
 			"filters": {
 				"dueThisWeek": "今週が期限",
 				"dueNextWeek": "来週が期限",
-				"noDueDate": "期限なし"
-			}
+				"noDueDate": "期限なし",
+				"priority": "優先度: {{name}}",
+				"assignee": "担当者: {{name}}",
+				"due": "期限: {{date}}",
+				"label": "ラベル: {{name}}"
+			},
+			"filter": "フィルター",
+			"addFilter": "フィルターを追加..."
 		},
 		"sort": {
 			"direction": "順序",
@@ -2992,7 +3622,9 @@
 				"dueDate": "期限",
 				"title": "タイトル",
 				"number": "タスク番号"
-			}
+			},
+			"label": "並び替え",
+			"by": "並び替え基準"
 		},
 		"boardFilters": {
 			"selectedCount": "{{count}} 件選択中",
@@ -3014,7 +3646,14 @@
 			},
 			"allCustomFieldValues": "All values",
 			"noCustomFieldValues": "No custom field values",
-			"noValuesUsedYet": "No values used yet"
+			"noValuesUsedYet": "No values used yet",
+			"filterBy": "フィルター条件",
+			"allStatuses": "すべてのステータス",
+			"allPriorities": "すべての優先度",
+			"allAssignees": "すべての担当者",
+			"allDueDates": "すべての期限",
+			"allLabels": "すべてのラベル",
+			"all": "All"
 		},
 		"calendar": {
 			"pageTitle": "{{name}} – カレンダー",
@@ -3048,7 +3687,8 @@
 			"previousPeriod": "Previous period",
 			"nextPeriod": "Next period",
 			"periodStart": "Timeline start date",
-			"showTaskDates": "Show task dates"
+			"showTaskDates": "Show task dates",
+			"noTasksMatch": "「{{query}}」に一致するスケジュール済みタスクはありません"
 		},
 		"delete": {
 			"title": "タスクを削除しますか？",
@@ -3087,13 +3727,17 @@
 			"label": "期限",
 			"clear": "日付をクリア",
 			"updateError": "期限の更新に失敗しました",
-			"clearError": "期限のクリアに失敗しました"
+			"clearError": "期限のクリアに失敗しました",
+			"updateSuccess": "期限を更新しました",
+			"clearSuccess": "期限をクリアしました"
 		},
 		"labels": {
-			"empty": "利用可能なラベルがありません"
+			"empty": "利用可能なラベルがありません",
+			"label": "ラベル"
 		},
 		"update": {
-			"error": "タスクの更新に失敗しました"
+			"error": "タスクの更新に失敗しました",
+			"success": "タスクを更新しました"
 		},
 		"contextMenu": {
 			"copyLink": "リンクをコピー",
@@ -3143,7 +3787,9 @@
 			"priorityPlaceholder": "優先度を設定…",
 			"assigneePlaceholder": "担当者を割り当て…",
 			"labelPlaceholder": "ラベルを追加…",
-			"columnPlaceholder": "列に移動…"
+			"columnPlaceholder": "列に移動…",
+			"deleteConfirm": "{{count}} 件のタスクを削除しますか？この操作は取り消せません。",
+			"setDueDate": "期限を設定"
 		},
 		"editor": {
 			"table": {
@@ -3179,7 +3825,8 @@
 			"missingRequired_other": "必須フィールドが {{count}} 件未入力です",
 			"saveError": "{{field}}を保存できませんでした",
 			"moreFields_other": "ほか {{count}} 件のフィールド",
-			"manage": "フィールドを管理"
+			"manage": "フィールドを管理",
+			"ariaLabel": "Custom fields"
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
@@ -3236,6 +3883,52 @@
 			"startsOn": "開始: {{date}}",
 			"beforeStart": "{{date}} は開始日より前です",
 			"afterDue": "{{date}} は期日より後です"
+		},
+		"boardGroup": {
+			"dragDisabled": "Drag & drop is disabled while grouping is active",
+			"groupBy": "Group by",
+			"label": "Group",
+			"labels": "ラベル",
+			"noLabel": "No label",
+			"none": "No grouping"
+		},
+		"boardSearchPlaceholder": "チケットを検索...",
+		"recurrence": {
+			"daily": "Daily",
+			"day_other": "days",
+			"every": "Every",
+			"hint": "Completing the task creates its next occurrence automatically.",
+			"month_other": "months",
+			"monthly": "Monthly",
+			"needsStartDate": "Set a start date first",
+			"none": "No recurrence",
+			"summary": "Every {{interval}} {{unit}}",
+			"title": "Recurrence",
+			"updateError": "Failed to update recurrence",
+			"updateSuccess": "Recurrence updated successfully",
+			"week_other": "weeks",
+			"weekly": "Weekly"
+		},
+		"reminders": {
+			"add": "Add reminder",
+			"amountLabel": "Amount",
+			"before": "before",
+			"daysBefore_other": "{{count}} days before",
+			"empty": "No reminder configured",
+			"hint": "Reminders are delivered via the unified Telegram configuration.",
+			"hoursBefore_other": "{{count}} hours before",
+			"minutesBefore_other": "{{count}} minutes before",
+			"needsStartDate": "Set a start date first",
+			"remove": "Remove reminder",
+			"title": "Reminders",
+			"unitDay_other": "days",
+			"unitHour_other": "hours",
+			"unitLabel": "Unit",
+			"unitMinute_other": "分",
+			"unitWeek_other": "weeks",
+			"updateError": "Failed to update reminders",
+			"updateSuccess": "Reminders updated successfully",
+			"weeksBefore_other": "{{count}} weeks before"
 		}
 	},
 	"invitations": {
@@ -3418,7 +4111,13 @@
 			"error": "チームメンバーの招待に失敗しました",
 			"createdTitle": "招待を作成しました",
 			"shareLinkDescription": "{{email}} にこのリンクを共有して、ワークスペースに参加してもらいましょう。",
-			"done": "完了"
+			"done": "完了",
+			"noTeams": "No team covers this workspace yet.",
+			"scopeHint": "Limit the invitation to specific workspaces and projects. Untick everything to rely on teams only.",
+			"scopeLabel": "Workspaces and projects",
+			"scopeRequired": "Select at least one team, workspace or project.",
+			"teamsHint": "Teams keep applying after acceptance: editing a team updates its members' access.",
+			"teamsLabel": "Teams"
 		},
 		"membersTable": {
 			"emptyTitle": "チームメンバーがまだいません",
@@ -3445,7 +4144,8 @@
 			"cancelInviteSuccess": "招待をキャンセルしました",
 			"cancelInviteError": "招待のキャンセルに失敗しました",
 			"roleUpdateSuccess": "ロールを更新しました",
-			"roleUpdateError": "ロールの更新に失敗しました"
+			"roleUpdateError": "ロールの更新に失敗しました",
+			"ariaMemberActions": "メンバーの操作"
 		},
 		"projectAccess": {
 			"allProjects": "All projects",
@@ -3466,6 +4166,83 @@
 			"updateSuccess": "Project access updated",
 			"archived": "Archived",
 			"allProjectsUnavailable": "Your own access is limited, so you can only give access to selected projects."
+		},
+		"accessScope": {
+			"allProjects": "All projects",
+			"noProjects": "No projects in this workspace.",
+			"noWorkspaces": "You don't administer any workspace yet."
+		},
+		"accessTeams": {
+			"addMember": "Add",
+			"addMemberPlaceholder": "Add a workspace member",
+			"allProjects": "All projects",
+			"createTitle": "New team",
+			"created": "Team created",
+			"delete": "Delete",
+			"deleteDialogDescription": "Delete the team \"{{name}}\"? Members lose the access this team was the only source of. This action cannot be undone.",
+			"deleteDialogTitle": "Delete this team?",
+			"deleteError": "Failed to delete the team",
+			"deleted": "Team deleted",
+			"description": "Reusable access bundles: pick workspaces and projects, then assign the team to members or invitations.",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this team for?",
+			"edit": "Edit",
+			"editTitle": "Edit team",
+			"empty": "No teams yet",
+			"emptyDescription": "Create a team to grant scoped access at invitation time.",
+			"memberAdded": "Member added to the team",
+			"memberCount_other": "{{count}} members",
+			"memberError": "Failed to update the team member",
+			"memberRemoved": "Member removed from the team",
+			"membersLabel": "Members",
+			"nameLabel": "Name",
+			"namePlaceholder": "Design team",
+			"newTeam": "New team",
+			"noMembers": "No members yet.",
+			"pageTitle": "Teams",
+			"projectCount_other": "{{count}} projects",
+			"removeMember": "Remove from the team",
+			"saveError": "Failed to save the team",
+			"scopeHint": "Projects selected here define everything the team can reach, including future invitations.",
+			"scopeLabel": "Access scope",
+			"title": "Teams",
+			"updated": "Team updated"
+		},
+		"inviteLinks": {
+			"copyFailed": "自動コピーに失敗しました。リンクを選択して Ctrl+C を押してください。",
+			"copyIconAria": "招待リンクをコピー",
+			"create": "リンクを作成",
+			"createError": "招待リンクを作成できませんでした",
+			"createSuccess": "招待リンクを作成しました",
+			"deleteError": "招待リンクを無効化できませんでした",
+			"deleteSuccess": "招待リンクを無効化しました",
+			"description": "リンクを知っている人は誰でもメンバーとしてこのワークスペースに参加できます — メールは不要です。",
+			"empty": "共有可能な招待リンクはまだありません。",
+			"expiry24h": "24 時間",
+			"expiry30d": "30 日間",
+			"expiry7d": "7 日間",
+			"expiryLabel": "有効期限",
+			"expiryNever": "無期限",
+			"join": "{{workspaceName}} に参加",
+			"linkCopied": "招待リンクをコピーしました",
+			"maxUsesLabel": "最大使用回数",
+			"maxUsesUnlimited": "無制限",
+			"never": "無期限",
+			"revokeIconAria": "招待リンクを無効化",
+			"title": "共有可能な招待リンク",
+			"uses": "{{used}}/{{max}} 回使用",
+			"usesUnlimited": "{{used}} 回使用",
+			"workspace": "ワークスペース: {{workspaceName}}"
+		},
+		"memberAccess": {
+			"description": "このワークスペースでの {{name}} の直接プロジェクトアクセス。",
+			"fullAccess": "このメンバーはすでにワークスペース全体へのアクセス権を持っています。",
+			"hint": "すべてのチェックを外すと直接アクセスが削除されます。チームや他のアクセスが残っていない場合、メンバーはワークスペースから外れます。",
+			"menuItem": "アクセスを管理",
+			"save": "アクセスを保存",
+			"saveError": "メンバーのアクセスを更新できませんでした",
+			"saveSuccess": "メンバーのアクセスを更新しました",
+			"title": "アクセスを管理"
 		}
 	},
 	"publicProject": {
@@ -3714,6 +4491,174 @@
 			"composeLinkDescription": "The maintained compose.yml with persistent storage and health checks.",
 			"startLink": "Start and verify the services",
 			"startLinkDescription": "Start the stack, inspect its status, and check that the application is available."
+		}
+	},
+	"appointments": {
+		"dialog": {
+			"assigneeLabel": "担当者",
+			"create": "作成",
+			"createTitle": "新しい予定",
+			"delete": "削除",
+			"description": "予定はタスクと同じようにスケジュールされますが、ボードやバックログには表示されません。",
+			"descriptionLabel": "説明",
+			"editTitle": "予定を編集",
+			"endLabel": "終了",
+			"priorityLabel": "優先度",
+			"rangeError": "終了は開始より後にしてください。",
+			"save": "保存",
+			"startLabel": "開始",
+			"titleLabel": "タイトル",
+			"titlePlaceholder": "例: デザインレビュー",
+			"unassigned": "未割り当て"
+		},
+		"empty": {
+			"description": "予定はここに表示され、ボードやバックログには表示されません。",
+			"title": "予定はまだありません"
+		},
+		"loadError": "予定を読み込めませんでした。",
+		"moveFromBacklog": "予定に移動",
+		"newAppointment": "新しい予定",
+		"nextWeek": "次の週",
+		"pageTitle": "予定 · {{name}}",
+		"previousWeek": "前の週",
+		"tab": "予定",
+		"toast": {
+			"created": "予定を作成しました",
+			"deleted": "予定を削除しました",
+			"error": "問題が発生しました",
+			"moved": "予定に移動しました",
+			"updated": "予定を更新しました"
+		},
+		"today": "今日",
+		"unscheduled": "未スケジュール",
+		"weekHint": "空きスロットをクリックして予定を追加、予定をクリックして編集します。"
+	},
+	"roadmap": {
+		"assign": {
+			"empty": "No sprint yet. Create one from the Roadmap view.",
+			"none": "No sprint",
+			"title": "Sprint",
+			"updateError": "Failed to move the task"
+		},
+		"create": "Create sprint",
+		"createError": "Failed to create the sprint",
+		"delete": "Delete sprint",
+		"deleteDescription": "Delete \"{{name}}\"? Its tasks are kept and return to the no-sprint lane.",
+		"deleteError": "Failed to delete the sprint",
+		"deleteSuccess": "Sprint deleted; its tasks stay in the roadmap",
+		"deleteTitle": "Delete sprint?",
+		"emptyDescription": "Create a first sprint, then assign tasks to draw the dependency graph.",
+		"emptyTitle": "No sprint or task yet",
+		"filter": {
+			"active": "Active",
+			"all": "All",
+			"blocked": "Blocked"
+		},
+		"graphLabel": "Roadmap dependency graph",
+		"moveLeft": "Move sprint left",
+		"moveRight": "Move sprint right",
+		"nameLabel": "Sprint name",
+		"namePlaceholder": "Sprint 1",
+		"newSprint": "New sprint",
+		"noSprint": "No sprint",
+		"reorderError": "Failed to reorder the sprints",
+		"resetView": "Reset view",
+		"sprints_other": "{{count}} sprints",
+		"state": {
+			"active": "Active",
+			"blocked": "Blocked",
+			"done": "Done",
+			"todo": "To do"
+		},
+		"tab": "Roadmap",
+		"title": "Roadmap",
+		"updateError": "Failed to update the sprint",
+		"zoneProgress": "{{completed}}/{{count}} done",
+		"zoomIn": "Zoom in",
+		"zoomOut": "Zoom out"
+	},
+	"unified": {
+		"appointments": {
+			"count_other": "{{count}} 件の予定",
+			"emptyDescription": "すべてのプロジェクトの予定は、スケジュールされるとここに表示されます。",
+			"emptyTitle": "予定はまだありません",
+			"unscheduled": "未スケジュール"
+		},
+		"charts": {
+			"average": "平均",
+			"backlog": "バックログ",
+			"byProject": "プロジェクト別",
+			"completed": "完了",
+			"created": "作成",
+			"empty": "過去6か月間にタスクの活動はありません。",
+			"noTasks": "配分するタスクがありません。",
+			"other": "その他",
+			"perUnit": "{{value}}/{{unit}}",
+			"period": "期間",
+			"periodSummary": "{{created}} 作成 · {{completed}} 完了",
+			"rangeAll": "全期間",
+			"rangeWeek": "1週間",
+			"range_one": "{{count}} か月",
+			"range_other": "{{count}} か月",
+			"statusDescription": "全プロジェクトのタスクが現在どこにあるか。",
+			"statusTitle": "ステータス内訳",
+			"tasks": "タスク",
+			"unassigned": "未割り当て",
+			"unit": "単位",
+			"unitDay": "日",
+			"unitHint": "Finer units narrow the period to one that supports them.",
+			"unitHour": "時間",
+			"unitLabelDay": "日",
+			"unitLabelHour": "時間",
+			"unitLabelMonth": "月",
+			"unitLabelWeek": "週",
+			"unitMonth": "か月",
+			"unitWeek": "週",
+			"velocityDescription": "全プロジェクトで{{unit}}ごとに作成・完了されたタスク。",
+			"velocityTitle": "ベロシティ",
+			"workloadDescription": "全プロジェクトの担当者ごとの未完了ボードタスク。",
+			"workloadEmpty": "割り当てられた未完了の作業はありません。",
+			"workloadTitle": "ワークロード"
+		},
+		"consolidated": {
+			"backlogCount_other": "{{count}} tasks in backlog",
+			"dueDate": "Due date",
+			"taskNumber": "#{{number}}",
+			"tasksCount_other": "{{count}} active tasks"
+		},
+		"empty": {
+			"backlogDescription": "Planned tasks from all your projects will show up here.",
+			"backlogTitle": "Backlog is empty",
+			"description": "プロジェクトを作成すると、すべてのワークスペースのプロジェクトがここに表示されます。",
+			"tasksDescription": "Tasks from all your projects will show up here as soon as they are created.",
+			"tasksTitle": "No tasks yet",
+			"title": "プロジェクトはまだありません"
+		},
+		"links": {
+			"mcp": "MCP",
+			"skills": "スキル"
+		},
+		"pageTitle": "すべてのプロジェクト",
+		"section": {
+			"projectCount_other": "{{count}}件のプロジェクト"
+		},
+		"stats": {
+			"completion": "完了率",
+			"projects": "プロジェクト",
+			"tasks": "タスク"
+		},
+		"table": {
+			"progress": "進捗",
+			"tasks": "タスク"
+		},
+		"tabs": {
+			"appointments": "予定",
+			"backlog": "Backlog",
+			"calendar": "カレンダー",
+			"charts": "グラフ",
+			"gantt": "ガントチャート",
+			"overview": "概要",
+			"tasks": "タスク"
 		}
 	}
 }

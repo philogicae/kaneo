@@ -19,14 +19,14 @@ export function MemberAccessButton({
 
   if (isOwner) {
     return (
-      <span className="text-[13px] text-muted-foreground">
+      <span className="text-[0.8125rem] text-muted-foreground">
         {t("team:projectAccess.allProjects")}
       </span>
     );
   }
 
   if (!access) {
-    return <span className="text-[13px] text-muted-foreground">–</span>;
+    return <span className="text-[0.8125rem] text-muted-foreground">–</span>;
   }
 
   const accessLabel =

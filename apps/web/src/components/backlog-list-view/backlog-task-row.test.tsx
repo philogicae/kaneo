@@ -34,7 +34,7 @@ const render = (ui: ReactElement) =>
 const { sortableKeyDown } = vi.hoisted(() => ({ sortableKeyDown: vi.fn() }));
 const { useSortable } = vi.hoisted(() => ({
   useSortable: vi.fn((_options: { id: string }) => ({
-    attributes: { role: "button", tabIndex: 0 },
+    attributes: { role: "button" },
     listeners: { onKeyDown: sortableKeyDown },
     setNodeRef: vi.fn(),
     transform: null,
@@ -44,6 +44,9 @@ const { useSortable } = vi.hoisted(() => ({
 }));
 vi.mock("@dnd-kit/sortable", () => ({ useSortable }));
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => vi.fn() }));
+vi.mock("@/hooks/mutations/appointment/use-move-task-to-appointments", () => ({
+  default: () => ({ mutate: vi.fn(), isPending: false }),
+}));
 vi.mock("@/hooks/mutations/task/use-delete-task", () => ({
   useDeleteTask: () => ({ mutateAsync: vi.fn() }),
 }));
@@ -171,20 +174,12 @@ describe("backlog row subscriptions", () => {
     expect(useBacklogBulkSelectionStore.getState().selectedTaskIds).toEqual(
       new Set([task.id, otherTask.id]),
     );
+    expect(sortableKeyDown).not.toHaveBeenCalled();
     fireEvent.keyDown(screen.getByRole("button", { name: /Second task/ }), {
       key: " ",
       code: "Space",
     });
-    expect(sortableKeyDown).not.toHaveBeenCalled();
-  });
-
-  it("takes keyboard focus when the row is focused", () => {
-    render(<BacklogTaskRow task={task} />);
-
-    fireEvent.keyDown(document, { key: "Tab" });
-    act(() => screen.getByRole("button", { name: /First task/ }).focus());
-
-    expect(useBacklogBulkSelectionStore.getState().focusedTaskId).toBe(task.id);
+    expect(sortableKeyDown).toHaveBeenCalledOnce();
   });
 
   it("only renders the row whose selection changes, including deselection", () => {
@@ -231,32 +226,24 @@ describe("backlog row subscriptions", () => {
     );
     expect(useSortable).not.toHaveBeenCalled();
 
-    act(() => useBacklogBulkSelectionStore.getState().setFocusedTask(task.id));
+    act(() => useBacklogBulkSelectionStore.getState().focusNext());
     expect(useSortable.mock.calls.map(([options]) => options.id)).toEqual([
       "task-1",
     ]);
     expect(
-      screen
-        .getByRole("button", { name: /First task/ })
-        .closest(".ring-board-card-focus"),
+      screen.getByRole("button", { name: /First task/ }).closest(".ring-2"),
     ).not.toBeNull();
 
     useSortable.mockClear();
-    act(() =>
-      useBacklogBulkSelectionStore.getState().setFocusedTask(otherTask.id),
-    );
+    act(() => useBacklogBulkSelectionStore.getState().focusNext());
     expect(
       useSortable.mock.calls.map(([options]) => options.id).sort(),
     ).toEqual(["task-1", "task-2"]);
     expect(
-      screen
-        .getByRole("button", { name: /First task/ })
-        .closest(".ring-board-card-focus"),
+      screen.getByRole("button", { name: /First task/ }).closest(".ring-2"),
     ).toBeNull();
     expect(
-      screen
-        .getByRole("button", { name: /Second task/ })
-        .closest(".ring-board-card-focus"),
+      screen.getByRole("button", { name: /Second task/ }).closest(".ring-2"),
     ).not.toBeNull();
   });
 

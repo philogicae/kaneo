@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { useTaskFiltersWithLabelsSupport } from "@/hooks/use-task-filters-with-labels-support";
+import type { useTaskFiltersWithLabelsSupport } from "@/hooks/use-task-view-filters";
 
 export type TaskFilterControls = Pick<
   ReturnType<typeof useTaskFiltersWithLabelsSupport>,

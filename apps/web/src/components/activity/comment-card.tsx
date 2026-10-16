@@ -157,11 +157,11 @@ export default function CommentCard({
               <div className="flex cursor-pointer items-center gap-2">
                 <Avatar className="size-5">
                   <AvatarImage src={user?.image ?? ""} alt={user?.name || ""} />
-                  <AvatarFallback className="bg-muted font-semibold text-[9px]">
+                  <AvatarFallback className="bg-muted font-semibold text-[0.5625rem]">
                     {getInitials(user?.name)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="font-medium text-[13px] text-foreground transition-colors hover:text-foreground/80">
+                <span className="font-medium text-[0.8125rem] text-foreground transition-colors hover:text-foreground/80">
                   {user?.name}
                 </span>
               </div>

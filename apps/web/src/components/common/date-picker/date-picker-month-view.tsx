@@ -37,7 +37,7 @@ export function DatePickerMonthView({
       <button
         type="button"
         onClick={onBack}
-        className="flex h-10 w-full cursor-pointer items-center gap-2 border-border/80 border-b px-3 text-left text-[13px] text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:text-foreground"
+        className="flex h-10 w-full cursor-pointer items-center gap-2 border-border/80 border-b px-3 text-left text-[0.8125rem] text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:text-foreground"
       >
         <ChevronLeft aria-hidden="true" className="size-3.5 shrink-0" />
         <span className="min-w-0 flex-1 truncate">{placeholder}</span>

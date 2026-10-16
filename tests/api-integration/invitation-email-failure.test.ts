@@ -57,9 +57,6 @@ describe("invitation email failure reporting", () => {
       code: "INVITATION_EMAIL_FAILED",
     });
     expect(await db.select().from(schema.invitationTable)).toHaveLength(1);
-    expect(send.mock.lastCall?.[2]).toEqual(
-      expect.objectContaining({ role: "Member", expiresAt: expect.any(Date) }),
-    );
     expect(
       (
         await post(

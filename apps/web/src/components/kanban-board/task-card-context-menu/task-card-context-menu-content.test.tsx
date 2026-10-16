@@ -125,11 +125,11 @@ vi.mock("@/store/project", () => ({
 }));
 
 vi.mock("react-i18next", () => ({
+  initReactI18next: { type: "3rdParty", init: vi.fn() },
   useTranslation: () => ({
     t: (key: string, options?: { title?: string }) =>
       options?.title ? `${key}|${options.title}` : key,
   }),
-  initReactI18next: { type: "3rdParty", init: vi.fn() },
 }));
 
 const task = {

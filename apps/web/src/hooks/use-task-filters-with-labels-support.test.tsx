@@ -1,9 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { useTaskFiltersWithLabelsSupport } from "./use-task-filters-with-labels-support";
-
-const IGNORE_STATUS = ["status"] as const;
 
 function createTestQueryClient() {
   return new QueryClient({
@@ -15,13 +14,14 @@ function createTestQueryClient() {
   });
 }
 
-function createWrapper() {
+function createWrapper(options?: { strict?: boolean }) {
   const queryClient = createTestQueryClient();
 
   return function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
+    const content = (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
+    return options?.strict ? <StrictMode>{content}</StrictMode> : content;
   };
 }
 
@@ -211,50 +211,25 @@ describe("useTaskFiltersWithLabelsSupport", () => {
     },
   );
 
-  it("keeps an ignored status filter stored but out of the backlog", () => {
+  // React StrictMode double-mounts effects in dev: the pre-hydration write
+  // effect used to clobber the stored value with the default, so the second
+  // mount restored the default and chosen filters vanished on reload.
+  it("survives a StrictMode double-mount with the stored filters intact", async () => {
     window.localStorage.setItem(
       storageKey,
-      JSON.stringify({ status: ["done"], priority: ["high"] }),
+      JSON.stringify({ status: ["todo"] }),
     );
-    const planned = {
-      id: "planned-1",
-      title: "Planned work",
-      number: 7,
-      description: null,
-      status: "planned",
-      priority: "high",
-      dueDate: null,
-      userId: null,
-      labels: [],
-    };
-    const project = {
-      id: "project-1",
-      slug: "PROJ",
-      columns: [],
-      plannedTasks: [planned],
-      archivedTasks: [],
-    } as unknown as Parameters<typeof useTaskFiltersWithLabelsSupport>[0];
 
     const { result } = renderHook(
-      () =>
-        useTaskFiltersWithLabelsSupport(
-          project,
-          "project-1",
-          "",
-          undefined,
-          IGNORE_STATUS,
-        ),
-      { wrapper: createWrapper() },
+      () => useTaskFiltersWithLabelsSupport(null, "project-1"),
+      { wrapper: createWrapper({ strict: true }) },
     );
 
-    expect(result.current.filters.status).toBeNull();
-    expect(result.current.activeFilterCount).toBe(1);
-    expect(result.current.filteredProject?.plannedTasks).toHaveLength(1);
-
-    act(() => result.current.clearFilters());
-
+    await waitFor(() => {
+      expect(result.current.filters.status).toEqual(["todo"]);
+    });
     expect(JSON.parse(window.localStorage.getItem(storageKey) ?? "{}")).toEqual(
-      expect.objectContaining({ status: ["done"], priority: null }),
+      expect.objectContaining({ status: ["todo"] }),
     );
   });
 });

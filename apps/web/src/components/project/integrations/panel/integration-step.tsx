@@ -26,7 +26,7 @@ export function IntegrationStep({
       <div className="flex w-8 shrink-0 flex-col items-center">
         <span
           className={cn(
-            "flex size-[22px] items-center justify-center rounded-full text-[11px] font-semibold",
+            "flex size-[22px] items-center justify-center rounded-full text-[0.6875rem] font-semibold",
             done
               ? "bg-success/15 text-success-foreground"
               : "border border-foreground/30 text-foreground",

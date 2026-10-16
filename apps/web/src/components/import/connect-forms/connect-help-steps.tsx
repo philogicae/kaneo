@@ -30,7 +30,7 @@ export function ConnectHelpSteps({
           >
             <span
               aria-hidden="true"
-              className="flex size-4.5 shrink-0 items-center justify-center rounded-[5px] border border-border font-medium text-[10px] tabular-nums"
+              className="flex size-4.5 shrink-0 items-center justify-center rounded-[5px] border border-border font-medium text-[0.625rem] tabular-nums"
             >
               {index + 1}
             </span>

@@ -15,7 +15,7 @@ export function WebhookFieldRow({
     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
       <span
         id={labelId}
-        className="text-[13px] text-muted-foreground sm:w-18 sm:shrink-0"
+        className="text-[0.8125rem] text-muted-foreground sm:w-18 sm:shrink-0"
       >
         {label}
       </span>

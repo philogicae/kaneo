@@ -27,7 +27,7 @@ export function AssigneeAvatar({
       <AvatarImage src={image ?? ""} alt="" />
       <AvatarFallback
         className={cn(
-          "border border-avatar-border bg-avatar font-semibold text-[8px] text-avatar-foreground",
+          "border border-avatar-border bg-avatar font-semibold text-[0.5rem] text-avatar-foreground",
           fallbackClassName,
         )}
       >

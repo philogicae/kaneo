@@ -19,8 +19,7 @@ export async function cleanupDraftUploads() {
           ),
         )
         .orderBy(asc(assetTable.createdAt), asc(assetTable.id))
-        .limit(500)
-        .for("update", { skipLocked: true });
+        .limit(500);
       if (!batch.length) return 0;
       const expired = await tx
         .delete(assetTable)

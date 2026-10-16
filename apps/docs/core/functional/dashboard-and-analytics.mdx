@@ -1,0 +1,41 @@
+---
+title: Dashboard and analytics
+description: Use the home dashboard to see every project at once, with charts for status, velocity, and workload.
+---
+
+The home dashboard (`/`) aggregates every project of the active workspace into one place. Use it for a daily overview and for reporting without opening each project.
+
+## Tabs
+
+The header switches the whole page between consolidated views:
+
+- **Overview** — projects and task counters (total, completed, completion percentage) with a consolidated task list and progress.
+- **Charts** — project and workspace analytics (see below).
+- **Backlog** — every planned task across the workspace.
+- **Tasks** — every board task across the workspace.
+- **Appointments** — scheduled appointments across projects.
+- **Calendar** — the workspace calendar (tasks with dates and appointments).
+- **Gantt** — the workspace timeline.
+
+The same views exist per project, where they are scoped to a single project.
+
+## Charts
+
+Charts read the tasks you can access and offer:
+
+| Control | Values |
+| --- | --- |
+| Range | `1w`, `1m`, `3m`, `6m`, `12m`, `all` |
+| Unit | `hour`, `day`, `week`, `month` |
+
+Available charts include task status distribution, velocity (created vs completed per unit with averages), workload per assignee, and a per-project breakdown; each chart handles its own empty state. The chosen range and unit are persisted per user, so the dashboard reopens with the same window.
+
+## Header shortcuts
+
+The dashboard header links straight to [MCP settings](/core/integrations/mcp) and [Skills settings](/core/integrations/agent-skill) for the connected instance.
+
+## Related
+
+- [Plan and execute tasks](/core/functional/plan-and-execute-tasks)
+- [Appointments, Calendar and Gantt](/core/functional/appointments-calendar-gantt)
+- [Backlog planning](/core/functional/backlog-planning)

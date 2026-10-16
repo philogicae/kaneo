@@ -1,23 +1,24 @@
-import { and, count, eq, isNull, min, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, min, sql } from "drizzle-orm";
 import db from "../../database";
 import { projectTable, taskTable } from "../../database/schema";
-import { projectAccessCondition } from "../../project-access/project-access-condition";
+import { getScopedProjectIds } from "../../utils/access-scope";
 
 type ProjectStatistics = {
   completionPercentage: number;
   totalTasks: number;
+  plannedTasks: number;
   dueDate: Date | null;
 };
 
 const EMPTY_STATISTICS: ProjectStatistics = {
   completionPercentage: 0,
   totalTasks: 0,
+  plannedTasks: 0,
   dueDate: null,
 };
 
 async function getProjectStatistics(
   workspaceId: string,
-  userId: string,
   includeArchived: boolean,
 ) {
   const statisticsByProject = new Map<string, ProjectStatistics>();
@@ -35,6 +36,9 @@ async function getProjectStatistics(
       completedTasks: count(
         sql`case when ${taskTable.status} in ('done', 'archived') then 1 end`,
       ),
+      plannedTasks: count(
+        sql`case when ${taskTable.status} = 'planned' then 1 end`,
+      ),
       dueDate: min(taskTable.dueDate),
     })
     .from(taskTable)
@@ -47,8 +51,7 @@ async function getProjectStatistics(
             isNull(projectTable.archivedAt),
           ),
     )
-    .groupBy(taskTable.projectId)
-    .having(projectAccessCondition(userId, taskTable.projectId));
+    .groupBy(taskTable.projectId);
 
   for (const row of rows) {
     const totalTasks = Number(row.totalTasks);
@@ -58,6 +61,7 @@ async function getProjectStatistics(
       totalTasks,
       completionPercentage:
         totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+      plannedTasks: Number(row.plannedTasks),
       dueDate: row.dueDate ?? null,
     });
   }
@@ -67,14 +71,28 @@ async function getProjectStatistics(
 
 async function getProjects(
   workspaceId: string,
-  userId: string,
   includeArchived = false,
+  userId?: string,
 ) {
+  // Scoped members only see the projects granted to them (directly or through
+  // an access team); a null result means the workspace is fully reachable.
+  const scopedProjectIds = userId
+    ? await getScopedProjectIds(userId, workspaceId)
+    : null;
+
+  if (scopedProjectIds?.length === 0) {
+    return [];
+  }
+
   const projects = await db.query.projectTable.findMany({
     where: and(
-      eq(projectTable.workspaceId, workspaceId),
-      includeArchived ? undefined : isNull(projectTable.archivedAt),
-      projectAccessCondition(userId, projectTable.id),
+      includeArchived
+        ? eq(projectTable.workspaceId, workspaceId)
+        : and(
+            eq(projectTable.workspaceId, workspaceId),
+            isNull(projectTable.archivedAt),
+          ),
+      scopedProjectIds ? inArray(projectTable.id, scopedProjectIds) : undefined,
     ),
     // `id` is the deterministic tie-breaker: without it, rows sharing both a
     // position and a createdAt come back in an unspecified order.
@@ -87,7 +105,6 @@ async function getProjects(
 
   const statisticsByProject = await getProjectStatistics(
     workspaceId,
-    userId,
     includeArchived,
   );
 

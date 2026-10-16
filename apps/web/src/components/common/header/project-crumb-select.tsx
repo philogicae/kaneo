@@ -48,7 +48,7 @@ export default function ProjectCrumbSelect({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-72" align="start">
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-[11px] uppercase tracking-wide">
+          <DropdownMenuLabel className="text-[0.6875rem] uppercase tracking-wide">
             {t("navigation:sidebar.projects")}
           </DropdownMenuLabel>
         </DropdownMenuGroup>

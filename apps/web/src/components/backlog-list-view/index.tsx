@@ -5,6 +5,7 @@ import {
   type DragOverEvent,
   DragOverlay,
   type DragStartEvent,
+  KeyboardSensor,
   MouseSensor,
   TouchSensor,
   type UniqueIdentifier,
@@ -12,17 +13,19 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { snapCenterToCursor } from "@dnd-kit/modifiers";
+import { useNavigate } from "@tanstack/react-router";
 import { produce } from "immer";
 import { Archive, Clock, Flag } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { useReducedMotion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
-import { useTaskViewShortcuts } from "@/components/project/task-view-keys/use-task-view-shortcuts";
+import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { getNextManualPosition } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
 import useBacklogBulkSelectionStore from "@/store/backlog-bulk-selection";
 import useProjectStore from "@/store/project";
+import type Task from "@/types/task";
 import type { ProjectWithTasks } from "@/types/project";
 import BacklogBulkToolbar from "../bulk-selection/backlog-bulk-toolbar";
 import CreateTaskModal from "../shared/modals/create-task-modal";
@@ -30,21 +33,25 @@ import BacklogSection from "./backlog-section";
 
 type BacklogListViewProps = {
   project?: ProjectWithTasks;
-  disableDragDrop?: boolean;
+  sortActive?: boolean;
 };
 
 function BacklogListView({
   project,
-  disableDragDrop = false,
+  sortActive = false,
 }: BacklogListViewProps) {
   const { t } = useTranslation();
-  const reduceMotion = useReducedMotion();
   const { mutate: updateTask } = useUpdateTask();
   const setProject = useProjectStore((state) => state.setProject);
   const setAvailableTasks = useBacklogBulkSelectionStore(
     (state) => state.setAvailableTasks,
   );
+  const focusNext = useBacklogBulkSelectionStore((state) => state.focusNext);
+  const focusPrevious = useBacklogBulkSelectionStore(
+    (state) => state.focusPrevious,
+  );
   const clearFocus = useBacklogBulkSelectionStore((state) => state.clearFocus);
+  const navigate = useNavigate();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [overColumnId, setOverColumnId] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<
@@ -77,16 +84,53 @@ function BacklogListView({
     clearFocus();
   }, [clearFocus]);
 
+  const keyboardShortcuts = useMemo(
+    () => ({
+      shortcuts: {
+        j: () => {
+          focusNext();
+          const state = useBacklogBulkSelectionStore.getState();
+          if (state.focusedTaskId) {
+            navigate({ to: ".", search: { taskId: state.focusedTaskId } });
+          }
+        },
+        k: () => {
+          focusPrevious();
+          const state = useBacklogBulkSelectionStore.getState();
+          if (state.focusedTaskId) {
+            navigate({ to: ".", search: { taskId: state.focusedTaskId } });
+          }
+        },
+        enter: () => {
+          const { focusedTaskId } = useBacklogBulkSelectionStore.getState();
+          if (focusedTaskId && project) {
+            navigate({
+              to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
+              params: {
+                workspaceId: project.workspaceId,
+                projectId: project.id,
+                taskId: focusedTaskId,
+              },
+            });
+          }
+        },
+      },
+    }),
+    [focusNext, focusPrevious, navigate, project],
+  );
+  useRegisterShortcuts(keyboardShortcuts);
+
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: disableDragDrop ? 999999 : 8 },
+      activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: disableDragDrop ? 999999 : 200,
+        delay: 200,
         tolerance: 8,
       },
     }),
+    useSensor(KeyboardSensor),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -118,8 +162,15 @@ function BacklogListView({
     }
   };
 
-  const moveTask = (activeTaskId: string, overId: string) => {
-    if (!project) return;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+    setOverColumnId(null);
+
+    if (!over || !project) return;
+
+    const activeTaskId = active.id.toString();
+    const overId = over.id.toString();
 
     const plannedTasks = project.plannedTasks || [];
     const archivedTasks = project.archivedTasks || [];
@@ -140,6 +191,8 @@ function BacklogListView({
       }
     }
 
+    const updates: Task[] = [];
+
     const updatedProject = produce(project, (draft) => {
       const sourceSection =
         activeTask.status === "planned"
@@ -153,15 +206,19 @@ function BacklogListView({
 
       if (!task) return;
 
-      if (activeTask.status === "planned") {
-        draft.plannedTasks =
-          draft.plannedTasks?.filter((t) => t.id !== activeTaskId) || [];
-      } else {
-        draft.archivedTasks =
-          draft.archivedTasks?.filter((t) => t.id !== activeTaskId) || [];
-      }
-
       if (activeTask.status === targetSection) {
+        // A sort defines the visible order, so a same-section drop has no
+        // manual position to write — the row returns to its sorted spot.
+        if (sortActive) return;
+
+        if (activeTask.status === "planned") {
+          draft.plannedTasks =
+            draft.plannedTasks?.filter((t) => t.id !== activeTaskId) || [];
+        } else {
+          draft.archivedTasks =
+            draft.archivedTasks?.filter((t) => t.id !== activeTaskId) || [];
+        }
+
         const targetSectionTasks =
           activeTask.status === "planned"
             ? draft.plannedTasks || []
@@ -187,13 +244,28 @@ function BacklogListView({
             : draft.archivedTasks || [];
 
         finalTasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            position: index,
-          });
+          t.position = index;
+          updates.push({ ...t });
         });
+        return;
+      }
+
+      if (activeTask.status === "planned") {
+        draft.plannedTasks =
+          draft.plannedTasks?.filter((t) => t.id !== activeTaskId) || [];
       } else {
-        task.status = targetSection;
+        draft.archivedTasks =
+          draft.archivedTasks?.filter((t) => t.id !== activeTaskId) || [];
+      }
+
+      task.status = targetSection;
+
+      if (sortActive) {
+        const targetSectionTasks =
+          targetSection === "planned"
+            ? draft.plannedTasks || []
+            : draft.archivedTasks || [];
+        task.position = getNextManualPosition(targetSectionTasks);
 
         if (targetSection === "planned") {
           draft.plannedTasks = [...(draft.plannedTasks || []), task];
@@ -201,40 +273,44 @@ function BacklogListView({
           draft.archivedTasks = [...(draft.archivedTasks || []), task];
         }
 
-        const updatedTasks =
-          targetSection === "planned"
-            ? draft.plannedTasks || []
-            : draft.archivedTasks || [];
-
-        updatedTasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            status: targetSection,
-            position: index,
-          });
-        });
-
-        const sourceTasks =
-          activeTask.status === "planned"
-            ? draft.plannedTasks || []
-            : draft.archivedTasks || [];
-
-        sourceTasks.forEach((t, index) => {
-          updateTask({
-            ...t,
-            position: index,
-          });
-        });
+        updates.push({ ...task });
+        return;
       }
+
+      if (targetSection === "planned") {
+        draft.plannedTasks = [...(draft.plannedTasks || []), task];
+      } else {
+        draft.archivedTasks = [...(draft.archivedTasks || []), task];
+      }
+
+      const updatedTasks =
+        targetSection === "planned"
+          ? draft.plannedTasks || []
+          : draft.archivedTasks || [];
+
+      updatedTasks.forEach((t, index) => {
+        t.position = index;
+        updates.push({ ...t, status: targetSection });
+      });
+
+      const sourceTasks =
+        activeTask.status === "planned"
+          ? draft.plannedTasks || []
+          : draft.archivedTasks || [];
+
+      sourceTasks.forEach((t, index) => {
+        t.position = index;
+        updates.push({ ...t });
+      });
     });
 
-    setProject(updatedProject);
-  };
+    for (const task of updates) {
+      updateTask(task);
+    }
 
-  const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    setActiveId(null);
-    setOverColumnId(null);
-    if (over) moveTask(active.id.toString(), over.id.toString());
+    if (updates.length > 0) {
+      setProject(updatedProject);
+    }
   };
 
   const toggleSection = useCallback((sectionId: string) => {
@@ -243,36 +319,6 @@ function BacklogListView({
       [sectionId]: !prev[sectionId],
     }));
   }, []);
-
-  const toggleAllSections = useCallback(() => {
-    setExpandedSections((prev) => {
-      const expand = !prev.planned && !prev.archived;
-      return { planned: expand, archived: expand };
-    });
-  }, []);
-
-  useTaskViewShortcuts({
-    layout: "list",
-    selection: useBacklogBulkSelectionStore,
-    getGroups: () => [
-      {
-        id: "planned",
-        taskIds: (project?.plannedTasks ?? []).map((task) => task.id),
-        collapsed: !expandedSections.planned,
-      },
-      {
-        id: "archived",
-        taskIds: (project?.archivedTasks ?? []).map((task) => task.id),
-        collapsed: !expandedSections.archived,
-      },
-    ],
-    project,
-    enabled: activeId === null,
-    canMove: !disableDragDrop,
-    onMove: moveTask,
-    onToggleGroup: toggleSection,
-    onToggleAllGroups: toggleAllSections,
-  });
 
   const openPlannedTaskModal = useCallback(() => {
     setIsTaskModalOpen(true);
@@ -293,11 +339,6 @@ function BacklogListView({
   return (
     <DndContext
       sensors={sensors}
-      accessibility={{
-        screenReaderInstructions: {
-          draggable: t("tasks:board.keyboardInstructions"),
-        },
-      }}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
@@ -329,7 +370,7 @@ function BacklogListView({
         </div>
       </div>
 
-      <DragOverlay dropAnimation={reduceMotion ? null : undefined}>
+      <DragOverlay>
         {activeTask && (
           <div className="bg-card border border-border rounded-lg shadow-lg p-2 max-w-[200px] cursor-grabbing">
             <div className="flex items-center gap-2">
@@ -346,7 +387,7 @@ function BacklogListView({
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono text-muted-foreground">
+                  <span className="text-[0.625rem] font-mono text-muted-foreground">
                     {project?.slug}-{activeTask.number}
                   </span>
                   <span className="text-xs text-foreground truncate">

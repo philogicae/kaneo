@@ -43,8 +43,7 @@ async function createTaskRelation({
             .where(inArray(taskTable.id, [sourceTaskId, targetTaskId])),
         ),
       )
-      .orderBy(projectTable.id)
-      .for("share");
+      .orderBy(projectTable.id);
     const [sourceTask] = await tx
       .select({
         id: taskTable.id,
@@ -85,7 +84,7 @@ async function createTaskRelation({
       throw new HTTPException(404, { message: "Target task not found" });
     }
 
-    await assertProjectAccess(userId, targetTask.projectId);
+    await assertProjectAccess(userId, targetTask.projectId, tx);
 
     const existing = await tx
       .select({ id: taskRelationTable.id })

@@ -1,11 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
-import { isOwnDomEvent } from "@/lib/is-own-dom-event";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
 import type Task from "@/types/task";
+import type { DragListeners } from "./drag-listeners";
 
-export function useTaskCardClick(task: Task) {
+export function useTaskCardClick(task: Task, dragListeners: DragListeners) {
   const { project } = useProjectStore();
   const { data: workspace } = useActiveWorkspace();
   const navigate = useNavigate();
@@ -17,8 +17,10 @@ export function useTaskCardClick(task: Task) {
     (state) => state.setSelectionAnchor,
   );
 
-  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (!project || !task || !workspace || !isOwnDomEvent(e)) return;
+  function handleClick(
+    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
+  ) {
+    if (!project || !task || !workspace) return;
 
     if (e.shiftKey) {
       e.preventDefault();
@@ -51,9 +53,14 @@ export function useTaskCardClick(task: Task) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.defaultPrevented || e.target !== e.currentTarget) return;
-    if (e.key === "Enter" && e.shiftKey) {
+    if (e.key === "Enter") {
+      handleClick(e);
       e.preventDefault();
-      selectRange(task.id);
+    } else {
+      if (e.key === "Escape") {
+        toggleSelection(task.id);
+      }
+      dragListeners?.onKeyDown?.(e);
     }
   };
 

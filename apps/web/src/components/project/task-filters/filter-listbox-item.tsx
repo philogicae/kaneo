@@ -23,7 +23,7 @@ export function FilterListboxItem({
       data-active={active || undefined}
       onClick={(event) => onSelect(entry, event.currentTarget)}
       onPointerEnter={(event) => onHover?.(entry, event.currentTarget)}
-      className="group/entry flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-[13px] text-foreground outline-none data-active:bg-accent data-highlighted:bg-accent"
+      className="group/entry flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-[0.8125rem] text-foreground outline-none data-active:bg-accent data-highlighted:bg-accent"
     >
       {entry.checked !== undefined && (
         <span
@@ -50,7 +50,7 @@ export function FilterListboxItem({
         </span>
       )}
       {!!entry.badge && (
-        <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-foreground px-1 font-semibold text-[10px] text-background tabular-nums">
+        <span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-foreground px-1 font-semibold text-[0.625rem] text-background tabular-nums">
           {entry.badge}
         </span>
       )}

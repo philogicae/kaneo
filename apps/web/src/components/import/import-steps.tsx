@@ -49,7 +49,7 @@ export function ImportSteps({
               <span
                 aria-hidden="true"
                 className={cn(
-                  "flex size-4 shrink-0 items-center justify-center rounded-full font-medium text-[10px] tabular-nums",
+                  "flex size-4 shrink-0 items-center justify-center rounded-full font-medium text-[0.625rem] tabular-nums",
                   done &&
                     "bg-success/8 text-success-foreground dark:bg-success/16",
                   active && "bg-primary text-primary-foreground",

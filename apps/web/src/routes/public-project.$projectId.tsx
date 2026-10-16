@@ -96,7 +96,7 @@ function RouteComponent() {
                     <h1 className="text-lg font-semibold text-foreground truncate">
                       {project.name}
                     </h1>
-                    <span className="px-1.5 py-0.5 text-[10px] bg-muted text-muted-foreground rounded font-medium shrink-0">
+                    <span className="px-1.5 py-0.5 text-[0.625rem] bg-muted text-muted-foreground rounded font-medium shrink-0">
                       {t("publicProject:badge")}
                     </span>
                   </div>

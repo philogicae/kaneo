@@ -1,7 +1,8 @@
-import { and, asc, eq, gt, sql, type SQL } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, sql, type SQL } from "drizzle-orm";
 import { externalLinkTable, taskTable } from "../../database/schema";
 import type { IntegrationDatabase } from "../github/services/integration-task-scope";
-import { parseLinkMetadata } from "../github/utils/parse-link-metadata";
+
+const pausedFlag = sql`coalesce(json_extract(case when json_valid(${externalLinkTable.metadata}) then ${externalLinkTable.metadata} end, '$.syncFilterPaused'), 0) = 1`;
 
 export async function pauseIssueLinks(
   projectId: string,
@@ -12,10 +13,7 @@ export async function pauseIssueLinks(
   let cursor: string | undefined;
   for (;;) {
     const links = await tx
-      .select({
-        id: externalLinkTable.id,
-        metadata: externalLinkTable.metadata,
-      })
+      .select({ id: externalLinkTable.id })
       .from(externalLinkTable)
       .innerJoin(taskTable, eq(taskTable.id, externalLinkTable.taskId))
       .where(
@@ -25,30 +23,18 @@ export async function pauseIssueLinks(
           eq(taskTable.projectId, projectId),
           excluded,
           cursor ? gt(externalLinkTable.id, cursor) : undefined,
-          sql`not coalesce(${externalLinkTable.metadata} ~ '"syncFilterPaused"[[:space:]]*:[[:space:]]*true', false)`,
+          sql`not ${pausedFlag}`,
         ),
       )
       .orderBy(asc(externalLinkTable.id))
-      .limit(100)
-      .for("update", { of: externalLinkTable });
+      .limit(100);
     if (!links.length) return;
-    const values = sql.join(
-      links.map(
-        (link) =>
-          sql`(${link.id}::text, ${JSON.stringify({
-            ...parseLinkMetadata(link.metadata, {
-              externalLinkId: link.id,
-              source: "sync_pause",
-            }),
-            syncFilterPaused: true,
-          })}::text)`,
-      ),
-      sql`, `,
-    );
-    // Locked rows retain concurrent sync metadata. One update per bounded page
-    // replaces a metadata transaction and round trip for every issue link.
-    await tx.execute(
-      sql`update ${externalLinkTable} set metadata = paused.metadata, updated_at = ${new Date()} from (values ${values}) as paused(id, metadata) where ${externalLinkTable.id} = paused.id`,
+    // One update per bounded page; json_set keeps the other metadata keys.
+    await tx.run(
+      sql`update ${externalLinkTable} set metadata = json_set(coalesce(case when json_valid(${externalLinkTable.metadata}) then ${externalLinkTable.metadata} end, '{}'), '$.syncFilterPaused', json('true')), updated_at = ${Date.now()} where ${inArray(
+        externalLinkTable.id,
+        links.map((link) => link.id),
+      )}`,
     );
     cursor = links.at(-1)!.id;
   }

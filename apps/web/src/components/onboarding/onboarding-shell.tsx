@@ -64,11 +64,11 @@ export function OnboardingShell({
             >
               <div className="flex flex-col gap-2 pb-8">
                 {eyebrow ? (
-                  <p className="font-medium text-[13px] text-muted-foreground">
+                  <p className="font-medium text-[0.8125rem] text-muted-foreground">
                     {eyebrow}
                   </p>
                 ) : null}
-                <h1 className="font-semibold text-[30px] text-foreground leading-9 tracking-[-0.025em]">
+                <h1 className="font-semibold text-[1.875rem] text-foreground leading-9 tracking-[-0.025em]">
                   {title}
                 </h1>
                 {description ? (

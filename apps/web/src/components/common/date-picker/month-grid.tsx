@@ -12,15 +12,15 @@ const classNames = {
   months: "relative",
   month: "flex flex-col",
   month_caption: "flex h-10 items-center px-0.5",
-  caption_label: "font-medium text-[13px] text-foreground",
+  caption_label: "font-medium text-[0.8125rem] text-foreground",
   nav: "absolute end-0 top-0 z-1 flex h-10 items-center gap-0.5",
   button_previous: navButtonClass,
   button_next: navButtonClass,
   month_grid: "w-full border-separate border-spacing-y-1",
-  weekday: "h-6 p-0 font-normal text-[11px] text-muted-foreground/70",
+  weekday: "h-6 p-0 font-normal text-[0.6875rem] text-muted-foreground/70",
   day: "p-0 text-center",
   day_button:
-    "relative mx-auto flex size-7.5 cursor-pointer items-center justify-center rounded-lg text-[13px] text-foreground/85 outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/40",
+    "relative mx-auto flex size-7.5 cursor-pointer items-center justify-center rounded-lg text-[0.8125rem] text-foreground/85 outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/40",
   today:
     "*:ring-1 *:ring-foreground/20 *:ring-inset not-data-selected:not-data-disabled:*:text-foreground",
   selected:

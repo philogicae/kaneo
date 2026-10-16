@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, or, sql } from "drizzle-orm";
 import db from "../../database";
 import {
   projectTable,
@@ -6,7 +6,10 @@ import {
   workspaceTable,
   workspaceUserTable,
 } from "../../database/schema";
-import { escapeLikePattern } from "../../search/like-pattern";
+import {
+  caseInsensitiveLike,
+  escapeLikePattern,
+} from "../../search/like-pattern";
 
 type ListWorkspacesInput = {
   search?: string;
@@ -19,8 +22,8 @@ async function listWorkspaces({ search, page, limit }: ListWorkspacesInput) {
   const pattern = `%${escapeLikePattern(term)}%`;
   const where = term
     ? or(
-        ilike(workspaceTable.name, pattern),
-        ilike(workspaceTable.slug, pattern),
+        caseInsensitiveLike(workspaceTable.name, pattern),
+        caseInsensitiveLike(workspaceTable.slug, pattern),
       )
     : undefined;
 
@@ -58,7 +61,12 @@ async function listWorkspaces({ search, page, limit }: ListWorkspacesInput) {
       .where(
         and(
           inArray(workspaceUserTable.workspaceId, workspaceIds),
-          sql`'owner' = any(string_to_array(${workspaceUserTable.role}, ','))`,
+          sql`(
+            ${workspaceUserTable.role} = 'owner'
+            OR ${workspaceUserTable.role} LIKE 'owner,%'
+            OR ${workspaceUserTable.role} LIKE '%,owner'
+            OR ${workspaceUserTable.role} LIKE '%,owner,%'
+          )`,
         ),
       ),
     db

@@ -154,7 +154,7 @@ function ActorAvatar({
   return (
     <Avatar className="size-4.5">
       <AvatarImage src={user?.user?.image ?? ""} alt={fallbackName} />
-      <AvatarFallback className="bg-muted font-semibold text-[8px]">
+      <AvatarFallback className="bg-muted font-semibold text-[0.5rem]">
         {getInitials(fallbackName)}
       </AvatarFallback>
     </Avatar>
@@ -483,7 +483,7 @@ function Activity({
           getActivityTypeIcon(activity.type)
         )}
       </span>
-      <TimelineContent className="min-w-0 flex-1 text-[13px] text-foreground leading-5">
+      <TimelineContent className="min-w-0 flex-1 text-[0.8125rem] text-foreground leading-5">
         <UserHoverName user={user || null} fallbackName={actorName} />{" "}
         {renderActivityContent({
           activity,

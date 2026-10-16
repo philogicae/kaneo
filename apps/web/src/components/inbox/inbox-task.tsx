@@ -133,7 +133,7 @@ export function InboxTask({ taskId, workspaceId }: InboxTaskProps) {
             </Button>
           )}
         </div>
-        <dl className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-foreground/85">
+        <dl className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] text-foreground/85">
           <div className="flex items-center gap-1.5">
             <dt className="sr-only">{t("tasks:status.label")}</dt>
             <dd className="flex items-center gap-1.5">
@@ -156,7 +156,10 @@ export function InboxTask({ taskId, workspaceId }: InboxTaskProps) {
             <div className="flex items-center gap-1.5">
               <dt className="sr-only">{t("tasks:dueDate.label")}</dt>
               <dd>
-                <DueDateText dueDate={task.dueDate} className="text-[13px]" />
+                <DueDateText
+                  dueDate={task.dueDate}
+                  className="text-[0.8125rem]"
+                />
               </dd>
             </div>
           )}

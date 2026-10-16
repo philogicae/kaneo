@@ -61,7 +61,7 @@ export function SequenceHint() {
         {continuations.map(({ id, next }) => (
           <li
             key={id}
-            className="flex h-7 items-center gap-2 px-1.5 text-[13px] text-foreground/85"
+            className="flex h-7 items-center gap-2 px-1.5 text-[0.8125rem] text-foreground/85"
           >
             <span className="inline-flex gap-0.5">
               {formatCombo(next, isMac).map((cap) => (
