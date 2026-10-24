@@ -1,17 +1,2184 @@
-## [unreleased]
+## [1.4.0] - 2026-10-24
 
 ### 🚀 Features
 
-- Feat(site): refresh open-source project management guide for search
-- Feat: fork customizations rebased onto upstream 106de343
+- Feat: port upstream column/import/label-sync/MCP/workflow fixes, upgrade deps and Better Auth, harden requests/sanitization, persist collapsed views, speed up board loading and polish collapsed sidebar
 
-Self-hosted layer above upstream/main: libSQL/Turso ports, local-disk
-storage, fork-only removals (site, charts, stdio MCP, release and
-security workflows, Postgres-only paths), account security page and the
-workspace switcher with sort and drag ordering. Future syncs: git rebase
-upstream/main.
+- apps/api/src/column/{to-slug,available-slug}.ts, controllers/{create,delete}-column.ts: extract slug helpers, suffix duplicate slugs (`-2`), and run create/delete checks in write transactions; update route docs/OpenAPI and add slug/race tests.
+- apps/api/src/task/{resolve-import-assignees,resolve-import-task-status}.ts, controllers/import-tasks.ts, schema.ts: accept assignee IDs or emails case-insensitively, resolve column names/slugs with ambiguity errors, recheck the column inside the write transaction, and distinguish workspace vs project access; add import tests.
+- apps/api/src/plugins/{sync,github,gitea,gitlab}, integration-sync/controllers/{review,apply}-resume.ts: read current issue labels under the field-label lease, apply only newly added status/priority labels, defer transient reads for replay, pause issue state sync for archived tasks, and record confirmed field-label baselines.
+- apps/api/src/scheduler/index.ts, scheduler/leader-lock.ts: replay deferred issue edits and label reads every minute and default job leases to 15 minutes.
+- apps/api/src/mcp/{index,modern,request-bounds,schemas}.ts: cap MCP bodies at 1 MiB and tool input arrays at 10k elements, advertise the canonical RFC 9728 protected-resource URL, and rely on the 8 KiB OAuth URL bound for state; add bounds/stateless tests.
+- apps/api/src/workflow-rule/{schema,response}.ts, apps/web/src/components/project/{automations/workflow-events,workflow-editor}.tsx: constrain workflow events to the six known types and add `issue_reopened`; add event-type test.
+- apps/api/src/notification/index.ts, notification-preferences/delivery.ts: skip self-assignment notifications and RFC 2047-encode non-ASCII ntfy titles; add self-assignment test.
+- apps/api/src/search/controllers/global-search.ts, apps/web/src/components/search-command-menu/index.test.tsx: remove the duplicate workspace-member join from workspace search and cover task-key matching/dedup.
+- apps/api/src/database/schema.ts, apps/api/drizzle/0012_team_member_count.sql, drizzle/meta/\_journal.json: add Better Auth 1.7 `team.member_count` with backfill and nullable unique `team_member.membership_key`.
+- apps/api/package.json, apps/web/package.json, packages/\*/package.json, package.json, pnpm-workspace.yaml, pnpm-lock.yaml: bump Better Auth 1.6.30→1.7.12, Undici 7→8.12.3, Marked 17→18.1.1, Nodemailer 9→10.2.1, Mermaid 11→12.2.0, Framer Motion 13→14.6.0, Vite+ 1.0.0→1.4.0, Vitest 5.0.1→5.0.5, pnpm 12.11.2→12.15.0, esbuild 0.28.1→0.28.2; add `ip-address >=10.7.4`, `dompurify >=3.4.17`, `handlebars >=4.7.10` overrides; regenerate lockfile.
+- .github/workflows/ci.yml, Dockerfile.kaneo, AGENTS.md: pin pnpm 12.15.0.
+- apps/web/src/lib/auth-client.ts, components/auth/use-provider-sign-in.ts, apps/api/src/utils/verify-turnstile.ts, routes/auth/captcha-flow.test.tsx, tests/api-integration/auth-captcha.test.ts: migrate custom OAuth to `signIn.social` and keep CAPTCHA coverage for the social and legacy oauth2 paths.
+- apps/web/src/components/{app-sidebar,nav-main,nav-projects,nav-unified,sidebar-header-controls}.tsx: align the collapsed icon rail, hide labels/counters, show project slug badges and the add-project action, and tighten header spacing.
+- apps/web/src/fetchers/task/{get-tasks,load-board-pages}.ts, fetchers/project/get-public-project.ts: request 200 tasks per page and load remaining pages with three-way bounded concurrency; adjust board/public revision tests.
+- apps/web/src/hooks/use-collapsed-sections.ts, lib/collapsed-sections.ts, components/{list-view,backlog-list-view}/index.tsx, hooks/mutations/column/use-create-column.ts, hooks/use-project-websocket.ts: persist collapsed lanes per project in localStorage, reset a reused column slug on create, keep list/backlog state across unmounts, and invalidate columns on project websocket updates; add tests.
+- apps/web/src/components/kanban-board/task-card/\*, components/custom-fields/card-field-list.tsx: coordinate touch drag with the long-press context menu and stop custom-field chips from starting a card drag; add hook tests.
+- apps/web/src/components/task/task-description.tsx: stop collapsing blank paragraphs in markdown; add round-trip test.
+- apps/web/src/hooks/mutations/task/{remove-task-from-relations,use-delete-task,use-bulk-operations}.ts: evict deleted tasks from relation caches and invalidate in-flight relation queries; add tests.
+- apps/web/src/lib/dompurify.test.ts: cover DOMPurify shadow-root/template and SVG sanitization regressions.
+- packages/planka-import/src/{kaneo,retry-after,index}.ts: honor 429 `Retry-After` up to 5 minutes with three retries and fail fast on quota-length waits; add tests and migration docs.
+- i18n/\*.json, apps/docs/{cli/reference,core/migrations/from-planka}.mdx, apps/docs/openapi.json: add `issue_reopened` copy, fill German/Chinese translations, document column suffixes and importer rate-limit behavior, and regenerate OpenAPI.
+- tests/api-integration/_, tests/api/_: add coverage for column slugs, import assignees/status/races, label echo, notification self-assignment, search dedup, MCP bounds/stateless behavior, and workflow event validation.
+
+### 🧪 Testing
+
+- Test: isolate MCP auth failure from API key database lookups
+
+The invalid bearer token test also reaches verifyApiKey, which queried a database that unit tests do not migrate and produced a 500 in CI. Mock the API key verifier so the test exercises request admission deterministically; full API unit suite passes 1236/1236.
+
+## [1.3.4] - 2026-10-16
+
+### 🚀 Features
+
+- Feat(web): animate sidebar and keep inset padding
+
+Opening and closing the sidebar now slides it in and out instead of
+snapping. The panel moves with translate, while the layout gap and the
+inset margin follow on the same 200ms ease-out curve so the content
+resizes in step. Reduced motion turns the transitions off.
+
+When the sidebar is collapsed the main inset keeps its 8px margin,
+rounded corners and border instead of filling the window edge to edge,
+in the workspace layout and in settings.
+
+- Feat(web): redesign task cards and the date picker
+
+Board cards and list rows move to quiet, outlined chips that are also
+inline editors, so priority, due date, labels, assignee and sub-tasks
+change in place without opening the task.
+
+Cards and rows:
+
+- Add board, chip, priority and avatar colors as theme tokens with
+  light and dark values; dark cards use a soft shadow, not an outline
+- Priority uses one mark glyph everywhere: !, !! or !!!, urgent in red
+- Due dates read relatively (Today, Tomorrow, In 3 days, 2d overdue)
+- Sub-task chip opens a hover list whose rows open the side panel
+- Custom field chips show the field name next to the value
+- Pull request icons carry their git state colors, closed included
+- Planned uses the clock icon; backlog actions become icon buttons
+- Keyboard focus shows a single brighter border; clicking, dragging
+  or returning focus from a menu or the command palette no longer
+  marks a card as focused
+- Escape clears focus once no tasks are selected
+
+Date picker:
+
+- One menu for due, start, bulk, create-task and custom date fields:
+  type a date (fri, in 3 days, oct 21), pick today, tomorrow, this
+  weekend or next week, or open a compact month view
+- The month mutes past days instead of striking them through, rings
+  today and marks the start or due date that limits the range, with a
+  hint explaining why earlier or later days are unavailable
+- The right-click menu offers the same quick picks as a short list and
+  gains icons for every item; the old calendar component is removed
+
+Filters and settings:
+
+- Status and priority filters use the new circle and mark icons
+- Custom date filter values are formatted instead of raw ISO strings
+- The settings header drops its Esc hint
+- Feat: fork customizations rebased onto upstream/main - restore the fork's board/list/backlog stack (DnD, board toolbar search/group/sort, bulk toolbars, editors, keyboard shortcuts) over the upstream redesign while absorbing the delta's improvements (hover prefetch, focus restore, lazy menus, DnD a11y, reduced motion, required custom fields), then fold in the follow-ups: colored priority marks with priority-tinted card borders, a compact 80% base type scale with the px type scale moved to rem (the ui-scale preference now multiplies the base instead of overriding it), no reserved project toolbar rows on routes that pass none, a fresh-database startup fix for the renumbered-migration repair, and the command-palette comment/activity hits opening their task (the search response carries the hit's taskId and the controller's result type follows)
 
 ### 🐛 Bug Fixes
+
+- Fix(web): stop chip taps opening the card menu
+
+On touch screens, tapping a chip on a card opened its editor and then
+the card's right-click menu half a second later. Chips stopped
+touchend from reaching the card, so the menu's long-press timer
+started on touchstart but was never cancelled.
+
+Chips, including pull request chips, now stop touchstart instead.
+That keeps both the long-press menu and touch dragging from starting
+on a chip, while a long-press on the card itself still opens the menu.
+
+- Fix(web): only press cards from the card itself
+
+On touch screens, tapping a chip such as the due date shrank the whole
+card because :active also matches the card while one of its children
+is pressed, and the rule meant to skip buttons did not hold on mobile.
+
+The press now follows pointer events on the card: pointerdown sets it
+and pointerup, pointerleave or pointercancel clear it. Chips already
+stop pointerdown, so pressing them leaves the card still, on desktop
+and on touch alike.
+
+- Fix(web): explain dates outside the allowed range
+
+Typing a weekday such as "fri" in the due date picker resolved to the
+coming Friday even when the task starts later, so the menu filtered it
+out and only showed "No results".
+
+- A typed weekday now rolls forward to the first matching day on or
+  after the start date
+- A typed date outside the range says why instead, for example
+  "Fri, Oct 16 is before the start date", in all locales
+- Fix(web): show the priority mark in the bulk toast
+
+Setting priority from the bulk bar confirmed with the old signal bars
+icon, which no longer matches the !, !! and !!! marks used everywhere
+else.
+
+Toasts now accept any icon component, not only lucide icons, and the
+bulk priority toast renders the mark for the priority that was set,
+so High shows !!! and Urgent shows it in red.
+
+### 💼 Changes
+
+- Merge remote-tracking branch 'origin/main' into claude/aws-ses-migration-413ea1
+
+### 📚 Documentation
+
+- Docs: update sponsors
+
+### ⚡️ Performance
+
+- Perf(web): open tasks without network waits
+
+Opening a task with Space or Enter waited on several round trips:
+the authenticated route guard asked the server for the session on
+every navigation, including the search param change behind the
+sheet, and the task details only started loading once the sheet or
+page was already rendering.
+
+- Read the session better-auth already keeps on the client in the
+  route guard, refresh it in the background at most once a minute,
+  and only wait on the network when nothing is cached
+- Prefetch task details when a card gets keyboard focus or the
+  pointer rests on it, and preload the task page on focus so Enter
+  no longer waits for its code
+- Stop the relation picker and the task breadcrumb from refetching
+  the whole board every time the sheet or page opens
+- Render the sheet frame first and its content as deferred work, so
+  the sheet starts sliding in right away
+
+Locally Space now opens the sheet in about 45ms instead of 250 to
+400ms, and Enter shows the task page in about 60ms instead of 270ms.
+
+## [2.46.2] - 2026-10-12
+
+### 🐛 Bug Fixes
+
+- Fix(web): space tooltip labels from key hints
+
+Shortcut tooltips set flex and gap on the tooltip popup, but the
+popup wraps its children in an inner viewport, so the label ran
+straight into the key caps.
+
+Add a ShortcutTooltipLabel that lays out the label and keys itself
+and use it for the copy link, copy branch, open full page, copy ID,
+add filter and display tooltips.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.46.2 [skip ci]
+
+### Bug Fixes
+
+- **web:** space tooltip labels from key hints: [85d2a84](https://github.com/usekaneo/kaneo/commit/85d2a8494b136da66b490288fb678fc67ac25ad8)
+
+## [2.46.1] - 2026-10-12
+
+### 🐛 Bug Fixes
+
+- Fix(api): retry upload checks on 403 and 404
+
+SeaweedFS answers HEAD with 403 for a moment after a presigned PUT
+and serves the object normally a few seconds later. Kaneo verified
+uploads right after the browser PUT, so every upload on SeaweedFS
+failed with "Unable to verify uploaded object."
+
+Retry the HEAD on 403 or 404 after 250ms, 500ms, 1s, 2s and 4s,
+within the existing 10s verification budget. Other storage errors
+still fail immediately. A missing object now takes about 8s to be
+rejected instead of failing at once.
+
+- Fix(api): retry upload checks only on 403
+
+The previous change also retried HEAD on 404, so a missing object
+waited about 8 seconds before being rejected, and a single 404
+followed by a successful check was accepted. That broke the asset
+finalization integration tests on main.
+
+SeaweedFS only answers 403 while a fresh upload is not yet
+readable, so retry on 403 alone. Missing objects fail immediately
+again with "Uploaded object was not found."
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.46.1 [skip ci]
+
+### Bug Fixes
+
+- **api:** retry upload checks only on 403: [8f5f735](https://github.com/usekaneo/kaneo/commit/8f5f73513dc5f5b255e9f387e5a95cbf904761c1)
+- **api:** retry upload checks on 403 and 404: [b799520](https://github.com/usekaneo/kaneo/commit/b799520a19d2907783c5965e45a12e2ec7ea845c)
+
+## [2.46.0] - 2026-10-12
+
+### 🚀 Features
+
+- Feat(web): redesign task details
+
+The task sheet and full page now put writing on the left and
+properties in a labeled rail on the right, with one row layout for
+sub-tasks, relations and resources.
+
+Task details:
+
+- New header with breadcrumb, copy link, copy branch and a more menu
+- Properties rail with status, priority, assignee, labels, dates,
+  project and custom fields; labels render as plain values
+- Sub-tasks, relations and resources share a section header and
+  rows with status, ID, title and assignee; the status icon toggles
+  sub-task completion and relations carry a blocked by tag
+- Activity reads oldest to newest with compact event rows, lighter
+  comment cards and the composer at the end
+- Task created events read "created this task"
+- The description save state no longer shifts the text
+
+Mobile:
+
+- Top bar with close, centered breadcrumb and more menu
+- Property chips sit under the title, with combined dates and labels
+- Rows grow to 40px and drop the ID column
+
+Menus:
+
+- Status, priority, assignee, labels and move share the bulk menu
+  component: search, number keys and soft highlights
+- Number keys still work when pressed before the menu takes focus
+- Move picks a project first and only asks for a status when the
+  destination workflow lacks the current one
+- Unassigned uses the same marker as task cards
+
+Code blocks:
+
+- Auto detect now picks a language from the code instead of
+  falling back to plain text
+- The copy and language toolbar closes when its block is removed
+
+### 🐛 Bug Fixes
+
+- Fix(web): keep key hints out of accessible names
+
+The Docker browser check timed out after the task details redesign.
+The rail status button included its hidden shortcut hint in its
+accessible name ("To Do" plus the key cap), so the check could not
+find the button named "To Do".
+
+- Hide the property shortcut hint and the menu number hints from
+  assistive tech; they are visual only
+- Pick the new status as a menu option in the browser check, since
+  the status picker now lists options instead of buttons
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.46.0 [skip ci]
+
+### Features
+
+- **web:** redesign task details: [d9cb555](https://github.com/usekaneo/kaneo/commit/d9cb5558893c32c2202505afc5ca37f1c35ccd08)
+
+### Bug Fixes
+
+- **web:** keep key hints out of accessible names: [23b07b4](https://github.com/usekaneo/kaneo/commit/23b07b4931548a3bcfe29f81b7f5e333733d000a)
+
+## [2.45.0] - 2026-10-12
+
+### 🚀 Features
+
+- Feat(api): add notification unread and delete
+
+The inbox keyboard shortcuts need actions the API did not have:
+marking a notification unread again, deleting one notification and
+deleting only the read ones.
+
+- Add PATCH /notification/{id}/unread, backed by a shared
+  setNotificationRead controller that replaces markNotificationAsRead
+- Add DELETE /notification/{id} for a single notification
+- Add DELETE /notification/clear-read, which reuses clearNotifications
+  with an only-read filter and keeps unread notifications
+- Scope every route to the current user and their resource access,
+  like the existing read routes, so foreign ids return 404
+- Regenerate openapi.json and add API reference pages
+- Cover the new controllers in the notification access integration
+  tests
+- Feat(web): add keyboard shortcuts across the app
+
+Most actions in Kaneo now have a keyboard shortcut. The old keys are
+replaced outright rather than kept as aliases.
+
+Engine and panel:
+
+- Add a catalog-driven shortcut registry with global, view, task and
+  overlay scopes, two-key sequences and a sequence hint
+- Replace the old shortcut hook and help modal with a searchable
+  shortcuts panel (? or Mod+/) and redesigned key caps
+- Show shortcut caps in tooltips, menus and the command palette
+
+Tasks (sheet and full page):
+
+- S, P, A, L and Shift+D open the property pickers; I assigns to me
+- Rename, description, comment, subtask, parent and relation keys
+  (M then B, X or R), copy ID, title, URL, branch and Markdown
+
+Board, list and backlog:
+
+- J/K and arrows move focus, Space peeks, Enter opens, X selects,
+  Mod+Alt+A selects a group, T and Alt+T collapse groups
+- Alt+arrows reorder and move tasks through the existing drop path;
+  keyboard drag is replaced by these moves
+- Task keys act on the selection or focused task via the bulk bar
+
+Inbox, filters and editor:
+
+- Inbox: J/K, U, Alt+U, E or Backspace, Shift+Backspace, Enter
+- Filters: F opens the menu, Shift+F and Alt+Shift+F clear filters
+- Editor: new list, quote, code and strike keys, Mod+K link,
+  Mod+Shift+U attach, Mod+Enter ticks a checklist item, and slash
+  menu hints rendered from the catalog
+
+Fixes found along the way:
+
+- Escape in the subtask input and editor slash menus no longer closes
+  the task sheet
+- The comment editor slash menu works from the keyboard again; its
+  key handler read stale state captured when the editor was created
+- Copy shortcuts report clipboard failures
+
+All strings are translated in every locale.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.45.0 [skip ci]
+
+### Features
+
+- **web:** add keyboard shortcuts across the app: [16648d4](https://github.com/usekaneo/kaneo/commit/16648d43c18ccdca5730f9323de421c0a6fac4f9)
+- **api:** add notification unread and delete: [425a8af](https://github.com/usekaneo/kaneo/commit/425a8af085fe193204a0539878d6ff892b8c3d87)
+
+## [2.44.1] - 2026-10-12
+
+### 🐛 Bug Fixes
+
+- Fix(api): log why upload verification fails
+
+Uploads that reached storage but failed the HEAD check returned
+"Unable to verify uploaded object." with nothing in the API logs,
+because the provider error was discarded to avoid leaking endpoints
+or signed URLs. Self-hosters could not tell a permission, network
+or timeout problem apart.
+
+Log the error name, HTTP status and error code, never the message,
+for the HEAD check and for removing oversized uploads. The response
+returned to the client is unchanged.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.44.1 [skip ci]
+
+### Bug Fixes
+
+- **api:** log why upload verification fails: [6160046](https://github.com/usekaneo/kaneo/commit/6160046c234f3f31a4df473ca96f16ca14a31fba)
+
+## [2.44.0] - 2026-10-12
+
+### 🚀 Features
+
+- Feat(web): edit links inline and make them legible
+
+Links in descriptions and comments now use the theme's blue with a
+clear underline instead of nearly matching the body text.
+
+- The link button turns the formatting toolbar into a URL field
+  instead of a browser prompt; Enter applies, Escape cancels, and
+  existing links can be edited or removed
+- Bare domains get https:// and email addresses become mailto links
+- The toolbar anchors to the first line of the selection, so select
+  all no longer floats it in the middle of the editor
+- Feat(web): redesign the bulk selection bar
+
+Replace the large text button row with a compact bar: a count chip
+that clears the selection, quick buttons for status, priority,
+assignee, labels and due date, the move action, and a menu with
+search, archive and delete.
+
+- Each quick button opens a searchable menu above the bar; number
+  keys pick an option
+- Below 1024px the buttons collapse to icons with tooltips
+- Escape inside a menu or dialog no longer clears the selection
+- The board and backlog bars share one component and one actions
+  hook instead of two copies
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.44.0 [skip ci]
+
+### Features
+
+- **web:** redesign the bulk selection bar: [51af01d](https://github.com/usekaneo/kaneo/commit/51af01d77f07186b63bae8a290c4681e3e88c63d)
+- **web:** edit links inline and make them legible: [9431c14](https://github.com/usekaneo/kaneo/commit/9431c14469bbc071642f83904e8f9a89d3bbaf5e)
+
+## [2.43.0] - 2026-10-12
+
+### 🚀 Features
+
+- Feat(web): rework project views and custom fields
+
+Bring the project and task screens closer to Linear and clean up
+motion, toasts and dialogs across the app.
+
+Project views:
+
+- One toolbar row with Tasks/Backlog, search, filter and display;
+  Board, List, Calendar and Gantt live in the Display menu
+- Filter chips with is / is not, a searchable nested picker and
+  option counts; filters persist per project across layouts
+
+Custom fields:
+
+- The create task modal and task sheet show fields as chips with
+  per-type editors; empty required fields are flagged on create
+- The full task page lists fields in a Fields group in the
+  sidebar, replacing the Custom Fields card
+- Cards and list rows show filled fields as small chips with a
+  "+N" overflow, and the Display menu can hide fields per person
+
+Toasts and dialogs:
+
+- Repeated toasts reuse the visible one and shake instead of
+  stacking, and each toast carries an icon for its action
+- Drop success toasts for inline edits, including a context menu
+  toast that fired even when the update failed
+- Dialogs open the same way whether or not they are nested;
+  native confirm() prompts and the archive modal now use the
+  shared confirm dialog
+
+Motion:
+
+- No animation for keyboard opened dialogs, sidebar collapse and
+  button presses; strong ease-out curves on transform and opacity
+- Gentle motion for import progress, the bulk toolbar exit, the
+  mobile inbox and the checkout success callout
+- Fix the kanban drop animation passing a CSS variable to WAAPI
+
+### 🐛 Bug Fixes
+
+- Fix(site): restore the gantt search placeholder
+
+The landing page app preview reads tasks.gantt.searchPlaceholder
+straight from the shared en-US messages. The web app no longer
+uses that string, so it was pruned with the other unused keys,
+which broke the site typecheck and build. Restore it in every
+locale with its original translations.
+
+### 📚 Documentation
+
+- Docs(site): surface in-app importers and retarget asana page
+
+Comparison pages for Jira, Trello, Linear, Plane, and PLANKA link to
+their import guides, and stale no-importer FAQs and blog copy are
+replaced. The docs quickstart points new users to importing, and the
+Asana page leads with Asana not being open source.
+
+- Docs: describe project views and custom fields
+
+Update the task, backlog, calendar, workspace, personalization and
+workflow guides for the Display menu, the new filter chips and the
+custom field chips and sidebar rows.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.43.0 [skip ci]
+
+### Features
+
+- **web:** rework project views and custom fields: [93f328d](https://github.com/usekaneo/kaneo/commit/93f328d7382e6a54cfe615d7b94cf76a033b414f)
+
+### Bug Fixes
+
+- **site:** restore the gantt search placeholder: [3d79a67](https://github.com/usekaneo/kaneo/commit/3d79a670264da92ed8ad7f556d7deed5ac6c295d)
+
+### Documentation
+
+- describe project views and custom fields: [593cad3](https://github.com/usekaneo/kaneo/commit/593cad31af833b335d8689166fbe84b692b2e9af)
+- **site:** surface in-app importers and retarget asana page: [0dd17d9](https://github.com/usekaneo/kaneo/commit/0dd17d92d17db0845747167c186a4d46ec02eb08)
+
+## [2.42.0] - 2026-10-12
+
+### 🚀 Features
+
+- Feat(api): edit custom fields and search repos
+
+Custom fields could only be created or deleted, the GitHub
+repository picker filtered one page of results on the client, and
+the web app had no way to know whether image uploads work.
+
+- Add PUT /custom-field/{id} to rename a field, change its
+  default, make it required, and add or reorder options. The type
+  is fixed except dropdown and multiselect. Removing or renaming
+  an option that tasks use is rejected so values never change
+  silently. Required fields backfill tasks without a value.
+- Share validation and backfill between create and update.
+- Add an optional search param to the GitHub repository list.
+  The server filters names and descriptions before permission
+  checks and keeps scanning pages and installations within a
+  fixed budget, returning a cursor to resume.
+- Report hasImageUploads in the public config so the UI can hide
+  uploads when no S3 storage is configured.
+- Regenerate the OpenAPI spec and add unit and integration tests.
+- Feat(web): rebuild settings pages
+
+The settings pages had drifted apart: nested cards, different row
+and button styles, inline add rows, several save buttons per page,
+and deletes with no confirmation. They now share the integrations
+row style through small settings primitives.
+
+- Add shared settings section, card, row, empty state, note,
+  status badge, row menu and confirm dialog components.
+- Rebuild labels, calendar feeds, API keys, project general,
+  visibility, workspace general, billing, profile, preferences,
+  security, notifications and the admin users and workspaces
+  pages, plus light changes to roles.
+- Split custom fields out of Workflow into their own page with a
+  field dialog for create and edit. Workflow keeps columns and
+  shows automations only for connected repositories, with a
+  "Don't move" option.
+- Rebuild every integration panel with setup steps, connected
+  sections and one footer. Slack, Discord and Mattermost share one
+  component. Disconnect, delete and revoke now ask first.
+- Search the GitHub repository picker on the server across all
+  pages, with load more.
+- Disable board background uploads when storage is missing.
+- Fix input groups showing an error border when valid, replace
+  dashed empty states with solid ones, and let theme tiles shrink.
+- Translate new strings in every locale and prune unused keys.
+
+### 📚 Documentation
+
+- Docs: describe the new settings pages
+
+- Workflow covers columns, the separate Custom fields page, field
+  editing rules and the Don't move option for automations.
+- GitHub setup describes linking the account, choosing a
+  repository with search, and the Automations section.
+- Account docs use Profile, the Change password dialog and API
+  keys; migration guides use the new API keys label.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.42.0 [skip ci]
+
+### Features
+
+- **web:** rebuild settings pages: [3f15710](https://github.com/usekaneo/kaneo/commit/3f15710726b51f976aa2040ff3d5683dbb97f003)
+- **api:** edit custom fields and search repos: [793a50c](https://github.com/usekaneo/kaneo/commit/793a50ca66e8c0d0016c074b17b2d56fb0a7bc4b)
+
+### Documentation
+
+- describe the new settings pages: [b7e8190](https://github.com/usekaneo/kaneo/commit/b7e8190dd8f89718fc5800803cdca1397c829b8a)
+
+## [2.41.1] - 2026-10-11
+
+### 🚀 Features
+
+- Feat(web): redesign onboarding with a live preview
+
+Onboarding asked everything on one card and then dropped people on
+an empty board. It now asks one question per screen while a
+miniature of Kaneo, built from the real sidebar, columns and cards,
+fills in beside it.
+
+- Steps: workspace name, who it's for, first project, invites (team
+  only, and only where email can be sent), then a plan on cloud or
+  a Ready summary on self-hosted
+- The preview writes the workspace and project names as they are
+  typed, drops the starter tasks in with their real ticket ids, and
+  adds teammates as their emails are entered
+- The workspace and starter project are created on the project
+  step, so the first two answers stay editable until then
+- Cloud plan step offers the free trial or subscribing right away;
+  a plan picked on the pricing page is preselected and goes
+  straight to checkout, and choosing the trial clears it
+- Opening the workspace zooms the preview into the real board;
+  reduced motion and narrow screens skip the zoom
+- Remove the split cloud auth layout and its board screenshots,
+  now unused
+- All copy moves to i18n with translations for every locale
+
+### 💼 Changes
+
+- Merge remote-tracking branch 'origin/main' into claude/aws-ses-migration-413ea1
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.41.1 [skip ci]
+
+### Features
+
+- **web:** redesign onboarding with a live preview: [4bc1a9b](https://github.com/usekaneo/kaneo/commit/4bc1a9b4cb801fc6dd0faefbc7503231173186ad)
+
+## [2.41.0] - 2026-10-11
+
+### 🚀 Features
+
+- Feat(auth): require email codes for cloud sign-up
+
+Cloud now creates accounts through a verified email code. The
+password sign-up endpoint and the email code route did not share
+the same protections, so a script could skip both.
+
+- Check disposable addresses when any account is created on cloud
+  (email code, magic link, password, social and SSO callbacks)
+- Refuse to send a code that would create an account for a
+  disposable address; existing accounts still get codes
+- Reject password sign-up on cloud when email codes are available,
+  except for the first account on a fresh instance
+- Gate password sign-in with Turnstile like the other entry points
+- Add optional CUSTOM_OAUTH_NAME to label the SSO button, exposed as
+  customOAuthName in the public config and documented
+- Feat(web): redesign auth and access pages
+
+The auth screens had a different button stack for every config and
+Turnstile always took space. They now share one calm column that
+assembles itself from the instance config.
+
+- One page shell: Kaneo mark, title, description, notice, content;
+  cloud adds Terms, Privacy and kaneo.app links
+- Sign-in slots: email code or password form, configured providers
+  (1 full width, 2 or 3 in a row, 4 as 2 by 2, stacked when there
+  is no form, primary when SSO is the only option) and a footer
+  line that explains how accounts are created
+- Sign-up uses the same method as sign-in: name and email, then a
+  code, so new accounts never need a password; instance setup keeps
+  the password form
+- Code screen with inline errors for wrong, expired and overused
+  codes; reset and forgot password follow the same layout
+- Turnstile only appears when Cloudflare needs interaction and
+  gates every action, including password sign-in
+- SSO auto-login shows a redirect screen with a manual link
+- Device approval ends on a connected or denied screen instead of
+  the dashboard; MCP authorization shows client, redirect and the
+  signed-in account
+- Invitation accept shows who invited you, flags a signed-in email
+  that differs from the invitation and offers to switch accounts
+- Signed-out pages no longer flash a skeleton on session refetch
+- All copy moves to i18n with translations for every locale
+
+### 🐛 Bug Fixes
+
+- Fix(web): read the turnstile key at runtime
+
+Production images build the web app with a KANEO_TURNSTILE_SITE_KEY
+placeholder and replace it when the container starts. The compiler
+treated the placeholder as a constant, folded the captcha check to
+"always required", and left every auth button disabled on instances
+without Turnstile. CI's browser regression caught it on main.
+
+Read the key through a module object the compiler cannot fold, so
+the check runs against the value the container injected.
+
+### 💼 Changes
+
+- Merge remote-tracking branch 'origin/main' into claude/aws-ses-migration-413ea1
+- Merge remote-tracking branch 'origin/main' into claude/aws-ses-migration-413ea1
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.41.0 [skip ci]
+
+### Features
+
+- **web:** redesign auth and access pages: [5565833](https://github.com/usekaneo/kaneo/commit/5565833474175ad42ac365ec2c1b992920277d78)
+- **auth:** require email codes for cloud sign-up: [f974b05](https://github.com/usekaneo/kaneo/commit/f974b0529d36bc60caac510d169417633459f381)
+
+### Bug Fixes
+
+- **web:** read the turnstile key at runtime: [a0d8cbb](https://github.com/usekaneo/kaneo/commit/a0d8cbb080c7289109332fd7aee1785132ad5c6a)
+
+## [2.40.1] - 2026-10-11
+
+### 🚀 Features
+
+- Feat(import): add Jira as an import source
+
+Jira is the most common tool teams move from, so the in-app
+importer now reads Jira Cloud and Jira Data Center projects.
+
+- Connect with the site URL plus an Atlassian email and API
+  token (Cloud), or a personal access token (Data Center)
+- Keeps the project key and issue numbers
+- Columns follow the Jira Software board; a Backlog column goes
+  to the Kaneo backlog, done columns are final; without a board,
+  columns follow the project statuses
+- Rendered descriptions and comments convert to Markdown;
+  priorities map to Kaneo's scale; labels get stable colors
+- Parents and sub-tasks become subtasks, Blocks links stay
+  blocks, other links become related
+- Uses Cloud's search/jql endpoint with nextPageToken and the
+  Data Center search with startAt
+- Web: Jira row, connect form with Atlassian token link, and
+  Jira in the create project prompt; new from-jira guide
+
+### 💼 Changes
+
+- Merge pull request #2010 from usekaneo/feat/jira-import
+
+feat(import): add Jira as an import source
+
+### 📚 Documentation
+
+- Docs: move import guides under Using Kaneo
+
+Importing projects is something workspace admins do while using
+Kaneo, not a self-hosting task, so the guides now sit in the Using
+Kaneo tab as "Import from other tools", including the new Jira
+guide. Page URLs are unchanged.
+
+The two deployment migration pages stay in Self-hosting under
+"Migrate a deployment".
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.40.1 [skip ci]
+
+### Features
+
+- **import:** add Jira as an import source: #2010
+
+### Credits
+
+Huge thanks to @andrejsshell for helping!
+
+## [2.40.0] - 2026-10-11
+
+### 🚀 Features
+
+- Feat(importers): add shared source importers
+
+Kaneo needs to read projects from other tools on the server so
+admins can migrate from the web UI. This adds @kaneo/importers, a
+private package with one adapter per source that turns a source
+project into a single ImportedProject model.
+
+- Sources: PLANKA, Plane (cloud and self-hosted), Linear, Trello
+  and another Kaneo instance
+- Shared JSON client with timeouts and 429 retry, injectable fetch
+  so the API can enforce its outbound destination checks
+- Backlog and triage states map to the Kaneo backlog, done and
+  canceled style states become final columns
+- Keeps the source project key and issue numbers when present
+- Warnings only report data that was actually affected
+- Plane HTML descriptions and comments convert to Markdown
+- Move the PLANKA client, mapping and key helpers out of the CLI;
+  @kaneo/planka-import now bundles this package with vp pack and
+  keeps its CLI behavior
+- Add @kaneo/importers to the API dependencies
+- Feat(api): run imports from other tools
+
+Adds /api/import so workspace admins can import projects from
+PLANKA, Plane, Linear, Trello or another Kaneo instance without
+running a CLI.
+
+- Routes to list source projects, start a run, list runs, read a
+  run, and get the Trello authorize link (admins only; the
+  Trello key is never exposed on the public config route)
+- Runs execute in the background with progress, heartbeat and
+  shutdown handling stored in a new import_run table, so any API
+  instance can report them; source credentials stay in memory
+- Each project is written in one transaction without per-task
+  events, so imports send no notifications and a failed project
+  leaves nothing behind
+- Assignees match workspace members by email, then by a unique
+  full name; comments keep the original author and date
+- Source URLs go through the outbound destination check and honor
+  KANEO_ALLOW_PRIVATE_WEBHOOK_DESTINATIONS
+- Accept plane, linear and kaneo as comment sources
+- Add TRELLO_API_KEY, build importers into both Docker images,
+  regenerate openapi.json
+- Feat(web): add import page to workspace settings
+
+Settings > Workspace > Import lets admins move projects in from
+another tool in a few steps: pick a source, connect with a key or
+the Trello authorize link, choose projects, then follow progress
+and read the report. Built on the existing settings layout and
+coss components, matching the integrations page.
+
+- Per-source connect forms with short how-to steps; secrets stay
+  in component state and are cleared once a run starts
+- Run view polls while running, shows per-project counts,
+  warnings and links to the new projects, and refreshes the
+  project list when done
+- Recent imports list on the overview
+- Entry points in the projects empty state and the create
+  project dialog, shown only to users who can import
+- Official Plane mark and PLANKA icon, Plane, Linear and Kaneo
+  names for imported comment sources
+- New settings.workspaceImport strings in all locales
+
+### 🐛 Bug Fixes
+
+- Fix(import): address code review findings
+
+- Validate import source addresses at connect time: an undici
+  agent with a checked DNS lookup blocks private addresses even
+  if DNS changes after the pre-check (rebinding)
+- Refuse new imports with 503 once shutdown starts and wait for
+  half-started runs before stopping
+- Retry the final run status write and repair stale runs on
+  single run reads too, so finished runs never stay running
+- Kaneo source: 404 on custom fields means none, 403 adds a
+  warning, 401 and other errors stop the read
+- Fall back to the author's email before "Unknown user" for
+  imported comments
+- Create the project and write its content in one transaction,
+  so a crash or failed write never leaves an empty project
+- Fix(import): hold the project lock only at commit
+
+Writing an imported project in one transaction held the workspace
+project-ordering lock for the whole write, so project creation,
+edits, moves and reordering in that workspace waited for large
+imports to finish.
+
+- Insert the imported project unplaced, write its content, then
+  take the lock just before commit to check the key and set the
+  position; a taken key still rolls back and retries the next one
+- Split the lock, key check and position helpers out of
+  insertProject so normal project creation behaves as before
+- Log a failed stale-run repair instead of failing the run read
+- Fix(import): grant importer access before writing
+
+Placing the project at commit time also moved the restricted
+member grant after the content write. Assignees are matched only
+among members with access to the new project, so an importer with
+selected-project access lost tasks assigned to themselves.
+
+- Grant the importer access right after inserting the project,
+  before tasks are written; placement now only handles the key
+  and position under the ordering lock
+- Integration test for an importer limited to selected projects
+
+### 💼 Changes
+
+- Merge branch 'main' into feat/in-app-importers
+- Merge pull request #2007 from usekaneo/feat/in-app-importers
+
+### 📚 Documentation
+
+- Docs: add guides for importing from other tools
+
+- New overview page covering what every import does: new
+  projects, keys and numbers, assignee matching, comments, no
+  notifications, limits, and the self-hosted network switch
+- Per-source guides for Linear, Trello, Plane and another Kaneo,
+  with what carries over and troubleshooting
+- PLANKA guide now leads with the in-app import and keeps the
+  CLI as a second option
+- Document TRELLO_API_KEY and that the private destination
+  switch also covers import sources
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.40.0 [skip ci]
+
+### Features
+
+- import projects from other tools in the UI: #2007
+
+### Credits
+
+Huge thanks to @andrejsshell for helping!
+
+## [2.39.1] - 2026-10-11
+
+### 🐛 Bug Fixes
+
+- Fix(email): fix gmail mobile layout and icons
+
+Gmail's mobile apps shrink and center any table that carries
+align="center", which React Email puts on every Section and Row.
+That collapsed the request details rows into "Accountname@..."
+and pushed the task card avatar next to the ticket ID.
+
+- Wrap Section and Row so inner tables drop the centering and
+  span the full width
+- Make the board column fluid up to 320px and the OTP row fill
+  the width up to 390px, so neither overflows a 375pt screen
+- Add a viewport meta tag so phones lay emails out at device width
+- Align the ticket ID and avatar in one 20px row with a border on
+  the avatar so it stays visible on dark backgrounds
+
+Gmail dark mode inverts button backgrounds but leaves images
+alone, so the white button icons disappeared on the light button.
+
+- Blend button icons with mix-blend-mode: difference so they
+  contrast with whatever color the button ends up as
+- Bake the invitation icon circle into the image so Gmail cannot
+  darken the circle behind a dark icon
+
+Also reset auto-linked addresses, domains and dates, and drop the
+leading zero from request times so they fit on one line.
+
+### 💼 Changes
+
+- Merge remote-tracking branch 'origin/main' into claude/aws-ses-migration-413ea1
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.39.1 [skip ci]
+
+### Bug Fixes
+
+- **email:** fix gmail mobile layout and icons: [2a41318](https://github.com/usekaneo/kaneo/commit/2a41318ab9e093441471396890e40384120668af)
+
+## [2.39.0] - 2026-10-11
+
+### 🚀 Features
+
+- Feat(email): redesign emails with Kaneo components
+
+The old emails used a letter-spaced wordmark and a grey code box,
+which read like phishing. They now look like Kaneo itself and say
+who they are for, where they came from, and why they were sent.
+
+Templates:
+
+- Rebuild sign-in code, sign-in link, password reset, invitation,
+  notification and trial emails from small components that copy
+  the coss button, OTP input, frame, card, badge, progress, board
+  column and task card from apps/web
+- Add a native dark theme with Kaneo's dark tokens, swap icons in
+  dark mode, and keep hairlines on border-color longhands so
+  forced inversion in Gmail and Outlook apps stays readable
+- Use hex colors, tables and line-height instead of rgba(),
+  flexbox and height, which Outlook and Yahoo drop
+- Add a title, an article wrapper and the html lang, and fix two
+  contrast failures found by axe (WCAG 2.2 AA now passes in light
+  and dark)
+- Serve the logo mark and icons as PNGs from apps/web/public/email,
+  since Gmail strips inline SVG; KANEO_EMAIL_ASSETS_URL overrides
+  the base for instances on private networks
+
+Data:
+
+- Put the sign-in code in the subject line so it shows in
+  notifications and iOS keeps suggesting it
+- Show the account, instance, request time and device on the
+  sign-in and reset emails; the device comes from the request
+  user agent, times are UTC because users have no stored timezone
+- Pass role and expiry to invitations, with translated labels in
+  every locale and built-in role names from team.roles
+- Resolve the task card (ticket, labels, priority, due status,
+  column and assignee) only when an email is sent, so other
+  delivery channels skip the extra queries
+- Drop the hardcoded English action label so it is translated
+
+Add @react-email/ui so the package's preview script runs.
+
+### 📚 Documentation
+
+- Docs(site): list Amazon SES as email subprocessor
+
+Kaneo Cloud now sends transactional email through Amazon SES in
+the eu-central-1 region instead of Resend, so the subprocessor
+list and the last updated date reflect that.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.39.0 [skip ci]
+
+### Features
+
+- **email:** redesign emails with Kaneo components: [ed0ea78](https://github.com/usekaneo/kaneo/commit/ed0ea78838ba703e924c9446c4db344ad6e4d831)
+
+### Documentation
+
+- **site:** list Amazon SES as email subprocessor: [e71a17b](https://github.com/usekaneo/kaneo/commit/e71a17b34bdf8bf3c812773bd4f0a65b554303e9)
+
+## [2.38.0] - 2026-10-10
+
+### 🚀 Features
+
+- Feat(web): start new workspaces with a starter project
+
+Half of new workspaces never get a task. Onboarding now asks for a first
+project name, creates it with a few starter tasks that teach the board,
+and lands on that board instead of an empty Home. On Home, New task opens
+project creation when the workspace has no projects yet, and the empty
+projects section links to it.
+
+### 🐛 Bug Fixes
+
+- Fix(api): keep imported tasks in file order
+
+Imported tasks were all created at position 0, so the board fell back to
+sorting them by id and showed them in random order. Assign each one the
+next position in its column, the same way task creation does.
+
+- Fix(web): name no column in the starter task and respect read-only members
+
+New projects keep the English default column names, so translated
+instructions pointed at a column label the board does not show. The
+starter task now says the next column instead. Members who cannot create
+projects see the read-only empty state text.
+
+### 💼 Changes
+
+- Merge pull request #1993 from usekaneo/feat/onboarding-starter-project
+
+feat: start new workspaces with a starter project
+
+### 🧪 Testing
+
+- Test(e2e): expect onboarding to land on the starter project board
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.38.0 [skip ci]
+
+### Features
+
+- start new workspaces with a starter project: #1993
+
+### Bug Fixes
+
+- **cli:** reject checksums that are not SHA-256 digests: #1996
+
+### Documentation
+
+- **cli:** add npm as an install option: #1995
+
+### Credits
+
+Huge thanks to @andrejsshell for helping!
+
+## [cli-v0.1.1] - 2026-10-10
+
+### 🐛 Bug Fixes
+
+- Fix(cli): reject checksums that are not SHA-256 digests
+
+### 💼 Changes
+
+- Merge pull request #1995 from usekaneo/docs/cli-npm-install
+
+docs(cli): add npm as an install option
+
+- Build(cli): generate the Homebrew formula from a release
+
+Writes the kaneo formula for a version from the release's SHA256SUMS, for macOS and Linux
+on arm64 and x64, and fails when a checksum is missing.
+
+- Merge pull request #1996 from usekaneo/feat/cli-homebrew
+
+feat(cli): install the CLI with Homebrew
+
+- Merge pull request #1997 from usekaneo/chore/cli-v0.1.1
+
+chore(cli): release 0.1.1
+
+### 📚 Documentation
+
+- Docs(cli): add npm as an install option
+
+@kaneo/cli is on npm now. The install script stays the main option because it needs no
+Node.js; npm is listed next to it in the docs, the README and the agent skill.
+
+- Docs(cli): add Homebrew as an install option
+
+### ⚙️ Miscellaneous Tasks
+
+- Ci(cli): update the Homebrew tap after each stable release
+
+Pushes the regenerated formula to usekaneo/homebrew-tap with HOMEBREW_TAP_TOKEN. Prereleases
+and versions that already had a release are skipped.
+
+- Ci(cli): retry the Homebrew update when the release already exists
+
+The tap job ran only after creating a release, so a failed push could not be retried. It now
+also runs when the release exists; an unchanged formula is a no-op.
+
+- Chore(cli): release 0.1.1
+
+Ships the --yes hint in confirmation errors and the update hint that links to the new
+install page. Merging builds the binaries and publishes to npm and the Homebrew tap.
+
+## [2.37.0] - 2026-10-10
+
+### 🐛 Bug Fixes
+
+- Fix: make the app usable on phones (#1983)
+
+* feat(api): load workspace capabilities in one request
+
+The web app checked each of its 19 UI capabilities with a separate
+better-auth has-permission call on every workspace load. Under the cloud
+rate limit (per IP and path) a few quick page loads hit 429s.
+
+Add GET /workspace/{workspaceId}/capabilities, which evaluates every
+capability with the same role rules the API enforces after a single role
+lookup. The capability vocabulary moves to @kaneo/permissions so the API
+and web share it.
+
+Also list src and tsconfig as cache inputs for the permissions compile
+task; without them vp replayed a stale dist after source edits.
+
+- fix(api): store database-generated timestamps in UTC
+
+Timestamp columns have no time zone and hold UTC, but bare now() and
+clock_timestamp() are cast through the session time zone. On a Postgres
+server not running in UTC, column defaults, the label deletion boundary,
+and the scheduler lease stored shifted times; activity showed entries
+created "in 2 hours".
+
+Default those columns to now() AT TIME ZONE 'utc', and compute the label
+boundary and job lease with timezone('UTC', clock_timestamp()) like the
+sync lease already does. The migration only changes defaults and uses
+ALTER TABLE IF EXISTS so drifted installs, whose missing tables are
+repaired at startup, still boot. The legacy github_integration table is
+left alone because the GitHub plugin drops it at startup.
+
+Rows written earlier on a non-UTC server keep their shifted times.
+
+- fix(web): make the app usable on phones
+
+Audited every screen at 390px and 320px and fixed what broke:
+
+- Home: the grid had no base column, so long titles pushed "Up next"
+  off-screen and the page scrolled sideways. The week strip opens on today.
+- Project header: the unlabeled menu button now shows the current project,
+  uses translated view labels, and closes after a choice.
+- The mobile sidebar closes on any navigation, not just its own links.
+- Board columns fit 320px screens and snap into view (not while dragging).
+- Task titles wrap instead of scrolling sideways; Enter still commits.
+- Task sheet scrolls as one on phones, drops the duplicate ID, labels its
+  buttons, and no longer pops the full-page tooltip on open.
+- Calendar shows a day-by-day agenda on phones, opening at today.
+- Gantt gets a compact control row, slimmer resize handles, and labels
+  beside bars too short to hold them.
+- Settings: workflow rows wrap so names stay editable, role rows keep
+  their chevron, card actions stack under the title.
+- Inputs and editors are 16px on phones so iOS doesn't zoom on focus.
+- Small raw buttons get a 44px touch area via a touch-hitbox utility.
+- Search, members, breadcrumbs, my tasks and the public error page get
+  phone spacing; full-height screens use svh.
+
+Also stop treating a failed getSession (429, 5xx) as signed out.
+
+- fix(web): address mobile review feedback
+
+* Settle the permission check when the capabilities request fails, so
+  gated UI denies instead of showing a loader forever.
+* Give Gantt resize handles a 24px touch width on phones, and drop them
+  on bars too short to also leave a tap/drag area.
+* Translate the new strings in every locale instead of English fallbacks.
+
+- fix: address second round of review feedback
+
+* Migration 0062 only sets defaults on notification timestamp columns
+  that exist. Drifted installs can lack them until the startup repair,
+  which runs after migrations, adds them with the UTC default.
+* Keep the scheduler lease as it was. Old instances wrote expiries in
+  Node's local time, so switching the comparison to UTC could let a new
+  instance take over a live lease mid-rollout west of UTC.
+* Space the list header's add and archive actions so their touch areas
+  don't overlap on coarse pointers.
+* Fix(build): stop vp from replaying stale typechecks and builds
+
+Vite+ infers task inputs by tracing the files a command reads (`auto`),
+but it can't see reads made by the native TypeScript 7 compiler or
+esbuild. Those tasks were keyed only on .env files, so after a source
+edit `pnpm typecheck` replayed an old pass (a deliberate type error went
+unreported) and builds replayed a stale dist.
+
+- Typechecks (web, api, libs, site) no longer cache, like cli already
+  does: they read sources across the workspace, so no narrow input list
+  is reliable.
+- tsc/esbuild compiles (api, email, permissions, planka-import) list
+  their sources explicitly, like mcp and cli.
+
+CI starts from an empty task cache, so this only affected local runs.
+
+- Fix(build): track the shared tsconfig in compile cache inputs
+
+planka-import, mcp, cli and the API bundle extend
+packages/typescript-config/base.json, so a change there must invalidate
+their cached build output. The API bundle now also lists its own
+tsconfig.json, which esbuild reads.
+
+- Fix(build): rebuild packages when their dependencies change
+
+Compiled declarations embed types inferred from dependencies (e.g.
+better-auth in @kaneo/permissions), so a dependency upgrade without a
+source edit must not replay old output. Track each compile task's
+package.json and the workspace lockfile.
+
+### 💼 Changes
+
+- Merge pull request #1989 from usekaneo/fix/vp-cache-inputs
+
+fix(build): stop vp from replaying stale typechecks and builds
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.37.0 [skip ci]
+
+### Features
+
+- **cli:** add an agent skill for the kaneo CLI: #1974
+- **cli:** install the CLI with a one-line script: #1971
+
+### Bug Fixes
+
+- **build:** stop vp from replaying stale typechecks and builds: #1989
+- make the app usable on phones: #1983
+- **mcp:** omit session credentials from whoami: [cf44625](https://github.com/usekaneo/kaneo/commit/cf446256f39935e6067e70dbb57f429d4b7b7a5b)
+- **cli:** point the update hint at the install page: #1976
+- **cli:** say how to confirm in confirmation errors: #1975
+
+### Credits
+
+Huge thanks to @tinsever and @andrejsshell for helping!
+
+## [mcp-v0.1.13] - 2026-10-09
+
+### 🚀 Features
+
+- Feat(cli): add an agent skill for the kaneo CLI
+
+Teaches coding agents to check the login and workspace, read the JSON output contract,
+address tasks by ticket id and confirm before shared changes.
+
+### 🐛 Bug Fixes
+
+- Fix(cli): say how to confirm in confirmation errors
+
+JSON errors carry only the message, so scripts and agents never saw the --yes hint.
+The message now says to pass --yes, and the three confirmation helpers share it.
+
+- Fix(cli): point the update hint at the install page
+- Fix(mcp): omit session credentials from whoami
+
+### 💼 Changes
+
+- Merge pull request #1975 from usekaneo/fix/cli-confirmation-message
+
+fix(cli): say how to confirm in confirmation errors
+
+- Merge pull request #1974 from usekaneo/feat/cli-skill
+
+feat(cli): add an agent skill for the kaneo CLI
+
+- Merge pull request #1976 from usekaneo/docs/cli-pages
+
+docs(cli): split the CLI docs into pages under Developers
+
+### 🚜 Refactor
+
+- Refactor(cli): inline the confirmation error at each prompt
+
+The shared helper only wrapped one constructor, which AGENTS.md asks to keep inline.
+
+### 📚 Documentation
+
+- Docs(cli): explain how to install the agent skill
+- Docs(cli): cover project keys, columns and deletes in the agent skill
+
+A test run showed agents guessing how to find a project key, which statuses exist and how
+to delete. It also corrects what task status returns.
+
+- Docs(cli): move the agent skill docs to the CLI docs split
+
+The CLI docs page is being split into several pages, which now carry this section.
+
+- Docs(cli): have users run the installer and note the task mine limit
+
+Agents ask the user to install the CLI and call it by its full path until PATH picks it up.
+task mine stops at 100 tasks per workspace, so the skill shows the complete alternative.
+
+- Docs(cli): split the CLI guide into pages under Developers
+
+The single CLI page covered install, sign-in, configuration, scripting and a command
+summary. It is now an overview plus Install, Sign in, Configuration, Scripts and agents
+and the command reference, in the Developers tab. Old URLs redirect to the new pages.
+
+- Docs(cli): link to the new CLI pages
+
+Also points developers reading the API introduction at the CLI.
+
+- Docs(cli): link the README to the install page itself
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(mcp): release v0.1.13
+
+## [cli-v0.1.0] - 2026-10-09
+
+### 🚀 Features
+
+- Feat(cli): add install scripts for macOS, Linux and Windows
+
+Serve install.sh and install.ps1 from kaneo.app/cli so the CLI installs with
+curl -fsSL https://kaneo.app/cli/install.sh | sh or irm https://kaneo.app/cli/install.ps1 | iex.
+
+Both scripts pick the build for the platform (Rosetta and musl aware on macOS and
+Linux, x64 build on Windows arm64), resolve the newest non-draft, non-prerelease
+cli-v release from the GitHub API without jq, verify the download against SHA256SUMS,
+run it once, and only then replace the existing binary atomically.
+
+KANEO_VERSION pins a version, KANEO_INSTALL_DIR changes the target directory, and
+KANEO_DOWNLOAD_URL replaces the GitHub releases/download root for mirrors and offline
+installs. install.sh prints the PATH command for bash, zsh, fish or sh, warns when
+another kaneo comes first on PATH, and warns when a musl system lacks libstdc++.
+install.ps1 adds the directory to the user PATH and works in Windows PowerShell 5.1
+and PowerShell 7.
+
+### 🐛 Bug Fixes
+
+- Fix(cli): point the update hint at the install scripts
+
+The unexpected response hint told users to update with npm, which is not how the
+CLI is installed. Point it at the install guide instead.
+
+- Fix(cli): keep drive roots intact in the Windows installer
+- Fix(cli): print a PATH command that works for any install folder
+
+Escape the folder for each shell's quoting and write the line with printf so
+apostrophes, quotes, dollar signs and backslashes survive.
+
+### 💼 Changes
+
+- Merge pull request #1971 from usekaneo/feat/cli-install-script
+
+feat(cli): install the CLI with a one-line script
+
+### 📚 Documentation
+
+- Docs(cli): make the install scripts the way to install
+
+Replace the npm instructions in the CLI guide and the package README with the
+macOS, Linux and Windows one-liners, install options, mirrors and offline
+installs, supported systems, update and uninstall steps, and links to read the
+scripts first.
+
+- Docs(cli): describe the binary release flow
+
+Merging a version bump now creates a cli-v<version> GitHub release with standalone binaries, and
+npm publishing waits for the CLI_NPM_PUBLISH repository variable.
+
+### ⚙️ Miscellaneous Tasks
+
+- Ci(cli): release standalone binaries on GitHub
+
+Compile the tested dist bundle with Bun 1.4.2 into binaries for macOS, Linux (glibc and musl)
+and Windows, and attach them with SHA256SUMS to a cli-v<version> release that is not marked
+latest. x64 targets use Bun's baseline builds so CPUs without AVX2 can run them.
+
+Binaries skip .env and bunfig.toml autoload so a project .env cannot change KANEO_API_URL, which
+matches the node build. macOS binaries are ad-hoc signed, and each runner smoke tests its native
+binary. The run skips versions that already have a release.
+
+npm publishing is kept but only runs when the CLI_NPM_PUBLISH repository variable is true, and
+it publishes the same tested bundle.
+
+- Ci(cli): mark suffixed versions as prereleases and finish partial releases
+
+A release counts as done only when every asset is attached; otherwise the
+workflow uploads them again.
+
+- Ci(cli): publish drafts and fix prerelease flags when repairing a release
+
+A release counts as done only when it is published, has every asset and has the
+right prerelease flag. The repair path uploads the assets and corrects both flags.
+
+- Ci(cli): stop on an unfinished release instead of repairing it
+
+Repairing releases needed write access in the check job and could replace live
+downloads. A complete release is skipped; anything else fails with the fix to run.
+
+## [2.36.0] - 2026-10-09
+
+### 🚀 Features
+
+- Feat: add advisory AI comment labeler
+- Feat: allow manual AI comment scans for existing PRs
+- Feat(api): add workspace list and detail endpoints
+
+Add GET /api/workspace and GET /api/workspace/{workspaceId} with a typed
+Workspace schema, so API clients no longer depend on Better Auth's untyped
+organization list. Both work with sessions, device tokens and API keys.
+A workspace the caller cannot see returns the same 404 as one that does
+not exist.
+
+- Feat(cli): add the official Kaneo command-line client
+
+Add @kaneo/cli in packages/cli, which installs the kaneo command. It is
+written with Effect 4 (effect/cli, effect/http, Schema) and bundled into
+one file with no runtime dependencies, so kaneo --version starts in about
+60 ms on Node 20.
+
+- Sign in with device authorization (client kaneo-cli) or an API key;
+  logins live in ~/.config/kaneo/config.json with mode 0600, and a file
+  written by another kaneo CLI is never overwritten.
+- Commands for tasks, comments, labels, relations, time tracking,
+  projects, columns, workspaces, members, invitations, custom fields,
+  workflow rules, notifications, search, profiles, link and context,
+  plus kaneo api, kaneo doctor and --jq.
+- JSON mode with --json, KANEO_JSON=true or piped stdout prints one JSON
+  value, and errors are {"error": "message"} with exit code 1.
+- Human mode has a themed renderer, pickers, spinners, OSC 8 links and
+  inline images, respecting NO_COLOR, FORCE_COLOR and TERM=dumb.
+
+The MCP device flow gains a single-step poll and a typed rejection error
+that the CLI reuses, the effect security override is scoped to v3 ranges
+so the CLI's effect 4 pin is kept, and the MCP and CLI build tasks get
+explicit cache inputs so the task cache no longer replays stale builds.
+Docs add a CLI page and a full command reference, and a publish workflow
+releases the package under cli-v tags.
+
+### 🐛 Bug Fixes
+
+- Fix(site): prevent theme flash during hydration
+- Fix(calendar): allow feeds without label filters (#1958)
+
+* fix(calendar): allow feeds without label filters
+
+* fix(calendar): index scheduled feed pagination
+
+---
+
+Co-authored-by: Codex <codex@users.noreply.github.com>
+
+- Fix(api): return 404 for missing and hidden resources
+
+A missing or deleted project or task returned 400 "Workspace ID could
+not be determined", a missing workspace returned 403, and instance
+admins got 200 [] or a 500 for nonexistent workspaces.
+
+Missing resources now return a resource-specific 404. A resource in a
+workspace the caller is not a member of returns the identical 404, so
+responses never reveal that it exists. 403 stays for members whose role
+lacks the permission and for project-level restrictions. Instance admins
+still bypass membership but get 404 when the workspace does not exist.
+A failed id lookup no longer falls through to a workspaceId query.
+
+- Fix(ci): explain automatic pull request draft conversions
+- Fix(api): never treat API keys as user sessions
+
+Better Auth's apiKey plugin turns any x-api-key header into a session
+for the key owner when auth.api.getSession sees it. A request with a
+valid x-api-key and an invalid Bearer token fell through to that lookup
+and was authenticated as a session, skipping requireUserSession and API
+key scopes. MCP consent used the same lookup, so an API key alone could
+approve an authorization request and mint a session token.
+
+Session lookups now drop x-api-key before calling Better Auth.
+
+- Fix(api): return every error as JSON with a stable code
+
+HTTPException errors were text/plain, validation errors reported only the
+first issue, and unhandled errors used another shape. Every /api error is
+now application/json: { message, code, issues?, missingPermissions? }.
+message keeps the old text, code is derived from the status unless a
+specific code applies (VALIDATION_ERROR with every issue,
+MISSING_PERMISSION and API_KEY_SCOPE with the missing permissions,
+SESSION_REQUIRED for API keys on session-only routes). Unknown /api paths
+return a JSON 404.
+
+The web fetchers, the MCP client and the OpenAPI error schemas read the
+new shape and still accept plain text from older servers. Device
+authorization, MCP OAuth and inbound webhook bodies keep their formats.
+
+- Fix(web): keep the session on GitLab token errors and avoid blank messages
+
+GitLab verification and project listing answer 401 when GitLab rejects the
+token. Now that those fetchers throw HttpError, the global query and mutation
+handlers treated that as an expired Kaneo session and signed the user out.
+
+The API now tags those responses with INTEGRATION_AUTH_FAILED, and the web only
+signs out for a 401 whose code is UNAUTHORIZED or missing (older plain-text
+APIs), so a Kaneo session 401 on any route still signs out.
+
+HttpError.fromResponse now falls back to the common server or unknown error
+copy when the body has no message, such as an empty proxy 502.
+
+- Fix(web): show English error fallbacks before translations load
+
+Pass defaultValue to i18n.t in the HttpError fallback so an empty error
+response that arrives before the locale resources load shows readable
+English text instead of the raw translation key. The keys stay the
+source of truth once translations are available.
+
+- Fix(api): enforce workspace:read on workspace endpoints
+
+API keys whose permissions lack workspace:read now get 403 "Insufficient API key scope"
+on GET /api/workspace and GET /api/workspace/{workspaceId}. Members whose role lacks
+workspace:read no longer see the workspace in the list and get the same 404 as a
+missing workspace on the detail route. Instance admins keep their access.
+
+Role permissions are checked in the same query by joining workspace_role, using shared
+pure helpers moved out of require-workspace-permission.
+
+The Workspace and WorkspaceMember role descriptions now list the actual built-in roles
+(owner, admin, member, viewer).
+
+- Fix(api): honor every assigned workspace role in permission checks
+
+Better Auth stores several member roles as a comma-separated string such as "owner,viewer".
+Permission checks looked up the whole string as one role name, so no built-in or custom
+role matched. The workspace disappeared from GET /api/workspace, its detail returned 404,
+and requireWorkspacePermission denied members whose other role allowed the action.
+
+Roles are now split on commas (trimmed, empty entries dropped), and access is granted when
+any assigned role grants the permission. The workspace endpoints and the shared
+roleHasWorkspacePermission helper use the same rolesAllow check, so both paths agree.
+
+Stored role rows are now loaded as a set instead of picking one arbitrary row. Duplicate
+workspace_role rows for the same name grant access when any of them grants the permission,
+so the result no longer depends on row order. The workspace endpoints load these rows in one
+extra query instead of joining them into the workspace query.
+
+- Fix(api): answer rate-limited API keys with 429
+
+A key over its rate limit or usage quota now gets 429 with Retry-After
+and X-RateLimit-Limit, X-RateLimit-Remaining and X-RateLimit-Reset
+instead of the 401 used for bad keys. Successful API key requests carry
+the X-RateLimit headers, including error responses. The same applies to
+the Bearer and x-api-key paths, asset routes and /api/auth requests.
+Unknown, disabled, expired and banned-owner keys still get 401.
+
+- Fix(api): send complete rate limit headers on every API key path
+
+When Better Auth rejects an x-api-key during the session lookup, the 429
+now comes from our own read-only check of that key, so it carries
+Retry-After and the X-RateLimit headers. Better Auth's body is only the
+fallback when the key cannot be read.
+
+/api/auth requests keep their X-RateLimit headers after spending the
+last quota unit, and a Better Auth 429 without Retry-After, such as a
+window filled by a concurrent request, gets the retry headers added.
+
+The read-only key check no longer opens a transaction or takes a row
+lock. Reading the headers after an auth request is best effort: a
+failure is logged and never turns a finished response into a 500.
+
+Publicly cacheable responses that carry per-key headers become private.
+The OpenAPI spec documents the 429 on get-session, asset download and
+the device page, which read an API key despite security: [].
+
+- Fix(api): keep API key headers out of Better Auth's own 429s and shared caches
+
+A 429 from Better Auth's per-IP limiter (marked by X-Retry-After) or any other
+429 the key did not cause no longer gets the key's X-RateLimit headers. It gets
+a standard Retry-After copied from X-Retry-After or computed from tryAgainIn.
+
+Responses carrying per-key headers are now always private: a missing
+Cache-Control becomes private, public becomes private, and private or no-store
+stay as they are.
+
+- Fix(api): add the error code to Better Auth rate limit responses
+
+Better Auth's per-IP limiter answers auth routes with a message-only body.
+Convert it to the documented ApiError shape and keep its retry headers.
+
+- Fix(cli): harden terminal output and address review findings
+
+- Strip control characters from every decoded API response and server
+  error message, and from device flow fields, so task text cannot send
+  escape sequences to the terminal. kaneo api keeps raw data.
+- Only emit OSC 8 links for plain http and https URLs.
+- Only open http and https URLs, and use rundll32 on Windows instead of
+  cmd start, which parsed shell metacharacters in the URL.
+- kaneo unlink only edits the .kaneo.json inside the current repository.
+- kaneo task attach checks the comment length before uploading files.
+- Pin the bundled dependencies to exact versions and replace
+  @types/pngjs with a local declaration.
+- Fix(cli): accept both member role response shapes
+
+Better Auth 1.6.26 returns the updated member directly, while the OpenAPI
+document declares a { member } wrapper. Decode either shape so kaneo
+member role keeps working if the server is changed to match its spec.
+
+- Fix(cli): sanitize jq string output and size attachment comments
+
+- Strip control characters from --jq string results, which kaneo api
+  prints from unsanitized server data.
+- Estimate attachment comment length with the server's real asset URL
+  shape instead of an oversized placeholder, so comments near the limit
+  are not rejected before upload.
+- Fix(cli): cap passthrough image size and report labels after create
+
+- Refuse images larger than 4096x4096 before sending them to kitty or
+  iTerm2, so a small file with huge declared dimensions cannot make the
+  terminal decode hundreds of megabytes.
+- When task create cannot attach labels after creating the task, name
+  the created task and print the command that adds the labels, so a
+  retry does not create a duplicate.
+- Fix(cli): make recovery commands copy-paste safe
+
+When labels or the parent link fail after task create, the suggested
+command now uses the full task id when there is no ticket number, and
+quotes label names and ids for the shell, so names with quotes or $()
+cannot break or change the command.
+
+- Fix(cli): print recovery commands that work in every shell
+
+Replace POSIX shell quoting in the task create recovery hints with
+arguments that never need quoting: the label name or ticket id when it
+is a plain token, otherwise the label or task id, which label and task
+lookups both accept. The hints now work the same in bash, zsh, fish,
+cmd and PowerShell.
+
+- Fix(auth): allow linking social accounts with different emails
+
+### 💼 Changes
+
+- Merge pull request #1969 from usekaneo/fix/api-key-session-bypass
+
+fix(api): never treat API keys as user sessions
+
+- Merge pull request #1962 from usekaneo/fix/json-error-shape
+
+fix(api): return every error as JSON with a stable code
+
+- Merge branch 'main' into fix/not-found-status-codes
+- Merge remote-tracking branch 'origin/main' into merge-1960
+
+# Conflicts:
+
+# apps/api/src/utils/require-workspace-permission.ts
+
+- Merge remote-tracking branch 'origin/main' into fix/api-key-rate-limit-429
+
+Session lookups now drop x-api-key (#1969), so Better Auth can no longer
+reject a key during them. The 429 handling for that case and its tests
+are removed; a key sent with an invalid Bearer token now gets 401.
+
+API key 429s go through the JSON error handler (#1962) as RATE_LIMITED
+and keep Retry-After and X-RateLimit-\* headers. The ApiKeyRateLimited
+OpenAPI response now documents the ApiError body.
+
+- Merge pull request #1961 from usekaneo/fix/api-key-rate-limit-429
+
+fix(api): answer rate-limited API keys with 429
+
+- Merge remote-tracking branch 'origin/main' into sync-1960
+- Merge pull request #1960 from usekaneo/feat/workspace-endpoints
+
+feat(api): add workspace list and detail endpoints
+
+- Merge branch 'main' into fix/not-found-status-codes
+- Merge pull request #1963 from usekaneo/fix/not-found-status-codes
+
+fix(api): return 404 for missing and hidden resources
+
+- Merge branch 'main' into feat/cli
+- Merge pull request #1968 from usekaneo/feat/cli
+
+feat(cli): add the official Kaneo command-line client
+
+### 🧪 Testing
+
+- Test(api): check missing permissions on the API key scope error
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(github): route feature requests to feedback
+- Chore(release): v2.36.0 [skip ci]
+
+### Features
+
+- **cli:** add the official Kaneo command-line client: #1968
+- **api:** add workspace list and detail endpoints: #1960
+- allow manual AI comment scans for existing PRs: [70de375](https://github.com/usekaneo/kaneo/commit/70de375184e7908e8b54fda9abee37756ed20eb6)
+- add advisory AI comment labeler: [d1a6a39](https://github.com/usekaneo/kaneo/commit/d1a6a392ed4c8dbc6873a8ad46de804cfadfbc3f)
+
+### Bug Fixes
+
+- **auth:** allow linking social accounts with different emails: [c613565](https://github.com/usekaneo/kaneo/commit/c61356534839adfd0c40b65325114d2fd69e4b25)
+- **api:** answer rate-limited API keys with 429: #1961
+- **api:** never treat API keys as user sessions: #1969
+- **api:** return every error as JSON with a stable code: #1962
+- **ci:** explain automatic pull request draft conversions: [5c42599](https://github.com/usekaneo/kaneo/commit/5c425995019c9f624110c0b84f117854a0c707d7)
+- **api:** return 404 for missing and hidden resources: #1963
+- **calendar:** allow feeds without label filters: #1958
+- **site:** prevent theme flash during hydration: [6bd0c1a](https://github.com/usekaneo/kaneo/commit/6bd0c1ac42164ec2604a2e74538f6e084c684641)
+
+### Credits
+
+Huge thanks to @andrejsshell and @tinsever for helping!
+
+## [2.35.0] - 2026-10-06
+
+### 🚀 Features
+
+- Feat(api): manage workspaces as an instance admin
+
+Instance admins could not manage workspaces they do not belong to,
+because better-auth member endpoints require membership. For
+example, nobody could transfer ownership after an owner left.
+
+Add instance-admin routes under /api/admin/workspaces to list
+workspaces with owners and counts, list members and assignable
+roles, add an existing user, change a role, remove a member, and
+transfer ownership (the chosen member becomes the only owner and
+previous owners become admins). Mutations lock the workspace and its
+member rows, protect the only owner, and run the shared member side
+effects.
+
+- Feat(web): add workspace management for admins
+
+Add Settings, Administration, Workspace management: search every
+workspace, open its members, change roles, remove members, make a
+member the owner, add existing users, and edit project access with
+the existing dialog. New strings are synced to every locale.
+
+### 🐛 Bug Fixes
+
+- Fix(api): count members and projects per workspace
+
+The correlated subqueries compared the workspace id unqualified, so it
+resolved to the inner row's own id and every count came back as 0.
+Count with grouped queries over the listed workspace ids instead.
+
+- Fix(web): hide actions for the only owner
+
+The only owner can't be removed or made owner again, so their row
+offered a removal the API always rejected. Drop the actions menu for
+that row, and render the member count only once members have loaded.
+
+### 💼 Changes
+
+- Merge branch 'main' into feat/admin-workspace-management
+- Merge pull request #1953 from usekaneo/feat/admin-workspace-management
+
+feat: manage workspaces as an instance admin
+
+### 🚜 Refactor
+
+- Refactor(api): share workspace member side effects
+
+Move the work better-auth hooks run when a member is added, removed,
+or promoted to owner (project access cleanup, membership events,
+WebSocket revocation, seat sync) into workspace-members helpers, so
+admin routes that change membership directly run exactly the same
+steps.
+
+### 📚 Documentation
+
+- Docs: document instance administration
+
+Add an "Administer users and workspaces" page covering user and
+workspace management, and point the members page to it for teams
+whose owner has left.
+
+### ⚙️ Miscellaneous Tasks
+
+- Chore(release): v2.35.0 [skip ci]
+
+### Features
+
+- manage workspaces as an instance admin: #1953
+
+### Credits
+
+Huge thanks to @andrejsshell for helping!
+
+## [2.34.0] - 2026-10-06
+
+### 🚀 Features
+
+- Feat: restrict members to selected projects
+
+Workspace owners can now give a member "All projects" (the default)
+or "Selected projects", when inviting them and from the members
+page. Roles still decide what someone can do; project access decides
+where. Owners and instance admins are never restricted. Refs #1764.
+
+Data:
+
+- Add workspace_member_access (mode per workspace and user) and
+  workspace_member_project (selected projects). No row means all
+  projects, so existing installs keep today's behavior with no
+  backfill.
+- Store projectAccess and projectIds on invitations and apply them
+  in beforeAcceptInvitation, before the member row exists, so a new
+  member is never briefly unrestricted. Removal and leave clear them.
+
+Enforcement:
+
+- The workspace access middleware now resolves each resource's
+  project and checks access, covering lookup-based routes.
+- Filter aggregate reads: project list and reorder, search, my
+  tasks, workspace activity, ticket lookup, workspace labels,
+  relations, subtask counts and notifications.
+- Check second projects: move destination, relation targets, label
+  targets, integrations, assets and duplicated parent links.
+- Assignees must be able to see the project; moving a task or
+  project unassigns people who can't.
+- WebSocket upgrades and broadcasts check access, and changing a
+  member's access closes their boards and refreshes other tabs,
+  across instances when Redis is configured.
+
+API: GET /workspace/{id}/project-access,
+PUT /workspace/{id}/members/{userId}/project-access, and a projectId
+filter on GET /workspace/{id}/members. A restricted manager can only
+grant projects they can see, and grants they can't see are kept.
+
+Web: project access column and dialog on the members page, the
+choice in the invite dialog, a no-access screen for blocked
+projects, and assignee and mention pickers limited to the project.
+
+- Feat(site): refresh open-source project management guide for search
+- Feat(site): offer a managed instance on pricing
+
+Teams that would rather not run Kaneo themselves want someone on
+call more than they want cheaper seats. Add a managed instance
+offer under the plans: a dedicated instance with its own database,
+custom domain and SSO, backups with restore tests, upgrades and
+security fixes handled, EU hosting, and a direct line to the
+maintainers, at one flat monthly price.
+
+"Talk to us" opens a prefilled email to support and fires a
+Plausible "Managed Instance Inquiry" event so interest can be
+measured before building anything.
+
+- Feat: restrict members to selected projects (#1952)
+
+* feat: restrict members to selected projects
+
+Workspace owners can now give a member "All projects" (the default)
+or "Selected projects", when inviting them and from the members
+page. Roles still decide what someone can do; project access decides
+where. Owners and instance admins are never restricted. Refs #1764.
+
+Data:
+
+- Add workspace_member_access (mode per workspace and user) and
+  workspace_member_project (selected projects). No row means all
+  projects, so existing installs keep today's behavior with no
+  backfill.
+- Store projectAccess and projectIds on invitations and apply them
+  in beforeAcceptInvitation, before the member row exists, so a new
+  member is never briefly unrestricted. Removal and leave clear them.
+
+Enforcement:
+
+- The workspace access middleware now resolves each resource's
+  project and checks access, covering lookup-based routes.
+- Filter aggregate reads: project list and reorder, search, my
+  tasks, workspace activity, ticket lookup, workspace labels,
+  relations, subtask counts and notifications.
+- Check second projects: move destination, relation targets, label
+  targets, integrations, assets and duplicated parent links.
+- Assignees must be able to see the project; moving a task or
+  project unassigns people who can't.
+- WebSocket upgrades and broadcasts check access, and changing a
+  member's access closes their boards and refreshes other tabs,
+  across instances when Redis is configured.
+
+API: GET /workspace/{id}/project-access,
+PUT /workspace/{id}/members/{userId}/project-access, and a projectId
+filter on GET /workspace/{id}/members. A restricted manager can only
+grant projects they can see, and grants they can't see are kept.
+
+Web: project access column and dialog on the members page, the
+choice in the invite dialog, a no-access screen for blocked
+projects, and assignee and mention pickers limited to the project.
+
+- refactor: split project access into single modules
+
+Each module added for project access held several functions. Split
+them so every file has one responsibility, matching the rest of the
+codebase.
+
+- API: break member-project-access, assert-project-access and
+  invitation-project-access into one function per file, with shared
+  types (DbOrTx, MemberProjectAccess, InvitationProjectAccess) in
+  their own modules, and move isOwnerRole out of the mode vocabulary
+- Web: move the project access helpers into team/project-access/
+  with a test beside each, and extract the cache tree walker into
+  lib/visit-records
+- Tests: split the integration helpers into
+  helpers/project-access/ and reuse them instead of per-file
+  client, setAccess and accessRows helpers
+- Drop the moved position comment in moveProject and the label
+  consistency comment in the access middleware in favor of named
+  values
+
+* fix(web): stop retrying 403 and 404 responses
+
+Opening a project you can't access left the board's own queries
+(tasks, custom fields) retrying each 403 twice, even though a
+permission or not-found error won't change on retry.
+
+Skip retries for 403 and 404 in the shared query client, alongside
+the existing 401 and network error rules. This also makes the
+project-specific retry override in useGetProject unnecessary, so
+it's removed.
+
+- fix(web): reset the invite dialog after it closes
+
+Closing the invite dialog with "Selected projects" chosen briefly
+showed "No projects in this workspace yet". The projects query was
+disabled as soon as the dialog closed, and the form reset waited on
+a refetch, so the closing frame rendered an empty project list.
+
+Keep the projects query enabled (it shares the sidebar cache) and
+reset the form in onOpenChangeComplete, after the close animation.
+
+- refactor(web): use design system fields for access
+
+Replace the dashed-border checklist with coss primitives: a Fieldset
+rendered as the RadioGroup and another as a CheckboxGroup, each with
+a FieldsetLegend, inside a Field so the "at least one project" error
+uses FieldError and the invalid checkbox state. CheckboxGroup owns
+the selected ids, so the toggleProjectId helper is removed.
+
+- fix(api): tighten member project access changes
+
+Address review findings on managing project access:
+
+- A manager whose own access is limited no longer sees project ids
+  they can not access: the restricted-member list and the update
+  response only include projects the caller can access, while
+  hidden grants are still kept on save
+- Re-check that the manager is still a workspace member inside the
+  write transaction, with a share lock, so an in-flight request from
+  someone removed mid-request can not grant access
+- Limiting a member unassigns them from tasks in the projects they
+  lose, records an unassigned activity and refreshes those boards,
+  matching what task and project moves already do
+
+* fix: recover missed project access revocations
+
+- After Redis reconnects, re-check every local board socket (one
+  lookup per user) and close the ones whose project access was
+  revoked while the fan-out message was missed, then notify the
+  affected tabs
+- When a tab learns its project access changed, refresh the project
+  list, evict cached data for projects that disappeared and refresh
+  notifications, instead of only marking a few queries stale
+
+* fix(api): serialize member project access updates
+
+Two managers editing the same member could race: the hidden-grant
+merge read the member grants before the write transaction, so a
+removal committed in between could be restored by the other request.
+
+Lock the caller and target workspace_member rows together (ordered
+by id, FOR UPDATE) at the start of the transaction, then read and
+merge hidden grants and replace them under that lock. The lock also
+replaces the earlier caller-only membership check.
+
+- fix(api): clear project limits for new owners
+
+Owners always reach every project, so a limited member promoted to
+owner kept a dormant rule that would silently come back if they were
+later demoted. Clear the rule in afterUpdateMemberRole when the new
+role includes owner and publish project_access.updated so their open
+tabs refresh.
+
+- fix(web): tighten project access pickers
+
+* Invite dialog lists archived projects (badged) and only loads them
+  once the dialog opens; useGetProjects gains an enabled option
+* Subtask assignee picker offers only members of every selected
+  task project, using the shared per-project member queries
+* Create-task modal no longer falls back to all workspace members
+  while the chosen project members load or fail
+* The members page refetches project access when it mounts
+
+- fix(api): validate access changes under the lock
+
+Everything that decides a project access change now runs after the
+caller and target membership rows are locked, so concurrent changes
+can not leave a stale decision behind:
+
+- Re-check the caller still holds member:update (or is an instance
+  admin), not only that they are still a member
+- Use the target role read under the lock, so a member promoted to
+  owner in the meantime can not get a new selected-project rule
+- Validate the requested projects against the caller current access
+  inside the transaction, so a project revoked from the caller in
+  the meantime can not be granted
+
+* fix: refresh assignee lists when access changes
+
+Changing a member project access also changes who can be assigned
+in each project. Broadcast PROJECT_MEMBERS_UPDATED to the workspace
+project boards so open clients refresh that project member list,
+and refresh workspace labels in the affected member tabs, since the
+label list is filtered by project access too.
+
+- fix(web): keep assignees and gate access on update
+
+* Create-task modal keeps a chosen assignee while the project member
+  list loads or fails and lets the API validate it, instead of
+  silently submitting the task unassigned
+* Gate the members page project access column and dialog on
+  member:update alone, which is what the API requires, rather than
+  member:update plus member:delete
+
+- fix(api): read role permissions inside the lock
+
+The access-change permission re-check read custom role definitions
+through the global pool while the transaction held its row locks.
+That needed a second connection per request and could exhaust the
+pool under concurrent changes. Pass the transaction through
+roleHasWorkspacePermission and customRoleStatements.
+
+- perf: notify only projects whose access changed
+
+Compare the member accessible projects before and after the change
+inside the transaction and send the difference with
+project_access.updated, so PROJECT_MEMBERS_UPDATED goes to those
+boards only instead of every project in the workspace. Events
+without a list, such as owner promotion, still reach every project.
+
+- fix(api): hide revoked projects in alert rules
+
+A selected-project notification rule kept returning project ids the
+member had since lost. The settings UI resubmitted those hidden ids
+and every later save failed validation. Drop inaccessible projects
+when reading the rule.
+
+- fix(api): keep hidden projects in alert rules
+
+Hiding revoked projects from a selected-project notification rule
+meant the next save replaced the stored selection with only the
+visible ids: hidden projects were dropped, and a rule with no
+visible project left failed validation. Keep stored projects the
+member can no longer access when saving, validate only the
+submitted visible ids, and allow an empty visible selection while
+hidden ones remain.
+
+- fix(api): hide invited project ids from viewers
+
+Invitations expose projectIds through better-auth responses. Filter
+them in list-invitations and get-full-organization against the
+viewer project access, so a limited admin can not learn the ids of
+projects hidden from them. Stored values are unchanged and still
+applied on acceptance.
+
+- fix: refresh assignee lists when members join
+
+Joining or leaving a workspace changes who can be assigned in its
+projects, but open assignee pickers only refreshed on access edits.
+Publish project_members.updated after an invitation is accepted or a
+member is added (for the projects they can access) and after a
+member is removed (for every project), and broadcast
+PROJECT_MEMBERS_UPDATED to those boards. Access edits reuse the same
+broadcast.
+
+- fix: respect the inviter own project access
+
+A manager limited to selected projects saw "All projects" as the
+default in the invite dialog, which the API always rejects.
+
+- Add GET /workspace/{id}/project-access/me for the caller own
+  effective access
+- Invite and edit dialogs default to selected projects and disable
+  "All projects" with an explanation when the caller is limited
+- The members table hides the edit action on members with every
+  project when the caller is limited, since the API rejects it
+
+* fix(web): wait for the caller access in dialogs
+
+The invite and access dialogs treated the caller as unrestricted
+while their own access was loading or had failed to load, so a
+limited manager could submit an "All projects" grant the API
+rejects. Disable the access fields and submit until it loads, and
+treat a failed load as limited.
+
+Also refresh the cached caller access on PROJECT_ACCESS_CHANGED, so
+the members page re-gates its edit controls when another manager
+changes the caller access.
+
+- fix(web): evict archived projects on revocation
+
+The access-change reconciliation compared only the active project
+list, so revoking access to an archived project never evicted its
+cached tasks. Collect project ids from every cached project list and
+single-project query, refresh the list including archived projects,
+and evict whatever disappeared.
+
+- fix(web): confirm assignee before creating a task
+
+After switching the destination project, the create-task modal kept
+the chosen assignee while that project member list loaded or failed,
+so a quick submit could send someone who can not see the project.
+Keep showing the choice but block Create until eligibility is known
+or the assignee is cleared.
+
+- docs(api): document invitation project access
+
+Add projectAccess and projectIds to the invite-member and
+get-invitation responses and give list-invitations a response schema,
+then regenerate openapi.json.
+
+- fix(web): reconcile project access on resync
+
+After Redis recovery the server re-checks only users with an open
+board socket, so a revoked user on the inbox or settings page could
+keep cached private project data if the PROJECT_ACCESS_CHANGED event
+was missed. Every tab already receives WORKSPACE_ACCESS_SYNC on
+recovery: reconcile cached projects for each listed workspace there,
+using the same helper as PROJECT_ACCESS_CHANGED. It only refetches
+when projects are cached, so a fresh page load does no extra work.
+
+- fix: hide inaccessible projects in move history
+
+A task moved from project A into B kept the id and name of A in its
+moved activity, so a member who can only see B could learn about A
+from the task history or the workspace activity feed. Blank the
+project id and name on either side of a move when the viewer can not
+access that project, and show "moved task from another project" in
+the UI when the source is hidden.
+
+- fix(api): resolve the viewer in invitation hooks
+
+The after-hook that hides inaccessible invitation project ids read
+ctx.context.session, which is only set inside the endpoint
+middleware, so it never ran and the integration test failed in CI.
+Resolve the viewer with getSessionFromCtx instead.
+
+- fix(api): hide deleted projects in move history
+
+The move-history redaction only hid projects that still exist and
+are inaccessible. After a source project was deleted, its stored id
+and name were shown again. Treat any referenced project the viewer
+can not access, including deleted ones, as hidden.
+
+- fix(api): drop stale projects from invitations
+
+Invitation project ids are a plain text array that project deletion
+and moves do not rewrite, and the response filter only removed ids
+that still exist and are inaccessible, so a deleted or moved project
+id could show again. Keep only ids the viewer can access that still
+belong to the invitation workspace. Share the lookup with the
+move-history redaction as findAccessibleProjects.
+
+### 🐛 Bug Fixes
+
+- Fix(web): stop retrying 403 and 404 responses
+
+Opening a project you can't access left the board's own queries
+(tasks, custom fields) retrying each 403 twice, even though a
+permission or not-found error won't change on retry.
+
+Skip retries for 403 and 404 in the shared query client, alongside
+the existing 401 and network error rules. This also makes the
+project-specific retry override in useGetProject unnecessary, so
+it's removed.
 
 - Fix(web): remove the add task row under board columns (#1931)
 
@@ -25,9 +2192,322 @@ at the bottom of each open column only added clutter.
 The previous commit deleted the component but left its import and usage
 in the column.
 
+- Fix(web): reset the invite dialog after it closes
+
+Closing the invite dialog with "Selected projects" chosen briefly
+showed "No projects in this workspace yet". The projects query was
+disabled as soon as the dialog closed, and the form reset waited on
+a refetch, so the closing frame rendered an empty project list.
+
+Keep the projects query enabled (it shares the sidebar cache) and
+reset the form in onOpenChangeComplete, after the close animation.
+
+- Fix(api): tighten member project access changes
+
+Address review findings on managing project access:
+
+- A manager whose own access is limited no longer sees project ids
+  they can not access: the restricted-member list and the update
+  response only include projects the caller can access, while
+  hidden grants are still kept on save
+- Re-check that the manager is still a workspace member inside the
+  write transaction, with a share lock, so an in-flight request from
+  someone removed mid-request can not grant access
+- Limiting a member unassigns them from tasks in the projects they
+  lose, records an unassigned activity and refreshes those boards,
+  matching what task and project moves already do
+- Fix: recover missed project access revocations
+
+- After Redis reconnects, re-check every local board socket (one
+  lookup per user) and close the ones whose project access was
+  revoked while the fan-out message was missed, then notify the
+  affected tabs
+- When a tab learns its project access changed, refresh the project
+  list, evict cached data for projects that disappeared and refresh
+  notifications, instead of only marking a few queries stale
+- Fix(api): serialize member project access updates
+
+Two managers editing the same member could race: the hidden-grant
+merge read the member grants before the write transaction, so a
+removal committed in between could be restored by the other request.
+
+Lock the caller and target workspace_member rows together (ordered
+by id, FOR UPDATE) at the start of the transaction, then read and
+merge hidden grants and replace them under that lock. The lock also
+replaces the earlier caller-only membership check.
+
+- Fix(api): clear project limits for new owners
+
+Owners always reach every project, so a limited member promoted to
+owner kept a dormant rule that would silently come back if they were
+later demoted. Clear the rule in afterUpdateMemberRole when the new
+role includes owner and publish project_access.updated so their open
+tabs refresh.
+
+- Fix(web): tighten project access pickers
+
+- Invite dialog lists archived projects (badged) and only loads them
+  once the dialog opens; useGetProjects gains an enabled option
+- Subtask assignee picker offers only members of every selected
+  task project, using the shared per-project member queries
+- Create-task modal no longer falls back to all workspace members
+  while the chosen project members load or fail
+- The members page refetches project access when it mounts
+- Fix(api): validate access changes under the lock
+
+Everything that decides a project access change now runs after the
+caller and target membership rows are locked, so concurrent changes
+can not leave a stale decision behind:
+
+- Re-check the caller still holds member:update (or is an instance
+  admin), not only that they are still a member
+- Use the target role read under the lock, so a member promoted to
+  owner in the meantime can not get a new selected-project rule
+- Validate the requested projects against the caller current access
+  inside the transaction, so a project revoked from the caller in
+  the meantime can not be granted
+- Fix: refresh assignee lists when access changes
+
+Changing a member project access also changes who can be assigned
+in each project. Broadcast PROJECT_MEMBERS_UPDATED to the workspace
+project boards so open clients refresh that project member list,
+and refresh workspace labels in the affected member tabs, since the
+label list is filtered by project access too.
+
+- Fix(web): keep assignees and gate access on update
+
+- Create-task modal keeps a chosen assignee while the project member
+  list loads or fails and lets the API validate it, instead of
+  silently submitting the task unassigned
+- Gate the members page project access column and dialog on
+  member:update alone, which is what the API requires, rather than
+  member:update plus member:delete
+- Fix(site): balance the managed instance card on desktop
+- Fix(api): read role permissions inside the lock
+
+The access-change permission re-check read custom role definitions
+through the global pool while the transaction held its row locks.
+That needed a second connection per request and could exhaust the
+pool under concurrent changes. Pass the transaction through
+roleHasWorkspacePermission and customRoleStatements.
+
+- Fix(api): hide revoked projects in alert rules
+
+A selected-project notification rule kept returning project ids the
+member had since lost. The settings UI resubmitted those hidden ids
+and every later save failed validation. Drop inaccessible projects
+when reading the rule.
+
+- Fix(api): keep hidden projects in alert rules
+
+Hiding revoked projects from a selected-project notification rule
+meant the next save replaced the stored selection with only the
+visible ids: hidden projects were dropped, and a rule with no
+visible project left failed validation. Keep stored projects the
+member can no longer access when saving, validate only the
+submitted visible ids, and allow an empty visible selection while
+hidden ones remain.
+
+- Fix(api): hide invited project ids from viewers
+
+Invitations expose projectIds through better-auth responses. Filter
+them in list-invitations and get-full-organization against the
+viewer project access, so a limited admin can not learn the ids of
+projects hidden from them. Stored values are unchanged and still
+applied on acceptance.
+
+- Fix: refresh assignee lists when members join
+
+Joining or leaving a workspace changes who can be assigned in its
+projects, but open assignee pickers only refreshed on access edits.
+Publish project_members.updated after an invitation is accepted or a
+member is added (for the projects they can access) and after a
+member is removed (for every project), and broadcast
+PROJECT_MEMBERS_UPDATED to those boards. Access edits reuse the same
+broadcast.
+
+- Fix: respect the inviter own project access
+
+A manager limited to selected projects saw "All projects" as the
+default in the invite dialog, which the API always rejects.
+
+- Add GET /workspace/{id}/project-access/me for the caller own
+  effective access
+- Invite and edit dialogs default to selected projects and disable
+  "All projects" with an explanation when the caller is limited
+- The members table hides the edit action on members with every
+  project when the caller is limited, since the API rejects it
+- Fix(ci): ci errors for contribution workflow
+- Fix(ci): browser test fixes/optimization
+- Fix(web): wait for the caller access in dialogs
+
+The invite and access dialogs treated the caller as unrestricted
+while their own access was loading or had failed to load, so a
+limited manager could submit an "All projects" grant the API
+rejects. Disable the access fields and submit until it loads, and
+treat a failed load as limited.
+
+Also refresh the cached caller access on PROJECT_ACCESS_CHANGED, so
+the members page re-gates its edit controls when another manager
+changes the caller access.
+
+- Fix(web): evict archived projects on revocation
+
+The access-change reconciliation compared only the active project
+list, so revoking access to an archived project never evicted its
+cached tasks. Collect project ids from every cached project list and
+single-project query, refresh the list including archived projects,
+and evict whatever disappeared.
+
+- Fix(web): confirm assignee before creating a task
+
+After switching the destination project, the create-task modal kept
+the chosen assignee while that project member list loaded or failed,
+so a quick submit could send someone who can not see the project.
+Keep showing the choice but block Create until eligibility is known
+or the assignee is cleared.
+
+- Fix(web): reconcile project access on resync
+
+After Redis recovery the server re-checks only users with an open
+board socket, so a revoked user on the inbox or settings page could
+keep cached private project data if the PROJECT_ACCESS_CHANGED event
+was missed. Every tab already receives WORKSPACE_ACCESS_SYNC on
+recovery: reconcile cached projects for each listed workspace there,
+using the same helper as PROJECT_ACCESS_CHANGED. It only refetches
+when projects are cached, so a fresh page load does no extra work.
+
+- Fix: hide inaccessible projects in move history
+
+A task moved from project A into B kept the id and name of A in its
+moved activity, so a member who can only see B could learn about A
+from the task history or the workspace activity feed. Blank the
+project id and name on either side of a move when the viewer can not
+access that project, and show "moved task from another project" in
+the UI when the source is hidden.
+
+- Fix(api): resolve the viewer in invitation hooks
+
+The after-hook that hides inaccessible invitation project ids read
+ctx.context.session, which is only set inside the endpoint
+middleware, so it never ran and the integration test failed in CI.
+Resolve the viewer with getSessionFromCtx instead.
+
+- Fix(api): hide deleted projects in move history
+
+The move-history redaction only hid projects that still exist and
+are inaccessible. After a source project was deleted, its stored id
+and name were shown again. Treat any referenced project the viewer
+can not access, including deleted ones, as hidden.
+
+- Fix(api): drop stale projects from invitations
+
+Invitation project ids are a plain text array that project deletion
+and moves do not rewrite, and the response filter only removed ids
+that still exist and are inaccessible, so a deleted or moved project
+id could show again. Keep only ids the viewer can access that still
+belong to the invitation workspace. Share the lookup with the
+move-history redaction as findAccessibleProjects.
+
+### 💼 Changes
+
+- Merge branch 'main' into feat/project-level-access-control
+- Merge remote-tracking branch 'origin/feat/project-level-access-control' into feat/project-level-access-control
+- Merge branch 'main' into feat/project-level-access-control
+- Merge remote-tracking branch 'origin/feat/project-level-access-control' into feat/project-level-access-control
+- Merge pull request #1939 from usekaneo/fix/contribution-ci
+
+fix(ci): ci errors for contribution workflow
+
+- Merge pull request #1941 from usekaneo/fix/browser-tests-ci
+
+fix(ci): browser test fixes/optimization
+
+- Merge branch 'main' into feat/project-level-access-control
+- Merge remote-tracking branch 'origin/feat/project-level-access-control' into feat/project-level-access-control
+
+### 🚜 Refactor
+
+- Refactor: split project access into single modules
+
+Each module added for project access held several functions. Split
+them so every file has one responsibility, matching the rest of the
+codebase.
+
+- API: break member-project-access, assert-project-access and
+  invitation-project-access into one function per file, with shared
+  types (DbOrTx, MemberProjectAccess, InvitationProjectAccess) in
+  their own modules, and move isOwnerRole out of the mode vocabulary
+- Web: move the project access helpers into team/project-access/
+  with a test beside each, and extract the cache tree walker into
+  lib/visit-records
+- Tests: split the integration helpers into
+  helpers/project-access/ and reuse them instead of per-file
+  client, setAccess and accessRows helpers
+- Drop the moved position comment in moveProject and the label
+  consistency comment in the access middleware in favor of named
+  values
+- Refactor(web): use design system fields for access
+
+Replace the dashed-border checklist with coss primitives: a Fieldset
+rendered as the RadioGroup and another as a CheckboxGroup, each with
+a FieldsetLegend, inside a Field so the "at least one project" error
+uses FieldError and the invalid checkbox state. CheckboxGroup owns
+the selected ids, so the toggleProjectId helper is removed.
+
+### 📚 Documentation
+
+- Docs(api): document invitation project access
+
+Add projectAccess and projectIds to the invite-member and
+get-invitation responses and give list-invitations a response schema,
+then regenerate openapi.json.
+
+### ⚡️ Performance
+
+- Perf: notify only projects whose access changed
+
+Compare the member accessible projects before and after the change
+inside the transaction and send the difference with
+project_access.updated, so PROJECT_MEMBERS_UPDATED goes to those
+boards only instead of every project in the workspace. Events
+without a list, such as owner promotion, still reach every project.
+
 ### ⚙️ Miscellaneous Tasks
 
-- Chore: update changelog
+- Chore(test): remove unncessary test
+- Ci(release): tag images with major and major.minor (#1950)
+
+* ci(release): tag images with major and major.minor
+
+Closes #1948
+
+Co-authored-by: Sam Jordan <sam@outsetworks.com>
+
+- docs: clarify floating image tags in Compose guide
+
+---
+
+Co-authored-by: Sam Jordan <sam@outsetworks.com>
+
+- Chore(release): v2.34.0 [skip ci]
+
+### Features
+
+- restrict members to selected projects: #1933
+- **site:** offer a managed instance on pricing: [c4d009f](https://github.com/usekaneo/kaneo/commit/c4d009f2e0e1a1c623233ae2d5220e01813c0188)
+- **site:** refresh open-source project management guide for search: [a181173](https://github.com/usekaneo/kaneo/commit/a18117307149a7db2f2b055c8d1a20d344f6e71d)
+
+### Bug Fixes
+
+- **ci:** browser test fixes/optimization: #1941
+- **ci:** ci errors for contribution workflow: #1939
+- **site:** balance the managed instance card on desktop: [5f07734](https://github.com/usekaneo/kaneo/commit/5f077346675e6bc63740c341b8edcce739f709b8)
+- **web:** remove the add task row under board columns: #1931
+
+### Credits
+
+Huge thanks to @andrejsshell, @tinsever, and @randoneering for helping!
 
 ## [2.33.0] - 2026-10-05
 
@@ -253,127 +2733,6 @@ chore(ci): require approved issues or vouchers for PRs
 - Chore(readme): add clarifying line in readme
 - Chore: vouch for MonsPropre
 - Chore(release): v2.33.0 [skip ci]
-
-### Features
-
-- **web:** redesign onboarding with a live preview: [4bc1a9b](https://github.com/usekaneo/kaneo/commit/4bc1a9b4cb801fc6dd0faefbc7503231173186ad)
-
-### Features
-
-- **web:** redesign auth and access pages: [5565833](https://github.com/usekaneo/kaneo/commit/5565833474175ad42ac365ec2c1b992920277d78)
-- **auth:** require email codes for cloud sign-up: [f974b05](https://github.com/usekaneo/kaneo/commit/f974b0529d36bc60caac510d169417633459f381)
-
-### Bug Fixes
-
-- **web:** read the turnstile key at runtime: [a0d8cbb](https://github.com/usekaneo/kaneo/commit/a0d8cbb080c7289109332fd7aee1785132ad5c6a)
-
-### Features
-
-- **import:** add Jira as an import source: #2010
-
-### Credits
-
-Huge thanks to @andrejsshell for helping!
-
-### Features
-
-- import projects from other tools in the UI: #2007
-
-### Credits
-
-Huge thanks to @andrejsshell for helping!
-
-### Bug Fixes
-
-- **email:** fix gmail mobile layout and icons: [2a41318](https://github.com/usekaneo/kaneo/commit/2a41318ab9e093441471396890e40384120668af)
-
-### Features
-
-- **email:** redesign emails with Kaneo components: [ed0ea78](https://github.com/usekaneo/kaneo/commit/ed0ea78838ba703e924c9446c4db344ad6e4d831)
-
-### Documentation
-
-- **site:** list Amazon SES as email subprocessor: [e71a17b](https://github.com/usekaneo/kaneo/commit/e71a17b34bdf8bf3c812773bd4f0a65b554303e9)
-
-### Features
-
-- start new workspaces with a starter project: #1993
-
-### Bug Fixes
-
-- **cli:** reject checksums that are not SHA-256 digests: #1996
-
-### Documentation
-
-- **cli:** add npm as an install option: #1995
-
-### Credits
-
-Huge thanks to @andrejsshell for helping!
-
-### Features
-
-- **cli:** add an agent skill for the kaneo CLI: #1974
-- **cli:** install the CLI with a one-line script: #1971
-
-### Bug Fixes
-
-- **build:** stop vp from replaying stale typechecks and builds: #1989
-- make the app usable on phones: #1983
-- **mcp:** omit session credentials from whoami: [cf44625](https://github.com/usekaneo/kaneo/commit/cf446256f39935e6067e70dbb57f429d4b7b7a5b)
-- **cli:** point the update hint at the install page: #1976
-- **cli:** say how to confirm in confirmation errors: #1975
-
-### Credits
-
-Huge thanks to @tinsever and @andrejsshell for helping!
-
-### Features
-
-- **cli:** add the official Kaneo command-line client: #1968
-- **api:** add workspace list and detail endpoints: #1960
-- allow manual AI comment scans for existing PRs: [70de375](https://github.com/usekaneo/kaneo/commit/70de375184e7908e8b54fda9abee37756ed20eb6)
-- add advisory AI comment labeler: [d1a6a39](https://github.com/usekaneo/kaneo/commit/d1a6a392ed4c8dbc6873a8ad46de804cfadfbc3f)
-
-### Bug Fixes
-
-- **auth:** allow linking social accounts with different emails: [c613565](https://github.com/usekaneo/kaneo/commit/c61356534839adfd0c40b65325114d2fd69e4b25)
-- **api:** answer rate-limited API keys with 429: #1961
-- **api:** never treat API keys as user sessions: #1969
-- **api:** return every error as JSON with a stable code: #1962
-- **ci:** explain automatic pull request draft conversions: [5c42599](https://github.com/usekaneo/kaneo/commit/5c425995019c9f624110c0b84f117854a0c707d7)
-- **api:** return 404 for missing and hidden resources: #1963
-- **calendar:** allow feeds without label filters: #1958
-- **site:** prevent theme flash during hydration: [6bd0c1a](https://github.com/usekaneo/kaneo/commit/6bd0c1ac42164ec2604a2e74538f6e084c684641)
-
-### Credits
-
-Huge thanks to @andrejsshell and @tinsever for helping!
-
-### Features
-
-- manage workspaces as an instance admin: #1953
-
-### Credits
-
-Huge thanks to @andrejsshell for helping!
-
-### Features
-
-- restrict members to selected projects: #1933
-- **site:** offer a managed instance on pricing: [c4d009f](https://github.com/usekaneo/kaneo/commit/c4d009f2e0e1a1c623233ae2d5220e01813c0188)
-- **site:** refresh open-source project management guide for search: [a181173](https://github.com/usekaneo/kaneo/commit/a18117307149a7db2f2b055c8d1a20d344f6e71d)
-
-### Bug Fixes
-
-- **ci:** browser test fixes/optimization: #1941
-- **ci:** ci errors for contribution workflow: #1939
-- **site:** balance the managed instance card on desktop: [5f07734](https://github.com/usekaneo/kaneo/commit/5f077346675e6bc63740c341b8edcce739f709b8)
-- **web:** remove the add task row under board columns: #1931
-
-### Credits
-
-Huge thanks to @andrejsshell, @tinsever, and @randoneering for helping!
 
 ### Features
 
