@@ -84,7 +84,7 @@ describe("complete board loading through bounded pages", () => {
     ]);
     expect(snapshots[0].columns[0].tasks).toHaveLength(1);
   });
-  it("loads sequentially and merges every column, planned and archived task with its complete fields", async () => {
+  it("loads with bounded concurrency and merges every column, planned and archived task with its complete fields", async () => {
     let active = 0;
     let peak = 0;
     const load = vi.fn(async (number: number) => {
@@ -96,7 +96,7 @@ describe("complete board loading through bounded pages", () => {
     });
     const result = await loadBoardPages(load);
     expect(load.mock.calls).toEqual([[1], [2], [3]]);
-    expect(peak).toBe(1);
+    expect(peak).toBeLessThanOrEqual(3);
     expect(result.columns[0].tasks.map((task) => task.id)).toEqual([
       "1",
       "2",
@@ -150,7 +150,11 @@ describe("complete board loading through bounded pages", () => {
       };
     });
     const result = await loadBoardPages(load);
-    expect(load.mock.calls).toEqual([[1], [1, 2], [1, 3], [2], [2, 2], [2, 3]]);
+    expect(
+      load.mock.calls
+        .map(([page, relatedPage]) => `${page}:${relatedPage ?? 1}`)
+        .sort(),
+    ).toEqual(["1:1", "1:2", "1:3", "2:1", "2:2", "2:3"]);
     expect(result.columns.map((column) => column.id)).toEqual([
       "column-1",
       "column-2",
@@ -183,7 +187,8 @@ describe("complete board loading through bounded pages", () => {
       .mockResolvedValueOnce(page(1))
       .mockRejectedValueOnce(new Error("permission revoked"));
     await expect(loadBoardPages(load)).rejects.toThrow("permission revoked");
-    expect(load).toHaveBeenCalledTimes(2);
+    expect(load.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(load.mock.calls.length).toBeLessThanOrEqual(3);
   });
   it("honors cancellation and stops scheduling pages after the active request", async () => {
     const controller = new AbortController();
@@ -192,7 +197,8 @@ describe("complete board loading through bounded pages", () => {
       return page(number);
     });
     await expect(loadBoardPages(load, controller.signal)).rejects.toThrow();
-    expect(load).toHaveBeenCalledTimes(2);
+    expect(load.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(load.mock.calls.length).toBeLessThanOrEqual(3);
   });
   it("uses the first page's work boundary and deduplicates tasks moved across pages", async () => {
     const load = vi.fn(async (number: number) =>

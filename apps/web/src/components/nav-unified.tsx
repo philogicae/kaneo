@@ -24,11 +24,13 @@ export function NavUnified() {
               tooltip={t("unified:pageTitle")}
               isActive={window.location.pathname === url}
               size="default"
-              className="h-8 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
+              className="h-8 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent group-data-[collapsible=icon]:ps-2!"
               onClick={() => navigate({ to: url })}
             >
-              <LayoutGrid className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/70" />
-              <span>{t("unified:pageTitle")}</span>
+              <LayoutGrid className="size-4 shrink-0 text-sidebar-foreground/70" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                {t("unified:pageTitle")}
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -10369,6 +10369,9 @@
 								},
 								"issue_closed": {
 									"type": "string"
+								},
+								"issue_reopened": {
+									"type": "string"
 								}
 							},
 							"required": [
@@ -10376,7 +10379,8 @@
 								"pr_opened",
 								"pr_merged",
 								"issue_opened",
-								"issue_closed"
+								"issue_closed",
+								"issue_reopened"
 							]
 						},
 						"dontMove": {

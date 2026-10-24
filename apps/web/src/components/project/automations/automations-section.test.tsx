@@ -119,7 +119,7 @@ describe("AutomationsSection", () => {
       screen.getByText("settings:projectIntegrations.statusConnected"),
     ).toBeInTheDocument();
     expect(screen.queryByText("Gitea")).toBeNull();
-    expect(screen.getAllByRole("combobox")).toHaveLength(5);
+    expect(screen.getAllByRole("combobox")).toHaveLength(6);
     expect(screen.getByText("Done")).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -134,7 +134,7 @@ describe("AutomationsSection", () => {
     expect(
       screen.getByText("settings:projectIntegrations.statusPaused"),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("combobox")).toHaveLength(15);
+    expect(screen.getAllByRole("combobox")).toHaveLength(18);
     expect(
       screen.queryByText(/settings:workflowEditor.connectMore/),
     ).toBeNull();

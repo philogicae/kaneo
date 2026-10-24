@@ -112,7 +112,7 @@ describe.each([
   it.each([
     ["auth:signUp.continueAsGuest", "anonymous"],
     ["auth:providers.github", "social"],
-    ["auth:providers.sso", "oauth2"],
+    ["auth:providers.sso", "social"],
   ] as const)(
     "sends the token and requires a fresh one after %s fails",
     async (label, method) => {

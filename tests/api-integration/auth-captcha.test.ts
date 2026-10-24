@@ -30,8 +30,8 @@ const endpoints = [
     { provider: "github", callbackURL: "http://localhost:5173/dashboard" },
   ],
   [
-    "/sign-in/oauth2",
-    { providerId: "custom", callbackURL: "http://localhost:5173/dashboard" },
+    "/sign-in/social",
+    { provider: "custom", callbackURL: "http://localhost:5173/dashboard" },
   ],
   ["/sign-in/anonymous", {}],
   ["/request-password-reset", { email: "captcha@example.com" }],

@@ -20,6 +20,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
+import { useCollapsedSections } from "@/hooks/use-collapsed-sections";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { getNextManualPosition } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
@@ -54,31 +55,29 @@ function BacklogListView({
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [overColumnId, setOverColumnId] = useState<string | null>(null);
-  const [expandedSections, setExpandedSections] = useState<
-    Record<string, boolean>
-  >({
-    planned: true,
-    archived: true,
-  });
+  const { isExpanded, toggleSection } = useCollapsedSections(
+    project?.id,
+    "backlog",
+  );
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
   useEffect(() => {
     if (project) {
       const visibleTaskIds: string[] = [];
-      if (expandedSections.planned) {
+      if (isExpanded("planned")) {
         visibleTaskIds.push(
           ...(project.plannedTasks || []).map((task) => task.id),
         );
       }
-      if (expandedSections.archived) {
+      if (isExpanded("archived")) {
         visibleTaskIds.push(
           ...(project.archivedTasks || []).map((task) => task.id),
         );
       }
       setAvailableTasks(visibleTaskIds);
     }
-  }, [project, expandedSections, setAvailableTasks]);
+  }, [project, isExpanded, setAvailableTasks]);
 
   useEffect(() => {
     clearFocus();
@@ -313,13 +312,6 @@ function BacklogListView({
     }
   };
 
-  const toggleSection = useCallback((sectionId: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [sectionId]: !prev[sectionId],
-    }));
-  }, []);
-
   const openPlannedTaskModal = useCallback(() => {
     setIsTaskModalOpen(true);
     setActiveColumn("planned");
@@ -352,7 +344,7 @@ function BacklogListView({
             title={t("tasks:backlog.sections.planned")}
             icon={Clock}
             tasks={plannedTasks}
-            isExpanded={expandedSections.planned}
+            isExpanded={isExpanded("planned")}
             showDropIndicator={activeId !== null && overColumnId === "planned"}
             onToggle={toggleSection}
             onAddTask={openPlannedTaskModal}
@@ -363,7 +355,7 @@ function BacklogListView({
             title={t("tasks:backlog.sections.archived")}
             icon={Archive}
             tasks={archivedTasks}
-            isExpanded={expandedSections.archived}
+            isExpanded={isExpanded("archived")}
             showDropIndicator={activeId !== null && overColumnId === "archived"}
             onToggle={toggleSection}
           />

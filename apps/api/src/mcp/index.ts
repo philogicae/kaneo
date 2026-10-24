@@ -18,7 +18,12 @@ import {
 } from "./controllers/oauth-consent";
 import { createModernMcpHandler } from "./modern";
 import { exchangeCode } from "./oauth";
-import { oauthRequestBounds } from "./request-bounds";
+import {
+  MCP_BODY_BYTES,
+  MCP_MAX_TOOL_INPUT_ELEMENTS,
+  mcpRequestBounds,
+  oauthRequestBounds,
+} from "./request-bounds";
 import {
   authorizationDecisionResponseSchema,
   authorizationDecisionSchema,
@@ -45,10 +50,13 @@ const sessions =
   new McpSessionStore<WebStandardStreamableHTTPServerTransport>();
 
 function createMcpServerForUser(token: string): LegacyMcpServer {
-  const server = new LegacyMcpServer({
-    name: "kaneo-mcp",
-    version: "1.0.0",
-  });
+  const server = new LegacyMcpServer(
+    {
+      name: "kaneo-mcp",
+      version: "1.0.0",
+    },
+    { maxToolInputElements: MCP_MAX_TOOL_INPUT_ELEMENTS },
+  );
   registerMcpTools(toMcpToolRegistrar(server), internalApiUrl, token);
   return server;
 }
@@ -272,7 +280,9 @@ mcp
 mcp.all("/mcp", async (c) => {
   const authResult = await validateBearerToken(c.req.raw);
   if (!authResult) {
-    const prmUrl = `${publicApiUrl}/api/.well-known/oauth-protected-resource/api/mcp`;
+    // Canonical RFC 9728 URL: the well-known path goes before the resource
+    // path. The /api/.well-known alias stays for clients that cached it.
+    const prmUrl = `${publicApiUrl}/.well-known/oauth-protected-resource/api/mcp`;
     c.header("WWW-Authenticate", `Bearer resource_metadata="${prmUrl}"`);
     return c.json(
       {
@@ -301,7 +311,13 @@ mcp.all("/mcp", async (c) => {
     return c.json({ error: "Unsupported Media Type" }, 415);
   }
 
-  if (!(await isLegacyRequest(c.req.raw.clone()))) {
+  await mcpRequestBounds(c, async () => {});
+
+  if (
+    !(await isLegacyRequest(c.req.raw.clone(), undefined, {
+      maxRequestBodySize: MCP_BODY_BYTES,
+    }))
+  ) {
     const modern = createModernMcpHandler(authResult.token, internalApiUrl);
     return modern.fetch(c.req.raw);
   }

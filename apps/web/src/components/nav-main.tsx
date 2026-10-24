@@ -97,11 +97,13 @@ export function NavMain() {
                 onClick={() => navigate({ to: item.url })}
               >
                 <item.icon aria-hidden="true" />
-                <span>{item.title}</span>
+                <span className="group-data-[collapsible=icon]:hidden">
+                  {item.title}
+                </span>
                 {item.count ? (
                   <span
                     className={cn(
-                      "ml-auto flex h-4.5 min-w-4.5 shrink-0 items-center justify-center rounded-full px-1 text-[0.6875rem] tabular-nums",
+                      "ml-auto flex h-4.5 min-w-4.5 shrink-0 items-center justify-center rounded-full px-1 text-[0.6875rem] tabular-nums group-data-[collapsible=icon]:hidden",
                       item.emphasizeCount
                         ? "bg-foreground font-semibold text-background"
                         : "font-medium text-muted-foreground",

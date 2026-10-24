@@ -1213,6 +1213,11 @@ describe.each(["github", "gitea", "gitlab"] as const)(
           previous: string[],
           added = "new-remote",
         ) {
+          // Label webhooks resolve fields from the issue's current labels.
+          mocks.read.mockResolvedValue({
+            ...(await mocks.read()),
+            labels: names,
+          });
           if (type === "github")
             await handleIssueLabeled({
               action: "labeled",

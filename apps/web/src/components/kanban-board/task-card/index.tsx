@@ -28,6 +28,9 @@ function TaskCard({
     disabled: disableDragDrop,
     data: { isFinalColumn },
   });
+  // The context menu trigger inside the card stops touchstart from bubbling,
+  // so the TouchSensor listens on that trigger instead of this wrapper.
+  const { onTouchStart, ...dragListeners } = listeners ?? {};
   const { handleKeyDown } = useTaskCardClick(task, listeners);
 
   const style: CSSProperties = {
@@ -44,7 +47,7 @@ function TaskCard({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
+      {...dragListeners}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -55,6 +58,7 @@ function TaskCard({
         isFinalColumn={isFinalColumn}
         isDragging={isDragging}
         dragListeners={listeners}
+        onDragTouchStart={(event) => onTouchStart?.(event)}
       />
     </div>
   );

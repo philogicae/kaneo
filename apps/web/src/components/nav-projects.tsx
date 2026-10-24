@@ -265,8 +265,8 @@ export function NavProjects() {
   return (
     <>
       <Collapsible defaultOpen className="group/collapsible">
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden gap-1 p-2 pt-1">
-          <div className="flex h-7 items-center">
+        <SidebarGroup className="gap-1 p-2 pt-1">
+          <div className="flex h-7 items-center group-data-[collapsible=icon]:hidden">
             <CollapsibleTrigger
               className="min-w-0 flex-1 data-panel-open:[&_svg]:rotate-90"
               render={
@@ -349,10 +349,10 @@ export function NavProjects() {
                             isActive={isCurrentProject(project.id)}
                             size="default"
                             tooltip={project.name}
-                            className="h-8 gap-0 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
+                            className="h-8 gap-0 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!"
                             onClick={() => handleProjectClick(project)}
                           >
-                            <span className="hidden h-5 min-w-6 items-center justify-center rounded-md bg-sidebar-accent px-1 text-[0.625rem] font-semibold tracking-wide text-sidebar-accent-foreground uppercase group-data-[collapsible=icon]:flex">
+                            <span className="hidden h-5 min-w-6 items-center justify-center rounded-md bg-sidebar-accent px-1 text-[0.625rem] font-semibold tracking-wide text-sidebar-accent-foreground uppercase group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:w-6 group-data-[collapsible=icon]:min-w-6 group-data-[collapsible=icon]:px-0">
                               {project.slug}
                             </span>
                             <ProjectIcon
@@ -366,7 +366,7 @@ export function NavProjects() {
                               percentage={
                                 project.statistics.completionPercentage
                               }
-                              className="text-muted-foreground max-md:hidden group-focus-within/menu-item:opacity-0 group-hover/menu-item:opacity-0 group-has-data-popup-open/menu-item:opacity-0"
+                              className="text-muted-foreground max-md:hidden group-focus-within/menu-item:opacity-0 group-hover/menu-item:opacity-0 group-has-data-popup-open/menu-item:opacity-0 group-data-[collapsible=icon]:hidden"
                             />
                           </SidebarMenuButton>
 
@@ -465,14 +465,16 @@ export function NavProjects() {
                       <SidebarMenuButton
                         size="default"
                         tooltip={t("navigation:projectList.addProject")}
-                        className="h-8 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent"
+                        className="h-8 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent group-data-[collapsible=icon]:ps-2!"
                         onClick={() => setIsCreateProjectModalOpen(true)}
                       >
                         <Plus
                           aria-hidden="true"
-                          className="h-3.5 w-3.5 shrink-0 text-sidebar-foreground/70"
+                          className="size-4 shrink-0 text-sidebar-foreground/70"
                         />
-                        <span>{t("navigation:projectList.addProject")}</span>
+                        <span className="group-data-[collapsible=icon]:hidden">
+                          {t("navigation:projectList.addProject")}
+                        </span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}

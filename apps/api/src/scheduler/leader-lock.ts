@@ -16,16 +16,18 @@ class LeaseHeldError extends Error {
  * losing the lease race is the normal case for a single-instance deployment:
  * the other holder is already doing the work.
  */
+const DEFAULT_JOB_LEASE_MS = 15 * 60 * 1000;
+
 export async function withJobLease<T>(
   name: string,
   run: () => Promise<T>,
   whenHeldElsewhere: () => T,
-  leaseMs?: number,
+  leaseMs = DEFAULT_JOB_LEASE_MS,
 ): Promise<T> {
   try {
     return await withLease(name, run, {
       busy: () => new LeaseHeldError(name),
-      ...(leaseMs ? { leaseMs } : {}),
+      leaseMs,
     });
   } catch (error) {
     if (error instanceof LeaseHeldError) return whenHeldElsewhere();

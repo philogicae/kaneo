@@ -1,7 +1,9 @@
 import { HTTPException } from "hono/http-exception";
 import { canAccessProject } from "./access-scope";
 
-const NOT_ASSIGNABLE = "Assignee does not have access to this project";
+export const NOT_ASSIGNABLE = "Assignee is not a member of this workspace";
+export const NO_PROJECT_ACCESS =
+  "Assignee does not have access to this project";
 
 // Project access is the assignability rule: a scoped member can only be given
 // work in the projects they can open, so no orphan assignment or notification
@@ -31,6 +33,6 @@ export async function assertAssignableUser(
   const assignable = await filterAssignableUsers([userId], projectId);
 
   if (!assignable.has(userId)) {
-    throw new HTTPException(403, { message: NOT_ASSIGNABLE });
+    throw new HTTPException(403, { message: NO_PROJECT_ACCESS });
   }
 }

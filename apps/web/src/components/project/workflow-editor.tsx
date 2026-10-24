@@ -17,6 +17,7 @@ const GITHUB_EVENT_TYPES = [
   "pr_merged",
   "issue_opened",
   "issue_closed",
+  "issue_reopened",
 ] as const;
 
 type WorkflowEditorProps = {

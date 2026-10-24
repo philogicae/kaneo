@@ -5383,7 +5383,7 @@
           },
           "eventType": {
             "type": "string",
-            "description": "The provider event that triggers the move, e.g. `pull_request.opened`."
+            "description": "The Kaneo event that triggers the move: `branch_push`, `pr_opened`, `pr_merged`, `issue_opened`, `issue_closed` or `issue_reopened`."
           },
           "columnId": {
             "type": "string",
@@ -9856,9 +9856,10 @@
           {
             "schema": {
               "type": "string",
-              "maxLength": 1024
+              "description": "Opaque client state, returned unchanged. The complete authorization URL is limited to 8 KiB."
             },
             "required": false,
+            "description": "Opaque client state, returned unchanged. The complete authorization URL is limited to 8 KiB.",
             "name": "state",
             "in": "query"
           }
@@ -13853,7 +13854,8 @@
                           "type": "string"
                         },
                         "status": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Column slug, current column name, or slugified current name. Unknown values map to planned with a warning; ambiguous names fail the task import."
                         },
                         "priority": {
                           "type": "string"
@@ -13874,7 +13876,8 @@
                           "type": [
                             "string",
                             "null"
-                          ]
+                          ],
+                          "description": "Assignable user's ID or email address. Emails match case-insensitively. Null, empty, or omitted leaves the task unassigned."
                         }
                       },
                       "required": [
@@ -14879,7 +14882,7 @@
           "Columns"
         ],
         "summary": "Create column",
-        "description": "Add a column to the end of a project's board. The slug is derived from the name.",
+        "description": "Add a column to the end of a project's board. The slug is derived from the name, with a numeric suffix such as `-2` when another column in the project already uses it.",
         "parameters": [
           {
             "schema": {
@@ -14969,7 +14972,7 @@
             }
           },
           "409": {
-            "description": "The slug is reserved, or already used in this project",
+            "description": "The slug is reserved for a virtual task status",
             "content": {
               "application/json": {
                 "schema": {
@@ -26387,7 +26390,15 @@
                     "type": "string"
                   },
                   "eventType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "branch_push",
+                      "pr_opened",
+                      "pr_merged",
+                      "issue_opened",
+                      "issue_closed",
+                      "issue_reopened"
+                    ]
                   },
                   "columnId": {
                     "type": "string"

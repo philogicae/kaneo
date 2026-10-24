@@ -20,12 +20,12 @@
     "test:watch": "vp test --config vitest.config.ts"
   },
   "dependencies": {
-    "better-auth": "~1.6.30"
+    "better-auth": "~1.7.12"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
-    "vitest": "catalog:",
+    "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vite": "catalog:"
+    "vitest": "catalog:"
   }
 }

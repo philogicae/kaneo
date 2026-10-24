@@ -27,7 +27,7 @@ async function getPublicProject(
               param: { id },
               query: {
                 page: String(page),
-                limit: "100",
+                limit: "200",
                 ...(relatedPage ? { relatedPage: String(relatedPage) } : {}),
               },
             },

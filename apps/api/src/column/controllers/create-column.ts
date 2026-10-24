@@ -1,20 +1,11 @@
 import { publishEvent } from "../../events";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { columnTable } from "../../database/schema";
 import { VIRTUAL_STATUSES } from "../../task/validate-task-fields";
-
-export function toSlug(name: string): string {
-  const slug = name
-    .normalize("NFKC")
-    .toLowerCase()
-    .trim()
-    .replace(/[^\p{L}\p{M}\p{N}]+/gu, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return /[\p{L}\p{N}]/u.test(slug) ? slug : "";
-}
+import { availableSlug } from "../available-slug";
+import { toSlug } from "../to-slug";
 
 async function createColumn({
   projectId,
@@ -43,40 +34,28 @@ async function createColumn({
     });
   }
 
-  const existing = await db
-    .select({ id: columnTable.id })
-    .from(columnTable)
-    .where(
-      sql`${columnTable.projectId} = ${projectId} AND ${columnTable.slug} = ${slug}`,
-    );
+  const created = await db.transaction(async (tx) => {
+    // The write queue serialises transactions, so the read and insert below
+    // cannot interleave with another create for this project.
+    const columns = await tx
+      .select({ slug: columnTable.slug, position: columnTable.position })
+      .from(columnTable)
+      .where(eq(columnTable.projectId, projectId));
 
-  if (existing.length > 0) {
-    throw new HTTPException(409, {
-      message: `Column with slug "${slug}" already exists in this project`,
-    });
-  }
-
-  const [maxPos] = await db
-    .select({
-      maxPosition: sql<number>`COALESCE(MAX(${columnTable.position}), -1)`,
-    })
-    .from(columnTable)
-    .where(eq(columnTable.projectId, projectId));
-
-  const position = (maxPos?.maxPosition ?? -1) + 1;
-
-  const [created] = await db
-    .insert(columnTable)
-    .values({
-      projectId,
-      name,
-      slug,
-      position,
-      icon: icon || null,
-      color: color || null,
-      isFinal: isFinal ?? false,
-    })
-    .returning();
+    const [row] = await tx
+      .insert(columnTable)
+      .values({
+        projectId,
+        name,
+        slug: availableSlug(slug, new Set(columns.map((c) => c.slug))),
+        position: Math.max(-1, ...columns.map((c) => c.position)) + 1,
+        icon: icon || null,
+        color: color || null,
+        isFinal: isFinal ?? false,
+      })
+      .returning();
+    return row;
+  });
 
   if (!created) {
     throw new HTTPException(500, { message: "Failed to create column" });

@@ -1,6 +1,7 @@
 import { acceptsIssue, readSyncRules } from "../../plugins/sync/rules";
 import { canSyncTask } from "../../plugins/sync/eligibility";
 import { importIssueLabels } from "../../plugins/sync/issue-labels";
+import { confirmedFieldLabels } from "../../plugins/sync/field-labels";
 import { parseLinkMetadata } from "../../plugins/github/utils/parse-link-metadata";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, eq, isNull } from "drizzle-orm";
@@ -576,6 +577,7 @@ async function importIssue(
       state: issue.state.toLowerCase(),
       createdFrom: "github-import",
       author: issue.author?.login,
+      ...confirmedFieldLabels(issue.labels.nodes),
     }),
   });
   return { id: created.id, result: "imported" };

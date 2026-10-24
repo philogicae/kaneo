@@ -8,6 +8,8 @@ export const authCaptchaPaths = new Set([
   "/sign-in/email",
   "/sign-up/email",
   "/sign-in/social",
+  // Kept for deployments whose Better Auth build still exposes the legacy
+  // generic-OAuth endpoint; no request is harmed if the route is absent.
   "/sign-in/oauth2",
   "/sign-in/anonymous",
   "/sign-in/magic-link",

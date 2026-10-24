@@ -114,13 +114,30 @@ export async function loadBoardPages<T extends ProjectWithTasks>(
     }
   };
   await loadRelated(1, first);
-  for (let page = 2; page <= first.pagination.totalPages; page++) {
-    signal?.throwIfAborted();
-    const next = await load(page);
-    merge(next);
-    reportProgress();
-    await loadRelated(page, next);
-  }
+  // Pages after the first are independent; overlapping them removes one
+  // network round trip per page from the critical path on large boards. Keep
+  // the fan-out small so a tablet or a busy server is not overwhelmed.
+  const remainingPages = Array.from(
+    { length: Math.max(0, first.pagination.totalPages - 1) },
+    (_, index) => index + 2,
+  );
+  let nextPage = 0;
+  const loadNextPage = async () => {
+    for (;;) {
+      const page = remainingPages[nextPage++];
+      if (page === undefined) return;
+      signal?.throwIfAborted();
+      const next = await load(page);
+      merge(next);
+      reportProgress();
+      await loadRelated(page, next);
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(3, remainingPages.length) }, () =>
+      loadNextPage(),
+    ),
+  );
   result.columns.sort(
     (left, right) => (left.position ?? 0) - (right.position ?? 0),
   );

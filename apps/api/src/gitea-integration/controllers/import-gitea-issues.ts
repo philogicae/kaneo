@@ -1,6 +1,7 @@
 import { acceptsIssue } from "../../plugins/sync/rules";
 import { canSyncTask } from "../../plugins/sync/eligibility";
 import { sameConfig } from "../../plugins/sync/same-config";
+import { confirmedFieldLabels } from "../../plugins/sync/field-labels";
 import { and, eq, inArray, notInArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
@@ -337,6 +338,7 @@ async function importSingleIssue(
             state: issue.state,
             createdFrom: "gitea-import",
             author: issue.user?.login ?? issue.user?.username,
+            ...confirmedFieldLabels(issue.labels),
           },
         },
         tx,

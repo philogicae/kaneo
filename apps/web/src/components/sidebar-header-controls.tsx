@@ -36,7 +36,7 @@ export function SidebarHeaderControls(
 ): React.ReactElement {
   return (
     <div
-      className="flex w-full items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center"
+      className="flex w-full items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-1.5"
       {...props}
     >
       <AppWordmark />

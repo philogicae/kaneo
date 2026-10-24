@@ -42,6 +42,8 @@ const { checkAppointmentRecurrence } =
   await import("../../apps/api/src/scheduler/appointment-recurrence");
 const { checkAppointmentReminders } =
   await import("../../apps/api/src/scheduler/appointment-reminders");
+const { shiftRecurrenceDate } =
+  await import("../../apps/api/src/task/recurrence");
 const { mockAuthenticatedSession } = await import("./helpers/auth");
 const { resetTestDatabase } = await import("./helpers/database");
 const { createProjectFixture, createWorkspaceMember } =
@@ -212,12 +214,19 @@ describe("appointment recurrence scheduling", () => {
       reminderOffsets: [15],
       recurrence: { frequency: "daily", interval: 1 },
     });
-    expect(child?.startDate?.getTime()).toBe(
-      pastStart.getTime() + 48 * 60 * MINUTE_MS,
+    // Daily recurrence preserves the local wall-clock time, so DST changes
+    // mean the absolute interval is not always exactly 48 hours.
+    const rule = { frequency: "daily", interval: 1 } as const;
+    const expectedStart = shiftRecurrenceDate(
+      shiftRecurrenceDate(pastStart, rule),
+      rule,
     );
-    expect(child?.dueDate?.getTime()).toBe(
-      pastStart.getTime() + 48 * 60 * MINUTE_MS + 30 * MINUTE_MS,
+    const expectedDue = shiftRecurrenceDate(
+      shiftRecurrenceDate(new Date(pastStart.getTime() + 30 * MINUTE_MS), rule),
+      rule,
     );
+    expect(child?.startDate?.getTime()).toBe(expectedStart?.getTime());
+    expect(child?.dueDate?.getTime()).toBe(expectedDue?.getTime());
 
     // A second pass must not spawn a duplicate.
     await checkAppointmentRecurrence();

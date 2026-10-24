@@ -55,7 +55,7 @@ describe("authenticated and public board fetchers", () => {
       request.mockImplementation(
         async ({ query }: { query: { page: string } }) => {
           const page = Number(query.page);
-          const pagination = { page, pageSize: 100, total: 201, totalPages: 3 };
+          const pagination = { page, pageSize: 200, total: 201, totalPages: 3 };
           return Response.json(
             visibility === "private"
               ? { data: data(page), pagination }
@@ -81,7 +81,7 @@ describe("authenticated and public board fetchers", () => {
               visibility === "private"
                 ? { projectId: "project" }
                 : { id: "project" },
-            query: { page: String(index + 1), limit: "100" },
+            query: { page: String(index + 1), limit: "200" },
           },
           { init: { signal: controller.signal } },
         ]);
@@ -100,7 +100,7 @@ describe("authenticated and public board fetchers", () => {
           });
           const pagination = {
             page: 1,
-            pageSize: 100,
+            pageSize: 200,
             total: 1,
             totalPages: 1,
             relatedTotalPages: 2,
@@ -120,7 +120,7 @@ describe("authenticated and public board fetchers", () => {
       expect(request.mock.calls[1][0].query).toMatchObject({
         page: "1",
         relatedPage: "2",
-        limit: "100",
+        limit: "200",
       });
     },
   );
@@ -129,7 +129,7 @@ describe("authenticated and public board fetchers", () => {
       .mockResolvedValueOnce(
         Response.json({
           ...data(1),
-          pagination: { page: 1, pageSize: 100, total: 101, totalPages: 2 },
+          pagination: { page: 1, pageSize: 200, total: 101, totalPages: 2 },
         }),
       )
       .mockResolvedValueOnce(
@@ -160,7 +160,7 @@ it("restarts a public board when concurrent membership or ordering changes its r
         ...board,
         pagination: {
           page,
-          pageSize: 100,
+          pageSize: 200,
           total: 201,
           totalPages: 3,
           revision: pass === 1 && page === 1 ? "before edit" : "after edit",
@@ -171,7 +171,7 @@ it("restarts a public board when concurrent membership or ordering changes its r
   const result = await getPublicProject({ id: "project" });
   expect(
     publicRequest.mock.calls.map(([request]) => request.query.page),
-  ).toEqual(["1", "2", "1", "2", "3"]);
+  ).toEqual(["1", "2", "3", "1", "2", "3"]);
   expect(result.columns[0].tasks.map((task) => task.id)).toEqual([
     "task-1",
     "task-2",
@@ -190,7 +190,7 @@ it("checks related continuations against the same public board revision", async 
         ...data(1),
         pagination: {
           page: 1,
-          pageSize: 100,
+          pageSize: 200,
           total: 1,
           totalPages: 1,
           relatedTotalPages: 2,
@@ -209,7 +209,7 @@ it("bounds public board restarts under continuous changes without committing an 
         ...data(Number(query.page)),
         pagination: {
           page: Number(query.page),
-          pageSize: 100,
+          pageSize: 200,
           total: 201,
           totalPages: 3,
           revision: query.page,
@@ -219,7 +219,7 @@ it("bounds public board restarts under continuous changes without committing an 
   await expect(getPublicProject({ id: "project" })).rejects.toThrow();
   expect(
     publicRequest.mock.calls.map(([request]) => request.query.page),
-  ).toEqual(["1", "2", "1", "2", "1", "2"]);
+  ).toEqual(["1", "2", "3", "1", "2", "3", "1", "2", "3"]);
 });
 it("honors cancellation before restarting a changed public board", async () => {
   const controller = new AbortController();
@@ -230,7 +230,7 @@ it("honors cancellation before restarting a changed public board", async () => {
         ...data(Number(query.page)),
         pagination: {
           page: Number(query.page),
-          pageSize: 100,
+          pageSize: 200,
           total: 201,
           totalPages: 3,
           revision: query.page,
@@ -266,7 +266,7 @@ it("reconciles shifted related rows while task membership remains unchanged", as
         ...board,
         pagination: {
           page: 1,
-          pageSize: 100,
+          pageSize: 200,
           total: 1,
           totalPages: 1,
           relatedTotalPages: 2,
@@ -292,7 +292,7 @@ it("compares related revisions within each task page", async () => {
         ...board,
         pagination: {
           page: Number(query.page),
-          pageSize: 100,
+          pageSize: 200,
           total: 201,
           totalPages: 3,
           relatedTotalPages: 2,

@@ -506,10 +506,6 @@ async function globalSearch(params: SearchParams): Promise<{
         relevanceScore: workspaceRelevanceScore.as("relevanceScore"),
       })
       .from(workspaceTable)
-      .leftJoin(
-        workspaceUserTable,
-        eq(workspaceTable.id, workspaceUserTable.workspaceId),
-      )
       .where(
         and(
           inArray(workspaceTable.id, accessibleWorkspaceIds),

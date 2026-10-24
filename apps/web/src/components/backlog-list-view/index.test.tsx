@@ -98,7 +98,10 @@ beforeEach(() => {
   );
   vi.clearAllMocks();
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  window.localStorage.clear();
+});
 
 describe("backlog row lifecycle", () => {
   it("mounts each row once and preserves the other section when collapsing and expanding", () => {
@@ -172,6 +175,25 @@ describe("backlog row lifecycle", () => {
     expect(renderRow).not.toHaveBeenCalled();
     expect(mountRow).not.toHaveBeenCalled();
     expect(unmountRow).not.toHaveBeenCalled();
+  });
+
+  it("keeps collapsed sections after the backlog unmounts", () => {
+    const plannedToggle = () =>
+      screen.getByRole("button", { name: /tasks:backlog.sections.planned/ });
+    const { unmount } = render(<BacklogListView project={project} />, {
+      wrapper: KeyboardShortcutsProvider,
+    });
+    fireEvent.click(plannedToggle());
+    // Visiting the board unmounts the backlog.
+    unmount();
+
+    render(<BacklogListView project={project} />, {
+      wrapper: KeyboardShortcutsProvider,
+    });
+    expect(plannedToggle()).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.getByRole("button", { name: /tasks:backlog.sections.archived/ }),
+    ).toHaveAttribute("aria-expanded", "true");
   });
 
   it("preserves rows when opening task creation or receiving updated task data", () => {

@@ -71,6 +71,25 @@ afterEach(() => {
 });
 
 describe("MCP 2026-07-28 stateless HTTP", () => {
+  it("advertises the canonical protected-resource metadata URL on 401", async () => {
+    const response = await mcpRoutes.request("/mcp", {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/event-stream",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+    });
+
+    expect(response.status).toBe(401);
+    const header = response.headers.get("www-authenticate") ?? "";
+    expect(header.startsWith("Bearer ")).toBe(true);
+    expect(header).toContain("/.well-known/oauth-protected-resource/api/mcp");
+    // RFC 9728 inserts the well-known path before the resource path, so the
+    // advertised URL must not carry the API mount before it.
+    expect(header).not.toContain("/api/.well-known/oauth-protected-resource");
+  });
+
   it("serves tools/list on independent HTTP requests without session IDs", async () => {
     const handler = createModernMcpHandler("test-token", "http://api.test");
 

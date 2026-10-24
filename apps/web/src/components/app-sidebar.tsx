@@ -38,7 +38,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeaderControls />
       </SidebarHeader>
       <SidebarContent className="overflow-hidden gap-1 py-1">
-        <Search />
+        {/* Same horizontal padding as the nav groups so the icon column lines
+            up in the collapsed rail and the expanded sidebar. */}
+        <div className="px-2 pt-1">
+          <Search />
+        </div>
         <NavUnified />
         <NavMain />
         <NavProjects />

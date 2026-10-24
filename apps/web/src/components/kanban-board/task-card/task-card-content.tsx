@@ -8,7 +8,7 @@ import {
   SlidersHorizontal,
   SquareCheck,
 } from "lucide-react";
-import { memo, useMemo, useState } from "react";
+import { memo, type TouchEvent, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
@@ -50,6 +50,7 @@ import TaskCardContextMenuContent from "../task-card-context-menu/task-card-cont
 import { TaskLabels } from "../task-labels";
 import type { DragListeners } from "./drag-listeners";
 import { useTaskCardClick } from "./use-task-card-click";
+import { useTouchDragMenu } from "./use-touch-drag-menu";
 
 const dueDateTextColors: Record<DueDateStatus, string> = {
   overdue: "text-destructive-foreground",
@@ -64,6 +65,7 @@ type TaskCardContentProps = {
   isFinalColumn?: boolean;
   isDragging: boolean;
   dragListeners: DragListeners;
+  onDragTouchStart?: (event: TouchEvent<HTMLDivElement>) => void;
 };
 
 function TaskCardContent({
@@ -72,6 +74,7 @@ function TaskCardContent({
   isFinalColumn,
   isDragging,
   dragListeners,
+  onDragTouchStart,
 }: TaskCardContentProps) {
   const { t } = useTranslation();
   const { project } = useProjectStore();
@@ -167,6 +170,7 @@ function TaskCardContent({
   }, [workspaceUsers, task.userId]);
 
   const { handleClick, handleKeyDown } = useTaskCardClick(task, dragListeners);
+  const touchDragMenu = useTouchDragMenu(isDragging, onDragTouchStart);
 
   const handleDeleteTask = async () => {
     try {
@@ -182,7 +186,9 @@ function TaskCardContent({
   return (
     <>
       <ContextMenu
+        open={touchDragMenu.isMenuOpen}
         onOpenChange={(open) => {
+          touchDragMenu.setIsMenuOpen(open);
           if (open) setHasOpenedMenu(true);
         }}
       >
@@ -191,6 +197,8 @@ function TaskCardContent({
           <div
             onClick={handleClick}
             onKeyDown={handleKeyDown}
+            onTouchStart={touchDragMenu.onTouchStart}
+            onTouchMove={touchDragMenu.onTouchMove}
             className={cn(
               "group relative rounded-lg border p-3 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98]",
               disableDragDrop ? "cursor-default" : "cursor-move",

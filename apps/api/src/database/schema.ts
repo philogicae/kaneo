@@ -248,6 +248,9 @@ export const teamTable = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).$onUpdate(
       () => /* @__PURE__ */ new Date(),
     ),
+    // Better Auth 1.7 keeps a denormalised team member count in sync when
+    // members are added or removed.
+    memberCount: integer("member_count").notNull().default(0),
   },
   (table) => [index("team_workspaceId_idx").on(table.workspaceId)],
 );
@@ -262,6 +265,9 @@ export const teamMemberTable = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
+    // Better Auth 1.7 writes a deterministic team/user key for idempotent
+    // membership creation. Existing rows stay null and still match by pair.
+    membershipKey: text("membership_key").unique(),
     createdAt: integer("created_at", { mode: "timestamp_ms" }),
   },
   (table) => [

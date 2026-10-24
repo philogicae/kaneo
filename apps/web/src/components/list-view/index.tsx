@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
+import { useCollapsedSections } from "@/hooks/use-collapsed-sections";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { applyTaskDrop } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
@@ -67,17 +68,10 @@ function ListView({
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [overColumnId, setOverColumnId] = useState<string | null>(null);
-  const [expandedSections, setExpandedSections] = useState<
-    Record<string, boolean>
-  >(() => {
-    const sections: Record<string, boolean> = {};
-    if (project?.columns) {
-      for (const col of project.columns) {
-        sections[col.id] = true;
-      }
-    }
-    return sections;
-  });
+  const { isExpanded, toggleSection } = useCollapsedSections(
+    project.id,
+    "list",
+  );
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
@@ -88,11 +82,11 @@ function ListView({
   useEffect(() => {
     if (project?.columns) {
       const visibleTaskIds = project.columns
-        .filter((column) => expandedSections[column.id])
+        .filter((column) => isExpanded(column.slug))
         .flatMap((column) => column.tasks.map((task) => task.id));
       setAvailableTasks(visibleTaskIds);
     }
-  }, [project, expandedSections, setAvailableTasks]);
+  }, [project, isExpanded, setAvailableTasks]);
 
   useEffect(() => {
     clearFocus();
@@ -193,13 +187,6 @@ function ListView({
     }
   };
 
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [sectionId]: !prev[sectionId],
-    }));
-  };
-
   const handleArchiveClick = (column: ProjectWithTasks["columns"][number]) => {
     if (
       disableCollectionActions ||
@@ -270,14 +257,14 @@ function ListView({
         <div className="flex items-center justify-between py-2 px-4 bg-muted/60 border-b border-border/50">
           <button
             type="button"
-            onClick={() => toggleSection(column.id)}
-            aria-expanded={Boolean(expandedSections[column.id])}
+            onClick={() => toggleSection(column.slug)}
+            aria-expanded={isExpanded(column.slug)}
             className="touch-hitbox relative flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground transition-colors"
           >
             <ChevronRight
               className={cn(
                 "w-3 h-3 transition-transform",
-                expandedSections[column.id] && "rotate-90",
+                isExpanded(column.slug) && "rotate-90",
               )}
             />
             <div className="flex items-center gap-2 h-4">
@@ -320,7 +307,7 @@ function ListView({
           </div>
         </div>
 
-        {expandedSections[column.id] && (
+        {isExpanded(column.slug) && (
           <div
             ref={setNodeRef}
             className="bg-card transition-[translate,opacity] duration-150 ease-out starting:-translate-y-1 starting:opacity-0 motion-reduce:starting:translate-y-0"
