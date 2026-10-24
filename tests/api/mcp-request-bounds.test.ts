@@ -12,6 +12,11 @@ const authMocks = vi.hoisted(() => ({
 vi.mock("../../apps/api/src/auth", () => ({
   auth: { api: { getSession: authMocks.getSession } },
 }));
+// An invalid bearer token is also tried as an API key. Keep this test focused
+// on request admission instead of depending on a migrated unit-test database.
+vi.mock("../../apps/api/src/utils/verify-api-key", () => ({
+  verifyApiKey: vi.fn(async () => null),
+}));
 vi.mock("@modelcontextprotocol/server", async (importOriginal) => {
   const original =
     await importOriginal<typeof import("@modelcontextprotocol/server")>();
