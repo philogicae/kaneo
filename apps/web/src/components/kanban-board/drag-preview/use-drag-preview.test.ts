@@ -30,7 +30,10 @@ describe("useDragPreview", () => {
     act(() =>
       result.current.hover(
         active("a"),
-        { id: "done", data: { current: { type: "column" } } } as unknown as Over,
+        {
+          id: "done",
+          data: { current: { type: "column" } },
+        } as unknown as Over,
         undefined,
       ),
     );
