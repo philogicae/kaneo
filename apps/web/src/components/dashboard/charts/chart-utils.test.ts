@@ -3,6 +3,9 @@ import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts"
 import {
   aggregateBuckets,
   averageCompleted,
+  chartAxisMax,
+  chartAxisTicks,
+  chartRatio,
   compressBuckets,
   cumulativeBuckets,
   formatBucketRange,
@@ -87,6 +90,39 @@ describe("aggregateBuckets", () => {
       bucket("2026-09-14T00:00:00.000Z", 5, 3),
       bucket("2026-09-21T00:00:00.000Z", 0, 1),
     ]);
+  });
+});
+
+describe("chart axis scale", () => {
+  it("keeps round powers of ten on a logarithmic axis", () => {
+    expect(chartAxisTicks(200, "log").map(({ value }) => value)).toEqual([
+      0, 1, 10, 100, 200,
+    ]);
+    expect(chartAxisTicks(101, "log").map(({ value }) => value)).toEqual([
+      0, 1, 10, 100,
+    ]);
+  });
+
+  it("keeps the linear mid/top ticks", () => {
+    expect(
+      chartAxisTicks(chartAxisMax(30, "linear"), "linear").map(
+        ({ value }) => value,
+      ),
+    ).toEqual([30, 15, 0]);
+  });
+
+  it("rounds a logarithmic maximum to a readable 1/2/5 step", () => {
+    expect(chartAxisMax(194, "log")).toBe(200);
+    expect(chartAxisMax(5, "log")).toBe(5);
+    expect(chartAxisMax(101, "log")).toBe(200);
+    expect(chartAxisMax(1000, "log")).toBe(1000);
+  });
+
+  it("lifts small values far above the baseline", () => {
+    const max = chartAxisMax(1000, "log");
+    expect(chartRatio(0, max, "log")).toBe(0);
+    expect(chartRatio(1, max, "log")).toBeGreaterThan(0.09);
+    expect(chartRatio(1, max, "linear")).toBeCloseTo(0.001);
   });
 });
 

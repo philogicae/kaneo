@@ -2,19 +2,22 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
-import type { ChartUnit } from "@/store/user-preferences";
+import type { ChartScale, ChartUnit } from "@/store/user-preferences";
 import {
+  chartAxisMax,
+  chartAxisTicks,
+  chartRatio,
   compressBuckets,
   cumulativeBuckets,
   formatBucketRange,
   formatBucketTick,
-  niceMax,
   tickIndexes,
 } from "./charts/chart-utils";
 
 type ProgressChartProps = {
   buckets: ProjectChartsBucket[] | undefined;
   unit: ChartUnit;
+  scale: ChartScale;
   isLoading?: boolean;
   height?: number;
 };
@@ -25,6 +28,7 @@ type ProgressChartProps = {
 export default function ProgressChart({
   buckets,
   unit,
+  scale,
   isLoading,
   height = 120,
 }: ProgressChartProps) {
@@ -56,16 +60,18 @@ export default function ProgressChart({
   const plotHeight = height - padding.top - padding.bottom;
   // Open work is the useful signal: it rises when tasks pile up in To Do,
   // In Progress or In Review, and falls as they move to Done.
-  const maxValue = niceMax(
+  const maxValue = chartAxisMax(
     Math.max(1, ...data.map((point) => Math.max(point.backlog, point.done))),
+    scale,
   );
+  const yTicks = chartAxisTicks(maxValue, scale);
 
   const x = (index: number) =>
     padding.left +
     (index / Math.max(1, data.length - 1)) *
       (width - padding.left - padding.right);
   const y = (value: number) =>
-    padding.top + (1 - value / maxValue) * plotHeight;
+    padding.top + (1 - chartRatio(value, maxValue, scale)) * plotHeight;
 
   const toPoints = (key: "done" | "backlog") =>
     data.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
@@ -80,14 +86,21 @@ export default function ProgressChart({
   return (
     <div>
       <div className="flex gap-2">
-        {/* Y-axis values, aligned to the plot area (month labels sit below). */}
+        {/* Y-axis values follow the active scale (log ticks are not evenly
+            spaced). */}
         <div
-          className="flex w-8 shrink-0 flex-col justify-between text-right text-[0.625rem] text-muted-foreground tabular-nums"
-          style={{ height: height - padding.bottom }}
+          className="relative w-8 shrink-0 text-right text-[0.625rem] text-muted-foreground tabular-nums"
+          style={{ height }}
         >
-          <span>{maxValue}</span>
-          <span>{Math.round(maxValue / 2)}</span>
-          <span>0</span>
+          {yTicks.map(({ value, ratio }) => (
+            <span
+              key={value}
+              className="absolute right-0 -translate-y-1/2"
+              style={{ top: padding.top + (1 - ratio) * plotHeight }}
+            >
+              {value}
+            </span>
+          ))}
         </div>
         <div className="relative min-w-0 flex-1">
           <svg
@@ -98,16 +111,16 @@ export default function ProgressChart({
             style={{ height }}
             viewBox={`0 0 ${width} ${height}`}
           >
-            {/* Horizontal grid at 0%, 50% and 100% of the scale. */}
-            {[0, 0.5, 1].map((ratio) => (
+            {/* Horizontal grid at each Y tick. */}
+            {yTicks.map(({ value, ratio }) => (
               <line
-                key={ratio}
+                key={value}
                 className="stroke-border/60"
                 strokeWidth="0.5"
                 x1={padding.left}
                 x2={width - padding.right}
-                y1={padding.top + ratio * plotHeight}
-                y2={padding.top + ratio * plotHeight}
+                y1={padding.top + (1 - ratio) * plotHeight}
+                y2={padding.top + (1 - ratio) * plotHeight}
               />
             ))}
             {hovered !== null && (

@@ -4955,7 +4955,11 @@
 			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
 			"overviewTitle": "Activity overview",
 			"done": "Done",
-			"openWork": "Open work"
+			"openWork": "Open work",
+			"scale": "Scale",
+			"scaleHint": "Logarithmic keeps small values visible as task counts grow.",
+			"scaleLinear": "Linear",
+			"scaleLog": "Log"
 		},
 		"consolidated": {
 			"backlogCount_few": "{{count}} tasks in backlog",

@@ -1,5 +1,5 @@
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
-import type { ChartUnit } from "@/store/user-preferences";
+import type { ChartScale, ChartUnit } from "@/store/user-preferences";
 
 export type DisplayBucket = ProjectChartsBucket & {
   /** Last bucket covered when several dense buckets were merged for display. */
@@ -39,6 +39,66 @@ export function niceMax(value: number) {
   return (
     SCALE_STEPS.find((step) => step >= value) ?? Math.ceil(value / 1000) * 1000
   );
+}
+
+export type AxisTick = {
+  value: number;
+  /** Position on the axis, 0 at the baseline and 1 at the top. */
+  ratio: number;
+};
+
+// Log axes round up to 1/2/5 × a power of ten so their top label stays round
+// (194 → 200) without the headroom a linear scale would add.
+function niceLogMax(rawMax: number) {
+  const max = Math.max(1, rawMax);
+  const magnitude = 10 ** Math.ceil(Math.log10(max));
+  const normalized = max / magnitude;
+  if (normalized <= 0.2) return magnitude / 5;
+  if (normalized <= 0.5) return magnitude / 2;
+  return magnitude;
+}
+
+export function chartAxisMax(rawMax: number, scale: ChartScale) {
+  return scale === "log" ? niceLogMax(rawMax) : niceMax(rawMax);
+}
+
+// log1p maps 0 to 0, so the baseline stays valid while every non-zero value
+// keeps a readable gap from its neighbours on a long-running project.
+export function chartRatio(value: number, axisMax: number, scale: ChartScale) {
+  if (axisMax <= 0) {
+    return 0;
+  }
+  if (scale === "log") {
+    return Math.log1p(Math.max(0, value)) / Math.log1p(axisMax);
+  }
+  return Math.max(0, value) / axisMax;
+}
+
+// Ticks stay round on a log axis (1, 10, 100, …), plus the exact maximum when
+// it is far enough from the previous power of ten to deserve its own label.
+export function chartAxisTicks(axisMax: number, scale: ChartScale): AxisTick[] {
+  if (scale === "linear") {
+    return [
+      { value: axisMax, ratio: 1 },
+      { value: axisMax / 2, ratio: 0.5 },
+      { value: 0, ratio: 0 },
+    ];
+  }
+
+  const max = Math.max(1, axisMax);
+  const values = [0];
+  for (let step = 1; step <= max; step *= 10) {
+    values.push(step);
+  }
+  const lastPower = values.at(-1) ?? 1;
+  if (max / lastPower >= 2) {
+    values.push(max);
+  }
+
+  return [...new Set(values)]
+    .filter((value) => value <= max)
+    .sort((left, right) => left - right)
+    .map((value) => ({ value, ratio: chartRatio(value, max, scale) }));
 }
 
 const UTC = { timeZone: "UTC" } as const;

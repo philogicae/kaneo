@@ -23,12 +23,14 @@ import getTasks from "@/fetchers/task/get-tasks";
 import { type ProjectListItem, sortProjects } from "@/lib/project-sort";
 import {
   CHART_RANGE_OPTIONS,
+  CHART_SCALE_OPTIONS,
   CHART_UNIT_OPTIONS,
   CHART_UNITS_BY_RANGE,
   type ChartRange,
   type ChartUnit,
   defaultChartUnit,
   isChartRange,
+  isChartScale,
   isChartUnit,
   type ProjectSortMode,
   rangeSupportingUnit,
@@ -141,8 +143,14 @@ export default function UnifiedCharts({
   projectsSort,
 }: UnifiedChartsProps) {
   const { t } = useTranslation();
-  const { chartsRange, chartsUnit, setChartsRange, setChartsUnit } =
-    useUserPreferencesStore();
+  const {
+    chartsRange,
+    chartsUnit,
+    chartsScale,
+    setChartsRange,
+    setChartsUnit,
+    setChartsScale,
+  } = useUserPreferencesStore();
 
   // Base UI renders the selected item's label from this map, since the
   // dropdown items are portaled and not mounted until the popup opens.
@@ -153,6 +161,14 @@ export default function UnifiedCharts({
   const unitItems = CHART_UNIT_OPTIONS.map((unit) => ({
     label: t(UNIT_LABEL_KEYS[unit]),
     value: unit,
+  }));
+  const scaleItems = CHART_SCALE_OPTIONS.map((scale) => ({
+    label: t(
+      scale === "log"
+        ? "unified:charts.scaleLog"
+        : "unified:charts.scaleLinear",
+    ),
+    value: scale,
   }));
 
   const projectEntries = useMemo(
@@ -390,6 +406,38 @@ export default function UnifiedCharts({
               </SelectContent>
             </Select>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {t("unified:charts.scale")}
+            </span>
+            <Select
+              items={scaleItems}
+              value={chartsScale}
+              onValueChange={(value) => {
+                if (isChartScale(value)) setChartsScale(value);
+              }}
+            >
+              <SelectTrigger
+                aria-label={t("unified:charts.scale")}
+                className="min-w-24"
+                size="sm"
+                title={t("unified:charts.scaleHint")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CHART_SCALE_OPTIONS.map((scale) => (
+                  <SelectItem key={scale} value={scale}>
+                    {t(
+                      scale === "log"
+                        ? "unified:charts.scaleLog"
+                        : "unified:charts.scaleLinear",
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <p className="text-xs text-muted-foreground tabular-nums">
           {isLoadingCharts
@@ -415,6 +463,7 @@ export default function UnifiedCharts({
             <VelocityChart
               buckets={allBuckets}
               unit={chartsUnit}
+              scale={chartsScale}
               isLoading={isLoadingCharts}
             />
             <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border/60 pt-3 sm:flex sm:flex-wrap sm:gap-6">
@@ -607,6 +656,7 @@ export default function UnifiedCharts({
                     <ProgressChart
                       buckets={buckets}
                       unit={chartsUnit}
+                      scale={chartsScale}
                       isLoading={
                         index >= 0 ? chartQueries[index]?.isLoading : true
                       }

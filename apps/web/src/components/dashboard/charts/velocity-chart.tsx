@@ -2,18 +2,21 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
-import type { ChartUnit } from "@/store/user-preferences";
+import type { ChartScale, ChartUnit } from "@/store/user-preferences";
 import {
+  chartAxisMax,
+  chartAxisTicks,
+  chartRatio,
   compressBuckets,
   formatBucketRange,
   formatBucketTick,
-  niceMax,
   tickIndexes,
 } from "./chart-utils";
 
 type VelocityChartProps = {
   buckets: ProjectChartsBucket[] | undefined;
   unit: ChartUnit;
+  scale: ChartScale;
   isLoading?: boolean;
   height?: number;
 };
@@ -23,6 +26,7 @@ type VelocityChartProps = {
 export default function VelocityChart({
   buckets,
   unit,
+  scale,
   isLoading,
   height = 150,
 }: VelocityChartProps) {
@@ -45,16 +49,18 @@ export default function VelocityChart({
   }
 
   const displayBuckets = compressBuckets(buckets);
-  const maxValue = niceMax(
+  const maxValue = chartAxisMax(
     Math.max(
       1,
       ...displayBuckets.map((bucket) =>
         Math.max(bucket.created, bucket.completed),
       ),
     ),
+    scale,
   );
+  const yTicks = chartAxisTicks(maxValue, scale);
   const barHeight = (value: number) =>
-    value <= 0 ? 0 : Math.max(2, (value / maxValue) * height);
+    value <= 0 ? 0 : Math.max(2, chartRatio(value, maxValue, scale) * height);
 
   const hoveredBucket = hovered !== null ? displayBuckets[hovered] : undefined;
   const tooltipLeft =
@@ -69,21 +75,27 @@ export default function VelocityChart({
     <div className="relative">
       <div className="flex gap-2">
         <div
-          className="flex w-8 shrink-0 flex-col justify-between text-right text-[0.625rem] text-muted-foreground tabular-nums"
+          className="relative w-8 shrink-0 text-right text-[0.625rem] text-muted-foreground tabular-nums"
           style={{ height }}
         >
-          <span>{maxValue}</span>
-          <span>{Math.round(maxValue / 2)}</span>
-          <span>0</span>
+          {yTicks.map(({ value, ratio }) => (
+            <span
+              key={value}
+              className="absolute right-0 -translate-y-1/2"
+              style={{ top: (1 - ratio) * height }}
+            >
+              {value}
+            </span>
+          ))}
         </div>
         <div className="relative min-w-0 flex-1">
           <div className="relative" style={{ height }}>
             <div className="absolute inset-x-0 top-0" style={{ height }}>
-              {[0, 0.5, 1].map((ratio) => (
+              {yTicks.map(({ value, ratio }) => (
                 <div
-                  key={ratio}
+                  key={value}
                   className="absolute inset-x-0 border-t border-border/60"
-                  style={{ top: ratio * height }}
+                  style={{ top: (1 - ratio) * height }}
                 />
               ))}
               <div className="absolute inset-0 flex items-end gap-px">

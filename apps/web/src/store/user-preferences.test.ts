@@ -10,16 +10,31 @@ const STORAGE_KEY = "user-preferences";
 
 afterEach(() => {
   window.localStorage.clear();
-  useUserPreferencesStore.setState({ chartsRange: "1m", chartsUnit: "day" });
+  useUserPreferencesStore.setState({
+    chartsRange: "1m",
+    chartsUnit: "day",
+    chartsScale: "log",
+  });
 });
 
 describe("chart preferences", () => {
-  it("defaults to the last month read in days", () => {
-    const { chartsRange, chartsUnit } =
+  it("defaults to the last month read in days on a log scale", () => {
+    const { chartsRange, chartsUnit, chartsScale } =
       useUserPreferencesStore.getInitialState();
 
     expect(chartsRange).toBe("1m");
     expect(chartsUnit).toBe("day");
+    expect(chartsScale).toBe("log");
+  });
+
+  it("falls back to the log scale for an invalid persisted value", async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ state: { chartsScale: "sqrt" }, version: 2 }),
+    );
+    await useUserPreferencesStore.persist.rehydrate();
+
+    expect(useUserPreferencesStore.getState().chartsScale).toBe("log");
   });
 
   it("carries a legacy default window onto the 1-month default once", async () => {

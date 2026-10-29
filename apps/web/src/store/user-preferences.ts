@@ -62,6 +62,16 @@ export function isChartUnit(value: unknown): value is ChartUnit {
   );
 }
 
+export const CHART_SCALE_OPTIONS = ["linear", "log"] as const;
+export type ChartScale = (typeof CHART_SCALE_OPTIONS)[number];
+
+export function isChartScale(value: unknown): value is ChartScale {
+  return (
+    typeof value === "string" &&
+    (CHART_SCALE_OPTIONS as readonly string[]).includes(value)
+  );
+}
+
 // Mirror of the API's ALLOWED_UNITS: the dashboard disables units the server
 // rejects, and falls back to the daily default when the window changes.
 export const CHART_UNITS_BY_RANGE: Record<ChartRange, readonly ChartUnit[]> = {
@@ -193,6 +203,8 @@ type UserPreferencesStore = {
   setChartsRange: (range: ChartRange) => void;
   chartsUnit: ChartUnit;
   setChartsUnit: (unit: ChartUnit) => void;
+  chartsScale: ChartScale;
+  setChartsScale: (scale: ChartScale) => void;
 };
 
 export const useUserPreferencesStore = create<UserPreferencesStore>()(
@@ -310,6 +322,10 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
           chartsUnit: unit,
           chartsRange: rangeSupportingUnit(state.chartsRange, unit),
         })),
+      // Log by default: long-running projects quickly dwarf their early
+      // values, and a linear axis then flattens everything below the maximum.
+      chartsScale: "log",
+      setChartsScale: (scale) => set({ chartsScale: scale }),
     }),
     {
       name: "user-preferences",
@@ -370,6 +386,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
             // A legacy pair the current tables reject: keep the finer unit the
             // user picked and widen/narrow the window to one that carries it.
             state.setChartsRange(rangeSupportingUnit(range, state.chartsUnit));
+          }
+          if (!isChartScale(state.chartsScale)) {
+            state.setChartsScale("log");
           }
         }
       },

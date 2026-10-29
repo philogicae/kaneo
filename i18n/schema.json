@@ -19695,6 +19695,18 @@
 						"range_other": {
 							"type": "string"
 						},
+						"scale": {
+							"type": "string"
+						},
+						"scaleHint": {
+							"type": "string"
+						},
+						"scaleLinear": {
+							"type": "string"
+						},
+						"scaleLog": {
+							"type": "string"
+						},
 						"statusDescription": {
 							"type": "string"
 						},
@@ -19779,6 +19791,10 @@
 						"periodSummary",
 						"rangeAll",
 						"rangeWeek",
+						"scale",
+						"scaleHint",
+						"scaleLinear",
+						"scaleLog",
 						"statusDescription",
 						"statusTitle",
 						"tasks",
