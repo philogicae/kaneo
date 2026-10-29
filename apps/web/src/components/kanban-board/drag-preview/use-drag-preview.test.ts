@@ -7,7 +7,7 @@ import { testBoard } from "./test-board";
 
 const active = (id: string) => ({ id }) as Active;
 const over = (id: string) =>
-  ({ id, data: { current: { type: "card" } } }) as Over;
+  ({ id, data: { current: { type: "card" } } }) as unknown as Over;
 
 describe("useDragPreview", () => {
   it("shows a cross-column card in the hovered slot and clears it", () => {
@@ -30,7 +30,7 @@ describe("useDragPreview", () => {
     act(() =>
       result.current.hover(
         active("a"),
-        { id: "done", data: { current: { type: "column" } } } as Over,
+        { id: "done", data: { current: { type: "column" } } } as unknown as Over,
         undefined,
       ),
     );

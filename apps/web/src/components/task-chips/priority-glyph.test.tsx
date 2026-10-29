@@ -5,24 +5,25 @@ import { PriorityGlyph } from "./priority-glyph";
 
 afterEach(() => {
   cleanup();
-  useUserPreferencesStore.getState().setPriorityIconStyle("marks");
+  useUserPreferencesStore.getState().setPriorityIconStyle("classic");
 });
 
 describe("PriorityGlyph", () => {
-  it("switches between the mark glyph and the classic icons", () => {
-    const { container, rerender } = render(<PriorityGlyph priority="high" />);
-    expect(container.querySelector("svg")).toHaveAttribute(
-      "viewBox",
-      "0 0 14 14",
-    );
-
-    act(() =>
-      useUserPreferencesStore.getState().setPriorityIconStyle("classic"),
-    );
-    rerender(<PriorityGlyph priority="high" />);
+  it("defaults to the classic colored chevrons", () => {
+    const { container } = render(<PriorityGlyph priority="high" />);
     expect(container.querySelector("svg")).toHaveAttribute(
       "viewBox",
       "0 0 24 24",
+    );
+  });
+
+  it("can switch to the mark glyphs", () => {
+    const { container, rerender } = render(<PriorityGlyph priority="high" />);
+    act(() => useUserPreferencesStore.getState().setPriorityIconStyle("marks"));
+    rerender(<PriorityGlyph priority="high" />);
+    expect(container.querySelector("svg")).toHaveAttribute(
+      "viewBox",
+      "0 0 14 14",
     );
   });
 });

@@ -12,16 +12,19 @@ import {
   CalendarDays,
   CalendarRange,
   ChartLine,
+  CircleCheckBig,
   Inbox,
   LayoutGrid,
   ListChecks,
   Sparkles,
+  Timer,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Layout from "@/components/common/layout";
 import UnifiedCharts from "@/components/dashboard/charts/unified-charts";
 import ConsolidatedTaskList from "@/components/dashboard/consolidated-task-list";
+import LocalClock from "@/components/dashboard/local-clock";
 import UnifiedAppointments from "@/components/dashboard/unified-appointments";
 import UnifiedCalendar from "@/components/dashboard/unified-calendar";
 import UnifiedGantt from "@/components/dashboard/unified-gantt";
@@ -127,11 +130,33 @@ function isUnifiedTab(value: string): value is UnifiedTab {
   return (UNIFIED_TABS as readonly string[]).includes(value);
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({
+  label,
+  value,
+  icon,
+  accent,
+}: {
+  label: string;
+  value: string;
+  icon: ReactNode;
+  accent: string;
+}) {
   return (
-    <Card className="gap-1 px-4 py-3">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <span className="text-xl font-semibold tabular-nums">{value}</span>
+    <Card className="group relative gap-1 overflow-hidden px-4 py-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="truncate text-xs font-medium text-muted-foreground">
+          {label}
+        </span>
+        <span
+          aria-hidden="true"
+          className={`flex size-6 shrink-0 items-center justify-center rounded-md bg-muted/70 ${accent}`}
+        >
+          {icon}
+        </span>
+      </div>
+      <span className="font-mono text-xl font-semibold tabular-nums tracking-tight">
+        {value}
+      </span>
     </Card>
   );
 }
@@ -210,7 +235,7 @@ function ProjectTileRow({ project }: { project: ProjectWithWorkspace }) {
   return (
     <button
       type="button"
-      className="flex w-full min-w-max flex-nowrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5 text-left transition-colors hover:bg-accent/40"
+      className="flex w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5 text-left transition-colors hover:bg-accent/40"
       onClick={() =>
         navigate({
           to: "/dashboard/workspace/$workspaceId/project/$projectId/board",
@@ -228,7 +253,7 @@ function ProjectTileRow({ project }: { project: ProjectWithWorkspace }) {
         </span>
       </span>
       <span
-        className="flex items-center gap-1.5"
+        className="hidden items-center gap-1.5 sm:flex"
         title={t("unified:table.progress")}
       >
         <Progress
@@ -240,13 +265,13 @@ function ProjectTileRow({ project }: { project: ProjectWithWorkspace }) {
         </span>
       </span>
       <span
-        className="w-8 text-right text-xs text-muted-foreground tabular-nums"
+        className="hidden w-8 text-right text-xs text-muted-foreground tabular-nums sm:block"
         title={t("unified:charts.backlog")}
       >
         {item.statistics.plannedTasks}
       </span>
       <span
-        className="w-8 text-right text-xs text-muted-foreground tabular-nums"
+        className="hidden w-8 text-right text-xs text-muted-foreground tabular-nums sm:block"
         title={t("unified:table.tasks")}
       >
         {item.statistics.totalTasks}
@@ -343,8 +368,18 @@ function RouteComponent() {
     );
     const completion =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    const openTasks = Math.max(0, totalTasks - Math.round(completedTasks));
+    const totalWorkspaces = new Set(withStats.map((entry) => entry.workspaceId))
+      .size;
 
-    return { totalProjects, totalTasks, totalBacklog, completion };
+    return {
+      totalProjects,
+      totalWorkspaces,
+      totalTasks,
+      totalBacklog,
+      openTasks,
+      completion,
+    };
   }, [allProjects]);
 
   const isLoading =
@@ -524,6 +559,29 @@ function RouteComponent() {
         </Layout.Header>
         <Layout.Content>
           <div className="flex w-full flex-col gap-4 p-4">
+            <div className="flex flex-wrap items-stretch gap-3">
+              <LocalClock className="w-full sm:w-64" />
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-1">
+                <h1 className="font-heading text-lg font-semibold tracking-tight">
+                  {t("unified:pageTitle")}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {t("unified:pageDescription")}
+                </p>
+              </div>
+              {!isLoading ? (
+                <div className="ml-auto flex items-center gap-3 self-center rounded-lg border border-border/60 bg-card/50 px-3 py-2 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground">
+                  <span>
+                    {t("unified:stats.workspaces")}: {stats.totalWorkspaces}
+                  </span>
+                  <span className="h-3 w-px bg-border" />
+                  <span>
+                    {t("unified:stats.projects")}: {stats.totalProjects}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+
             {isLoading ? (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -547,22 +605,36 @@ function RouteComponent() {
               </Empty>
             ) : (
               <>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
                   <StatCard
                     label={t("unified:stats.projects")}
                     value={String(stats.totalProjects)}
-                  />
-                  <StatCard
-                    label={t("unified:charts.backlog")}
-                    value={String(stats.totalBacklog)}
+                    icon={<LayoutGrid className="size-3.5" />}
+                    accent="text-info"
                   />
                   <StatCard
                     label={t("unified:stats.tasks")}
                     value={String(stats.totalTasks)}
+                    icon={<ListChecks className="size-3.5" />}
+                    accent="text-chart-2"
+                  />
+                  <StatCard
+                    label={t("unified:stats.open")}
+                    value={String(stats.openTasks)}
+                    icon={<Timer className="size-3.5" />}
+                    accent="text-warning-foreground"
+                  />
+                  <StatCard
+                    label={t("unified:charts.backlog")}
+                    value={String(stats.totalBacklog)}
+                    icon={<Inbox className="size-3.5" />}
+                    accent="text-chart-4"
                   />
                   <StatCard
                     label={t("unified:stats.completion")}
                     value={`${stats.completion}%`}
+                    icon={<CircleCheckBig className="size-3.5" />}
+                    accent="text-success-foreground"
                   />
                 </div>
                 {activeTab === "charts" ? (
@@ -587,40 +659,52 @@ function RouteComponent() {
                   <UnifiedGantt projects={allProjects} />
                 ) : null}
                 {activeTab === "overview" ? (
-                  <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-4 items-stretch">
-                    {sections.map(({ workspace, projects }) =>
-                      !projects || projects.length === 0 ? null : (
-                        <CardFrame
-                          key={workspace.id}
-                          className="h-full min-w-0"
-                        >
-                          <CardFrameHeader>
-                            <CardFrameTitle>{workspace.name}</CardFrameTitle>
-                            <CardFrameDescription>
-                              {t("unified:section.projectCount", {
-                                count: projects.length,
-                              })}
-                            </CardFrameDescription>
-                          </CardFrameHeader>
-                          <CardPanel className="p-0">
-                            <div className="divide-border/60 divide-y overflow-x-auto">
-                              {sortProjects(projects, projectsSort).map(
-                                (project) => (
-                                  <ProjectTileRow
-                                    key={project.id}
-                                    project={{
-                                      workspaceId: workspace.id,
-                                      workspaceName: workspace.name,
-                                      project,
-                                    }}
-                                  />
-                                ),
-                              )}
-                            </div>
-                          </CardPanel>
-                        </CardFrame>
-                      ),
-                    )}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-end justify-between gap-2 pt-1">
+                      <div>
+                        <h2 className="font-heading text-sm font-semibold tracking-tight">
+                          {t("unified:section.workspaces")}
+                        </h2>
+                        <p className="text-xs text-muted-foreground">
+                          {t("unified:section.workspacesDescription")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] items-stretch gap-4">
+                      {sections.map(({ workspace, projects }) =>
+                        !projects || projects.length === 0 ? null : (
+                          <CardFrame
+                            key={workspace.id}
+                            className="h-full min-w-0"
+                          >
+                            <CardFrameHeader>
+                              <CardFrameTitle>{workspace.name}</CardFrameTitle>
+                              <CardFrameDescription>
+                                {t("unified:section.projectCount", {
+                                  count: projects.length,
+                                })}
+                              </CardFrameDescription>
+                            </CardFrameHeader>
+                            <CardPanel className="p-0">
+                              <div className="divide-border/60 divide-y">
+                                {sortProjects(projects, projectsSort).map(
+                                  (project) => (
+                                    <ProjectTileRow
+                                      key={project.id}
+                                      project={{
+                                        workspaceId: workspace.id,
+                                        workspaceName: workspace.name,
+                                        project,
+                                      }}
+                                    />
+                                  ),
+                                )}
+                              </div>
+                            </CardPanel>
+                          </CardFrame>
+                        ),
+                      )}
+                    </div>
                   </div>
                 ) : null}
               </>

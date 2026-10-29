@@ -291,7 +291,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       weekStartsOn: 0,
       setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
 
-      priorityIconStyle: "marks",
+      priorityIconStyle: "classic",
       setPriorityIconStyle: (priorityIconStyle) => set({ priorityIconStyle }),
 
       projectsSort: "name",
@@ -318,7 +318,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       // months, then 3 months, were the defaults still hold one of those. Move
       // them once so the new default shows, while a window deliberately picked
       // after the migration is never overridden.
-      version: 1,
+      version: 2,
       migrate: (persistedState, version) => {
         const state = (persistedState ?? {}) as Partial<UserPreferencesStore>;
         if (
@@ -326,6 +326,11 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
           (state.chartsRange === "3m" || state.chartsRange === "6m")
         ) {
           state.chartsRange = "1m";
+        }
+        // The mark glyphs shipped as the default for one build; the classic
+        // colored chevrons are the intended default.
+        if (version < 2 && state.priorityIconStyle === "marks") {
+          state.priorityIconStyle = "classic";
         }
         return state as UserPreferencesStore;
       },
@@ -338,7 +343,7 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
           state.priorityIconStyle !== "marks" &&
           state.priorityIconStyle !== "classic"
         ) {
-          state.setPriorityIconStyle("marks");
+          state.setPriorityIconStyle("classic");
         }
         if (state && !isProjectSortMode(state.projectsSort)) {
           state.setProjectsSort("name");

@@ -4939,7 +4939,21 @@
 			"velocityTitle": "Скорость",
 			"workloadDescription": "Открытые задачи доски по исполнителям, по всем проектам.",
 			"workloadEmpty": "Открытая работа не назначена.",
-			"workloadTitle": "Нагрузка"
+			"workloadTitle": "Нагрузка",
+			"assigneeCount_few": "{{count}} assignees",
+			"assigneeCount_many": "{{count}} assignees",
+			"assigneeCount_one": "{{count}} assignee",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_few": "{{count}} tasks in backlog",
@@ -4970,12 +4984,16 @@
 			"projectCount_few": "{{count}} проекта",
 			"projectCount_many": "{{count}} проектов",
 			"projectCount_one": "{{count}} проект",
-			"projectCount_other": "{{count}} проекта"
+			"projectCount_other": "{{count}} проекта",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Выполнено",
 			"projects": "Проекты",
-			"tasks": "Задачи"
+			"tasks": "Задачи",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Прогресс",
@@ -4989,6 +5007,10 @@
 			"gantt": "Гант",
 			"overview": "Обзор",
 			"tasks": "Задачи"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

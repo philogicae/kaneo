@@ -4682,14 +4682,26 @@
 			"unscheduled": "Unscheduled"
 		},
 		"charts": {
+			"assigneeCount_one": "{{count}} assignee",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
 			"average": "Average",
 			"backlog": "Backlog",
 			"byProject": "By project",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
 			"completed": "Completed",
 			"created": "Created",
+			"dueSoon": "Due soon",
 			"empty": "No task activity in this period.",
 			"noTasks": "No tasks to distribute.",
+			"openNow": "Open now",
 			"other": "Other",
+			"overdue": "Overdue",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
 			"perUnit": "{{value}}/{{unit}}",
 			"period": "Period",
 			"periodSummary": "{{created}} created · {{completed}} completed",
@@ -4733,19 +4745,27 @@
 			"tasksTitle": "No tasks yet",
 			"title": "No projects yet"
 		},
+		"clock": {
+			"localTime": "Local time"
+		},
 		"links": {
 			"mcp": "MCP",
 			"skills": "Skills"
 		},
+		"pageDescription": "A live overview of every workspace and project.",
 		"pageTitle": "All projects",
 		"section": {
 			"projectCount_one": "{{count}} project",
-			"projectCount_other": "{{count}} projects"
+			"projectCount_other": "{{count}} projects",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Completion",
+			"open": "Open",
 			"projects": "Projects",
-			"tasks": "Tasks"
+			"tasks": "Tasks",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Progress",

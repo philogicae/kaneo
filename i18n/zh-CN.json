@@ -4632,7 +4632,18 @@
 			"velocityTitle": "速度",
 			"workloadDescription": "所有项目中每位负责人的未完成看板任务。",
 			"workloadEmpty": "没有已分配的未完成工作。",
-			"workloadTitle": "工作量"
+			"workloadTitle": "工作量",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_other": "{{count}} tasks in backlog",
@@ -4654,12 +4665,16 @@
 		},
 		"pageTitle": "所有项目",
 		"section": {
-			"projectCount_other": "{{count}} 个项目"
+			"projectCount_other": "{{count}} 个项目",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "完成度",
 			"projects": "项目",
-			"tasks": "任务"
+			"tasks": "任务",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "进度",
@@ -4673,6 +4688,10 @@
 			"gantt": "甘特图",
 			"overview": "概览",
 			"tasks": "任务"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

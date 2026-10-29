@@ -3,8 +3,11 @@ import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts"
 import {
   aggregateBuckets,
   averageCompleted,
+  compressBuckets,
   cumulativeBuckets,
+  formatBucketRange,
   plotMinWidth,
+  summarizeTasks,
   tickIndexes,
 } from "./chart-utils";
 
@@ -115,6 +118,90 @@ describe("averageCompleted", () => {
         bucket("2026-09-14T00:00:00.000Z", 0, 0),
       ]),
     ).toBe(1);
+  });
+});
+
+describe("compressBuckets", () => {
+  it("leaves a readable series untouched", () => {
+    const buckets = [
+      bucket("2026-09-07T00:00:00.000Z", 1, 0),
+      bucket("2026-09-14T00:00:00.000Z", 2, 1),
+    ];
+    expect(compressBuckets(buckets, 72)).toEqual(buckets);
+  });
+
+  it("merges adjacent buckets so a dense series never scrolls", () => {
+    const buckets = series(new Date("2026-01-01T00:00:00.000Z"), DAY, 365).map(
+      (entry, index) => ({ ...entry, created: index, completed: index % 2 }),
+    );
+    const compressed = compressBuckets(buckets, 72);
+    expect(compressed.length).toBeLessThanOrEqual(72);
+    expect(compressed.reduce((sum, entry) => sum + entry.created, 0)).toBe(
+      buckets.reduce((sum, entry) => sum + entry.created, 0),
+    );
+    expect(compressed[0]?.bucketStart).toBe(buckets[0]?.bucketStart);
+    expect(compressed.at(-1)?.bucketEnd).toBe(buckets.at(-1)?.bucketStart);
+  });
+
+  it("formats a grouped bucket as a range", () => {
+    expect(
+      formatBucketRange(
+        "2026-01-01T00:00:00.000Z",
+        "2026-01-03T00:00:00.000Z",
+        "day",
+      ),
+    ).toContain("–");
+  });
+});
+
+describe("summarizeTasks", () => {
+  const now = new Date("2026-09-15T12:00:00.000Z");
+
+  it("separates open, done, backlog and due pressure", () => {
+    const stats = summarizeTasks(
+      {
+        columns: [
+          {
+            isFinal: false,
+            tasks: [
+              { dueDate: "2026-09-10T12:00:00.000Z", assigneeId: "u1" },
+              { dueDate: "2026-09-18T12:00:00.000Z", assigneeId: "u1" },
+              { dueDate: null, assigneeId: null },
+            ],
+          },
+          {
+            isFinal: true,
+            tasks: [{ dueDate: "2026-09-01T12:00:00.000Z", assigneeId: "u2" }],
+          },
+        ],
+        plannedTasks: [{}, {}],
+      },
+      now,
+    );
+
+    expect(stats).toMatchObject({
+      total: 4,
+      open: 3,
+      done: 1,
+      backlog: 2,
+      overdue: 1,
+      dueSoon: 1,
+      assignees: 2,
+      completion: 25,
+    });
+  });
+
+  it("handles a project with no tasks", () => {
+    expect(summarizeTasks(undefined, now)).toEqual({
+      total: 0,
+      open: 0,
+      done: 0,
+      backlog: 0,
+      overdue: 0,
+      dueSoon: 0,
+      assignees: 0,
+      completion: 0,
+    });
   });
 });
 

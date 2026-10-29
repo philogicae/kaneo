@@ -4,8 +4,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
 import type { ChartUnit } from "@/store/user-preferences";
 import {
+  compressBuckets,
   cumulativeBuckets,
-  formatBucket,
+  formatBucketRange,
   formatBucketTick,
   niceMax,
   tickIndexes,
@@ -45,7 +46,11 @@ export default function ProgressChart({
     );
   }
 
-  const data = cumulativeBuckets(buckets);
+  const displayBuckets = compressBuckets(buckets);
+  const data = cumulativeBuckets(displayBuckets).map((point, index) => ({
+    ...point,
+    bucketEnd: displayBuckets[index]?.bucketEnd,
+  }));
   const width = 100; // viewBox units; the SVG scales to its container.
   const padding = { top: 6, right: 2, bottom: 14, left: 2 };
   const plotHeight = height - padding.top - padding.bottom;
@@ -63,7 +68,7 @@ export default function ProgressChart({
   const toPoints = (key: "tasks" | "backlog") =>
     data.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
 
-  const ticks = tickIndexes(buckets, unit);
+  const ticks = tickIndexes(displayBuckets, unit);
   const hoveredPoint = hovered !== null ? data[hovered] : undefined;
   const tooltipLeft =
     hovered !== null
@@ -125,7 +130,7 @@ export default function ProgressChart({
               fill="none"
               points={toPoints("backlog")}
               strokeWidth="1.4"
-              style={{ stroke: "var(--chart-2)" }}
+              style={{ stroke: "var(--chart-4)" }}
               vectorEffect="non-scaling-stroke"
             />
           </svg>
@@ -148,18 +153,22 @@ export default function ProgressChart({
             >
               <div className="space-y-0.5 rounded-md border border-border bg-popover px-2 py-1 text-[0.625rem] whitespace-nowrap text-popover-foreground shadow-md">
                 <p className="font-medium">
-                  {formatBucket(hoveredPoint.bucketStart, unit)}
+                  {formatBucketRange(
+                    hoveredPoint.bucketStart,
+                    hoveredPoint.bucketEnd,
+                    unit,
+                  )}
                 </p>
                 <p className="flex items-center gap-1.5">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-info" />
-                  {t("unified:charts.tasks")}: {hoveredPoint.tasks}
+                  {t("unified:charts.totalTasks")}: {hoveredPoint.tasks}
                 </p>
                 <p className="flex items-center gap-1.5">
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: "var(--chart-2)" }}
+                    style={{ backgroundColor: "var(--chart-4)" }}
                   />
-                  {t("unified:charts.backlog")}: {hoveredPoint.backlog}
+                  {t("unified:charts.remainingWork")}: {hoveredPoint.backlog}
                 </p>
                 <p className="text-muted-foreground">
                   {t("unified:charts.created")}: {hoveredPoint.created} ·{" "}
@@ -182,14 +191,14 @@ export default function ProgressChart({
           <div className="mt-1 flex items-center gap-4 text-[0.625rem] text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <span className="inline-block h-0.5 w-3 rounded bg-info" />
-              {t("unified:charts.tasks")}
+              {t("unified:charts.totalTasks")}
             </span>
             <span className="inline-flex items-center gap-1">
               <span
                 className="inline-block h-0.5 w-3 rounded"
-                style={{ backgroundColor: "var(--chart-2)" }}
+                style={{ backgroundColor: "var(--chart-4)" }}
               />
-              {t("unified:charts.backlog")}
+              {t("unified:charts.remainingWork")}
             </span>
           </div>
         </div>

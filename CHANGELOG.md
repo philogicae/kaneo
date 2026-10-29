@@ -5,8 +5,9 @@
 - Port the upstream fixes that apply to the fork: public-link metadata is sanitized, workspace search stays inside the requested workspace, OAuth sign-out no longer races a late 401 redirect, editors keep every dropped file, the properties rail keeps dates inside the panel, and project:update now covers column and project settings edits.
 - Block IPv6 transition destinations (6to4, NAT64, Teredo, IPv4-compatible/mapped) and literal-address lookups when validating outbound webhooks and imports.
 - Custom-field dropdown options can be hidden instead of deleted: existing task values keep working, hidden options are no longer offered, and the default can't point at one. Adds the `0013_custom_field_hidden_options` migration.
-- Add a priority icon preference (marks or classic chevrons) and apply it to cards, rows, filters and pickers.
+- Default priority to the classic colored chevrons everywhere (the mark glyphs stay available as an option), migrating preferences saved by the previous build.
 - Add the classic OTP code layout that copies as one piece in sign-in emails.
+- Rework the All Projects landing page around a live browser clock, a cleaner workspace/project hero, richer stat cards and a status-colored chart suite with no horizontal scrolling, semantic status colors, due-pressure stats and per-project workload.
 - Make cross-column drag and drop preview the card in its destination slot, pick drop targets from the pointer instead of corner distance, and commit exactly the previewed board.
 - Indent subtasks in the list view with per-project expand/collapse state, keeping the top-level row as the only drag source.
 - Extend task recurrence with yearly rules and selected weekdays, keeping the start/due span when the next occurrence is created.

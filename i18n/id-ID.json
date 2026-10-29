@@ -4632,7 +4632,18 @@
 			"velocityTitle": "Kecepatan",
 			"workloadDescription": "Tugas papan terbuka per penerima, di semua proyek.",
 			"workloadEmpty": "Tidak ada pekerjaan terbuka yang ditugaskan.",
-			"workloadTitle": "Beban kerja"
+			"workloadTitle": "Beban kerja",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_other": "{{count}} tasks in backlog",
@@ -4654,12 +4665,16 @@
 		},
 		"pageTitle": "Semua proyek",
 		"section": {
-			"projectCount_other": "{{count}} proyek"
+			"projectCount_other": "{{count}} proyek",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Penyelesaian",
 			"projects": "Proyek",
-			"tasks": "Tugas"
+			"tasks": "Tugas",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Progres",
@@ -4673,6 +4688,10 @@
 			"gantt": "Gantt",
 			"overview": "Ringkasan",
 			"tasks": "Tugas"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

@@ -4883,7 +4883,21 @@
 			"velocityTitle": "Prędkość",
 			"workloadDescription": "Otwarte zadania tablicy na osobę we wszystkich projektach.",
 			"workloadEmpty": "Brak przypisanej otwartej pracy.",
-			"workloadTitle": "Obciążenie"
+			"workloadTitle": "Obciążenie",
+			"assigneeCount_few": "{{count}} assignees",
+			"assigneeCount_many": "{{count}} assignees",
+			"assigneeCount_one": "{{count}} assignee",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_few": "{{count}} tasks in backlog",
@@ -4914,12 +4928,16 @@
 			"projectCount_few": "{{count}} projekty",
 			"projectCount_many": "{{count}} projektów",
 			"projectCount_one": "{{count}} projekt",
-			"projectCount_other": "{{count}} projektu"
+			"projectCount_other": "{{count}} projektu",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Ukończono",
 			"projects": "Projekty",
-			"tasks": "Zadania"
+			"tasks": "Zadania",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Postęp",
@@ -4933,6 +4951,10 @@
 			"gantt": "Gantt",
 			"overview": "Przegląd",
 			"tasks": "Zadania"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

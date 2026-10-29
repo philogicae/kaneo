@@ -4765,14 +4765,27 @@
 			"unscheduled": "Non planifié"
 		},
 		"charts": {
+			"assigneeCount_many": "{{count}} assignés",
+			"assigneeCount_one": "{{count}} assigné",
+			"assigneeCount_other": "{{count}} assignés",
+			"assignees": "Assignés",
 			"average": "Moyenne",
 			"backlog": "Backlog",
 			"byProject": "Par projet",
+			"byProjectDescription": "Vélocité, répartition des statuts, pression des échéances et charge ouverte pour chaque projet.",
 			"completed": "Terminées",
 			"created": "Créées",
+			"dueSoon": "Échéance proche",
 			"empty": "Aucune activité de tâches au cours des 6 derniers mois.",
 			"noTasks": "Aucune tâche à répartir.",
+			"openNow": "Ouvertes",
 			"other": "Autres",
+			"overdue": "En retard",
+			"overviewDescription": "Rythme de création et de complétion, statuts, charge et échéances sur tous les projets sélectionnés.",
+			"overviewTitle": "Vue d'activité",
+			"projectSummary": "{{tasks}} tâches · {{completion}} % terminé",
+			"remainingWork": "Restant",
+			"totalTasks": "Tâches totales",
 			"perUnit": "{{value}}/{{unit}}",
 			"period": "Période",
 			"periodSummary": "{{created}} créées · {{completed}} terminées",
@@ -4819,20 +4832,28 @@
 			"tasksTitle": "Aucune tâche",
 			"title": "Aucun projet pour le moment"
 		},
+		"clock": {
+			"localTime": "Heure locale"
+		},
 		"links": {
 			"mcp": "MCP",
 			"skills": "Compétences"
 		},
+		"pageDescription": "Une vue en direct de tous vos espaces de travail et projets.",
 		"pageTitle": "Tous les projets",
 		"section": {
 			"projectCount_many": "{{count}} projets",
 			"projectCount_one": "{{count}} projet",
-			"projectCount_other": "{{count}} projets"
+			"projectCount_other": "{{count}} projets",
+			"workspaces": "Espaces de travail",
+			"workspacesDescription": "Les projets regroupés par espace de travail, avec progression et backlog en un coup d'œil."
 		},
 		"stats": {
 			"completion": "Complétion",
+			"open": "Ouvertes",
 			"projects": "Projets",
-			"tasks": "Tâches"
+			"tasks": "Tâches",
+			"workspaces": "Espaces"
 		},
 		"table": {
 			"progress": "Progression",

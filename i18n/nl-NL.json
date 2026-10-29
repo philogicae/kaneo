@@ -4715,7 +4715,19 @@
 			"velocityTitle": "Snelheid",
 			"workloadDescription": "Open boardtaken per persoon, over alle projecten.",
 			"workloadEmpty": "Geen open werk toegewezen.",
-			"workloadTitle": "Werkbelasting"
+			"workloadTitle": "Werkbelasting",
+			"assigneeCount_one": "{{count}} assignee",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_one": "{{count}} task in backlog",
@@ -4740,12 +4752,16 @@
 		"pageTitle": "Alle projecten",
 		"section": {
 			"projectCount_one": "{{count}} project",
-			"projectCount_other": "{{count}} projecten"
+			"projectCount_other": "{{count}} projecten",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Voltooiing",
 			"projects": "Projecten",
-			"tasks": "Taken"
+			"tasks": "Taken",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Voortgang",
@@ -4759,6 +4775,10 @@
 			"gantt": "Gantt",
 			"overview": "Overzicht",
 			"tasks": "Taken"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

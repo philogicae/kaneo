@@ -4632,7 +4632,18 @@
 			"velocityTitle": "Tốc độ",
 			"workloadDescription": "Công việc trên bảng đang mở theo người được giao, trên tất cả dự án.",
 			"workloadEmpty": "Không có công việc đang mở nào được giao.",
-			"workloadTitle": "Khối lượng công việc"
+			"workloadTitle": "Khối lượng công việc",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_other": "{{count}} tasks in backlog",
@@ -4654,12 +4665,16 @@
 		},
 		"pageTitle": "Tất cả dự án",
 		"section": {
-			"projectCount_other": "{{count}} dự án"
+			"projectCount_other": "{{count}} dự án",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Hoàn thành",
 			"projects": "Dự án",
-			"tasks": "Công việc"
+			"tasks": "Công việc",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Tiến độ",
@@ -4673,6 +4688,10 @@
 			"gantt": "Gantt",
 			"overview": "Tổng quan",
 			"tasks": "Nhiệm vụ"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

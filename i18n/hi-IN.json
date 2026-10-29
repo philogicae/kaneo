@@ -4715,7 +4715,19 @@
 			"velocityTitle": "वेग",
 			"workloadDescription": "सभी परियोजनाओं में प्रति असाइनी खुले बोर्ड कार्य।",
 			"workloadEmpty": "कोई खुला कार्य असाइन नहीं है।",
-			"workloadTitle": "कार्यभार"
+			"workloadTitle": "कार्यभार",
+			"assigneeCount_one": "{{count}} assignee",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_one": "{{count}} task in backlog",
@@ -4740,12 +4752,16 @@
 		"pageTitle": "सभी प्रोजेक्ट",
 		"section": {
 			"projectCount_one": "{{count}} प्रोजेक्ट",
-			"projectCount_other": "{{count}} प्रोजेक्ट"
+			"projectCount_other": "{{count}} प्रोजेक्ट",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "पूर्णता",
 			"projects": "प्रोजेक्ट",
-			"tasks": "कार्य"
+			"tasks": "कार्य",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "प्रगति",
@@ -4759,6 +4775,10 @@
 			"gantt": "गैंट",
 			"overview": "अवलोकन",
 			"tasks": "कार्य"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

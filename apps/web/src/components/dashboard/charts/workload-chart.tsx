@@ -8,6 +8,7 @@ export type WorkloadItem = {
   name: string;
   count: number;
   image?: string | null;
+  isUnassigned?: boolean;
 };
 
 type WorkloadChartProps = {
@@ -59,7 +60,11 @@ export default function WorkloadChart({
           </span>
           <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
             <span
-              className="block h-full rounded-full bg-info"
+              className={
+                item.isUnassigned
+                  ? "block h-full rounded-full bg-muted-foreground/55"
+                  : "block h-full rounded-full bg-info"
+              }
               style={{ width: `${(item.count / max) * 100}%` }}
             />
           </span>

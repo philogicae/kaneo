@@ -1,6 +1,35 @@
 import type { ProjectChartsBucket } from "@/fetchers/project/get-project-charts";
 import type { ChartUnit } from "@/store/user-preferences";
 
+export type DisplayBucket = ProjectChartsBucket & {
+  /** Last bucket covered when several dense buckets were merged for display. */
+  bucketEnd?: string;
+};
+
+export type ProjectTaskStats = {
+  total: number;
+  open: number;
+  done: number;
+  backlog: number;
+  overdue: number;
+  dueSoon: number;
+  assignees: number;
+  completion: number;
+};
+
+type StatsColumn = {
+  isFinal: boolean;
+  tasks?: Array<{
+    dueDate?: string | null;
+    assigneeId?: string | null;
+  }>;
+};
+
+type StatsData = {
+  columns?: StatsColumn[];
+  plannedTasks?: unknown[];
+};
+
 // Scale ceilings with integer halves so the 50% tick label stays clean.
 const SCALE_STEPS = [
   2, 4, 6, 8, 12, 16, 20, 30, 40, 60, 80, 100, 150, 200, 300, 500, 1000,
@@ -149,6 +178,75 @@ export function averageCompleted(buckets: ProjectChartsBucket[]) {
   if (buckets.length === 0) return 0;
   const completed = buckets.reduce((sum, bucket) => sum + bucket.completed, 0);
   return completed / buckets.length;
+}
+
+// Dense windows (one year at day granularity, 365 buckets) cannot fit in a
+// card without horizontal scrolling. Merge adjacent buckets for the drawing
+// only; counts stay exact in the tooltip range and the summary totals.
+export function compressBuckets(
+  buckets: ProjectChartsBucket[],
+  maxBuckets = 72,
+): DisplayBucket[] {
+  if (buckets.length <= maxBuckets) return buckets;
+  const groupSize = Math.ceil(buckets.length / maxBuckets);
+  const compressed: DisplayBucket[] = [];
+  for (let index = 0; index < buckets.length; index += groupSize) {
+    const group = buckets.slice(index, index + groupSize);
+    const first = group[0];
+    if (!first) continue;
+    compressed.push({
+      bucketStart: first.bucketStart,
+      bucketEnd: group.at(-1)?.bucketStart,
+      created: group.reduce((sum, bucket) => sum + bucket.created, 0),
+      completed: group.reduce((sum, bucket) => sum + bucket.completed, 0),
+    });
+  }
+  return compressed;
+}
+
+export function formatBucketRange(
+  bucketStart: string,
+  bucketEnd: string | undefined,
+  unit: ChartUnit,
+) {
+  const start = formatBucket(bucketStart, unit);
+  if (!bucketEnd || bucketEnd === bucketStart) return start;
+  return `${start} – ${formatBucket(bucketEnd, unit)}`;
+}
+
+export function summarizeTasks(
+  data: StatsData | undefined,
+  now = new Date(),
+): ProjectTaskStats {
+  let total = 0;
+  let done = 0;
+  let overdue = 0;
+  let dueSoon = 0;
+  const assignees = new Set<string>();
+  const soon = now.getTime() + 7 * 24 * 60 * 60 * 1000;
+  for (const column of data?.columns ?? []) {
+    for (const task of column.tasks ?? []) {
+      total += 1;
+      if (column.isFinal) done += 1;
+      if (task.assigneeId) assignees.add(task.assigneeId);
+      if (!task.dueDate || column.isFinal) continue;
+      const due = new Date(task.dueDate).getTime();
+      if (Number.isNaN(due)) continue;
+      if (due < now.getTime()) overdue += 1;
+      else if (due <= soon) dueSoon += 1;
+    }
+  }
+  const backlog = data?.plannedTasks?.length ?? 0;
+  return {
+    total,
+    open: total - done,
+    done,
+    backlog,
+    overdue,
+    dueSoon,
+    assignees: assignees.size,
+    completion: total > 0 ? Math.round((done / total) * 100) : 0,
+  };
 }
 
 // Below this share of the plot a bucket pair (two bars plus their inner gap)

@@ -19584,6 +19584,27 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
+						"assigneeCount_one": {
+							"type": "string"
+						},
+						"assigneeCount_zero": {
+							"type": "string"
+						},
+						"assigneeCount_two": {
+							"type": "string"
+						},
+						"assigneeCount_few": {
+							"type": "string"
+						},
+						"assigneeCount_many": {
+							"type": "string"
+						},
+						"assigneeCount_other": {
+							"type": "string"
+						},
+						"assignees": {
+							"type": "string"
+						},
 						"average": {
 							"type": "string"
 						},
@@ -19593,10 +19614,16 @@
 						"byProject": {
 							"type": "string"
 						},
+						"byProjectDescription": {
+							"type": "string"
+						},
 						"completed": {
 							"type": "string"
 						},
 						"created": {
+							"type": "string"
+						},
+						"dueSoon": {
 							"type": "string"
 						},
 						"empty": {
@@ -19605,7 +19632,28 @@
 						"noTasks": {
 							"type": "string"
 						},
+						"openNow": {
+							"type": "string"
+						},
 						"other": {
+							"type": "string"
+						},
+						"overdue": {
+							"type": "string"
+						},
+						"overviewDescription": {
+							"type": "string"
+						},
+						"overviewTitle": {
+							"type": "string"
+						},
+						"projectSummary": {
+							"type": "string"
+						},
+						"remainingWork": {
+							"type": "string"
+						},
+						"totalTasks": {
 							"type": "string"
 						},
 						"perUnit": {
@@ -19700,14 +19748,24 @@
 						}
 					},
 					"required": [
+						"assignees",
 						"average",
 						"backlog",
 						"byProject",
+						"byProjectDescription",
 						"completed",
 						"created",
+						"dueSoon",
 						"empty",
 						"noTasks",
+						"openNow",
 						"other",
+						"overdue",
+						"overviewDescription",
+						"overviewTitle",
+						"projectSummary",
+						"remainingWork",
+						"totalTasks",
 						"perUnit",
 						"period",
 						"periodSummary",
@@ -19815,6 +19873,16 @@
 						"title"
 					]
 				},
+				"clock": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"localTime": {
+							"type": "string"
+						}
+					},
+					"required": ["localTime"]
+				},
 				"links": {
 					"type": "object",
 					"additionalProperties": false,
@@ -19827,6 +19895,9 @@
 						}
 					},
 					"required": ["mcp", "skills"]
+				},
+				"pageDescription": {
+					"type": "string"
 				},
 				"pageTitle": {
 					"type": "string"
@@ -19852,9 +19923,15 @@
 						},
 						"projectCount_other": {
 							"type": "string"
+						},
+						"workspaces": {
+							"type": "string"
+						},
+						"workspacesDescription": {
+							"type": "string"
 						}
 					},
-					"required": []
+					"required": ["workspaces", "workspacesDescription"]
 				},
 				"stats": {
 					"type": "object",
@@ -19863,14 +19940,20 @@
 						"completion": {
 							"type": "string"
 						},
+						"open": {
+							"type": "string"
+						},
 						"projects": {
 							"type": "string"
 						},
 						"tasks": {
 							"type": "string"
+						},
+						"workspaces": {
+							"type": "string"
 						}
 					},
-					"required": ["completion", "projects", "tasks"]
+					"required": ["completion", "open", "projects", "tasks", "workspaces"]
 				},
 				"table": {
 					"type": "object",
@@ -19927,7 +20010,9 @@
 				"charts",
 				"consolidated",
 				"empty",
+				"clock",
 				"links",
+				"pageDescription",
 				"pageTitle",
 				"section",
 				"stats",

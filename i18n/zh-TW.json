@@ -4631,7 +4631,18 @@
 			"velocityTitle": "Velocity",
 			"workloadDescription": "Open board tasks per assignee, across all projects.",
 			"workloadEmpty": "No open work assigned.",
-			"workloadTitle": "Workload"
+			"workloadTitle": "Workload",
+			"assigneeCount_other": "{{count}} assignees",
+			"assignees": "Assignees",
+			"dueSoon": "Due soon",
+			"openNow": "Open now",
+			"overdue": "Overdue",
+			"projectSummary": "{{tasks}} tasks · {{completion}}% complete",
+			"remainingWork": "Remaining",
+			"totalTasks": "Total tasks",
+			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
+			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
+			"overviewTitle": "Activity overview"
 		},
 		"consolidated": {
 			"backlogCount_other": "{{count}} tasks in backlog",
@@ -4653,12 +4664,16 @@
 		},
 		"pageTitle": "All projects",
 		"section": {
-			"projectCount_other": "{{count}} projects"
+			"projectCount_other": "{{count}} projects",
+			"workspaces": "Workspaces",
+			"workspacesDescription": "Projects grouped by workspace, with progress and backlog at a glance."
 		},
 		"stats": {
 			"completion": "Completion",
 			"projects": "Projects",
-			"tasks": "Tasks"
+			"tasks": "Tasks",
+			"open": "Open",
+			"workspaces": "Workspaces"
 		},
 		"table": {
 			"progress": "Progress",
@@ -4672,6 +4687,10 @@
 			"gantt": "Gantt",
 			"overview": "Overview",
 			"tasks": "Tasks"
-		}
+		},
+		"clock": {
+			"localTime": "Local time"
+		},
+		"pageDescription": "A live overview of every workspace and project."
 	}
 }

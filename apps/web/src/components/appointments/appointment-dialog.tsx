@@ -7,7 +7,6 @@ import useUpdateAppointment from "@/hooks/mutations/appointment/use-update-appoi
 import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { getPriorityLabel } from "@/lib/i18n/domain";
-import type { RecurrenceFrequency } from "@/lib/recurrence";
 import { toast } from "@/lib/toast";
 import type Appointment from "@/types/appointment";
 import { Button } from "../ui/button";
@@ -37,7 +36,10 @@ type Priority = (typeof PRIORITIES)[number];
 // reminder vocabulary. Arbitrary offsets remain available through the API/MCP.
 const REMINDER_PRESETS = [15, 60, 2 * 60, 24 * 60, 7 * 24 * 60] as const;
 
-const RECURRENCE_FREQUENCIES: RecurrenceFrequency[] = [
+// Appointments keep the three-period recurrence; task rules also have yearly.
+type AppointmentRecurrenceFrequency = "daily" | "weekly" | "monthly";
+
+const RECURRENCE_FREQUENCIES: AppointmentRecurrenceFrequency[] = [
   "daily",
   "weekly",
   "monthly",
@@ -102,7 +104,7 @@ export default function AppointmentDialog({
   const [assignee, setAssignee] = useState(UNASSIGNED);
   const [reminderOffsets, setReminderOffsets] = useState<number[]>([]);
   const [recurrenceFrequency, setRecurrenceFrequency] = useState<
-    RecurrenceFrequency | "none"
+    AppointmentRecurrenceFrequency | "none"
   >("none");
   const [recurrenceInterval, setRecurrenceInterval] = useState(1);
 
@@ -357,7 +359,7 @@ export default function AppointmentDialog({
                   onValueChange={(value) =>
                     value &&
                     setRecurrenceFrequency(
-                      value as RecurrenceFrequency | "none",
+                      value as AppointmentRecurrenceFrequency | "none",
                     )
                   }
                 >
