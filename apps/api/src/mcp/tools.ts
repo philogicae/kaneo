@@ -1119,8 +1119,13 @@ export function registerMcpTools(
     "update_task_status",
     {
       description:
-        "Update only the status of a task: a column slug (from list_project_columns), `planned` for the backlog, or `archived`.",
-      inputSchema: z.object({ taskId: nonEmptyString, status: nonEmptyString }),
+        "Update only the status of a task: a column slug from `list_project_columns` (slugs are project-specific — e.g. `in-review`, not `review`), `planned` for the backlog, or `archived`.",
+      inputSchema: z.object({
+        taskId: nonEmptyString,
+        status: nonEmptyString.describe(
+          "Column slug from list_project_columns, or planned/archived",
+        ),
+      }),
     },
     async (args) =>
       run(() =>
@@ -1178,9 +1183,11 @@ export function registerMcpTools(
     "update_task_comment",
     {
       description:
-        "Update one of your comments on a task. Requires both authorship and task:update permission; prefer an appended correction for historical evidence.",
+        "Update one of your comments on a task. Requires both authorship and task:update permission; prefer an appended correction for historical evidence. `commentId` is the comment's own id from `list_task_comments`, not the task id.",
       inputSchema: z.object({
-        commentId: nonEmptyString,
+        commentId: nonEmptyString.describe(
+          "Comment id (from list_task_comments), not the task id",
+        ),
         content: nonEmptyString,
       }),
     },
@@ -2171,7 +2178,7 @@ export function registerMcpTools(
     "create_task_relation",
     {
       description:
-        "Create a relation between two tasks. relationType: 'subtask' (sourceTaskId is the parent, targetTaskId the child), 'blocks' (sourceTaskId blocks targetTaskId), or 'related' (bidirectional).",
+        "Create a relation between two tasks. relationType: 'subtask' (sourceTaskId is the parent, targetTaskId the child), 'blocks' (sourceTaskId blocks targetTaskId), or 'related' (bidirectional). Check `get_task_relations` first: an existing relation is rejected rather than duplicated.",
       inputSchema: z.object({
         sourceTaskId: nonEmptyString,
         targetTaskId: nonEmptyString,

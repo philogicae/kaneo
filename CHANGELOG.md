@@ -10,6 +10,8 @@
 - Rework the All Projects landing page around a live 24-hour browser clock, a cleaner workspace/project hero, richer stat cards and a status-colored chart suite with no horizontal scrolling, semantic status colors, due-pressure stats and per-project workload.
 - Show every board status in project breakdowns (including zero-count ones), use theme-independent semantic colors so Done stays green and Backlog violet in Volt, and lighten the Volt surfaces without washing them out.
 - Keep priority-colored card borders on hover with a subtle halo, and remove the drag transition delay so a card follows the pointer immediately.
+- Memoize the card body so starting a drag on a large board only re-renders the dragged card instead of the whole board.
+- Clarify the MCP tool descriptions for comment ids, project-specific status slugs and duplicate task relations.
 - Make cross-column drag and drop preview the card in its destination slot, pick drop targets from the pointer instead of corner distance, and commit exactly the previewed board.
 - Indent subtasks in the list view with per-project expand/collapse state, keeping the top-level row as the only drag source.
 - Extend task recurrence with yearly rules and selected weekdays, keeping the start/due span when the next occurrence is created.

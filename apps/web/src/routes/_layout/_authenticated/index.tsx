@@ -477,7 +477,7 @@ function RouteComponent() {
                   </Tabs>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-0.5">
+                <div className="hidden shrink-0 items-center gap-0.5 sm:flex">
                   <Button
                     render={<Link to="/dashboard/settings/account/mcp" />}
                     variant="ghost"

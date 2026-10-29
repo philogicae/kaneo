@@ -4643,7 +4643,9 @@
 			"totalTasks": "Total tasks",
 			"byProjectDescription": "Velocity, status mix, due pressure and open workload for every project.",
 			"overviewDescription": "Creation and completion pace, status mix, workload and due pressure across every selected project.",
-			"overviewTitle": "Activity overview"
+			"overviewTitle": "Activity overview",
+			"done": "Done",
+			"openWork": "Open work"
 		},
 		"consolidated": {
 			"backlogCount_other": "{{count}} tasks in backlog",

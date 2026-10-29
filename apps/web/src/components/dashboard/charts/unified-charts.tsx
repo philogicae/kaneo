@@ -417,7 +417,7 @@ export default function UnifiedCharts({
               unit={chartsUnit}
               isLoading={isLoadingCharts}
             />
-            <div className="flex flex-wrap gap-6 border-t border-border/60 pt-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border/60 pt-3 sm:flex sm:flex-wrap sm:gap-6">
               <MiniStat
                 label={t("unified:charts.created")}
                 value={String(periodCreated)}
@@ -454,7 +454,7 @@ export default function UnifiedCharts({
           </CardFrameHeader>
           <CardPanel className="space-y-3">
             <WorkloadChart items={workloadItems} isLoading={isLoadingTasks} />
-            <div className="flex flex-wrap gap-6 border-t border-border/60 pt-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border/60 pt-3 sm:flex sm:flex-wrap sm:gap-6">
               <MiniStat
                 label={t("unified:charts.openNow")}
                 value={String(globalStats.open)}
@@ -487,7 +487,10 @@ export default function UnifiedCharts({
             <span className="shrink-0 text-[0.625rem] text-muted-foreground">
               {t("unified:stats.completion")}
             </span>
-            <Progress value={globalCompletion} className="h-1.5 flex-1" />
+            <Progress
+              value={globalCompletion}
+              className="h-1.5 flex-1 [&_[data-slot=progress-indicator]]:bg-[var(--color-emerald-500)]"
+            />
             <span className="w-8 shrink-0 text-right text-[0.625rem] tabular-nums text-muted-foreground">
               {globalCompletion}%
             </span>
@@ -560,7 +563,7 @@ export default function UnifiedCharts({
                     </CardFrameDescription>
                   </CardFrameHeader>
                   <CardPanel className="space-y-4">
-                    <div className="flex flex-wrap gap-x-6 gap-y-2 border-b border-border/60 pb-3">
+                    <div className="grid grid-cols-3 gap-x-4 gap-y-3 border-b border-border/60 pb-3 sm:flex sm:flex-wrap sm:gap-x-6 sm:gap-y-2">
                       <MiniStat
                         label={t("unified:charts.created")}
                         value={String(projectCreated)}
@@ -595,7 +598,7 @@ export default function UnifiedCharts({
                       </span>
                       <Progress
                         value={stats.completion}
-                        className="h-1.5 flex-1"
+                        className="h-1.5 flex-1 [&_[data-slot=progress-indicator]]:bg-[var(--color-emerald-500)]"
                       />
                       <span className="w-8 shrink-0 text-right text-[0.625rem] tabular-nums text-muted-foreground">
                         {stats.completion}%

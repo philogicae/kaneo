@@ -1,6 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -11,7 +10,7 @@ import {
   SlidersHorizontal,
   SquareCheck,
 } from "lucide-react";
-import { type CSSProperties, useMemo, useState } from "react";
+import { type CSSProperties, memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
@@ -43,7 +42,6 @@ import {
 import { getInitials } from "@/lib/get-initials";
 import { getTaskItemStats } from "@/lib/get-task-item-stats";
 import { getPriorityLabel } from "@/lib/i18n/domain";
-import { isOwnDomEvent } from "@/lib/is-own-dom-event";
 import { getPriorityBorderClass, getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import useBulkSelectionStore from "@/store/bulk-selection";
@@ -51,6 +49,7 @@ import useProjectStore from "@/store/project";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 import type Task from "@/types/task";
 import TaskCardContextMenuContent from "./task-card-context-menu/task-card-context-menu-content";
+import { useTaskCardClick } from "./task-card/use-task-card-click";
 import { TaskLabels } from "./task-labels";
 
 const dueDateTextColors: Record<DueDateStatus, string> = {
@@ -66,24 +65,23 @@ type TaskCardProps = {
   isFinalColumn?: boolean;
 };
 
-function TaskCard({
+type TaskCardBodyProps = {
+  task: Task;
+  disableDragDrop: boolean;
+  isFinalColumn?: boolean;
+  isDragging: boolean;
+};
+
+// Every card subscribes to the drag context, so each drag start re-renders the
+// whole board. Keep the heavy card tree out of that pass and only re-render
+// the card that is actually being dragged.
+const TaskCardBody = memo(function TaskCardBody({
   task,
-  disableDragDrop = false,
+  disableDragDrop,
   isFinalColumn,
-}: TaskCardProps) {
+  isDragging,
+}: TaskCardBodyProps) {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: task.id,
-    disabled: disableDragDrop,
-    data: { isFinalColumn },
-  });
   const { project } = useProjectStore();
   const taskIsCompleted =
     isFinalColumn ?? isTaskCompleted(task.status, project?.columns);
@@ -91,7 +89,6 @@ function TaskCard({
   const isOverdue = dueDateStatus === "overdue";
   const { data: workspace } = useActiveWorkspace();
   const { mutateAsync: deleteTask } = useDeleteTask();
-  const navigate = useNavigate();
   const {
     showAssignees,
     showDueDates,
@@ -100,13 +97,6 @@ function TaskCard({
     showTaskItemCounts,
   } = useUserPreferencesStore();
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
-  const toggleSelection = useBulkSelectionStore(
-    (state) => state.toggleSelection,
-  );
-  const selectRange = useBulkSelectionStore((state) => state.selectRange);
-  const setSelectionAnchor = useBulkSelectionStore(
-    (state) => state.setSelectionAnchor,
-  );
   const isTaskSelected = useBulkSelectionStore((state) =>
     state.selectedTaskIds.has(task.id),
   );
@@ -170,17 +160,6 @@ function TaskCard({
     [customFieldValues],
   );
 
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition: isDragging
-      ? "none"
-      : transition || "transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-    willChange: isDragging ? "transform" : undefined,
-    opacity: isDragging ? 0.6 : 1,
-    touchAction: isDragging ? "none" : "auto",
-    zIndex: isDragging ? 999 : "auto",
-  };
-
   const { data: workspaceUsers } = useGetActiveWorkspaceUsers(
     workspace?.id ?? "",
   );
@@ -190,53 +169,6 @@ function TaskCard({
       (member) => member.userId === task.userId,
     );
   }, [workspaceUsers, task.userId]);
-
-  function handleTaskCardClick(
-    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
-  ) {
-    if (!project || !task || !workspace || !isOwnDomEvent(e)) return;
-
-    if (e.shiftKey) {
-      e.preventDefault();
-      selectRange(task.id);
-      return;
-    }
-
-    if (e.metaKey || e.ctrlKey) {
-      e.preventDefault();
-      toggleSelection(task.id);
-      return;
-    }
-
-    setSelectionAnchor(task.id);
-    const currentParams = new URLSearchParams(window.location.search);
-    const currentTaskId = currentParams.get("taskId");
-
-    if (currentTaskId === task.id) {
-      navigate({
-        to: ".",
-        search: {},
-      });
-    } else {
-      navigate({
-        to: ".",
-        search: { taskId: task.id },
-      });
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.defaultPrevented || e.target !== e.currentTarget) return;
-    if (e.key === "Enter") {
-      handleTaskCardClick(e);
-      e.preventDefault();
-    } else {
-      if (e.key === "Escape") {
-        toggleSelection(task.id);
-      }
-      listeners?.onKeyDown?.(e);
-    }
-  };
 
   const handleDeleteTask = async () => {
     try {
@@ -250,21 +182,10 @@ function TaskCard({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      role="button"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-    >
+    <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- false positive for onClick and onKeyDown */}
           <div
-            onClick={handleTaskCardClick}
-            onKeyDown={handleKeyDown}
             className={cn(
               "group relative rounded-lg border p-2.5 transition-[background-color,border-color,box-shadow,scale] duration-150 ease-out active:scale-[0.98]",
               disableDragDrop ? "cursor-default" : "cursor-move",
@@ -588,6 +509,57 @@ function TaskCard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  );
+});
+
+function TaskCard({
+  task,
+  disableDragDrop = false,
+  isFinalColumn,
+}: TaskCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: task.id,
+    disabled: disableDragDrop,
+    data: { isFinalColumn },
+  });
+  const { handleClick, handleKeyDown } = useTaskCardClick(task, listeners);
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition: isDragging
+      ? "none"
+      : transition || "transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    willChange: isDragging ? "transform" : undefined,
+    opacity: isDragging ? 0.6 : 1,
+    touchAction: isDragging ? "none" : "auto",
+    zIndex: isDragging ? 999 : "auto",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+    >
+      <TaskCardBody
+        task={task}
+        disableDragDrop={disableDragDrop}
+        isFinalColumn={isFinalColumn}
+        isDragging={isDragging}
+      />
     </div>
   );
 }

@@ -54,8 +54,13 @@ export default function ProgressChart({
   const width = 100; // viewBox units; the SVG scales to its container.
   const padding = { top: 6, right: 2, bottom: 14, left: 2 };
   const plotHeight = height - padding.top - padding.bottom;
+  // Open work is the useful signal: it rises when tasks pile up in To Do,
+  // In Progress or In Review, and falls as they move to Done.
   const maxValue = niceMax(
-    Math.max(...data.map((point) => Math.max(point.tasks, point.backlog))),
+    Math.max(
+      1,
+      ...data.map((point) => Math.max(point.backlog, point.completed)),
+    ),
   );
 
   const x = (index: number) =>
@@ -65,7 +70,7 @@ export default function ProgressChart({
   const y = (value: number) =>
     padding.top + (1 - value / maxValue) * plotHeight;
 
-  const toPoints = (key: "tasks" | "backlog") =>
+  const toPoints = (key: "completed" | "backlog") =>
     data.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
 
   const ticks = tickIndexes(displayBuckets, unit);
@@ -121,16 +126,16 @@ export default function ProgressChart({
             )}
             <polyline
               fill="none"
-              points={toPoints("tasks")}
+              points={toPoints("completed")}
               strokeWidth="1.4"
-              style={{ stroke: "var(--color-sky-500)" }}
+              style={{ stroke: "var(--color-emerald-500)" }}
               vectorEffect="non-scaling-stroke"
             />
             <polyline
               fill="none"
               points={toPoints("backlog")}
               strokeWidth="1.4"
-              style={{ stroke: "var(--color-violet-500)" }}
+              style={{ stroke: "var(--color-sky-500)" }}
               vectorEffect="non-scaling-stroke"
             />
           </svg>
@@ -164,14 +169,14 @@ export default function ProgressChart({
                     className="inline-block h-1.5 w-1.5 rounded-full"
                     style={{ backgroundColor: "var(--color-sky-500)" }}
                   />
-                  {t("unified:charts.totalTasks")}: {hoveredPoint.tasks}
+                  {t("unified:charts.openWork")}: {hoveredPoint.backlog}
                 </p>
                 <p className="flex items-center gap-1.5">
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: "var(--color-violet-500)" }}
+                    style={{ backgroundColor: "var(--color-emerald-500)" }}
                   />
-                  {t("unified:charts.remainingWork")}: {hoveredPoint.backlog}
+                  {t("unified:charts.done")}: {hoveredPoint.completed}
                 </p>
                 <p className="text-muted-foreground">
                   {t("unified:charts.created")}: {hoveredPoint.created} ·{" "}
@@ -197,14 +202,14 @@ export default function ProgressChart({
                 className="inline-block h-0.5 w-3 rounded"
                 style={{ backgroundColor: "var(--color-sky-500)" }}
               />
-              {t("unified:charts.totalTasks")}
+              {t("unified:charts.openWork")}
             </span>
             <span className="inline-flex items-center gap-1">
               <span
                 className="inline-block h-0.5 w-3 rounded"
-                style={{ backgroundColor: "var(--chart-4)" }}
+                style={{ backgroundColor: "var(--color-emerald-500)" }}
               />
-              {t("unified:charts.remainingWork")}
+              {t("unified:charts.done")}
             </span>
           </div>
         </div>
