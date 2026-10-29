@@ -120,17 +120,17 @@ export default function ProgressChart({
               />
             )}
             <polyline
-              className="stroke-info"
               fill="none"
               points={toPoints("tasks")}
               strokeWidth="1.4"
+              style={{ stroke: "var(--color-sky-500)" }}
               vectorEffect="non-scaling-stroke"
             />
             <polyline
               fill="none"
               points={toPoints("backlog")}
               strokeWidth="1.4"
-              style={{ stroke: "var(--chart-4)" }}
+              style={{ stroke: "var(--color-violet-500)" }}
               vectorEffect="non-scaling-stroke"
             />
           </svg>
@@ -160,13 +160,16 @@ export default function ProgressChart({
                   )}
                 </p>
                 <p className="flex items-center gap-1.5">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-info" />
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: "var(--color-sky-500)" }}
+                  />
                   {t("unified:charts.totalTasks")}: {hoveredPoint.tasks}
                 </p>
                 <p className="flex items-center gap-1.5">
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: "var(--chart-4)" }}
+                    style={{ backgroundColor: "var(--color-violet-500)" }}
                   />
                   {t("unified:charts.remainingWork")}: {hoveredPoint.backlog}
                 </p>
@@ -190,7 +193,10 @@ export default function ProgressChart({
           </div>
           <div className="mt-1 flex items-center gap-4 text-[0.625rem] text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <span className="inline-block h-0.5 w-3 rounded bg-info" />
+              <span
+                className="inline-block h-0.5 w-3 rounded"
+                style={{ backgroundColor: "var(--color-sky-500)" }}
+              />
               {t("unified:charts.totalTasks")}
             </span>
             <span className="inline-flex items-center gap-1">

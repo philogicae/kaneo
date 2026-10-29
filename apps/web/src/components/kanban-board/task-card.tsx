@@ -172,8 +172,10 @@ function TaskCard({
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
-    transition:
-      transition || "transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    transition: isDragging
+      ? "none"
+      : transition || "transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    willChange: isDragging ? "transform" : undefined,
     opacity: isDragging ? 0.6 : 1,
     touchAction: isDragging ? "none" : "auto",
     zIndex: isDragging ? 999 : "auto",
@@ -279,7 +281,7 @@ function TaskCard({
                   ? "border-destructive/70 ring-[3px] ring-destructive/10"
                   : cn(
                       getPriorityBorderClass(task.priority ?? ""),
-                      "hover:border-border/90",
+                      "hover:ring-2 hover:ring-inset hover:ring-ring/15",
                     ),
               isTaskFocused && "ring-2 ring-inset ring-ring/50",
             )}

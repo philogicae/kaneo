@@ -32,6 +32,7 @@ describe("LocalClock", () => {
     render(<LocalClock />);
 
     expect(screen.getByText("unified:clock.localTime")).toBeInTheDocument();
+    expect(screen.queryByText(/AM|PM/)).toBeNull();
     const first = screen.getByText(/\d{1,2}:\d{2}:\d{2}/).textContent;
 
     act(() => vi.advanceTimersByTime(1000));

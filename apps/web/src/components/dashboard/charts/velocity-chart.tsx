@@ -96,12 +96,18 @@ export default function VelocityChart({
                     onMouseLeave={() => setHovered(null)}
                   >
                     <div
-                      className="w-[44%] max-w-3 rounded-t-[2px] bg-info"
-                      style={{ height: barHeight(bucket.created) }}
+                      className="w-[44%] max-w-3 rounded-t-[2px]"
+                      style={{
+                        height: barHeight(bucket.created),
+                        backgroundColor: "var(--color-sky-500)",
+                      }}
                     />
                     <div
-                      className="w-[44%] max-w-3 rounded-t-[2px] bg-chart-2"
-                      style={{ height: barHeight(bucket.completed) }}
+                      className="w-[44%] max-w-3 rounded-t-[2px]"
+                      style={{
+                        height: barHeight(bucket.completed),
+                        backgroundColor: "var(--color-emerald-500)",
+                      }}
                     />
                   </div>
                 ))}
@@ -138,11 +144,17 @@ export default function VelocityChart({
               )}
             </p>
             <p className="flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-info" />
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: "var(--color-sky-500)" }}
+              />
               {t("unified:charts.created")}: {hoveredBucket.created}
             </p>
             <p className="flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-chart-2" />
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: "var(--color-emerald-500)" }}
+              />
               {t("unified:charts.completed")}: {hoveredBucket.completed}
             </p>
           </div>
@@ -151,11 +163,17 @@ export default function VelocityChart({
 
       <div className="mt-2 flex items-center gap-4 text-[0.625rem] text-muted-foreground">
         <span className="inline-flex items-center gap-1">
-          <span className="inline-block h-2 w-2 rounded-[2px] bg-info" />
+          <span
+            className="inline-block h-2 w-2 rounded-[2px]"
+            style={{ backgroundColor: "var(--color-sky-500)" }}
+          />
           {t("unified:charts.created")}
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="inline-block h-2 w-2 rounded-[2px] bg-chart-2" />
+          <span
+            className="inline-block h-2 w-2 rounded-[2px]"
+            style={{ backgroundColor: "var(--color-emerald-500)" }}
+          />
           {t("unified:charts.completed")}
         </span>
       </div>

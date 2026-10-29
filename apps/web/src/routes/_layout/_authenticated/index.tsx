@@ -142,19 +142,19 @@ function StatCard({
   accent: string;
 }) {
   return (
-    <Card className="group relative gap-1 overflow-hidden px-4 py-3">
-      <div className="flex items-center justify-between gap-3">
-        <span className="truncate text-xs font-medium text-muted-foreground">
+    <Card className="group relative gap-1 overflow-hidden px-3 py-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="truncate text-[0.6875rem] font-medium text-muted-foreground">
           {label}
         </span>
         <span
           aria-hidden="true"
-          className={`flex size-6 shrink-0 items-center justify-center rounded-md bg-muted/70 ${accent}`}
+          className={`flex size-5 shrink-0 items-center justify-center rounded-md bg-muted/70 ${accent}`}
         >
           {icon}
         </span>
       </div>
-      <span className="font-mono text-xl font-semibold tabular-nums tracking-tight">
+      <span className="font-mono text-lg font-semibold tabular-nums tracking-tight xl:text-xl">
         {value}
       </span>
     </Card>
@@ -369,12 +369,8 @@ function RouteComponent() {
     const completion =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
     const openTasks = Math.max(0, totalTasks - Math.round(completedTasks));
-    const totalWorkspaces = new Set(withStats.map((entry) => entry.workspaceId))
-      .size;
-
     return {
       totalProjects,
-      totalWorkspaces,
       totalTasks,
       totalBacklog,
       openTasks,
@@ -560,8 +556,8 @@ function RouteComponent() {
         <Layout.Content>
           <div className="flex w-full flex-col gap-4 p-4">
             <div className="flex flex-wrap items-stretch gap-3">
-              <LocalClock className="w-full sm:w-64" />
-              <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-1">
+              <LocalClock className="w-full sm:w-56" />
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-1 xl:max-w-56">
                 <h1 className="font-heading text-lg font-semibold tracking-tight">
                   {t("unified:pageTitle")}
                 </h1>
@@ -569,28 +565,50 @@ function RouteComponent() {
                   {t("unified:pageDescription")}
                 </p>
               </div>
-              {!isLoading ? (
-                <div className="ml-auto flex items-center gap-3 self-center rounded-lg border border-border/60 bg-card/50 px-3 py-2 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground">
-                  <span>
-                    {t("unified:stats.workspaces")}: {stats.totalWorkspaces}
-                  </span>
-                  <span className="h-3 w-px bg-border" />
-                  <span>
-                    {t("unified:stats.projects")}: {stats.totalProjects}
-                  </span>
+              {isLoading ? (
+                <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:w-auto xl:flex-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Skeleton key={i} className="h-[4.75rem]" />
+                  ))}
                 </div>
-              ) : null}
+              ) : (
+                <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:w-auto xl:flex-1">
+                  <StatCard
+                    label={t("unified:stats.projects")}
+                    value={String(stats.totalProjects)}
+                    icon={<LayoutGrid className="size-3.5" />}
+                    accent="text-[var(--color-sky-500)]"
+                  />
+                  <StatCard
+                    label={t("unified:stats.tasks")}
+                    value={String(stats.totalTasks)}
+                    icon={<ListChecks className="size-3.5" />}
+                    accent="text-[var(--color-emerald-500)]"
+                  />
+                  <StatCard
+                    label={t("unified:stats.open")}
+                    value={String(stats.openTasks)}
+                    icon={<Timer className="size-3.5" />}
+                    accent="text-[var(--color-amber-500)]"
+                  />
+                  <StatCard
+                    label={t("unified:charts.backlog")}
+                    value={String(stats.totalBacklog)}
+                    icon={<Inbox className="size-3.5" />}
+                    accent="text-[var(--color-violet-500)]"
+                  />
+                  <StatCard
+                    label={t("unified:stats.completion")}
+                    value={`${stats.completion}%`}
+                    icon={<CircleCheckBig className="size-3.5" />}
+                    accent="text-[var(--color-emerald-500)]"
+                  />
+                </div>
+              )}
             </div>
 
             {isLoading ? (
-              <>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <Skeleton key={i} className="h-16" />
-                  ))}
-                </div>
-                <Skeleton className="h-64" />
-              </>
+              <Skeleton className="h-64" />
             ) : isEmpty ? (
               <Empty className="min-h-[60vh]">
                 <EmptyHeader>
@@ -605,38 +623,6 @@ function RouteComponent() {
               </Empty>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-                  <StatCard
-                    label={t("unified:stats.projects")}
-                    value={String(stats.totalProjects)}
-                    icon={<LayoutGrid className="size-3.5" />}
-                    accent="text-info"
-                  />
-                  <StatCard
-                    label={t("unified:stats.tasks")}
-                    value={String(stats.totalTasks)}
-                    icon={<ListChecks className="size-3.5" />}
-                    accent="text-chart-2"
-                  />
-                  <StatCard
-                    label={t("unified:stats.open")}
-                    value={String(stats.openTasks)}
-                    icon={<Timer className="size-3.5" />}
-                    accent="text-warning-foreground"
-                  />
-                  <StatCard
-                    label={t("unified:charts.backlog")}
-                    value={String(stats.totalBacklog)}
-                    icon={<Inbox className="size-3.5" />}
-                    accent="text-chart-4"
-                  />
-                  <StatCard
-                    label={t("unified:stats.completion")}
-                    value={`${stats.completion}%`}
-                    icon={<CircleCheckBig className="size-3.5" />}
-                    accent="text-success-foreground"
-                  />
-                </div>
                 {activeTab === "charts" ? (
                   <UnifiedCharts
                     sections={sections}

@@ -194,7 +194,7 @@ function ListView({
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { distance: disableDragDrop ? 999999 : 8 },
+      activationConstraint: { distance: disableDragDrop ? 999999 : 5 },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {

@@ -60,12 +60,13 @@ export default function WorkloadChart({
           </span>
           <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
             <span
-              className={
-                item.isUnassigned
-                  ? "block h-full rounded-full bg-muted-foreground/55"
-                  : "block h-full rounded-full bg-info"
-              }
-              style={{ width: `${(item.count / max) * 100}%` }}
+              className="block h-full rounded-full"
+              style={{
+                width: `${(item.count / max) * 100}%`,
+                backgroundColor: item.isUnassigned
+                  ? "var(--color-slate-400)"
+                  : "var(--color-sky-500)",
+              }}
             />
           </span>
           <span className="w-6 shrink-0 text-right tabular-nums text-muted-foreground">

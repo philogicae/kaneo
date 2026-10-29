@@ -14,27 +14,41 @@ type StatusDistributionProps = {
   maxSegments?: number;
 };
 
+// Fixed semantic colors: chart-* tokens are re-themed by Volt, which made Done
+// and Backlog both green in that theme.
 const FALLBACK_COLORS = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-  "var(--info)",
+  "var(--color-violet-500)",
+  "var(--color-sky-500)",
+  "var(--color-rose-500)",
+  "var(--color-amber-500)",
+  "var(--color-emerald-500)",
+  "var(--color-indigo-500)",
 ] as const;
 
 const STATUS_COLORS: Array<{ match: RegExp; color: string }> = [
-  { match: /^(done|complete|closed|finished)/i, color: "var(--success)" },
-  { match: /^(in[-_ ]?review|review|qa|verify)/i, color: "var(--warning)" },
+  {
+    match: /^(done|complete|closed|finished)/i,
+    color: "var(--color-emerald-500)",
+  },
+  {
+    match: /^(in[-_ ]?review|review|qa|verify)/i,
+    color: "var(--color-amber-500)",
+  },
   {
     match: /^(in[-_ ]?progress|progress|doing|active|started)/i,
-    color: "var(--info)",
+    color: "var(--color-sky-500)",
   },
-  { match: /^(planned|backlog|icebox|someday)/i, color: "var(--chart-4)" },
-  { match: /^(archived|trash|cancelled)/i, color: "var(--muted-foreground)" },
+  {
+    match: /^(planned|backlog|icebox|someday)/i,
+    color: "var(--color-violet-500)",
+  },
+  {
+    match: /^(archived|trash|cancelled)/i,
+    color: "var(--color-slate-400)",
+  },
   {
     match: /^(to[-_ ]?do|todo|ready|open|new)/i,
-    color: "var(--muted-foreground)",
+    color: "var(--color-slate-400)",
   },
 ];
 
@@ -74,12 +88,10 @@ export default function StatusDistribution({
     return <Skeleton className="h-16 w-full" />;
   }
 
-  const sorted = [...(segments ?? [])]
-    .filter((segment) => segment.count > 0)
-    .sort(
-      (left, right) =>
-        statusRank(left) - statusRank(right) || right.count - left.count,
-    );
+  const sorted = [...(segments ?? [])].sort(
+    (left, right) =>
+      statusRank(left) - statusRank(right) || right.count - left.count,
+  );
   const total = sorted.reduce((sum, segment) => sum + segment.count, 0);
 
   if (total === 0) {

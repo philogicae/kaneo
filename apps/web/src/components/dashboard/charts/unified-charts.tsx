@@ -62,19 +62,17 @@ function statusSegmentsFor(
   if (!data) return [];
   const segments: StatusSegment[] = [];
   for (const column of data.columns ?? []) {
-    const count = column.tasks?.length ?? 0;
-    if (count > 0) {
-      segments.push({
-        name: column.name ?? "—",
-        count,
-        slug: column.slug,
-      });
-    }
+    segments.push({
+      name: column.name ?? "—",
+      count: column.tasks?.length ?? 0,
+      slug: column.slug,
+    });
   }
-  const planned = data.plannedTasks?.length ?? 0;
-  if (planned > 0) {
-    segments.push({ name: backlogLabel, count: planned, slug: "planned" });
-  }
+  segments.push({
+    name: backlogLabel,
+    count: data.plannedTasks?.length ?? 0,
+    slug: "planned",
+  });
   return segments;
 }
 
@@ -201,7 +199,6 @@ export default function UnifiedCharts({
     for (const query of taskQueries) {
       for (const column of query.data?.columns ?? []) {
         const count = column.tasks?.length ?? 0;
-        if (count <= 0) continue;
         const current = counts.get(column.slug) ?? {
           name: column.name ?? "—",
           count: 0,
@@ -215,9 +212,7 @@ export default function UnifiedCharts({
       ...entry,
       slug,
     }));
-    if (backlog > 0) {
-      segments.push({ name: backlogLabel, count: backlog, slug: "planned" });
-    }
+    segments.push({ name: backlogLabel, count: backlog, slug: "planned" });
     return segments;
   }, [taskQueries, backlogLabel]);
 
@@ -270,10 +265,16 @@ export default function UnifiedCharts({
       ),
     [projectStats],
   );
+  // Match the status bar exactly: backlog is part of the denominator, unlike
+  // the board-only completion used by the project cards.
+  const statusTotal = statusSegments.reduce(
+    (sum, segment) => sum + segment.count,
+    0,
+  );
+  const statusDone =
+    statusSegments.find((segment) => segment.slug === "done")?.count ?? 0;
   const globalCompletion =
-    globalStats.total > 0
-      ? Math.round((globalStats.done / globalStats.total) * 100)
-      : 0;
+    statusTotal > 0 ? Math.round((statusDone / statusTotal) * 100) : 0;
 
   const periodCreated = allBuckets.reduce(
     (sum, bucket) => sum + bucket.created,
