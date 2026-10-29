@@ -128,14 +128,14 @@ export default function ProgressChart({
               fill="none"
               points={toPoints("completed")}
               strokeWidth="1.4"
-              style={{ stroke: "var(--color-emerald-500)" }}
+              style={{ stroke: "var(--color-green-500)" }}
               vectorEffect="non-scaling-stroke"
             />
             <polyline
               fill="none"
               points={toPoints("backlog")}
               strokeWidth="1.4"
-              style={{ stroke: "var(--color-sky-500)" }}
+              style={{ stroke: "var(--color-red-500)" }}
               vectorEffect="non-scaling-stroke"
             />
           </svg>
@@ -167,14 +167,14 @@ export default function ProgressChart({
                 <p className="flex items-center gap-1.5">
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: "var(--color-sky-500)" }}
+                    style={{ backgroundColor: "var(--color-red-500)" }}
                   />
                   {t("unified:charts.openWork")}: {hoveredPoint.backlog}
                 </p>
                 <p className="flex items-center gap-1.5">
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: "var(--color-emerald-500)" }}
+                    style={{ backgroundColor: "var(--color-green-500)" }}
                   />
                   {t("unified:charts.done")}: {hoveredPoint.completed}
                 </p>
@@ -200,14 +200,14 @@ export default function ProgressChart({
             <span className="inline-flex items-center gap-1">
               <span
                 className="inline-block h-0.5 w-3 rounded"
-                style={{ backgroundColor: "var(--color-sky-500)" }}
+                style={{ backgroundColor: "var(--color-red-500)" }}
               />
               {t("unified:charts.openWork")}
             </span>
             <span className="inline-flex items-center gap-1">
               <span
                 className="inline-block h-0.5 w-3 rounded"
-                style={{ backgroundColor: "var(--color-emerald-500)" }}
+                style={{ backgroundColor: "var(--color-green-500)" }}
               />
               {t("unified:charts.done")}
             </span>

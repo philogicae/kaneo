@@ -611,13 +611,18 @@ export default function UnifiedCharts({
                         index >= 0 ? chartQueries[index]?.isLoading : true
                       }
                     />
-                    <StatusDistribution
-                      segments={statusSegmentsFor(tasks, backlogLabel)}
-                      isLoading={
-                        index >= 0 ? taskQueries[index]?.isLoading : true
-                      }
-                      maxSegments={5}
-                    />
+                    <div className="space-y-2">
+                      <h5 className="text-[0.625rem] font-medium text-muted-foreground">
+                        {t("unified:charts.statusTitle")}
+                      </h5>
+                      <StatusDistribution
+                        segments={statusSegmentsFor(tasks, backlogLabel)}
+                        isLoading={
+                          index >= 0 ? taskQueries[index]?.isLoading : true
+                        }
+                        maxSegments={5}
+                      />
+                    </div>
                     <div className="space-y-2 border-t border-border/60 pt-3">
                       <div className="flex items-center justify-between">
                         <h5 className="text-[0.625rem] font-medium text-muted-foreground">

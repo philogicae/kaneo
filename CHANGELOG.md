@@ -9,7 +9,8 @@
 - Add the classic OTP code layout that copies as one piece in sign-in emails.
 - Rework the All Projects landing page around a live 24-hour browser clock, a cleaner workspace/project hero, richer stat cards and a status-colored chart suite with no horizontal scrolling, semantic status colors, due-pressure stats and per-project workload.
 - Show every board status in project breakdowns (including zero-count ones), use theme-independent semantic colors so Done stays green and Backlog violet in Volt, and lighten the Volt surfaces without washing them out.
-- Keep priority-colored card borders on hover with a subtle halo, and remove the drag transition delay so a card follows the pointer immediately.
+- Keep priority-colored card borders on hover with a matching inset ring and soft halo instead of the theme ring (magenta in Volt), and remove the drag transition delay so a card follows the pointer immediately.
+- Plot the project progress chart with a red Open work line and a green Done line, keeping the status breakdown palette separate, and label the status section in each project card.
 - Memoize the card body so starting a drag on a large board only re-renders the dragged card instead of the whole board.
 - Clarify the MCP tool descriptions for comment ids, project-specific status slugs and duplicate task relations.
 - Make cross-column drag and drop preview the card in its destination slot, pick drop targets from the pointer instead of corner distance, and commit exactly the previewed board.

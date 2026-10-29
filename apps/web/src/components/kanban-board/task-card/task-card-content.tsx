@@ -40,7 +40,11 @@ import {
 import { getInitials } from "@/lib/get-initials";
 import { getTaskItemStats } from "@/lib/get-task-item-stats";
 import { getPriorityLabel } from "@/lib/i18n/domain";
-import { getPriorityBorderClass, getPriorityIcon } from "@/lib/priority";
+import {
+  getPriorityBorderClass,
+  getPriorityHoverClass,
+  getPriorityIcon,
+} from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import useBulkSelectionStore from "@/store/bulk-selection";
 import useProjectStore from "@/store/project";
@@ -208,14 +212,14 @@ function TaskCardContent({
                 : "bg-background shadow-xs/5",
               isDragging
                 ? "border-ring/40 bg-card shadow-lg"
-                : "hover:bg-background hover:shadow-sm",
+                : "hover:bg-background",
               isTaskSelected
                 ? "border-ring/40 bg-accent/50 shadow-sm ring-1 ring-inset ring-ring/30"
                 : isOverdue
                   ? "border-destructive/70 ring-[3px] ring-destructive/10"
                   : cn(
                       getPriorityBorderClass(task.priority ?? ""),
-                      "hover:ring-2 hover:ring-inset hover:ring-ring/15",
+                      getPriorityHoverClass(task.priority ?? ""),
                     ),
               isTaskFocused && "ring-2 ring-inset ring-ring/50",
             )}
