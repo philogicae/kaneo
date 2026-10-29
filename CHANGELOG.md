@@ -11,6 +11,7 @@
 - Show every board status in project breakdowns (including zero-count ones), use theme-independent semantic colors so Done stays green and Backlog violet in Volt, and lighten the Volt surfaces without washing them out.
 - Keep priority-colored card borders on hover with a matching inset ring and soft halo instead of the theme ring (magenta in Volt), and remove the drag transition delay so a card follows the pointer immediately.
 - Plot the project progress chart with a red Open work line and a green Done line, keeping the status breakdown palette separate, and label the status section in each project card.
+- Keep the project Done line cumulative so it holds its total on quiet days instead of falling back to zero.
 - Memoize the card body so starting a drag on a large board only re-renders the dragged card instead of the whole board.
 - Clarify the MCP tool descriptions for comment ids, project-specific status slugs and duplicate task relations.
 - Make cross-column drag and drop preview the card in its destination slot, pick drop targets from the pointer instead of corner distance, and commit exactly the previewed board.

@@ -19,8 +19,8 @@ type ProgressChartProps = {
   height?: number;
 };
 
-// Lightweight dependency-free SVG line chart: two cumulative lines (total
-// tasks and remaining backlog) over the covered buckets, with adaptive tick
+// Lightweight dependency-free SVG line chart: two cumulative lines (remaining
+// open work and completed tasks) over the covered buckets, with adaptive tick
 // density based on the render width and a per-bucket hover cursor.
 export default function ProgressChart({
   buckets,
@@ -57,10 +57,7 @@ export default function ProgressChart({
   // Open work is the useful signal: it rises when tasks pile up in To Do,
   // In Progress or In Review, and falls as they move to Done.
   const maxValue = niceMax(
-    Math.max(
-      1,
-      ...data.map((point) => Math.max(point.backlog, point.completed)),
-    ),
+    Math.max(1, ...data.map((point) => Math.max(point.backlog, point.done))),
   );
 
   const x = (index: number) =>
@@ -70,7 +67,7 @@ export default function ProgressChart({
   const y = (value: number) =>
     padding.top + (1 - value / maxValue) * plotHeight;
 
-  const toPoints = (key: "completed" | "backlog") =>
+  const toPoints = (key: "done" | "backlog") =>
     data.map((point, index) => `${x(index)},${y(point[key])}`).join(" ");
 
   const ticks = tickIndexes(displayBuckets, unit);
@@ -126,7 +123,7 @@ export default function ProgressChart({
             )}
             <polyline
               fill="none"
-              points={toPoints("completed")}
+              points={toPoints("done")}
               strokeWidth="1.4"
               style={{ stroke: "var(--color-green-500)" }}
               vectorEffect="non-scaling-stroke"
@@ -176,11 +173,10 @@ export default function ProgressChart({
                     className="inline-block h-1.5 w-1.5 rounded-full"
                     style={{ backgroundColor: "var(--color-green-500)" }}
                   />
-                  {t("unified:charts.done")}: {hoveredPoint.completed}
+                  {t("unified:charts.done")}: {hoveredPoint.done}
                 </p>
                 <p className="text-muted-foreground">
-                  {t("unified:charts.created")}: {hoveredPoint.created} ·{" "}
-                  {t("unified:charts.completed")}: {hoveredPoint.completed}
+                  {t("unified:charts.created")}: {hoveredPoint.created}
                 </p>
               </div>
             </div>

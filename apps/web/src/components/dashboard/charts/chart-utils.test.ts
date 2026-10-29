@@ -96,15 +96,19 @@ describe("cumulativeBuckets", () => {
       bucket("2026-09-07T00:00:00.000Z", 2, 0),
       // A deleted task can leave more completions than creations in a window.
       bucket("2026-09-14T00:00:00.000Z", 0, 3),
+      bucket("2026-09-21T00:00:00.000Z", 0, 0),
     ] as ProjectChartsBucket[];
     expect(
-      cumulativeBuckets(buckets).map(({ tasks, backlog }) => ({
+      cumulativeBuckets(buckets).map(({ tasks, backlog, done }) => ({
         tasks,
         backlog,
+        done,
       })),
     ).toEqual([
-      { tasks: 2, backlog: 2 },
-      { tasks: 2, backlog: 0 },
+      { tasks: 2, backlog: 2, done: 0 },
+      { tasks: 2, backlog: 0, done: 3 },
+      // Done keeps its running total on a quiet bucket instead of resetting.
+      { tasks: 2, backlog: 0, done: 3 },
     ]);
   });
 });

@@ -140,7 +140,11 @@ export function cumulativeBuckets(buckets: ProjectChartsBucket[]) {
     return {
       bucketStart: bucket.bucketStart,
       created: bucket.created,
+      // Per-bucket completions, used by the summary and the tooltip.
       completed: bucket.completed,
+      // Running total of completed tasks: a line that only rises, so "Done"
+      // does not fall back to zero on days without a status change.
+      done: completed,
       tasks: created,
       // "Backlog" is the remaining work: created minus finished, floored at 0
       // so data gaps (deleted tasks) can't make it negative.
