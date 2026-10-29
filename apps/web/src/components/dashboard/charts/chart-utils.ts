@@ -62,6 +62,10 @@ export function chartAxisMax(rawMax: number, scale: ChartScale) {
   return scale === "log" ? niceLogMax(rawMax) : niceMax(rawMax);
 }
 
+export function formatAxisValue(value: number) {
+  return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+}
+
 // log1p maps 0 to 0, so the baseline stays valid while every non-zero value
 // keeps a readable gap from its neighbours on a long-running project.
 export function chartRatio(value: number, axisMax: number, scale: ChartScale) {

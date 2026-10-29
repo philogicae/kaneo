@@ -9,6 +9,7 @@ import {
   chartRatio,
   compressBuckets,
   cumulativeBuckets,
+  formatAxisValue,
   formatBucketRange,
   formatBucketTick,
   tickIndexes,
@@ -89,7 +90,7 @@ export default function ProgressChart({
         {/* Y-axis values follow the active scale (log ticks are not evenly
             spaced). */}
         <div
-          className="relative w-8 shrink-0 text-right text-[0.625rem] text-muted-foreground tabular-nums"
+          className="relative w-10 shrink-0 text-right text-[0.625rem] text-muted-foreground tabular-nums"
           style={{ height }}
         >
           {yTicks.map(({ value, ratio }) => (
@@ -98,7 +99,7 @@ export default function ProgressChart({
               className="absolute right-0 -translate-y-1/2"
               style={{ top: padding.top + (1 - ratio) * plotHeight }}
             >
-              {value}
+              {formatAxisValue(value)}
             </span>
           ))}
         </div>

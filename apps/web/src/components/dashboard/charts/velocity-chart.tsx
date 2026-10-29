@@ -8,6 +8,7 @@ import {
   chartAxisTicks,
   chartRatio,
   compressBuckets,
+  formatAxisValue,
   formatBucketRange,
   formatBucketTick,
   tickIndexes,
@@ -75,7 +76,7 @@ export default function VelocityChart({
     <div className="relative">
       <div className="flex gap-2">
         <div
-          className="relative w-8 shrink-0 text-right text-[0.625rem] text-muted-foreground tabular-nums"
+          className="relative w-10 shrink-0 text-right text-[0.625rem] text-muted-foreground tabular-nums"
           style={{ height }}
         >
           {yTicks.map(({ value, ratio }) => (
@@ -84,7 +85,7 @@ export default function VelocityChart({
               className="absolute right-0 -translate-y-1/2"
               style={{ top: (1 - ratio) * height }}
             >
-              {value}
+              {formatAxisValue(value)}
             </span>
           ))}
         </div>
