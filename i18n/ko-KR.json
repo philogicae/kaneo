@@ -877,7 +877,11 @@
 			"priorityDescription": "우선순위 표시기를 표시합니다",
 			"taskNumbersDescription": "작업 ID와 번호를 표시합니다",
 			"themeDescription": "선호하는 색상 구성표를 선택합니다",
-			"themeVolt": "볼트"
+			"themeVolt": "볼트",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API 키",
@@ -1955,7 +1959,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3711,7 +3717,10 @@
 		"listView": {
 			"addTask": "작업 추가",
 			"archiveAllTooltip": "완료된 모든 작업 보관",
-			"noTasks": "작업 없음"
+			"noTasks": "작업 없음",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "작업 추가",
@@ -3908,7 +3917,11 @@
 			"updateError": "Failed to update recurrence",
 			"updateSuccess": "Recurrence updated successfully",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

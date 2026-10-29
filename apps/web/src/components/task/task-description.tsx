@@ -1,15 +1,3 @@
-import { ShortcutKeys } from "@/components/shortcuts/shortcut-keys";
-import {
-  richTextCommands,
-  type SlashCommand,
-  type SlashRange,
-} from "@/components/editor/slash-commands";
-import { BubbleLinkEditor } from "@/components/editor/bubble-link-editor";
-import { selectionStartAnchor } from "@/components/editor/selection-start-anchor";
-import { TableToolbar } from "@/components/editor/table-toolbar";
-import { createEditorExtensions } from "@/components/editor/extensions";
-import { insertUploadedAsset as insertEditorAsset } from "@/components/editor/insert-uploaded-asset";
-import { useEditorHighlighter } from "@/components/editor/use-editor-highlighter";
 import type { Editor } from "@tiptap/core";
 import { EditorState, TextSelection } from "@tiptap/pm/state";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -22,6 +10,7 @@ import {
   Code,
   Copy,
   Heading2,
+  ImageUpIcon,
   Italic,
   Link2,
   List,
@@ -32,7 +21,6 @@ import {
   Strikethrough,
   Table2,
   Underline as UnderlineIcon,
-  ImageUpIcon,
 } from "lucide-react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import {
@@ -46,7 +34,19 @@ import {
   useSyncExternalStore,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { BubbleLinkEditor } from "@/components/editor/bubble-link-editor";
+import { createEditorExtensions } from "@/components/editor/extensions";
+import { insertUploadedAsset as insertEditorAsset } from "@/components/editor/insert-uploaded-asset";
+import { selectionStartAnchor } from "@/components/editor/selection-start-anchor";
+import {
+  richTextCommands,
+  type SlashCommand,
+  type SlashRange,
+} from "@/components/editor/slash-commands";
+import { TableToolbar } from "@/components/editor/table-toolbar";
+import { useEditorHighlighter } from "@/components/editor/use-editor-highlighter";
 import { AuthContext } from "@/components/providers/auth-provider";
+import { ShortcutKeys } from "@/components/shortcuts/shortcut-keys";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogPopup } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -486,7 +486,7 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
           }
 
           const plainText = event.clipboardData?.getData("text/plain") || "";
-          if (editor && pasteMarkdown(editor, event)) return true;
+          if (editor && pasteMarkdown(view, event)) return true;
 
           const pastedText = plainText.trim();
           if (!pastedText || /\s/.test(pastedText)) return false;
@@ -536,22 +536,17 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
           setEmbedComposerError("");
           return true;
         },
-        handleDrop: (view, event) => {
+        handleDrop: (_view, event) => {
           const droppedFiles = Array.from(event.dataTransfer?.files || []);
-          const droppedFile = droppedFiles[0];
 
-          if (!droppedFile) return false;
+          if (droppedFiles.length === 0) return false;
 
           event.preventDefault();
-          const coordinates = view.posAtCoords({
-            left: event.clientX,
-            top: event.clientY,
-          });
-          const dropRange = coordinates
-            ? { from: coordinates.pos, to: coordinates.pos }
-            : undefined;
-
-          void handleAssetFileUpload(droppedFile, editor, dropRange);
+          // Each upload inserts after the previous one, the same way pasted
+          // files do, so a multi-file drop keeps every file.
+          for (const droppedFile of droppedFiles) {
+            void handleAssetFileUpload(droppedFile, editor);
+          }
           return true;
         },
         handleTextInput: (view, _from, _to, text) => {

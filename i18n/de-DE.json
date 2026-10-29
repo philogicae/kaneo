@@ -965,7 +965,11 @@
 			"priorityDescription": "Prioritätsindikatoren anzeigen",
 			"taskNumbersDescription": "Aufgaben-IDs und -Nummern anzeigen",
 			"themeDescription": "Wähle dein bevorzugtes Farbschema",
-			"themeVolt": "Volt"
+			"themeVolt": "Volt",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API-Schlüssel",
@@ -2044,7 +2048,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"security": "Sicherheit",
 		"securityPage": {
@@ -3750,7 +3756,10 @@
 		"listView": {
 			"addTask": "Aufgabe hinzufügen",
 			"archiveAllTooltip": "Alle abgeschlossenen Aufgaben archivieren",
-			"noTasks": "Keine Aufgaben"
+			"noTasks": "Keine Aufgaben",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "Aufgabe hinzufügen",
@@ -3973,7 +3982,12 @@
 			"updateSuccess": "Recurrence updated successfully",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

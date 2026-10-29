@@ -33,8 +33,8 @@ export default function ColumnEditor({ projectId }: ColumnEditorProps) {
   const { mutateAsync: updateColumn } = useUpdateColumn();
   const { mutateAsync: deleteColumn } = useDeleteColumn();
   const { mutateAsync: reorderColumns } = useReorderColumns();
-  const { canManageProjects } = useWorkspacePermission();
-  const canEdit = canManageProjects();
+  const { canUpdateProjects } = useWorkspacePermission();
+  const canEdit = canUpdateProjects();
   const [newColumnName, setNewColumnName] = useState("");
   const [newColumnIcon, setNewColumnIcon] = useState("Circle");
   const [iconPickerColumnId, setIconPickerColumnId] = useState<string | null>(

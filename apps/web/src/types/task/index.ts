@@ -36,8 +36,9 @@ type Task = {
   reminderOffsets?: number[] | null;
   // Calendar-like recurrence; the next occurrence is spawned on completion.
   recurrence?: {
-    frequency: "daily" | "weekly" | "monthly";
+    frequency: "daily" | "weekly" | "monthly" | "yearly";
     interval: number;
+    weekdays?: number[];
   } | null;
   position: number | null;
   createdAt: string;

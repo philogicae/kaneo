@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { columnTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
-import { shiftRecurrenceDate } from "../recurrence";
+import { shiftRecurrenceDates } from "../recurrence";
 import { assertValidTaskStatus } from "../validate-task-fields";
 import createTask from "./create-task";
 import { publishTaskMutation } from "./task-mutation-effects";
@@ -83,22 +83,23 @@ async function updateTaskStatus({
     column?.isFinal &&
     statusChanged
   ) {
+    const nextDates = shiftRecurrenceDates(
+      {
+        startDate: existingTask.startDate
+          ? new Date(existingTask.startDate)
+          : null,
+        dueDate: existingTask.dueDate ? new Date(existingTask.dueDate) : null,
+      },
+      recurrence,
+    );
     await createTask({
       projectId: existingTask.projectId,
       currentUserId,
       userId: existingTask.userId ?? undefined,
       title: existingTask.title,
       description: existingTask.description ?? undefined,
-      startDate:
-        shiftRecurrenceDate(
-          existingTask.startDate ? new Date(existingTask.startDate) : null,
-          recurrence,
-        ) ?? undefined,
-      dueDate:
-        shiftRecurrenceDate(
-          existingTask.dueDate ? new Date(existingTask.dueDate) : null,
-          recurrence,
-        ) ?? undefined,
+      startDate: nextDates.startDate ?? undefined,
+      dueDate: nextDates.dueDate ?? undefined,
       priority: existingTask.priority,
       status: existingTask.status,
       reminderOffsets: existingTask.reminderOffsets ?? null,

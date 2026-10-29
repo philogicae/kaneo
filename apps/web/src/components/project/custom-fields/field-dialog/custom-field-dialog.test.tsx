@@ -203,6 +203,7 @@ describe("CustomFieldDialog", () => {
           required: false,
           defaultValue: null,
           options: ["iOS", "Android"],
+          hiddenOptions: [],
         },
       }),
     );

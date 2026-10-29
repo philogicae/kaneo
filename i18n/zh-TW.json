@@ -876,7 +876,11 @@
 			"priorityDescription": "顯示優先順序指標",
 			"taskNumbersDescription": "顯示任務 ID 與編號",
 			"themeDescription": "選擇你偏好的色彩配置",
-			"themeVolt": "Volt"
+			"themeVolt": "Volt",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API 金鑰",
@@ -1954,7 +1958,9 @@
 			"availableOptions": "可用選項",
 			"defaultValues": "{{count}} 個預設值",
 			"multiple": "多個",
-			"options": "{{count}} 個選項"
+			"options": "{{count}} 個選項",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "管理",
 		"adminUsers": {
@@ -3711,7 +3717,10 @@
 		"listView": {
 			"addTask": "新增任務",
 			"archiveAllTooltip": "封存所有已完成的任務",
-			"noTasks": "沒有任務"
+			"noTasks": "沒有任務",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "新增任務",
@@ -3908,7 +3917,11 @@
 			"updateError": "Failed to update recurrence",
 			"updateSuccess": "Recurrence updated successfully",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

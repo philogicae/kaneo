@@ -83,7 +83,6 @@ function RouteComponent() {
   const { data: rawCustomFields = [] } = useGetCustomFieldsByProject(projectId);
   const { data: filterValuesData = [] } =
     useGetCustomFieldFilterValues(projectId);
-  const { getValuesForTask } = useGetCachedCustomFieldValues();
 
   const usedCustomFieldValues = useMemo<Record<string, string[]>>(
     () =>
@@ -142,6 +141,10 @@ function RouteComponent() {
     labels: [] as string[],
     customFields: {} as Record<string, string[]>,
   });
+  const { getValuesForTask, hasData: customFieldValuesReady } =
+    useGetCachedCustomFieldValues(
+      Object.keys(filters.customFields).length ? projectId : undefined,
+    );
 
   const updateFilter = (key: string, value: string | null) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -303,7 +306,12 @@ function RouteComponent() {
           }
         }
 
-        if (Object.keys(filters.customFields).length > 0) {
+        // Until the project values arrive, a custom-field filter is unknown,
+        // not a reason to hide every task.
+        if (
+          customFieldValuesReady &&
+          Object.keys(filters.customFields).length > 0
+        ) {
           const taskFieldValues = getValuesForTask(task.id);
           const allMatch = Object.entries(filters.customFields).every(
             ([fieldId, selectedVals]) => {
@@ -330,7 +338,14 @@ function RouteComponent() {
       plannedTasks: filterTasks(project.plannedTasks || []),
       archivedTasks: filterTasks(project.archivedTasks || []),
     };
-  }, [project, filters, getTaskLabels, getValuesForTask, backlogSearchQuery]);
+  }, [
+    project,
+    filters,
+    getTaskLabels,
+    getValuesForTask,
+    customFieldValuesReady,
+    backlogSearchQuery,
+  ]);
 
   const uniqueLabels = workspaceLabels.reduce(
     (

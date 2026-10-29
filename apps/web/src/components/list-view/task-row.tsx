@@ -6,6 +6,7 @@ import {
   Calendar,
   CalendarClock,
   CalendarX,
+  ChevronRight,
   GitMerge,
   GitPullRequest,
 } from "lucide-react";
@@ -55,11 +56,37 @@ import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
 type TaskRowProps = {
   task: Task;
   projectSlug: string;
+  /** Nesting level; 0 for a task in its own status group. */
+  depth?: number;
+  /**
+   * Identifies the row rather than the task. The task id is not unique when a
+   * subtask is repeated under several parents.
+   */
+  rowId?: string;
+  childCount?: number;
+  isExpanded?: boolean;
+  onToggleExpanded?: (rowId: string) => void;
+  /** Keeps titles aligned when the section contains at least one subtask. */
+  reserveToggleSpace?: boolean;
+  /** Dims a repeated row while its top-level row is being dragged. */
+  isTaskDragging?: boolean;
 };
 
-function TaskRow({ task, projectSlug }: TaskRowProps) {
+function TaskRow({
+  task,
+  projectSlug,
+  depth = 0,
+  rowId = task.id,
+  childCount = 0,
+  isExpanded = false,
+  onToggleExpanded,
+  reserveToggleSpace = false,
+  isTaskDragging = false,
+}: TaskRowProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const showToggleColumn = depth > 0 || childCount > 0 || reserveToggleSpace;
+  const isNestedRepeat = depth > 0;
   const {
     attributes,
     listeners,
@@ -68,7 +95,8 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
     transition,
     isDragging,
   } = useSortable({
-    id: task.id,
+    id: rowId,
+    disabled: isNestedRepeat,
     transition: { duration: 200, easing: EASE_OUT_CSS },
   });
 
@@ -98,10 +126,14 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
     state.selectedTaskIds.has(task.id),
   );
   const isTaskFocused = useBulkSelectionStore(
-    (state) => state.focusedTaskId === task.id,
+    (state) =>
+      state.focusedTaskId === task.id &&
+      (state.focusedTaskRowId
+        ? state.focusedTaskRowId === rowId
+        : rowId === task.id),
   );
   const setFocusedTask = useBulkSelectionStore((state) => state.setFocusedTask);
-  useRestoreTaskFocus(task.id, useBulkSelectionStore);
+  useRestoreTaskFocus(task.id, useBulkSelectionStore, rowId);
   const hoverPrefetch = useTaskHoverPrefetch(task.id);
 
   const { data: workspaceUsers } = useGetActiveWorkspaceUsers(
@@ -188,7 +220,7 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.defaultPrevented || e.target !== e.currentTarget) return;
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || (isNestedRepeat && e.key === " ")) {
       handleClick(e);
       e.preventDefault();
     } else {
@@ -212,13 +244,56 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "border-b border-border/50 transition-colors duration-150",
-        isDragging && "opacity-50",
+        "group/row flex items-stretch border-b border-border/50 transition-colors duration-150",
+        (isDragging || isTaskDragging) && "opacity-50",
         isTaskSelected &&
           "bg-accent/60 shadow-sm ring-1 ring-inset ring-ring/30",
         isTaskFocused && "ring-2 ring-inset ring-ring/50",
       )}
     >
+      {showToggleColumn && (
+        <div
+          className={cn(
+            "flex shrink-0 items-center pl-3.5",
+            isTaskSelected ? "bg-accent/45" : "group-hover/row:bg-accent/60",
+          )}
+        >
+          {depth > 0 && (
+            <span
+              aria-hidden="true"
+              className="shrink-0"
+              style={{ width: `${Math.min(depth, 6) * 1.25}rem` }}
+            />
+          )}
+
+          {childCount > 0 ? (
+            <button
+              type="button"
+              onClick={() => onToggleExpanded?.(rowId)}
+              aria-expanded={isExpanded}
+              aria-label={
+                isExpanded
+                  ? t("tasks:listView.collapseSubtasks", {
+                      title: task.title,
+                    })
+                  : t("tasks:listView.expandSubtasks", {
+                      title: task.title,
+                    })
+              }
+              className="touch-hitbox relative shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <ChevronRight
+                className={cn(
+                  "size-3 transition-transform duration-150 ease-out",
+                  isExpanded && "rotate-90",
+                )}
+              />
+            </button>
+          ) : (
+            <span aria-hidden="true" className="w-5 shrink-0" />
+          )}
+        </div>
+      )}
       <ContextMenu
         onOpenChange={(open) => {
           if (open) setHasOpenedMenu(true);
@@ -228,20 +303,28 @@ function TaskRow({ task, projectSlug }: TaskRowProps) {
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- false positive for onClick and onKeyDown */}
           <div
             data-task-id={task.id}
+            data-task-row-id={rowId}
             onClick={handleClick}
             className={cn(
-              "group relative flex items-center gap-3 px-4 py-1.5 transition-colors cursor-pointer",
+              "group relative flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-1.5 pr-4 transition-colors",
+              showToggleColumn ? "pl-2" : "pl-4",
               isTaskSelected ? "bg-accent/45" : "hover:bg-accent/60",
             )}
-            {...attributes}
-            {...listeners}
+            {...(isNestedRepeat
+              ? { role: "button" as const, tabIndex: 0 }
+              : { ...attributes, ...listeners })}
             {...hoverPrefetch}
             onKeyDown={handleKeyDown}
             onFocus={(event) => {
               if (event.target !== event.currentTarget) return;
-              setFocusedTask(isKeyboardFocus(event) ? task.id : null);
+              setFocusedTask(isKeyboardFocus(event) ? task.id : null, rowId);
             }}
           >
+            {depth > 0 && (
+              <span className="sr-only">
+                {t("tasks:listView.subtaskLevel", { level: depth })}
+              </span>
+            )}
             {showPriority && (
               <div className="flex-shrink-0 first:[&_svg]:h-4 first:[&_svg]:w-4">
                 {getPriorityIcon(task.priority ?? "")}

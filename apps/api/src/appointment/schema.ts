@@ -1,5 +1,5 @@
 import { z } from "../openapi";
-import { recurrenceRule, reminderOffsets } from "../task/schema";
+import { reminderOffsets } from "../task/schema";
 import { VALID_PRIORITIES } from "../task/validate-task-fields";
 import { pagingNumber } from "../utils/paging";
 
@@ -19,6 +19,20 @@ export const listAppointmentsQuery = z.object({
 
 const priority = z.enum(VALID_PRIORITIES);
 
+// Appointments keep the simpler three-period recurrence they always had;
+// task recurrence adds weekdays and yearly rules.
+export const appointmentRecurrenceRule = z
+  .object({
+    frequency: z.enum(["daily", "weekly", "monthly"]),
+    interval: z.number().int().min(1).max(365),
+  })
+  .nullable()
+  .optional()
+  .openapi({
+    description:
+      "Recurrence of the appointment. The next occurrence is created automatically when the current one ends.",
+  });
+
 export const createAppointmentBody = z.object({
   projectId: z.string(),
   title: z.string(),
@@ -28,7 +42,7 @@ export const createAppointmentBody = z.object({
   priority: priority.optional(),
   userId: z.string().optional().openapi({ description: "Assignee, if any." }),
   reminderOffsets,
-  recurrence: recurrenceRule,
+  recurrence: appointmentRecurrenceRule,
 });
 
 export const updateAppointmentBody = createAppointmentBody.omit({

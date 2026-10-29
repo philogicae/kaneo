@@ -45,13 +45,14 @@ export const taskSchema = z
     }),
     recurrence: z
       .object({
-        frequency: z.enum(["daily", "weekly", "monthly"]),
+        frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
         interval: z.number(),
+        weekdays: z.array(z.number()).optional(),
       })
       .nullable()
       .openapi({
         description:
-          "Recurrence of the task; the next occurrence is spawned on completion.",
+          "Recurrence of the task; the next occurrence is spawned on completion. Weekly rules may list weekdays (0 Sunday to 6 Saturday).",
       }),
     createdAt: responseTimestamp,
     customFields: z
@@ -151,13 +152,14 @@ export const boardTaskSchema = z
     }),
     recurrence: z
       .object({
-        frequency: z.enum(["daily", "weekly", "monthly"]),
+        frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
         interval: z.number(),
+        weekdays: z.array(z.number()).optional(),
       })
       .nullable()
       .openapi({
         description:
-          "Recurrence of the task; the next occurrence is spawned on completion.",
+          "Recurrence of the task; the next occurrence is spawned on completion. Weekly rules may list weekdays (0 Sunday to 6 Saturday).",
       }),
     position: z.number().nullable(),
     createdAt: responseTimestamp,

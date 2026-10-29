@@ -1,15 +1,3 @@
-import { ShortcutKeys } from "@/components/shortcuts/shortcut-keys";
-import {
-  richTextCommands,
-  type SlashCommand,
-  type SlashRange,
-} from "@/components/editor/slash-commands";
-import { BubbleLinkEditor } from "@/components/editor/bubble-link-editor";
-import { selectionStartAnchor } from "@/components/editor/selection-start-anchor";
-import { TableToolbar } from "@/components/editor/table-toolbar";
-import { createEditorExtensions } from "@/components/editor/extensions";
-import { insertUploadedAsset as insertEditorAsset } from "@/components/editor/insert-uploaded-asset";
-import { useEditorHighlighter } from "@/components/editor/use-editor-highlighter";
 import type { Editor } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
 import { TextSelection } from "@tiptap/pm/state";
@@ -20,6 +8,7 @@ import {
   Check,
   ChevronDown,
   Copy,
+  ImageUpIcon,
   Italic,
   Link2,
   List,
@@ -27,11 +16,22 @@ import {
   ListTodo,
   Paperclip,
   UnderlineIcon,
-  ImageUpIcon,
 } from "lucide-react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { BubbleLinkEditor } from "@/components/editor/bubble-link-editor";
+import { createEditorExtensions } from "@/components/editor/extensions";
+import { insertUploadedAsset as insertEditorAsset } from "@/components/editor/insert-uploaded-asset";
+import { selectionStartAnchor } from "@/components/editor/selection-start-anchor";
+import {
+  richTextCommands,
+  type SlashCommand,
+  type SlashRange,
+} from "@/components/editor/slash-commands";
+import { TableToolbar } from "@/components/editor/table-toolbar";
+import { useEditorHighlighter } from "@/components/editor/use-editor-highlighter";
+import { ShortcutKeys } from "@/components/shortcuts/shortcut-keys";
 import { KaneoMention } from "@/components/task/extensions/kaneo-mention";
 import type { MentionMember } from "@/components/task/extensions/mention-list";
 import { MentionSuggestion } from "@/components/task/extensions/mention-suggestion";
@@ -578,7 +578,7 @@ export default function CommentEditor({
           }
 
           const plainText = event.clipboardData?.getData("text/plain") || "";
-          if (editor && pasteMarkdown(editor, event)) return true;
+          if (editor && pasteMarkdown(view, event)) return true;
 
           const pastedText = plainText.trim();
           if (!pastedText || /\s/.test(pastedText)) return false;
@@ -637,25 +637,19 @@ export default function CommentEditor({
           }
           return false;
         },
-        handleDrop: (view, event) => {
+        handleDrop: (_view, event) => {
           if (readOnly || disabled) return false;
 
           const droppedFiles = Array.from(event.dataTransfer?.files || []);
-          const droppedFile = droppedFiles[0];
 
-          if (!droppedFile) return false;
+          if (droppedFiles.length === 0) return false;
 
           event.preventDefault();
-          const coordinates = view.posAtCoords({
-            left: event.clientX,
-            top: event.clientY,
-          });
-
-          const dropRange = coordinates
-            ? { from: coordinates.pos, to: coordinates.pos }
-            : undefined;
-
-          void handleAssetFileUpload(droppedFile, editor, dropRange);
+          // Each upload inserts after the previous one, the same way pasted
+          // files do, so a multi-file drop keeps every file.
+          for (const droppedFile of droppedFiles) {
+            void handleAssetFileUpload(droppedFile, editor);
+          }
           return true;
         },
         handleTextInput: (view, _from, _to, text) => {

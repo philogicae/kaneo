@@ -885,7 +885,11 @@
 			"priorityDescription": "Prioritet göstəricilərini göstər",
 			"taskNumbersDescription": "Tapşırıq identifikatorlarını və nömrələrini göstər",
 			"themeDescription": "İstədiyiniz rəng sxemini seçin",
-			"themeVolt": "Volt"
+			"themeVolt": "Volt",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API açarları",
@@ -1964,7 +1968,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3759,7 +3765,10 @@
 		"listView": {
 			"addTask": "Tapşırıq əlavə et",
 			"archiveAllTooltip": "Bütün tamamlanmış tapşırıqları arxivlə",
-			"noTasks": "Tapşırıq yoxdur"
+			"noTasks": "Tapşırıq yoxdur",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "Tapşırıq əlavə et",
@@ -3973,7 +3982,12 @@
 			"updateSuccess": "Recurrence updated successfully",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

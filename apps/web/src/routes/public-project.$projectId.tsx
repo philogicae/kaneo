@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Layout, List } from "lucide-react";
-import { createElement, useEffect, useMemo, useState } from "react";
+import { createElement, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
 import { CopyUrlButton } from "@/components/public-project/copy-url-button";
@@ -15,6 +15,7 @@ import { ThemeToggle } from "@/components/public-project/theme-toggle";
 import { Button } from "@/components/ui/button";
 import icons from "@/constants/project-icons";
 import useGetPublicProject from "@/hooks/queries/project/use-get-public-project";
+import { useStoredState } from "@/hooks/use-stored-state";
 import type Task from "@/types/task";
 
 export const Route = createFileRoute("/public-project/$projectId")({
@@ -30,13 +31,11 @@ function RouteComponent() {
   const { projectId } = Route.useParams();
   const { data: project, isLoading, error } = useGetPublicProject(projectId);
 
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
-      return (saved as ViewMode) || "kanban";
-    }
-    return "kanban";
-  });
+  const [viewMode, setViewMode] = useStoredState(
+    VIEW_MODE_STORAGE_KEY,
+    (raw): ViewMode => (raw === "list" ? "list" : "kanban"),
+    "kanban",
+  );
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const selectedTask = useMemo(() => {
@@ -52,10 +51,6 @@ function RouteComponent() {
     );
   }, [project, selectedTaskId]);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
-  }, [viewMode]);
 
   const handleTaskClick = (task: Task) => {
     setSelectedTaskId(task.id);

@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vite-plus/test";
+import { moveBoardTask } from "@/components/kanban-board/move-task";
 import type { ProjectWithTasks } from "@/types/project";
 import type Task from "@/types/task";
-import { applyTaskDrop, getNextManualPosition } from "./apply-task-drop";
+import {
+  applyTaskDrop,
+  getNextManualPosition,
+  getTaskPositionUpdates,
+} from "./apply-task-drop";
 
 function makeTask(id: string, status: string, position: number | null): Task {
   return {
@@ -86,6 +91,59 @@ describe("applyTaskDrop without an active sort", () => {
       expect.objectContaining({ id: "a", status: "done", position: 1 }),
       expect.objectContaining({ id: "b", position: 0 }),
     ]);
+  });
+
+  it("honors the previewed slot across columns", () => {
+    const project = makeProject([
+      makeColumn("to-do", [makeTask("a", "to-do", 0)]),
+      makeColumn("done", [makeTask("b", "done", 0), makeTask("c", "done", 1)]),
+    ]);
+
+    const before = applyTaskDrop({
+      project,
+      activeTaskId: "a",
+      overId: "c",
+      sortActive: false,
+      insertAfterTarget: false,
+    });
+    expect(columnTasks(before.project, "done").map((t) => t.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
+
+    const after = applyTaskDrop({
+      project,
+      activeTaskId: "a",
+      overId: "b",
+      sortActive: false,
+      insertAfterTarget: true,
+    });
+    expect(columnTasks(after.project, "done").map((t) => t.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
+  });
+
+  it("persists exactly the rows the cross-column preview moved", () => {
+    const project = makeProject([
+      makeColumn("to-do", [makeTask("a", "to-do", 0)]),
+      makeColumn("done", [makeTask("b", "done", 0), makeTask("c", "done", 1)]),
+    ]);
+    const preview = moveBoardTask(project, "a", "c", false, false)?.project;
+    if (!preview) throw new Error("Expected a cross-column preview");
+
+    expect(columnTasks(preview, "done").map((task) => task.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
+    expect(
+      getTaskPositionUpdates(project, preview)
+        .map((task) => task.id)
+        .sort(),
+    ).toEqual(["a", "c"]);
   });
 
   it("reorders tasks within the same column", () => {

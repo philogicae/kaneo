@@ -34,6 +34,41 @@ describe("shiftRecurrenceDate", () => {
     ).toEqual(new Date(2026, 2, 15));
   });
 
+  it("shifts yearly rules and clamps February 29", () => {
+    expect(
+      shiftRecurrenceDate(new Date(2026, 4, 12, 8, 0), {
+        frequency: "yearly",
+        interval: 2,
+      }),
+    ).toEqual(new Date(2028, 4, 12, 8, 0));
+    expect(
+      shiftRecurrenceDate(new Date(2028, 1, 29), {
+        frequency: "yearly",
+        interval: 1,
+      }),
+    ).toEqual(new Date(2029, 1, 28));
+  });
+
+  it("picks the next selected weekday later in the week, then wraps", () => {
+    const monday = new Date(2026, 0, 5, 9, 0);
+    expect(
+      shiftRecurrenceDate(monday, {
+        frequency: "weekly",
+        interval: 1,
+        weekdays: [3],
+      }),
+    ).toEqual(new Date(2026, 0, 7, 9, 0));
+
+    const friday = new Date(2026, 0, 9, 9, 0);
+    expect(
+      shiftRecurrenceDate(friday, {
+        frequency: "weekly",
+        interval: 2,
+        weekdays: [1],
+      }),
+    ).toEqual(new Date(2026, 0, 19, 9, 0));
+  });
+
   it("does not mutate the input date", () => {
     const base = new Date(2026, 0, 10);
     shiftRecurrenceDate(base, { frequency: "daily", interval: 5 });

@@ -1097,6 +1097,10 @@
 			"weekStartsOnSunday": "Sunday",
 			"weekStartsOnMonday": "Monday",
 			"weekStartsOnSaturday": "Saturday",
+			"priorityIcons": "Priority icons",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks",
+			"priorityIconsClassic": "Classic",
 			"defaultView": "Default view",
 			"defaultViewDescription": "The view projects open in.",
 			"selectViewMode": "Select a view mode",
@@ -1976,6 +1980,8 @@
 			"dragOptionAria": "Reorder {{option}}",
 			"renameOptionAria": "Rename {{option}}",
 			"removeOptionAria": "Remove {{option}}",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}",
 			"allowSeveral": "Allow several",
 			"allowSeveralDescription": "A task can pick more than one option.",
 			"requiredDescription": "Every task always has a value.",
@@ -3765,7 +3771,10 @@
 		"listView": {
 			"addTask": "Add task",
 			"archiveAllTooltip": "Archive all completed tasks",
-			"noTasks": "No tasks"
+			"noTasks": "No tasks",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "Add task",
@@ -3967,13 +3976,18 @@
 			"monthly": "Monthly",
 			"needsStartDate": "Set a start date first",
 			"none": "No recurrence",
+			"onDays": "Repeat on",
 			"summary": "Every {{interval}} {{unit}}",
 			"title": "Recurrence",
 			"updateError": "Failed to update recurrence",
 			"updateSuccess": "Recurrence updated successfully",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"withDays": "{{rule}} on {{days}}",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

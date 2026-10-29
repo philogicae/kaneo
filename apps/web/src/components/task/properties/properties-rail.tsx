@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   Calendar,
   CalendarDays,
   Milestone as MilestoneIcon,
@@ -8,16 +7,16 @@ import {
 import { useTranslation } from "react-i18next";
 import icons from "@/constants/project-icons";
 import useGetMilestones from "@/hooks/queries/milestone/use-get-milestones";
-import { getColumnIcon } from "@/lib/column";
 import { cn } from "@/lib/cn";
+import { getColumnIcon } from "@/lib/column";
 import { formatDateShort } from "@/lib/format";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
 import { TaskCustomFieldRows } from "../custom-fields/task-custom-field-rows";
 import TaskAssigneePopover from "../task-assignee-popover";
 import TaskDueDatePopover from "../task-due-date-popover";
-import TaskMilestonePopover from "../task-milestone-popover";
 import TaskLabelsPopover from "../task-labels-popover";
+import TaskMilestonePopover from "../task-milestone-popover";
 import TaskMovePopover from "../task-move-popover";
 import TaskPriorityPopover from "../task-priority-popover";
 import TaskRemindersPopover from "../task-reminders-popover";
@@ -45,7 +44,7 @@ export function PropertiesRail({
   workspaceId,
   className,
 }: PropertiesRailProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { task, project, labels, status, assignee, dueStatus, canMoveTask } =
     useTaskProperties(taskId, projectId, workspaceId);
   const { data: milestones = [] } = useGetMilestones(projectId);
@@ -128,13 +127,16 @@ export function PropertiesRail({
           </TaskLabelsPopover>
         </PropertyRow>
 
-        <PropertyRow label={t("tasks:properties.dates")}>
-          <div className="flex min-w-0 items-center gap-0.5">
+        <PropertyRow label={t("tasks:properties.dates")} align="start">
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <TaskStartDatePopover task={task}>
               <PropertyValue className="flex-none">
                 <CalendarDays className="text-muted-foreground" />
                 <span
-                  className={cn(!task.startDate && "text-muted-foreground")}
+                  className={cn(
+                    "truncate",
+                    !task.startDate && "text-muted-foreground",
+                  )}
                 >
                   {task.startDate
                     ? formatDateShort(task.startDate)
@@ -143,14 +145,17 @@ export function PropertiesRail({
                 {task.recurrence && (
                   <span
                     className="flex shrink-0"
-                    title={formatRecurrenceSummary(task.recurrence, t)}
+                    title={formatRecurrenceSummary(
+                      task.recurrence,
+                      t,
+                      i18n.language,
+                    )}
                   >
                     <Repeat className="size-3 text-muted-foreground" />
                   </span>
                 )}
               </PropertyValue>
             </TaskStartDatePopover>
-            <ArrowRight className="size-3 shrink-0 text-muted-foreground/60" />
             <TaskDueDatePopover task={task}>
               <PropertyValue
                 data-task-action="dueDate"
@@ -159,7 +164,12 @@ export function PropertiesRail({
                 <Calendar
                   className={cn(!task.dueDate && "text-muted-foreground")}
                 />
-                <span className={cn(!task.dueDate && "text-muted-foreground")}>
+                <span
+                  className={cn(
+                    "truncate",
+                    !task.dueDate && "text-muted-foreground",
+                  )}
+                >
                   {task.dueDate
                     ? formatDateShort(task.dueDate)
                     : t("tasks:dueDate.label")}

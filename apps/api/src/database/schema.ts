@@ -823,8 +823,9 @@ export const taskTable = sqliteTable(
     // Calendar-like recurrence; the next occurrence is spawned when the task
     // completes (moved to a final column).
     recurrence: text("recurrence", { mode: "json" }).$type<{
-      frequency: "daily" | "weekly" | "monthly";
+      frequency: "daily" | "weekly" | "monthly" | "yearly";
       interval: number;
+      weekdays?: number[];
     } | null>(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .defaultNow()
@@ -1776,6 +1777,11 @@ export const customFieldDefinitionTable = sqliteTable(
     required: integer("required", { mode: "boolean" }).default(false).notNull(),
     defaultValue: text("default_value"),
     options: text("options", { mode: "json" }),
+    // Options kept for tasks that already use them but no longer offered.
+    hiddenOptions: text("hidden_options", { mode: "json" })
+      .$type<string[]>()
+      .default([])
+      .notNull(),
     position: integer("position").default(0).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .defaultNow()

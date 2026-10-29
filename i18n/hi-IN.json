@@ -885,7 +885,11 @@
 			"priorityDescription": "प्राथमिकता संकेतक दिखाएँ",
 			"taskNumbersDescription": "कार्य ID और संख्याएँ दिखाएँ",
 			"themeDescription": "अपनी पसंदीदा रंग योजना चुनें",
-			"themeVolt": "वोल्ट"
+			"themeVolt": "वोल्ट",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API कुंजियाँ",
@@ -1964,7 +1968,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3750,7 +3756,10 @@
 		"listView": {
 			"addTask": "कार्य जोड़ें",
 			"archiveAllTooltip": "सभी पूर्ण कार्य संग्रहित करें",
-			"noTasks": "कोई कार्य नहीं"
+			"noTasks": "कोई कार्य नहीं",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "कार्य जोड़ें",
@@ -3973,7 +3982,12 @@
 			"updateSuccess": "Recurrence updated successfully",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

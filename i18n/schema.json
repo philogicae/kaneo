@@ -4400,6 +4400,18 @@
 						"weekStartsOnSaturday": {
 							"type": "string"
 						},
+						"priorityIcons": {
+							"type": "string"
+						},
+						"priorityIconsDescription": {
+							"type": "string"
+						},
+						"priorityIconsMarks": {
+							"type": "string"
+						},
+						"priorityIconsClassic": {
+							"type": "string"
+						},
 						"defaultView": {
 							"type": "string"
 						},
@@ -4508,6 +4520,10 @@
 						"weekStartsOnSunday",
 						"weekStartsOnMonday",
 						"weekStartsOnSaturday",
+						"priorityIcons",
+						"priorityIconsDescription",
+						"priorityIconsMarks",
+						"priorityIconsClassic",
 						"defaultView",
 						"defaultViewDescription",
 						"selectViewMode",
@@ -8025,6 +8041,12 @@
 						"removeOptionAria": {
 							"type": "string"
 						},
+						"hideOptionAria": {
+							"type": "string"
+						},
+						"showOptionAria": {
+							"type": "string"
+						},
 						"allowSeveral": {
 							"type": "string"
 						},
@@ -8194,6 +8216,8 @@
 						"dragOptionAria",
 						"renameOptionAria",
 						"removeOptionAria",
+						"hideOptionAria",
+						"showOptionAria",
 						"allowSeveral",
 						"allowSeveralDescription",
 						"requiredDescription",
@@ -15551,9 +15575,25 @@
 						},
 						"noTasks": {
 							"type": "string"
+						},
+						"collapseSubtasks": {
+							"type": "string"
+						},
+						"expandSubtasks": {
+							"type": "string"
+						},
+						"subtaskLevel": {
+							"type": "string"
 						}
 					},
-					"required": ["addTask", "archiveAllTooltip", "noTasks"]
+					"required": [
+						"addTask",
+						"archiveAllTooltip",
+						"noTasks",
+						"collapseSubtasks",
+						"expandSubtasks",
+						"subtaskLevel"
+					]
 				},
 				"kanban": {
 					"type": "object",
@@ -16561,6 +16601,9 @@
 						"none": {
 							"type": "string"
 						},
+						"onDays": {
+							"type": "string"
+						},
 						"summary": {
 							"type": "string"
 						},
@@ -16593,6 +16636,30 @@
 						},
 						"weekly": {
 							"type": "string"
+						},
+						"withDays": {
+							"type": "string"
+						},
+						"year_one": {
+							"type": "string"
+						},
+						"year_zero": {
+							"type": "string"
+						},
+						"year_two": {
+							"type": "string"
+						},
+						"year_few": {
+							"type": "string"
+						},
+						"year_many": {
+							"type": "string"
+						},
+						"year_other": {
+							"type": "string"
+						},
+						"yearly": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -16602,11 +16669,14 @@
 						"monthly",
 						"needsStartDate",
 						"none",
+						"onDays",
 						"summary",
 						"title",
 						"updateError",
 						"updateSuccess",
-						"weekly"
+						"weekly",
+						"withDays",
+						"yearly"
 					]
 				},
 				"reminders": {

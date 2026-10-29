@@ -22,11 +22,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { produce } from "immer";
 import { Archive, ChevronRight, Flag, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
+import { useUpdateTaskPositions } from "@/hooks/mutations/task/use-update-task-positions";
 import { useCollapsedSections } from "@/hooks/use-collapsed-sections";
+import { useStoredState } from "@/hooks/use-stored-state";
+import useGetProjectRelations from "@/hooks/queries/task-relation/use-get-project-relations";
+import { buildSubtaskChildren, flattenSubtaskRows } from "@/lib/subtask-tree";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { applyTaskDrop } from "@/lib/apply-task-drop";
 import { cn } from "@/lib/cn";
@@ -39,6 +43,15 @@ import BulkToolbar from "../bulk-selection/bulk-toolbar";
 import { ArchiveTasksModal } from "../shared/modals/archive-tasks-modal";
 import CreateTaskModal from "../shared/modals/create-task-modal";
 import TaskRow from "./task-row";
+
+function parseExpandedRows(raw: unknown): Record<string, boolean> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  return Object.fromEntries(
+    Object.entries(raw).filter((entry): entry is [string, true] => {
+      return entry[1] === true;
+    }),
+  );
+}
 
 type ListViewProps = {
   project: ProjectWithTasks;
@@ -65,6 +78,7 @@ function ListView({
   const focusedTaskId = useBulkSelectionStore((state) => state.focusedTaskId);
   const clearFocus = useBulkSelectionStore((state) => state.clearFocus);
   const { mutate: updateTask } = useUpdateTask();
+  const { mutate: updateTaskPositions } = useUpdateTaskPositions();
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [overColumnId, setOverColumnId] = useState<string | null>(null);
@@ -72,21 +86,76 @@ function ListView({
     project.id,
     "list",
   );
+  const { data: relations = [], isLoading: relationsLoading } =
+    useGetProjectRelations(project.id);
+  const subtaskChildren = useMemo(
+    () => buildSubtaskChildren(relations),
+    [relations],
+  );
+  const tasksById = useMemo(() => {
+    const index = new Map<
+      string,
+      ProjectWithTasks["columns"][number]["tasks"][number]
+    >();
+    for (const column of project.columns ?? []) {
+      for (const task of column.tasks) index.set(task.id, task);
+    }
+    return index;
+  }, [project.columns]);
+  const [expandedTasks, setExpandedTasks] = useStoredState(
+    `kaneo:list-view:expanded-subtasks:${project.id}`,
+    parseExpandedRows,
+    {},
+  );
+  const toggleTaskExpanded = useCallback(
+    (rowId: string) => {
+      setExpandedTasks((previous) => {
+        const rows = { ...previous };
+        if (rows[rowId]) delete rows[rowId];
+        else rows[rowId] = true;
+        return rows;
+      });
+    },
+    [setExpandedTasks],
+  );
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
-  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [columnToArchive, setColumnToArchive] = useState<
     ProjectWithTasks["columns"][number] | null
   >(null);
+
+  // Nothing stays expanded while a drag is in flight, so every sortable row
+  // keeps its single top-level identity.
+  const rowsByColumn = useMemo(
+    () =>
+      new Map(
+        (project.columns ?? []).map((column) => [
+          column.id,
+          flattenSubtaskRows({
+            tasks: column.tasks,
+            children: subtaskChildren,
+            tasksById,
+            isExpanded: (rowId) => !activeId && Boolean(expandedTasks[rowId]),
+          }),
+        ]),
+      ),
+    [project.columns, subtaskChildren, tasksById, expandedTasks, activeId],
+  );
+  const shownTaskIds = useCallback(
+    (column: ProjectWithTasks["columns"][number]) => [
+      ...new Set((rowsByColumn.get(column.id) ?? []).map((row) => row.task.id)),
+    ],
+    [rowsByColumn],
+  );
 
   useEffect(() => {
     if (project?.columns) {
       const visibleTaskIds = project.columns
         .filter((column) => isExpanded(column.slug))
-        .flatMap((column) => column.tasks.map((task) => task.id));
-      setAvailableTasks(visibleTaskIds);
+        .flatMap(shownTaskIds);
+      setAvailableTasks([...new Set(visibleTaskIds)]);
     }
-  }, [project, isExpanded, setAvailableTasks]);
+  }, [project, isExpanded, setAvailableTasks, shownTaskIds]);
 
   useEffect(() => {
     clearFocus();
@@ -178,12 +247,9 @@ function ListView({
       sortActive,
     });
 
-    for (const task of updates) {
-      updateTask(task);
-    }
-
     if (updates.length > 0) {
       setProject(updatedProject);
+      updateTaskPositions({ projectId: project.id, tasks: updates });
     }
   };
 
@@ -195,7 +261,6 @@ function ListView({
     )
       return;
     setColumnToArchive(column);
-    setIsArchiveModalOpen(true);
   };
 
   const handleConfirmArchive = () => {
@@ -228,7 +293,6 @@ function ListView({
       t("tasks:archive.success", { count: columnToArchive.tasks.length }),
     );
 
-    setIsArchiveModalOpen(false);
     setColumnToArchive(null);
   };
 
@@ -246,6 +310,10 @@ function ListView({
     });
 
     const showDropIndicator = activeId && overColumnId === column.id;
+    const rows = rowsByColumn.get(column.id) ?? [];
+    const groupHasSubtasks =
+      relationsLoading ||
+      rows.some((row) => row.childCount > 0 || row.depth > 0);
 
     return (
       <div
@@ -317,15 +385,25 @@ function ListView({
               strategy={verticalListSortingStrategy}
             >
               <AnimatePresence initial={false} mode="popLayout">
-                {column.tasks.map((task) => (
+                {rows.map((row) => (
                   <motion.div
-                    key={task.id}
+                    key={row.rowId}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
                   >
-                    <TaskRow task={task} projectSlug={project?.slug ?? ""} />
+                    <TaskRow
+                      task={row.task}
+                      projectSlug={project?.slug ?? ""}
+                      depth={row.depth}
+                      rowId={row.rowId}
+                      childCount={row.childCount}
+                      isExpanded={row.isExpanded}
+                      onToggleExpanded={toggleTaskExpanded}
+                      reserveToggleSpace={groupHasSubtasks}
+                      isTaskDragging={activeId === row.task.id}
+                    />
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -406,11 +484,8 @@ function ListView({
         status={activeColumn ?? "done"}
       />
       <ArchiveTasksModal
-        open={isArchiveModalOpen}
-        onClose={() => {
-          setIsArchiveModalOpen(false);
-          setColumnToArchive(null);
-        }}
+        open={columnToArchive !== null}
+        onClose={() => setColumnToArchive(null)}
         disabled={disableCollectionActions}
         onConfirm={handleConfirmArchive}
         taskCount={

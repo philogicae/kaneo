@@ -2108,7 +2108,11 @@
 			"priorityDescription": "Wyświetlaj wskaźniki priorytetu",
 			"taskNumbersDescription": "Pokaż identyfikatory i numery zadań",
 			"themeDescription": "Wybierz preferowany schemat kolorów",
-			"themeVolt": "Volt"
+			"themeVolt": "Volt",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"projectGeneral": {
 			"dangerZone": "Strefa niebezpieczna",
@@ -2814,7 +2818,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -4172,7 +4178,10 @@
 		"listView": {
 			"addTask": "Dodaj zadanie",
 			"archiveAllTooltip": "Archiwizuj wszystkie ukończone zadania",
-			"noTasks": "Brak zadań"
+			"noTasks": "Brak zadań",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"move": {
 			"action": "Przenieś zadanie",
@@ -4475,7 +4484,14 @@
 			"week_many": "weeks",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_few": "years",
+			"year_many": "years",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

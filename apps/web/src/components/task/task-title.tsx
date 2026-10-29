@@ -50,13 +50,16 @@ export default function TaskTitle({ taskId, size = "md" }: TaskTitleProps) {
 
   const debouncedUpdate = useMemo(
     () =>
-      debounce(async (title: string) => {
+      debounce(async (title: string, forTaskId: string) => {
         if (!isInitializedRef.current) return;
 
         const currentTask = taskRef.current;
         const updateTaskFn = updateTaskRef.current;
 
-        if (!currentTask || !updateTaskFn) return;
+        // The sheet can swap tasks before the debounce fires; the typed title
+        // belongs to the task that was open, not the one now on screen.
+        if (!currentTask || currentTask.id !== forTaskId || !updateTaskFn)
+          return;
 
         try {
           await updateTaskFn({
@@ -70,6 +73,8 @@ export default function TaskTitle({ taskId, size = "md" }: TaskTitleProps) {
     [],
   );
 
+  useEffect(() => () => debouncedUpdate.cancel(), [debouncedUpdate]);
+
   const title = form.watch("title");
   const textareaRef = useAutoGrowTextarea(title);
 
@@ -77,9 +82,9 @@ export default function TaskTitle({ taskId, size = "md" }: TaskTitleProps) {
     (value: string) => {
       if (!isInitializedRef.current) return;
 
-      debouncedUpdate(value);
+      debouncedUpdate(value, taskId);
     },
-    [debouncedUpdate],
+    [debouncedUpdate, taskId],
   );
 
   return (

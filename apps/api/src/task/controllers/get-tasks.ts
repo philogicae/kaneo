@@ -7,8 +7,8 @@ import {
   inArray,
   lte,
   type SQL,
-  sql,
   type SQLWrapper,
+  sql,
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { HTTPException } from "hono/http-exception";
@@ -17,10 +17,11 @@ import {
   externalLinkTable,
   labelTable,
   projectTable,
-  taskTable,
   taskRelationTable,
+  taskTable,
   userTable,
 } from "../../database/schema";
+import { publicExternalLink } from "../../project/controllers/public-external-link";
 import { boundedTaskRead, type TaskReadDatabase } from "../bounded-read";
 import {
   boardDescription,
@@ -29,8 +30,8 @@ import {
   projectDescriptionDeferred,
 } from "../description-pages";
 import { getSubtaskCounts } from "../get-subtask-counts";
-import { buildTaskOrderBy, sortValue, type TaskSortField } from "../task-order";
 import { taskIsCompleted } from "../task-is-completed";
+import { buildTaskOrderBy, sortValue, type TaskSortField } from "../task-order";
 
 export type GetTasksOptions = {
   /**
@@ -295,10 +296,13 @@ async function getTasksPage(
     if (!taskExternalLinksMap.has(externalLink.taskId)) {
       taskExternalLinksMap.set(externalLink.taskId, []);
     }
-    taskExternalLinksMap.get(externalLink.taskId)?.push({
+    const link = {
       ...externalLink,
       metadata: parseMetadata(externalLink.metadata),
-    });
+    };
+    taskExternalLinksMap
+      .get(externalLink.taskId)
+      ?.push(options.publicOnly ? publicExternalLink(link) : link);
   }
 
   const projectColumns = await db

@@ -125,6 +125,8 @@ export function clampUiScale(value: number): number {
 
 export type TaskLayout = "board" | "list" | "calendar" | "gantt";
 
+export type PriorityIconStyle = "marks" | "classic";
+
 type UserPreferencesStore = {
   theme: "light" | "dark" | "volt" | "system";
   setTheme: (
@@ -176,6 +178,9 @@ type UserPreferencesStore = {
 
   weekStartsOn: WeekStartDay;
   setWeekStartsOn: (weekStartsOn: WeekStartDay) => void;
+
+  priorityIconStyle: PriorityIconStyle;
+  setPriorityIconStyle: (style: PriorityIconStyle) => void;
 
   projectsSort: ProjectSortMode;
   setProjectsSort: (mode: ProjectSortMode) => void;
@@ -286,6 +291,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       weekStartsOn: 0,
       setWeekStartsOn: (weekStartsOn) => set({ weekStartsOn }),
 
+      priorityIconStyle: "marks",
+      setPriorityIconStyle: (priorityIconStyle) => set({ priorityIconStyle }),
+
       projectsSort: "name",
       setProjectsSort: (mode) => set({ projectsSort: mode }),
       workspaceSort: "name",
@@ -324,6 +332,13 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
       onRehydrateStorage: () => (state) => {
         if (state && !isWeekStartDay(state.weekStartsOn)) {
           state.setWeekStartsOn(0);
+        }
+        if (
+          state &&
+          state.priorityIconStyle !== "marks" &&
+          state.priorityIconStyle !== "classic"
+        ) {
+          state.setPriorityIconStyle("marks");
         }
         if (state && !isProjectSortMode(state.projectsSort)) {
           state.setProjectsSort("name");

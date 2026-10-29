@@ -13,7 +13,7 @@ import { getDescriptionMatches } from "@/fetchers/task/get-description-matches";
 import type { ProjectWithTasks } from "@/types/project";
 import type Task from "@/types/task";
 import { addLabelToTaskInTasksCache } from "../../mutations/label/sync-task-labels-cache";
-import { useTaskFiltersWithLabelsSupport } from "../../use-task-filters-with-labels-support";
+import { useTaskFiltersWithLabelsSupport } from "../../use-task-view-filters";
 import { useDescriptionMatches } from "./use-description-matches";
 
 vi.mock("@/fetchers/task/get-description-matches", () => ({

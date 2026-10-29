@@ -12,6 +12,12 @@ type ApplyTaskDropArgs = {
    * sort re-applies as soon as the project re-renders.
    */
   sortActive: boolean;
+  /**
+   * Set when the pointer settled in a preview slot: place the card before
+   * (`false`) or after (`true`) the target instead of using the default
+   * same-column index correction.
+   */
+  insertAfterTarget?: boolean;
 };
 
 type ApplyTaskDropResult = {
@@ -29,6 +35,35 @@ export function getNextManualPosition(tasks: Task[]): number {
 }
 
 /**
+ * The preview is the board the user was shown. Persist every row that the
+ * preview actually moved, so the saved state can't disagree with it.
+ */
+export function getTaskPositionUpdates(
+  project: ProjectWithTasks,
+  preview: ProjectWithTasks,
+): Task[] {
+  const before = new Map(
+    (project.columns ?? [])
+      .flatMap((column) => column.tasks)
+      .map((task) => [task.id, task]),
+  );
+  const updates: Task[] = [];
+  for (const column of preview.columns ?? []) {
+    for (const task of column.tasks) {
+      const previous = before.get(task.id);
+      if (
+        !previous ||
+        previous.position !== task.position ||
+        previous.status !== task.status
+      ) {
+        updates.push(task);
+      }
+    }
+  }
+  return updates;
+}
+
+/**
  * Applies a drag-and-drop result to a column-based project (kanban board and
  * list view). With a sort active, a cross-column drop only changes the status
  * and appends the task to the destination's manual order; a same-column drop
@@ -40,6 +75,7 @@ export function applyTaskDrop({
   activeTaskId,
   overId,
   sortActive,
+  insertAfterTarget,
 }: ApplyTaskDropArgs): ApplyTaskDropResult {
   const updates: Task[] = [];
 
@@ -67,12 +103,19 @@ export function applyTaskDrop({
         (t) => t.id !== activeTaskId,
       );
 
-      let destinationIndex = destinationColumn.tasks.findIndex(
-        (t) => t.id === overId,
-      );
-      if (sourceTaskIndex <= destinationIndex) {
-        destinationIndex += 1;
+      let destinationIndex =
+        overId === destinationColumn.id
+          ? destinationColumn.tasks.length
+          : destinationColumn.tasks.findIndex((t) => t.id === overId);
+      if (overId !== destinationColumn.id) {
+        if (insertAfterTarget !== undefined) {
+          destinationIndex += insertAfterTarget ? 1 : 0;
+        } else if (sourceTaskIndex <= destinationIndex) {
+          destinationIndex += 1;
+        }
       }
+      if (destinationIndex < 0)
+        destinationIndex = destinationColumn.tasks.length;
       destinationColumn.tasks.splice(destinationIndex, 0, task);
 
       destinationColumn.tasks.forEach((t, index) => {
@@ -98,10 +141,18 @@ export function applyTaskDrop({
       return;
     }
 
-    const destinationIndex =
+    let destinationIndex =
       overId === destinationColumn.id
         ? destinationColumn.tasks.length
-        : destinationColumn.tasks.findIndex((t) => t.id === overId) + 1;
+        : destinationColumn.tasks.findIndex((t) => t.id === overId);
+    if (overId !== destinationColumn.id) {
+      if (insertAfterTarget !== undefined) {
+        destinationIndex += insertAfterTarget ? 1 : 0;
+      } else {
+        destinationIndex += 1;
+      }
+    }
+    if (destinationIndex < 0) destinationIndex = destinationColumn.tasks.length;
 
     destinationColumn.tasks.splice(destinationIndex, 0, task);
 

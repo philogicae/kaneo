@@ -901,7 +901,11 @@
 			"priorityDescription": "Показывать индикаторы приоритета",
 			"taskNumbersDescription": "Показывать идентификаторы и номера задач",
 			"themeDescription": "Выберите предпочтительную цветовую схему",
-			"themeVolt": "Вольт"
+			"themeVolt": "Вольт",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API-ключи",
@@ -1990,7 +1994,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3876,7 +3882,10 @@
 		"listView": {
 			"addTask": "Добавить задачу",
 			"archiveAllTooltip": "Архивировать все завершённые задачи",
-			"noTasks": "Нет задач"
+			"noTasks": "Нет задач",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "Добавить задачу",
@@ -4159,7 +4168,14 @@
 			"week_many": "weeks",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_few": "years",
+			"year_many": "years",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

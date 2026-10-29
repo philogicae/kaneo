@@ -893,7 +893,11 @@
 			"priorityDescription": "Exibir indicadores de prioridade",
 			"taskNumbersDescription": "Mostrar IDs e números das tarefas",
 			"themeDescription": "Escolha seu esquema de cores preferido",
-			"themeVolt": "Volt"
+			"themeVolt": "Volt",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "Chaves de API",
@@ -1973,7 +1977,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3803,7 +3809,10 @@
 		"listView": {
 			"addTask": "Adicionar tarefa",
 			"archiveAllTooltip": "Arquivar todas as tarefas concluídas",
-			"noTasks": "Nenhuma tarefa"
+			"noTasks": "Nenhuma tarefa",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "Adicionar tarefa",
@@ -4038,7 +4047,13 @@
 			"week_many": "weeks",
 			"week_one": "week",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_many": "years",
+			"year_one": "year",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

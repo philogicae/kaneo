@@ -262,18 +262,25 @@
                 "enum": [
                   "daily",
                   "weekly",
-                  "monthly"
+                  "monthly",
+                  "yearly"
                 ]
               },
               "interval": {
                 "type": "number"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
               }
             },
             "required": [
               "frequency",
               "interval"
             ],
-            "description": "Recurrence of the task; the next occurrence is spawned on completion."
+            "description": "Recurrence of the task; the next occurrence is spawned on completion. Weekly rules may list weekdays (0 Sunday to 6 Saturday)."
           },
           "position": {
             "type": [
@@ -1269,18 +1276,25 @@
                 "enum": [
                   "daily",
                   "weekly",
-                  "monthly"
+                  "monthly",
+                  "yearly"
                 ]
               },
               "interval": {
                 "type": "number"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
               }
             },
             "required": [
               "frequency",
               "interval"
             ],
-            "description": "Recurrence of the task; the next occurrence is spawned on completion."
+            "description": "Recurrence of the task; the next occurrence is spawned on completion. Weekly rules may list weekdays (0 Sunday to 6 Saturday)."
           },
           "createdAt": {
             "type": "string",
@@ -1536,18 +1550,25 @@
                 "enum": [
                   "daily",
                   "weekly",
-                  "monthly"
+                  "monthly",
+                  "yearly"
                 ]
               },
               "interval": {
                 "type": "number"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
               }
             },
             "required": [
               "frequency",
               "interval"
             ],
-            "description": "Recurrence of the task; the next occurrence is spawned on completion."
+            "description": "Recurrence of the task; the next occurrence is spawned on completion. Weekly rules may list weekdays (0 Sunday to 6 Saturday)."
           },
           "position": {
             "type": [
@@ -6062,6 +6083,13 @@
             ]
           },
           "options": {},
+          "hiddenOptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Options no longer offered for new selections. Tasks that already use them keep them."
+          },
           "position": {
             "type": "number"
           },
@@ -6081,6 +6109,7 @@
           "type",
           "required",
           "defaultValue",
+          "hiddenOptions",
           "position",
           "createdAt",
           "updatedAt"
@@ -13187,20 +13216,31 @@
                         "enum": [
                           "daily",
                           "weekly",
-                          "monthly"
+                          "monthly",
+                          "yearly"
                         ]
                       },
                       "interval": {
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 365
+                      },
+                      "weekdays": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6
+                        },
+                        "minItems": 1,
+                        "maxItems": 7
                       }
                     },
                     "required": [
                       "frequency",
                       "interval"
                     ],
-                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
+                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes. Weekly rules can repeat on selected days (0 Sunday to 6 Saturday)."
                   }
                 },
                 "required": [
@@ -13518,20 +13558,31 @@
                         "enum": [
                           "daily",
                           "weekly",
-                          "monthly"
+                          "monthly",
+                          "yearly"
                         ]
                       },
                       "interval": {
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 365
+                      },
+                      "weekdays": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 6
+                        },
+                        "minItems": 1,
+                        "maxItems": 7
                       }
                     },
                     "required": [
                       "frequency",
                       "interval"
                     ],
-                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
+                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes. Weekly rules can repeat on selected days (0 Sunday to 6 Saturday)."
                   }
                 },
                 "required": [
@@ -15950,7 +16001,7 @@
                       "frequency",
                       "interval"
                     ],
-                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
+                    "description": "Recurrence of the appointment. The next occurrence is created automatically when the current one ends."
                   }
                 },
                 "required": [
@@ -16252,7 +16303,7 @@
                       "frequency",
                       "interval"
                     ],
-                    "description": "Recurrence of the task. The next occurrence is created automatically when the task completes."
+                    "description": "Recurrence of the appointment. The next occurrence is created automatically when the current one ends."
                   }
                 },
                 "required": [
@@ -29018,6 +29069,13 @@
                       "type": "string"
                     },
                     "description": "The full option list for dropdown and multiselect fields, in display order. Adding and reordering options is always allowed. Removing or renaming an option that a task still uses is rejected with 400, so task values are never changed silently."
+                  },
+                  "hiddenOptions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Options no longer offered for new selections. They stay valid on tasks that already use them and can't be set as the default."
                   }
                 }
               }

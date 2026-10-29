@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
-import { shiftRecurrenceDate } from "../../apps/api/src/task/recurrence";
+import {
+  shiftRecurrenceDate,
+  shiftRecurrenceDates,
+} from "../../apps/api/src/task/recurrence";
 
 const date = (iso: string) => new Date(iso);
 
@@ -48,6 +51,50 @@ describe("shiftRecurrenceDate", () => {
         interval: 1,
       })?.toISOString(),
     ).toBe("2026-02-28T00:00:00.000Z");
+  });
+
+  it("shifts yearly recurrences and clamps February 29", () => {
+    expect(
+      shiftRecurrenceDate(new Date(2026, 4, 12, 8, 0), {
+        frequency: "yearly",
+        interval: 2,
+      }),
+    ).toEqual(new Date(2028, 4, 12, 8, 0));
+    expect(
+      shiftRecurrenceDate(new Date(2028, 1, 29), {
+        frequency: "yearly",
+        interval: 1,
+      }),
+    ).toEqual(new Date(2029, 1, 28));
+  });
+
+  it("picks selected weekdays, wrapping after the current week", () => {
+    expect(
+      shiftRecurrenceDate(new Date(2026, 0, 5, 9, 0), {
+        frequency: "weekly",
+        interval: 1,
+        weekdays: [3],
+      }),
+    ).toEqual(new Date(2026, 0, 7, 9, 0));
+    expect(
+      shiftRecurrenceDate(new Date(2026, 0, 9, 9, 0), {
+        frequency: "weekly",
+        interval: 2,
+        weekdays: [1],
+      }),
+    ).toEqual(new Date(2026, 0, 19, 9, 0));
+  });
+
+  it("keeps the start/due span across a weekday shift", () => {
+    const next = shiftRecurrenceDates(
+      {
+        startDate: new Date(2026, 0, 5, 9, 0),
+        dueDate: new Date(2026, 0, 9, 17, 0),
+      },
+      { frequency: "weekly", interval: 1, weekdays: [3] },
+    );
+    expect(next.startDate).toEqual(new Date(2026, 0, 7, 9, 0));
+    expect(next.dueDate).toEqual(new Date(2026, 0, 11, 17, 0));
   });
 
   it("shifts monthly recurrences without overflow unchanged", () => {

@@ -14,7 +14,15 @@ function readStored<T>(
   if (!key || typeof window === "undefined") return fallback;
   try {
     const raw = window.localStorage.getItem(key);
-    return raw === null ? fallback : parse(JSON.parse(raw));
+    if (raw === null) return fallback;
+    let value: unknown;
+    try {
+      value = JSON.parse(raw);
+    } catch {
+      // Older callers stored bare strings; their parsers still validate.
+      value = raw;
+    }
+    return parse(value);
   } catch {
     return fallback;
   }

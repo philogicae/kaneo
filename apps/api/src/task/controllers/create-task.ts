@@ -1,6 +1,11 @@
-import { extractAssetIds } from "../../storage/cleanup-assets";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
+import {
+  findNewHiddenPicks,
+  isChoiceType,
+  readHiddenOptions,
+  readOptions,
+} from "../../custom-field/choice-options";
 import db from "../../database";
 import {
   assetTable,
@@ -18,6 +23,7 @@ import {
   type TaskQualification,
 } from "../../jev/qualify";
 import createLabel from "../../label/controllers/create-label";
+import { extractAssetIds } from "../../storage/cleanup-assets";
 import { assertAssignableUser } from "../../utils/assert-assignable-user";
 import type { RecurrenceRule } from "../recurrence";
 import {
@@ -145,6 +151,20 @@ async function createTask({
     .select()
     .from(customFieldDefinitionTable)
     .where(eq(customFieldDefinitionTable.projectId, projectId));
+
+  for (const input of normalizedCustomFields ?? []) {
+    const field = allFields.find((candidate) => candidate.id === input.fieldId);
+    if (!field || !isChoiceType(field.type)) continue;
+    const hidden = readHiddenOptions(
+      field.hiddenOptions,
+      readOptions(field.options),
+    );
+    if (findNewHiddenPicks(input.value, null, field.type, hidden).length > 0) {
+      throw new HTTPException(400, {
+        message: `Custom field "${field.name}" has a hidden option selected.`,
+      });
+    }
+  }
 
   const mergedCustomFields: CustomFieldInput[] = normalizedCustomFields ?? [];
   const providedFieldIds = new Set(mergedCustomFields.map((f) => f.fieldId));

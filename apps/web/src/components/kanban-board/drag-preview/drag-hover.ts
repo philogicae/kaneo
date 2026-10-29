@@ -1,1 +1,5 @@
-export type DragHover = { activeId: string; overId: string };
+export type DragHover = {
+  activeId: string;
+  overId: string;
+  insertAfterTarget?: boolean;
+};

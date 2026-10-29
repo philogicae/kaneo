@@ -509,6 +509,7 @@ async function globalSearch(params: SearchParams): Promise<{
       .where(
         and(
           inArray(workspaceTable.id, accessibleWorkspaceIds),
+          workspaceId ? eq(workspaceTable.id, workspaceId) : undefined,
           or(
             allTokensLike(workspaceTable.name),
             allTokensLike(workspaceTable.description),

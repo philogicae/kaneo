@@ -90,14 +90,26 @@ export const bulkUpdateBody = z.object({
 // completed (moved to a final column).
 export const recurrenceRule = z
   .object({
-    frequency: z.enum(["daily", "weekly", "monthly"]),
+    frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
     interval: z.number().int().min(1).max(365),
+    weekdays: z
+      .array(z.number().int().min(0).max(6))
+      .min(1)
+      .max(7)
+      .refine((days) => new Set(days).size === days.length, {
+        message: "Weekdays must be unique",
+      })
+      .optional(),
+  })
+  .refine((rule) => !rule.weekdays || rule.frequency === "weekly", {
+    message: "Weekdays only apply to weekly rules",
+    path: ["weekdays"],
   })
   .nullable()
   .optional()
   .openapi({
     description:
-      "Recurrence of the task. The next occurrence is created automatically when the task completes.",
+      "Recurrence of the task. The next occurrence is created automatically when the task completes. Weekly rules can repeat on selected days (0 Sunday to 6 Saturday).",
   });
 
 export const reminderOffsets = z

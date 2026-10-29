@@ -877,7 +877,11 @@
 			"priorityDescription": "显示优先级指示",
 			"taskNumbersDescription": "显示任务 ID 和编号",
 			"themeDescription": "选择你偏好的颜色方案",
-			"themeVolt": "闪电"
+			"themeVolt": "闪电",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API 密钥",
@@ -1955,7 +1959,9 @@
 			"availableOptions": "可选项",
 			"defaultValues": "{{count}} 个默认值",
 			"multiple": "可多选",
-			"options": "{{count}} 个选项"
+			"options": "{{count}} 个选项",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "管理后台",
 		"adminUsers": {
@@ -3711,7 +3717,10 @@
 		"listView": {
 			"addTask": "添加任务",
 			"archiveAllTooltip": "归档所有已完成任务",
-			"noTasks": "无任务"
+			"noTasks": "无任务",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "添加任务",
@@ -3908,7 +3917,11 @@
 			"updateError": "Failed to update recurrence",
 			"updateSuccess": "Recurrence updated successfully",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

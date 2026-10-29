@@ -4,6 +4,7 @@ import {
   type ApiErrorIssue,
   parseApiErrorBody,
 } from "./parse-api-error-body";
+import { signOutState } from "./sign-out-state";
 
 function fallbackMessage(status: number): string {
   if (status >= 500) {
@@ -60,6 +61,7 @@ export function isUnauthorizedError(error: unknown): boolean {
 // current pathname/search/hash so the sign-in page can return the user to
 // where they were instead of dropping them on /dashboard.
 export function handleUnauthorized(): void {
+  if (signOutState.isRedirecting) return;
   const currentPath =
     window.location.pathname + window.location.search + window.location.hash;
   const target = currentPath

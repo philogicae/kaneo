@@ -38,6 +38,14 @@ describe("useStoredState", () => {
     expect(window.localStorage.getItem("key-b")).toBe(JSON.stringify("second"));
   });
 
+  it("reads a bare value written before JSON persistence", () => {
+    window.localStorage.setItem("key-a", "labels");
+
+    const { result } = renderHook(() => useStoredState("key-a", parse, "none"));
+
+    expect(result.current[0]).toBe("labels");
+  });
+
   it("writes updates under the current key", () => {
     const { result } = renderHook(() => useStoredState("key-a", parse, "none"));
 

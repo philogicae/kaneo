@@ -877,7 +877,11 @@
 			"priorityDescription": "Tampilkan indikator prioritas",
 			"taskNumbersDescription": "Tampilkan ID dan nomor tugas",
 			"themeDescription": "Pilih skema warna yang Anda inginkan",
-			"themeVolt": "Volt"
+			"themeVolt": "Volt",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "API key",
@@ -1955,7 +1959,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3697,7 +3703,10 @@
 		"listView": {
 			"addTask": "Tambah tugas",
 			"archiveAllTooltip": "Arsipkan semua tugas yang selesai",
-			"noTasks": "Tidak ada tugas"
+			"noTasks": "Tidak ada tugas",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "Tambah tugas",
@@ -3908,7 +3917,11 @@
 			"updateError": "Failed to update recurrence",
 			"updateSuccess": "Recurrence updated successfully",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

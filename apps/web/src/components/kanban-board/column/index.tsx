@@ -9,7 +9,6 @@ import { ColumnSortHint } from "./column-sort-hint";
 
 type ColumnProps = {
   column: ProjectWithTasks["columns"][number];
-  activeTaskId: string | null;
   sortHint?: string;
   disableDragDrop?: boolean;
   disableSorting?: boolean;
@@ -60,7 +59,6 @@ export const columnVariants = cva(
 
 function Column({
   column,
-  activeTaskId,
   sortHint,
   disableDragDrop = false,
   disableSorting = false,
@@ -89,7 +87,6 @@ function Column({
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2 [-webkit-overflow-scrolling:touch]">
         <ColumnDropzone
           column={column}
-          activeTaskId={activeTaskId}
           disableDragDrop={disableDragDrop}
           disableSorting={disableSorting}
         />

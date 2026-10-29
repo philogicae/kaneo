@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
+import { formatWeekday } from "@/lib/format-weekday";
 import type { RecurrenceRule } from "@/lib/recurrence";
 import {
   applyDatePreservingTime,
@@ -28,6 +29,7 @@ import {
 } from "@/lib/task-datetime";
 import { toast } from "@/lib/toast";
 import type Task from "@/types/task";
+import WeekdayPicker from "./weekday-picker";
 
 type TaskStartDatePopoverProps = {
   task: Task;
@@ -38,23 +40,35 @@ const FREQUENCIES: RecurrenceRule["frequency"][] = [
   "daily",
   "weekly",
   "monthly",
+  "yearly",
 ];
 
 const UNIT_KEY_BY_FREQUENCY: Record<RecurrenceRule["frequency"], string> = {
   daily: "day",
   weekly: "week",
   monthly: "month",
+  yearly: "year",
 };
 
 export function formatRecurrenceSummary(
   rule: RecurrenceRule,
   t: (key: string, options?: Record<string, unknown>) => string,
+  locale = "en-US",
 ): string {
-  return t("tasks:recurrence.summary", {
+  const summary = t("tasks:recurrence.summary", {
     interval: rule.interval,
     unit: t(`tasks:recurrence.${UNIT_KEY_BY_FREQUENCY[rule.frequency]}`, {
       count: rule.interval,
     }),
+  });
+  if (rule.frequency !== "weekly" || !rule.weekdays?.length) return summary;
+
+  const days = [...rule.weekdays]
+    .sort((left, right) => ((left + 6) % 7) - ((right + 6) % 7))
+    .map((day) => formatWeekday(day, locale));
+  return t("tasks:recurrence.withDays", {
+    rule: summary,
+    days: new Intl.ListFormat(locale, { type: "conjunction" }).format(days),
   });
 }
 
@@ -183,9 +197,17 @@ export default function TaskStartDatePopover({
                   setDraftRecurrence(null);
                   return;
                 }
+                const frequency = value as RecurrenceRule["frequency"];
                 setDraftRecurrence({
-                  frequency: value as RecurrenceRule["frequency"],
+                  frequency,
                   interval: draftRecurrence?.interval ?? 1,
+                  ...(frequency === "weekly"
+                    ? {
+                        weekdays: draftRecurrence?.weekdays ?? [
+                          draftDate?.getDay() ?? new Date().getDay(),
+                        ],
+                      }
+                    : {}),
                 });
               }}
             >
@@ -244,6 +266,23 @@ export default function TaskStartDatePopover({
                   { count: draftRecurrence.interval },
                 )}
               </span>
+            </div>
+          )}
+          {draftRecurrence?.frequency === "weekly" && (
+            <div className="space-y-1.5 pl-6">
+              <span className="text-xs text-muted-foreground">
+                {t("tasks:recurrence.onDays")}
+              </span>
+              <WeekdayPicker
+                value={
+                  draftRecurrence.weekdays ?? [
+                    draftDate?.getDay() ?? new Date().getDay(),
+                  ]
+                }
+                onChange={(weekdays) =>
+                  setDraftRecurrence({ ...draftRecurrence, weekdays })
+                }
+              />
             </div>
           )}
         </div>

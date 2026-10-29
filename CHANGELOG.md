@@ -1,3 +1,28 @@
+## [1.5.0] - 2026-10-29
+
+### 🚀 Features
+
+- Port the upstream fixes that apply to the fork: public-link metadata is sanitized, workspace search stays inside the requested workspace, OAuth sign-out no longer races a late 401 redirect, editors keep every dropped file, the properties rail keeps dates inside the panel, and project:update now covers column and project settings edits.
+- Block IPv6 transition destinations (6to4, NAT64, Teredo, IPv4-compatible/mapped) and literal-address lookups when validating outbound webhooks and imports.
+- Custom-field dropdown options can be hidden instead of deleted: existing task values keep working, hidden options are no longer offered, and the default can't point at one. Adds the `0013_custom_field_hidden_options` migration.
+- Add a priority icon preference (marks or classic chevrons) and apply it to cards, rows, filters and pickers.
+- Add the classic OTP code layout that copies as one piece in sign-in emails.
+- Make cross-column drag and drop preview the card in its destination slot, pick drop targets from the pointer instead of corner distance, and commit exactly the previewed board.
+- Indent subtasks in the list view with per-project expand/collapse state, keeping the top-level row as the only drag source.
+- Extend task recurrence with yearly rules and selected weekdays, keeping the start/due span when the next occurrence is created.
+
+### 🧹 Refactor
+
+- Keep one task-filter implementation: the board now shares the toolbar hook, including planned/archived filtering, negation and project-scoped custom-field values. Remove the duplicate hook that could drop `negated` from the same localStorage key.
+- Load custom-field values once per project instead of relying on per-task caches, and wait for that data instead of treating unknown values as empty.
+- Route filter labels through a shared name/color key and expand saved label groups before matching, so labels recreated with a different id still match.
+- Move board grouping to `useStoredState`, keep legacy bare-string storage readable, and serialize overlapping position writes so a fast second drop cannot overtake the first.
+- Keep the command palette's Members entry on the real workspace members route.
+
+### 🧪 Testing
+
+- Add coverage for hidden custom-field options, project-scoped filter values, label-group expansion, legacy stored values, serialized drops, IPv6 destination validation and the OTP code block.
+
 ## [1.4.0] - 2026-10-24
 
 ### 🚀 Features
@@ -13,8 +38,8 @@
 - apps/api/src/notification/index.ts, notification-preferences/delivery.ts: skip self-assignment notifications and RFC 2047-encode non-ASCII ntfy titles; add self-assignment test.
 - apps/api/src/search/controllers/global-search.ts, apps/web/src/components/search-command-menu/index.test.tsx: remove the duplicate workspace-member join from workspace search and cover task-key matching/dedup.
 - apps/api/src/database/schema.ts, apps/api/drizzle/0012_team_member_count.sql, drizzle/meta/\_journal.json: add Better Auth 1.7 `team.member_count` with backfill and nullable unique `team_member.membership_key`.
-- apps/api/package.json, apps/web/package.json, packages/\*/package.json, package.json, pnpm-workspace.yaml, pnpm-lock.yaml: bump Better Auth 1.6.30→1.7.12, Undici 7→8.12.3, Marked 17→18.1.1, Nodemailer 9→10.2.1, Mermaid 11→12.2.0, Framer Motion 13→14.6.0, Vite+ 1.0.0→1.4.0, Vitest 5.0.1→5.0.5, pnpm 12.11.2→12.15.0, esbuild 0.28.1→0.28.2; add `ip-address >=10.7.4`, `dompurify >=3.4.17`, `handlebars >=4.7.10` overrides; regenerate lockfile.
-- .github/workflows/ci.yml, Dockerfile.kaneo, AGENTS.md: pin pnpm 12.15.0.
+- apps/api/package.json, apps/web/package.json, packages/\*/package.json, package.json, pnpm-workspace.yaml, pnpm-lock.yaml: bump Better Auth 1.6.30→1.7.12, Undici 7→8.12.3, Marked 17→18.1.1, Nodemailer 9→10.2.1, Mermaid 11→12.2.0, Framer Motion 13→14.6.0, Vite+ 1.0.0→1.4.0, Vitest 5.0.1→5.0.5, pnpm 12.11.2→12.16.1, esbuild 0.28.1→0.28.2; add `ip-address >=10.7.4`, `dompurify >=3.4.17`, `handlebars >=4.7.10` overrides; regenerate lockfile.
+- .github/workflows/ci.yml, Dockerfile.kaneo, AGENTS.md: pin pnpm 12.16.1.
 - apps/web/src/lib/auth-client.ts, components/auth/use-provider-sign-in.ts, apps/api/src/utils/verify-turnstile.ts, routes/auth/captcha-flow.test.tsx, tests/api-integration/auth-captcha.test.ts: migrate custom OAuth to `signIn.social` and keep CAPTCHA coverage for the social and legacy oauth2 paths.
 - apps/web/src/components/{app-sidebar,nav-main,nav-projects,nav-unified,sidebar-header-controls}.tsx: align the collapsed icon rail, hide labels/counters, show project slug badges and the add-project action, and tighten header spacing.
 - apps/web/src/fetchers/task/{get-tasks,load-board-pages}.ts, fetchers/project/get-public-project.ts: request 200 tasks per page and load remaining pages with three-way bounded concurrency; adjust board/public revision tests.

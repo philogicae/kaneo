@@ -10,6 +10,7 @@ const dropdown: CurrentCustomField = {
   required: false,
   defaultValue: "Medium",
   options: ["Small", "Medium", "Large"],
+  hiddenOptions: [],
 };
 
 describe("resolveFieldUpdate", () => {

@@ -5,7 +5,7 @@ import { localeCompareSort } from "@/lib/format";
 
 function useGetLabelsByWorkspace(workspaceId: string) {
   const { i18n } = useTranslation();
-  const locale = i18n.resolvedLanguage || i18n.language;
+  const locale = i18n?.resolvedLanguage || i18n?.language || "en-US";
 
   return useQuery({
     enabled: Boolean(workspaceId),

@@ -877,7 +877,11 @@
 			"priorityDescription": "優先度インジケーターを表示します",
 			"taskNumbersDescription": "タスク ID と番号を表示します",
 			"themeDescription": "お好みのカラースキームを選択してください",
-			"themeVolt": "ボルト"
+			"themeVolt": "ボルト",
+			"priorityIcons": "Priority icons",
+			"priorityIconsClassic": "Classic",
+			"priorityIconsDescription": "How priority is drawn on cards, rows and filters.",
+			"priorityIconsMarks": "Marks"
 		},
 		"developerPage": {
 			"pageTitle": "APIキー",
@@ -1955,7 +1959,9 @@
 			"availableOptions": "Available options",
 			"defaultValues": "{{count}} default(s)",
 			"multiple": "Multiple",
-			"options": "{{count}} option(s)"
+			"options": "{{count}} option(s)",
+			"hideOptionAria": "Hide {{option}}",
+			"showOptionAria": "Show {{option}}"
 		},
 		"administration": "Administration",
 		"adminUsers": {
@@ -3706,7 +3712,10 @@
 		"listView": {
 			"addTask": "タスクを追加",
 			"archiveAllTooltip": "完了したタスクをすべてアーカイブ",
-			"noTasks": "タスクはありません"
+			"noTasks": "タスクはありません",
+			"collapseSubtasks": "Hide subtasks of {{title}}",
+			"expandSubtasks": "Show subtasks of {{title}}",
+			"subtaskLevel": "Subtask level {{level}}"
 		},
 		"kanban": {
 			"addTask": "タスクを追加",
@@ -3908,7 +3917,11 @@
 			"updateError": "Failed to update recurrence",
 			"updateSuccess": "Recurrence updated successfully",
 			"week_other": "weeks",
-			"weekly": "Weekly"
+			"weekly": "Weekly",
+			"onDays": "Repeat on",
+			"withDays": "{{rule}} on {{days}}",
+			"year_other": "years",
+			"yearly": "Yearly"
 		},
 		"reminders": {
 			"add": "Add reminder",

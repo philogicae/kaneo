@@ -2,9 +2,14 @@ import { and, eq, isNotNull, sql } from "drizzle-orm";
 import db from "../database";
 import { appointmentTable } from "../database/schema";
 import { publishEvent } from "../events";
-import { type RecurrenceRule, shiftRecurrenceDate } from "../task/recurrence";
+import { shiftRecurrenceDate } from "../task/recurrence";
 
 type DueAppointment = typeof appointmentTable.$inferSelect;
+
+type AppointmentRecurrenceRule = {
+  frequency: "daily" | "weekly" | "monthly";
+  interval: number;
+};
 
 // Upper bound for skipping missed periods; a chain decades behind still
 // converges (interval >= 1 day, so 10k periods is far beyond any real data).
@@ -47,7 +52,7 @@ export async function checkAppointmentRecurrence(): Promise<{
 }
 
 async function spawnNextOccurrence(appointment: DueAppointment): Promise<void> {
-  const rule = appointment.recurrence as RecurrenceRule | null;
+  const rule = appointment.recurrence as AppointmentRecurrenceRule | null;
   if (!rule) return;
 
   // Missed occurrences (the instance was down, or the chain fell behind) are

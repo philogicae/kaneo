@@ -1,8 +1,8 @@
 import {
-  closestCorners,
   DndContext,
   type DragEndEvent,
   DragOverlay,
+  type DragOverEvent,
   type DragStartEvent,
   type DropAnimation,
   defaultDropAnimationSideEffects,
@@ -17,9 +17,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
+import { useUpdateTaskPositions } from "@/hooks/mutations/task/use-update-task-positions";
 import { useRegisterShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { applyTaskDrop } from "@/lib/apply-task-drop";
+import { boardCollisionDetection } from "./board-collision-detection";
+import { useDragPreview } from "./drag-preview/use-drag-preview";
+import { moveBoardTask } from "./move-task";
+import { applyTaskDrop, getTaskPositionUpdates } from "@/lib/apply-task-drop";
 import { buildLabelGroups } from "@/lib/group-tasks";
 import { EASE_OUT_CSS } from "@/lib/motion";
 import useBulkSelectionStore from "@/store/bulk-selection";
@@ -58,7 +61,8 @@ function KanbanBoard({
   const clearFocus = useBulkSelectionStore((state) => state.clearFocus);
   const [activeIsFinal, setActiveIsFinal] = useState<boolean | undefined>();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const { mutate: updateTask } = useUpdateTask();
+  const dragPreview = useDragPreview(project);
+  const { mutate: updateTaskPositions } = useUpdateTaskPositions();
   const navigate = useNavigate();
 
   const groups = useMemo(
@@ -142,31 +146,76 @@ function KanbanBoard({
 
   const reduceMotion = useReducedMotion();
 
+  const insertAfterTarget = (event: DragOverEvent | DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || over.data.current?.type === "column") return undefined;
+    const activeRect = active.rect.current.translated;
+    const overRect = over.rect;
+    if (!activeRect || !overRect) return undefined;
+    return (
+      activeRect.top + activeRect.height / 2 >
+      overRect.top + overRect.height / 2
+    );
+  };
+
   const handleDragStart = (event: DragStartEvent) => {
+    dragPreview.clear();
     setActiveId(event.active.id);
     const isFinal = event.active.data?.current?.isFinalColumn;
     setActiveIsFinal(typeof isFinal === "boolean" ? isFinal : undefined);
   };
 
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (disableDragDrop || sortActive || !over) {
+      dragPreview.clear();
+      return;
+    }
+    dragPreview.hover(active, over, insertAfterTarget(event));
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    const activeTaskId = active.id.toString();
+    const overId = over?.id.toString();
     setActiveId(null);
+    dragPreview.clear();
 
-    if (disableDragDrop || !over || !project?.columns) return;
+    if (
+      disableDragDrop ||
+      !overId ||
+      overId === activeTaskId ||
+      !project?.columns
+    )
+      return;
 
-    const { project: updatedProject, updates } = applyTaskDrop({
-      project,
-      activeTaskId: active.id.toString(),
-      overId: over.id.toString(),
-      sortActive,
-    });
+    // Recompute against the drop event itself: pointer moves can outrun the
+    // last onDragOver frame, and the saved board must be the one on screen.
+    const preview = sortActive
+      ? null
+      : moveBoardTask(
+          project,
+          activeTaskId,
+          overId,
+          false,
+          insertAfterTarget(event),
+        )?.project;
 
-    for (const task of updates) {
-      updateTask(task);
-    }
+    const { project: updatedProject, updates } = preview
+      ? {
+          project: preview,
+          updates: getTaskPositionUpdates(project, preview),
+        }
+      : applyTaskDrop({
+          project,
+          activeTaskId,
+          overId,
+          sortActive,
+        });
 
     if (updates.length > 0) {
       setProject(updatedProject);
+      updateTaskPositions({ projectId: project.id, tasks: updates });
     }
   };
 
@@ -219,6 +268,7 @@ function KanbanBoard({
         .flatMap((col) => col.tasks)
         .find((task) => task.id === activeId)
     : null;
+  const shownProject = dragPreview.preview ?? project;
 
   if (groupActive) {
     return (
@@ -247,22 +297,24 @@ function KanbanBoard({
           draggable: t("tasks:board.keyboardInstructions"),
         },
       }}
-      collisionDetection={closestCorners}
+      collisionDetection={boardCollisionDetection}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => {
+        setActiveId(null);
+        dragPreview.clear();
+      }}
     >
       <div className="flex h-full w-full flex-col bg-linear-to-b from-muted/20 to-background">
         <div className="min-h-0 flex-1 overflow-x-auto [-webkit-overflow-scrolling:touch]">
           <div className="flex h-full min-w-max gap-4 px-4 py-4 md:px-5">
-            {project.columns?.map((column) => (
+            {shownProject.columns?.map((column) => (
               <div
                 key={column.id}
                 className="h-full max-w-96 min-w-72 shrink-0 flex-1"
               >
-                <Column
-                  column={column}
-                  activeTaskId={activeId?.toString() ?? null}
-                />
+                <Column column={column} />
               </div>
             ))}
           </div>
