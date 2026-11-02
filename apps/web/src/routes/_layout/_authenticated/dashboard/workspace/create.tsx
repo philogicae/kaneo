@@ -24,7 +24,8 @@ function RouteComponent() {
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { mutateAsync, isPending } = useCreateWorkspace();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutateAsync } = useCreateWorkspace();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -38,26 +39,30 @@ function RouteComponent() {
     e.preventDefault();
     if (!name.trim()) return;
 
+    setIsSubmitting(true);
     try {
       const createdWorkspace = await mutateAsync({ name, description });
-      toast.success(t("workspace:create.success"), { icon: SquarePlusIcon });
+
       await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
 
       await authClient.organization.setActive({
         organizationId: createdWorkspace.id,
       });
 
-      navigate({
+      await navigate({
         to: "/dashboard/workspace/$workspaceId",
         params: {
           workspaceId: createdWorkspace.id,
         },
         replace: true,
       });
+      toast.success(t("workspace:create.success"), { icon: SquarePlusIcon });
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : t("workspace:create.error"),
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -128,10 +133,10 @@ function RouteComponent() {
                 <div className="pt-4">
                   <Button
                     type="submit"
-                    disabled={!name.trim() || isPending}
+                    disabled={!name.trim() || isSubmitting}
                     className="w-full h-12 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isPending
+                    {isSubmitting
                       ? t("workspace:create.creating")
                       : t("workspace:create.submit")}
                   </Button>

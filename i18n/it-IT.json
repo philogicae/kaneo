@@ -252,7 +252,10 @@
 			"passwordRequired": "Inserisci la tua password.",
 			"passwordTooShort": "Usa almeno 8 caratteri.",
 			"disposableEmail": "Usa un indirizzo email permanente. Con gli indirizzi usa e getta non è possibile creare account.",
-			"continueWithEmail": "Continua con l'email"
+			"continueWithEmail": "Continua con l'email",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Controlla la tua Email",
@@ -3954,7 +3957,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Premi Spazio per l'anteprima e Invio per aprire questa attività. Usa Alt o Opzione con le frecce per spostarla."
+			"keyboardInstructions": "Premi Spazio per l'anteprima e Invio per aprire questa attività. Usa Alt o Opzione con le frecce per spostarla.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Cerca attività",

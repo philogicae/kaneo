@@ -86,9 +86,13 @@ const TaskCardBody = memo(function TaskCardBody({
   isDragging,
 }: TaskCardBodyProps) {
   const { t } = useTranslation();
-  const { project } = useProjectStore();
+  const projectColumns = useProjectStore((state) =>
+    isFinalColumn === undefined ? state.project?.columns : undefined,
+  );
+  const projectId = useProjectStore((state) => state.project?.id);
+  const projectSlug = useProjectStore((state) => state.project?.slug);
   const taskIsCompleted =
-    isFinalColumn ?? isTaskCompleted(task.status, project?.columns);
+    isFinalColumn ?? isTaskCompleted(task.status, projectColumns);
   const dueDateStatus = getDueDateStatus(task.dueDate, taskIsCompleted);
   const isOverdue = dueDateStatus === "overdue";
   const { data: workspace } = useActiveWorkspace();
@@ -213,7 +217,7 @@ const TaskCardBody = memo(function TaskCardBody({
           >
             {showTaskNumbers && (
               <div className="mb-1.5 font-medium text-[0.6875rem] text-muted-foreground/90">
-                {project?.slug}-{task.number}
+                {projectSlug}-{task.number}
               </div>
             )}
 
@@ -471,11 +475,11 @@ const TaskCardBody = memo(function TaskCardBody({
           </div>
         </ContextMenuTrigger>
 
-        {project && workspace && (
+        {projectId && workspace && (
           <TaskCardContextMenuContent
             task={task}
             taskCardContext={{
-              projectId: project.id,
+              projectId,
               worskpaceId: workspace.id,
               workspaceSlug: workspace.slug,
             }}

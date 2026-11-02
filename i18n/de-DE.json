@@ -252,7 +252,10 @@
 			"passwordRequired": "Gib dein Passwort ein.",
 			"passwordTooShort": "Verwende mindestens 8 Zeichen.",
 			"disposableEmail": "Verwende eine dauerhafte E-Mail-Adresse. Mit Wegwerfadressen können keine Konten erstellt werden.",
-			"continueWithEmail": "Weiter mit E-Mail"
+			"continueWithEmail": "Weiter mit E-Mail",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Prüfe deine E-Mails",
@@ -3897,7 +3900,11 @@
 		},
 		"board": {
 			"reorderFailed": "Die Reihenfolge konnte nicht gespeichert werden.",
-			"keyboardInstructions": "Drücke die Leertaste für die Vorschau und Enter, um diese Aufgabe zu öffnen. Mit Alt oder Option und den Pfeiltasten verschiebst du sie."
+			"keyboardInstructions": "Drücke die Leertaste für die Vorschau und Enter, um diese Aufgabe zu öffnen. Mit Alt oder Option und den Pfeiltasten verschiebst du sie.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Aufgaben suchen",

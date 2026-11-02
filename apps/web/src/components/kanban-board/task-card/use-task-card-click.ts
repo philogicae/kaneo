@@ -8,7 +8,6 @@ import type Task from "@/types/task";
 import type { DragListeners } from "./drag-listeners";
 
 export function useTaskCardClick(task: Task, dragListeners: DragListeners) {
-  const { project } = useProjectStore();
   const { data: workspace } = useActiveWorkspace();
   const navigate = useNavigate();
   const toggleSelection = useBulkSelectionStore(
@@ -23,7 +22,13 @@ export function useTaskCardClick(task: Task, dragListeners: DragListeners) {
     (
       e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
     ) => {
-      if (!project || !task || !workspace || !isOwnDomEvent(e)) return;
+      if (
+        !useProjectStore.getState().project ||
+        !task ||
+        !workspace ||
+        !isOwnDomEvent(e)
+      )
+        return;
 
       if (e.shiftKey) {
         e.preventDefault();
@@ -55,7 +60,6 @@ export function useTaskCardClick(task: Task, dragListeners: DragListeners) {
     },
     [
       navigate,
-      project,
       selectRange,
       setSelectionAnchor,
       task,

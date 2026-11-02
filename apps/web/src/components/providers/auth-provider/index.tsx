@@ -7,7 +7,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { descriptionSaveQueue } from "@/lib/description-save-queue";
 import type { User } from "@/types/user";
-import { LoadingSkeleton } from "../../ui/loading-skeleton";
+import { BootFrame } from "../../common/boot-frame";
 
 const { useSession } = authClient;
 
@@ -41,7 +41,7 @@ function AuthProvider({ children }: PropsWithChildren) {
   }
 
   if (isPending && !hasLoadedOnce.current) {
-    return <LoadingSkeleton />;
+    return <BootFrame />;
   }
 
   return (

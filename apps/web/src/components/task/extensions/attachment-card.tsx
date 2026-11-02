@@ -55,7 +55,14 @@ export const AttachmentCard = Node.create({
     return {
       url: { default: "" },
       filename: { default: "" },
-      mimeType: { default: "" },
+      mimeType: {
+        default: "",
+        parseHTML: (element: HTMLElement) =>
+          element.getAttribute("mime-type") ??
+          element.getAttribute("data-mime-type") ??
+          element.getAttribute("mimetype") ??
+          "",
+      },
       size: { default: 0 },
     };
   },

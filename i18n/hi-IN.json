@@ -252,7 +252,10 @@
 			"passwordRequired": "अपना पासवर्ड दर्ज करें।",
 			"passwordTooShort": "कम से कम 8 वर्णों का उपयोग करें।",
 			"disposableEmail": "स्थायी ईमेल पते का उपयोग करें। अस्थायी पतों से खाते नहीं बनाए जा सकते।",
-			"continueWithEmail": "ईमेल के साथ जारी रखें"
+			"continueWithEmail": "ईमेल के साथ जारी रखें",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "अपना ईमेल जाँचें",
@@ -3897,7 +3900,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "पूर्वावलोकन के लिए Space और यह कार्य खोलने के लिए Enter दबाएँ। इसे ले जाने के लिए Alt या Option के साथ तीर कुंजियों का उपयोग करें।"
+			"keyboardInstructions": "पूर्वावलोकन के लिए Space और यह कार्य खोलने के लिए Enter दबाएँ। इसे ले जाने के लिए Alt या Option के साथ तीर कुंजियों का उपयोग करें।",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "कार्य खोजें",

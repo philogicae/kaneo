@@ -977,6 +977,15 @@
 						"disposableEmail": {
 							"type": "string"
 						},
+						"captchaChecking": {
+							"type": "string"
+						},
+						"captchaFailed": {
+							"type": "string"
+						},
+						"captchaRetry": {
+							"type": "string"
+						},
 						"continueWithEmail": {
 							"type": "string"
 						}
@@ -996,6 +1005,9 @@
 						"passwordRequired",
 						"passwordTooShort",
 						"disposableEmail",
+						"captchaChecking",
+						"captchaFailed",
+						"captchaRetry",
 						"continueWithEmail"
 					]
 				},
@@ -16241,9 +16253,28 @@
 						},
 						"keyboardInstructions": {
 							"type": "string"
+						},
+						"loadErrorTitle": {
+							"type": "string"
+						},
+						"loadErrorDescription": {
+							"type": "string"
+						},
+						"refreshError": {
+							"type": "string"
+						},
+						"tryAgain": {
+							"type": "string"
 						}
 					},
-					"required": ["reorderFailed", "keyboardInstructions"]
+					"required": [
+						"reorderFailed",
+						"keyboardInstructions",
+						"loadErrorTitle",
+						"loadErrorDescription",
+						"refreshError",
+						"tryAgain"
+					]
 				},
 				"toolbar": {
 					"type": "object",

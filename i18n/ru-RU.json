@@ -252,7 +252,10 @@
 			"passwordRequired": "Введите пароль.",
 			"passwordTooShort": "Используйте не менее 8 символов.",
 			"disposableEmail": "Используйте постоянный адрес электронной почты. С одноразовыми адресами создать аккаунт нельзя.",
-			"continueWithEmail": "Продолжить по электронной почте"
+			"continueWithEmail": "Продолжить по электронной почте",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Проверьте почту",
@@ -4067,7 +4070,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Нажмите Пробел для предпросмотра и Enter, чтобы открыть эту задачу. Используйте Alt или Option со стрелками, чтобы переместить её."
+			"keyboardInstructions": "Нажмите Пробел для предпросмотра и Enter, чтобы открыть эту задачу. Используйте Alt или Option со стрелками, чтобы переместить её.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Поиск задач",

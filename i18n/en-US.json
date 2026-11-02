@@ -252,6 +252,9 @@
 			"passwordRequired": "Enter your password.",
 			"passwordTooShort": "Use at least 8 characters.",
 			"disposableEmail": "Use a permanent email address. Disposable addresses cannot create accounts.",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again",
 			"continueWithEmail": "Continue with email"
 		},
 		"checkEmail": {
@@ -3897,7 +3900,11 @@
 		"descriptionLoadError": "The description could not be loaded. Retry to load the current version.",
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Press Space to preview and Enter to open this task. Use Alt or Option with the arrow keys to move it."
+			"keyboardInstructions": "Press Space to preview and Enter to open this task. Use Alt or Option with the arrow keys to move it.",
+			"loadErrorTitle": "This board didn't load",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Search tasks",

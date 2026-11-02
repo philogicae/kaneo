@@ -252,7 +252,10 @@
 			"passwordRequired": "Nhập mật khẩu của bạn.",
 			"passwordTooShort": "Dùng ít nhất 8 ký tự.",
 			"disposableEmail": "Hãy dùng địa chỉ email cố định. Không thể tạo tài khoản bằng địa chỉ email dùng một lần.",
-			"continueWithEmail": "Tiếp tục với email"
+			"continueWithEmail": "Tiếp tục với email",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Kiểm tra email",
@@ -3840,7 +3843,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Nhấn Space để xem trước và Enter để mở công việc này. Dùng Alt hoặc Option với phím mũi tên để di chuyển."
+			"keyboardInstructions": "Nhấn Space để xem trước và Enter để mở công việc này. Dùng Alt hoặc Option với phím mũi tên để di chuyển.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Tìm công việc",

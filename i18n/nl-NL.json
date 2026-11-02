@@ -252,7 +252,10 @@
 			"passwordRequired": "Vul je wachtwoord in.",
 			"passwordTooShort": "Gebruik minimaal 8 tekens.",
 			"disposableEmail": "Gebruik een permanent e-mailadres. Met wegwerpadressen kun je geen account aanmaken.",
-			"continueWithEmail": "Doorgaan met e-mail"
+			"continueWithEmail": "Doorgaan met e-mail",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Controleer je e-mail",
@@ -3897,7 +3900,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Druk op Spatie voor een voorbeeld en op Enter om deze taak te openen. Gebruik Alt of Option met de pijltjestoetsen om haar te verplaatsen."
+			"keyboardInstructions": "Druk op Spatie voor een voorbeeld en op Enter om deze taak te openen. Gebruik Alt of Option met de pijltjestoetsen om haar te verplaatsen.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Taken zoeken",

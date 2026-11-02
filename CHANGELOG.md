@@ -1,3 +1,17 @@
+## [1.6.0] - 2026-11-02
+
+### 🚀 Features
+
+- Port the upstream fixes that still apply to the fork: manual pull request links can be created and updated through the API with their status, workspace slugs and Gitea credentials no longer depend on `crypto.randomUUID` on plain-HTTP origins, and issue-link/attachment attributes survive a Markdown reload.
+- Keep the workspace shell mounted across workspace navigation, add a boot frame while route chunks and the session load, preload the board on hover, and delay loading placeholders so fast loads no longer flash.
+- Place a dropped task between its neighbours with sparse positions so a move only persists the task and the few neighbours it shifts.
+
+### 🩹 Fixes
+
+- Keep task-sheet focus on the keyboard origin, restore it only when the sheet was opened from the keyboard, and stop horizontal swipe gestures from chaining to the page.
+- Reuse the settled session on auth routes, surface CAPTCHA load failures with a retry, and navigate to sign-in before ending a local session so the app no longer degrades through a late 401.
+- Show a retry state when a board fails to load or refresh instead of leaving the skeleton up.
+
 ## [1.5.0] - 2026-10-29
 
 ### 🚀 Features

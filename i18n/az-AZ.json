@@ -252,7 +252,10 @@
 			"passwordRequired": "Parolunuzu daxil edin.",
 			"passwordTooShort": "Ən azı 8 simvoldan istifadə edin.",
 			"disposableEmail": "Daimi e-poçt ünvanından istifadə edin. Birdəfəlik ünvanlarla hesab yaratmaq olmur.",
-			"continueWithEmail": "E-poçtla davam et"
+			"continueWithEmail": "E-poçtla davam et",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "E-poçtunuzu yoxlayın",
@@ -3897,7 +3900,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Önbaxış üçün Boşluq, bu tapşırığı açmaq üçün Enter düyməsini basın. Köçürmək üçün Alt və ya Option ilə ox düymələrindən istifadə edin."
+			"keyboardInstructions": "Önbaxış üçün Boşluq, bu tapşırığı açmaq üçün Enter düyməsini basın. Köçürmək üçün Alt və ya Option ilə ox düymələrindən istifadə edin.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Tapşırıqları axtar",

@@ -9,11 +9,13 @@ import "@/index.css";
 import { useAuth } from "@/components/providers/auth-provider/hooks/use-auth";
 import { SequenceHint } from "./components/shortcuts/sequence-hint";
 import { ShortcutsPanel } from "./components/shortcuts/shortcuts-panel";
+import { BootFrame } from "./components/common/boot-frame";
 import AuthProvider from "./components/providers/auth-provider";
 import { ThemeProvider } from "./components/providers/theme-provider";
 import { ErrorBoundary } from "./components/ui/error-boundary";
 import { KeyboardShortcutsProvider } from "./hooks/use-keyboard-shortcuts";
 import { ShortcutListener } from "./lib/shortcuts/shortcut-listener";
+import { preloadRouteComponents } from "./lib/preload-route-components";
 import { AppI18nProvider } from "./lib/i18n/provider";
 import { routeTree } from "./routeTree.gen";
 
@@ -71,12 +73,15 @@ const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
+  defaultPendingComponent: BootFrame,
   defaultNotFoundComponent: NotFoundFallback,
   context: {
     user: null,
     queryClient,
   },
 });
+
+preloadRouteComponents(router, window.location.pathname);
 
 function App() {
   const { user } = useAuth();

@@ -252,7 +252,10 @@
 			"passwordRequired": "Внеси ја твојата лозинка.",
 			"passwordTooShort": "Користи најмалку 8 знаци.",
 			"disposableEmail": "Користи трајна адреса за е-пошта. Со привремени адреси не може да се креираат сметки.",
-			"continueWithEmail": "Продолжи со е-пошта"
+			"continueWithEmail": "Продолжи со е-пошта",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Провери ја е-поштата",
@@ -3897,7 +3900,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Притиснете Space за преглед и Enter за да ја отворите оваа задача. Користете Alt или Option со стрелките за да ја преместите."
+			"keyboardInstructions": "Притиснете Space за преглед и Enter за да ја отворите оваа задача. Користете Alt или Option со стрелките за да ја преместите.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Пребарај задачи",

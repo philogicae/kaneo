@@ -252,6 +252,9 @@
 			"passwordRequired": "Saisissez votre mot de passe.",
 			"passwordTooShort": "Utilisez au moins 8 caractères.",
 			"disposableEmail": "Utilisez une adresse e-mail permanente. Les adresses jetables ne permettent pas de créer un compte.",
+			"captchaChecking": "Vérification du défi de sécurité…",
+			"captchaFailed": "Le défi de sécurité n'a pas pu se charger.",
+			"captchaRetry": "Réessayer",
 			"continueWithEmail": "Continuer avec l'e-mail"
 		},
 		"checkEmail": {
@@ -3954,7 +3957,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Appuyez sur Espace pour l'aperçu et sur Entrée pour ouvrir cette tâche. Utilisez Alt ou Option avec les flèches pour la déplacer."
+			"keyboardInstructions": "Appuyez sur Espace pour l'aperçu et sur Entrée pour ouvrir cette tâche. Utilisez Alt ou Option avec les flèches pour la déplacer.",
+			"loadErrorTitle": "Ce tableau ne s'est pas chargé",
+			"loadErrorDescription": "Un problème est survenu lors de la récupération des tâches. Vérifiez votre connexion et réessayez.",
+			"refreshError": "Impossible d'actualiser ce tableau, il n'est peut-être pas à jour.",
+			"tryAgain": "Réessayer"
 		},
 		"toolbar": {
 			"search": "Rechercher des tâches",

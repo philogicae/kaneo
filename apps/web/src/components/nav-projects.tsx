@@ -66,6 +66,7 @@ import useDeleteProject from "@/hooks/mutations/project/use-delete-project";
 import useReorderProjects from "@/hooks/mutations/project/use-reorder-projects";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
+import { useBoardHoverPrefetch } from "@/hooks/use-board-hover-prefetch";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { EASE_OUT_CSS } from "@/lib/motion";
 import { toast } from "@/lib/toast";
@@ -148,6 +149,7 @@ export function NavProjects() {
   // alone — not the create+update+delete bundle.
   const canReorder = canUpdateProjects() && projectsSort === "custom";
   const navigate = useNavigate();
+  const boardHoverPrefetch = useBoardHoverPrefetch(workspace?.id ?? "");
   const { workspaceId: currentWorkspaceId, projectId: currentProjectId } =
     useParams({
       strict: false,
@@ -351,6 +353,7 @@ export function NavProjects() {
                             tooltip={project.name}
                             className="h-8 gap-0 ps-3.5 text-sm hover:bg-transparent hover:text-sidebar-accent-foreground active:bg-transparent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!"
                             onClick={() => handleProjectClick(project)}
+                            {...boardHoverPrefetch(project.id)}
                           >
                             <span className="hidden h-5 min-w-6 items-center justify-center rounded-md bg-sidebar-accent px-1 text-[0.625rem] font-semibold tracking-wide text-sidebar-accent-foreground uppercase group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:w-6 group-data-[collapsible=icon]:min-w-6 group-data-[collapsible=icon]:px-0">
                               {project.slug}

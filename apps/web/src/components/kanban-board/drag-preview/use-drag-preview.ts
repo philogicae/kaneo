@@ -16,6 +16,7 @@ export function useDragPreview(project: ProjectWithTasks) {
             hover.overId,
             false,
             hover.insertAfterTarget,
+            false,
           )?.project ?? null)
         : null,
     [project, hover],

@@ -6,6 +6,8 @@ import ProjectLayout from "@/components/common/project-layout";
 import KanbanBoard from "@/components/kanban-board";
 import ListView from "@/components/list-view";
 import PageTitle from "@/components/page-title";
+import { BoardLoadError } from "@/components/project/board-load-error";
+import { BoardRefreshError } from "@/components/project/board-refresh-error";
 import type { CustomFieldDefinition } from "@/components/project/custom-field-editor";
 import CreateTaskModal from "@/components/shared/modals/create-task-modal";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
@@ -45,7 +47,7 @@ const skeletonColumns = [
 
 function BoardSkeleton() {
   return (
-    <div className="flex h-full w-full gap-4 p-4 overflow-hidden">
+    <div className="delayed-reveal flex h-full w-full gap-4 p-4 overflow-hidden">
       {skeletonColumns.map((col) => (
         <div key={col.key} className="flex w-72 shrink-0 flex-col gap-3">
           <div className="flex items-center gap-2 px-1">
@@ -81,7 +83,7 @@ function RouteComponent() {
   const { projectId, workspaceId } = Route.useParams();
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
-  const { data } = useGetTasks(projectId);
+  const { data, isError, isFetching, refetch } = useGetTasks(projectId);
   const { project, setProject } = useProjectStore();
   const { viewMode, setViewMode } = useUserPreferencesStore();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -223,6 +225,13 @@ function RouteComponent() {
           searchInputRef={boardSearchInput}
         />
 
+        {sortedProject && isError ? (
+          <BoardRefreshError
+            isRetrying={isFetching}
+            onRetry={() => void refetch()}
+          />
+        ) : null}
+
         <div className="flex h-full flex-1 overflow-hidden bg-background">
           {sortedProject ? (
             viewMode === "board" ? (
@@ -237,6 +246,11 @@ function RouteComponent() {
                 sortActive={sort.field !== "position"}
               />
             )
+          ) : isError ? (
+            <BoardLoadError
+              isRetrying={isFetching}
+              onRetry={() => void refetch()}
+            />
           ) : (
             <BoardSkeleton />
           )}

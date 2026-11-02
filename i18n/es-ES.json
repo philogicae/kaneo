@@ -252,7 +252,10 @@
 			"passwordRequired": "Introduce tu contraseña.",
 			"passwordTooShort": "Usa al menos 8 caracteres.",
 			"disposableEmail": "Usa una dirección de correo permanente. Con direcciones desechables no se pueden crear cuentas.",
-			"continueWithEmail": "Continuar con correo electrónico"
+			"continueWithEmail": "Continuar con correo electrónico",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Verifica tu email",
@@ -3954,7 +3957,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Pulsa Espacio para ver la vista previa y Enter para abrir esta tarea. Usa Alt u Opción con las flechas para moverla."
+			"keyboardInstructions": "Pulsa Espacio para ver la vista previa y Enter para abrir esta tarea. Usa Alt u Opción con las flechas para moverla.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Buscar tareas",

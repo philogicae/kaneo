@@ -252,7 +252,10 @@
 			"passwordRequired": "Εισάγετε τον κωδικό πρόσβασής σας.",
 			"passwordTooShort": "Χρησιμοποιήστε τουλάχιστον 8 χαρακτήρες.",
 			"disposableEmail": "Χρησιμοποιήστε μια μόνιμη διεύθυνση email. Με προσωρινές διευθύνσεις δεν μπορούν να δημιουργηθούν λογαριασμοί.",
-			"continueWithEmail": "Συνέχεια με email"
+			"continueWithEmail": "Συνέχεια με email",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Ελέγξτε το email σας",
@@ -3897,7 +3900,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Πατήστε Space για προεπισκόπηση και Enter για να ανοίξετε αυτή την εργασία. Χρησιμοποιήστε Alt ή Option με τα βέλη για να τη μετακινήσετε."
+			"keyboardInstructions": "Πατήστε Space για προεπισκόπηση και Enter για να ανοίξετε αυτή την εργασία. Χρησιμοποιήστε Alt ή Option με τα βέλη για να τη μετακινήσετε.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Αναζήτηση εργασιών",

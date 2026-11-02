@@ -130,8 +130,22 @@ export const KaneoIssueLink = Node.create({
   addAttributes() {
     return {
       url: { default: "" },
-      issueKey: { default: "" },
-      taskId: { default: "" },
+      issueKey: {
+        default: "",
+        parseHTML: (element: HTMLElement) =>
+          element.getAttribute("issue-key") ??
+          element.getAttribute("data-issue-key") ??
+          element.getAttribute("issuekey") ??
+          "",
+      },
+      taskId: {
+        default: "",
+        parseHTML: (element: HTMLElement) =>
+          element.getAttribute("task-id") ??
+          element.getAttribute("data-task-id") ??
+          element.getAttribute("taskid") ??
+          "",
+      },
     };
   },
 

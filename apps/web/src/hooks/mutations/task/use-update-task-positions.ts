@@ -11,9 +11,10 @@ type UpdateTaskPositions = {
   tasks: Task[];
 };
 
-// A drop rewrites every position in the source and destination columns. Sending
-// them one at a time keeps SQLite writes serialized, and invalidating once at
-// the end avoids the refetch storm the per-task mutation caused mid-drag.
+// A drop only rewrites the moved task and any neighbours whose gap was too
+// tight. Sending them one at a time keeps SQLite writes serialized, and
+// invalidating once at the end avoids the refetch storm the per-task mutation
+// caused mid-drag.
 export function useUpdateTaskPositions() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();

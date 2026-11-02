@@ -99,8 +99,11 @@ vi.mock("@/hooks/mutations/appointment/use-move-task-to-appointments", () => ({
 }));
 
 vi.mock("@/store/project", () => ({
-  default: (selector?: (state: typeof projectState) => unknown) =>
-    selector ? selector(projectState) : projectState,
+  default: Object.assign(
+    (selector?: (state: typeof projectState) => unknown) =>
+      selector ? selector(projectState) : projectState,
+    { getState: () => projectState },
+  ),
 }));
 
 vi.mock("@/store/user-preferences", () => ({

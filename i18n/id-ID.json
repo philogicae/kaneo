@@ -252,7 +252,10 @@
 			"passwordRequired": "Masukkan kata sandi Anda.",
 			"passwordTooShort": "Gunakan minimal 8 karakter.",
 			"disposableEmail": "Gunakan alamat email permanen. Alamat email sekali pakai tidak dapat digunakan untuk membuat akun.",
-			"continueWithEmail": "Lanjutkan dengan email"
+			"continueWithEmail": "Lanjutkan dengan email",
+			"captchaChecking": "Checking the security challenge…",
+			"captchaFailed": "The security challenge could not load.",
+			"captchaRetry": "Try again"
 		},
 		"checkEmail": {
 			"pageTitle": "Periksa Email Anda",
@@ -3840,7 +3843,11 @@
 		},
 		"board": {
 			"reorderFailed": "Could not move task. Please try again.",
-			"keyboardInstructions": "Tekan Spasi untuk pratinjau dan Enter untuk membuka tugas ini. Gunakan Alt atau Option dengan tombol panah untuk memindahkannya."
+			"keyboardInstructions": "Tekan Spasi untuk pratinjau dan Enter untuk membuka tugas ini. Gunakan Alt atau Option dengan tombol panah untuk memindahkannya.",
+			"loadErrorDescription": "Something went wrong while fetching its tasks. Check your connection and try again.",
+			"loadErrorTitle": "This board didn't load",
+			"refreshError": "Couldn't refresh this board, so it may be out of date.",
+			"tryAgain": "Try again"
 		},
 		"toolbar": {
 			"search": "Cari tugas",
