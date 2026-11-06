@@ -1,3 +1,10 @@
+## [1.7.0] - 2026-11-06
+
+### 🩹 Fixes
+
+- Unblock the web typecheck on the native TypeScript checker: pin `apps/web` to 7.1.0-beta for the upstream relation-expansion fix (microsoft/TypeScript#64423), type the schedule views with `Task`, and keep the projected occurrence `sourceTaskId` discriminant behind an explicit guard.
+- Bump pnpm 12.16.1→12.18.0 in the package metadata, CI, Dockerfile and lockfile.
+
 ## [1.6.0] - 2026-11-02
 
 ### 🚀 Features

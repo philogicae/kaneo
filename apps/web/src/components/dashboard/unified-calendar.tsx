@@ -10,9 +10,10 @@ import { buildMonthWeeks } from "@/components/calendar/month-grid-model";
 import getAppointments from "@/fetchers/appointment/get-appointments";
 import getTasks from "@/fetchers/task/get-tasks";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { expandRecurringTasks } from "@/lib/recurrence";
+import { expandRecurringTasks, isProjectedOccurrence } from "@/lib/recurrence";
 import { toScheduledTask, toScheduledTasks } from "@/lib/task-schedule";
 import { useUserPreferencesStore } from "@/store/user-preferences";
+import type Task from "@/types/task";
 import type { ConsolidatedProject } from "./consolidated-task-list";
 
 // Lanes are capped so a busy week cannot push a row taller than its container;
@@ -68,7 +69,7 @@ function UnifiedCalendar({ projects }: { projects: ConsolidatedProject[] }) {
         projectId: project.id,
       };
       const data = taskQueries[index]?.data;
-      const base = toScheduledTasks(data);
+      const base = toScheduledTasks<Task>(data);
       // Completed recurring tasks do not project: completing one spawns its
       // next occurrence as a real task, which projects on its own.
       const completedIds = new Set(
@@ -87,7 +88,9 @@ function UnifiedCalendar({ projects }: { projects: ConsolidatedProject[] }) {
           : base;
 
       for (const task of scheduled) {
-        const realId = "sourceTaskId" in task ? task.sourceTaskId : task.id;
+        const realId = isProjectedOccurrence(task)
+          ? task.sourceTaskId
+          : task.id;
         locations.set(realId, { ...location, kind: "task" });
         tasks.push({ ...task, projectSlug: project.slug });
       }

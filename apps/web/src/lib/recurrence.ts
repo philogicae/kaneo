@@ -69,6 +69,15 @@ export type ProjectedOccurrence<TTask> = TTask & {
   sourceTaskId: string;
 };
 
+// `ProjectedOccurrence<T>` is a structural subtype of `T`, so the checker
+// collapses the expansion union to `T[]`; an explicit predicate keeps the
+// occurrence discriminant available at call sites.
+export function isProjectedOccurrence<TTask extends ProjectableTask>(
+  task: TTask,
+): task is ProjectedOccurrence<TTask> {
+  return "sourceTaskId" in task;
+}
+
 // Future occurrences are not rows in the database (they are spawned only on
 // completion), so date-based views project them client-side. Completed
 // recurring tasks must not project: completing one already spawns its next

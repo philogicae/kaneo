@@ -24,6 +24,7 @@ import { cn } from "@/lib/cn";
 import { getStatusLabel } from "@/lib/i18n/domain";
 import { toScheduledTask, toScheduledTasks } from "@/lib/task-schedule";
 import { useUserPreferencesStore } from "@/store/user-preferences";
+import type Task from "@/types/task";
 import type { ConsolidatedProject } from "./consolidated-task-list";
 
 type UnifiedGanttItem = {
@@ -81,7 +82,7 @@ function UnifiedGantt({ projects }: { projects: ConsolidatedProject[] }) {
         projectSlug: project.slug,
       };
 
-      for (const task of toScheduledTasks(taskQueries[index]?.data)) {
+      for (const task of toScheduledTasks<Task>(taskQueries[index]?.data)) {
         acc.push({
           ...base,
           id: task.id,

@@ -17,6 +17,10 @@ export default defineConfig({
         cache: false,
       },
       "check:types": {
+        // TypeScript 7.0.2's native checker has an unbounded relation
+        // regression on this project (microsoft/TypeScript#64423). The
+        // 7.1.0-beta compiler has the fix; drop this pin once a stable 7.x
+        // release ships it.
         command:
           "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
         dependsOn: [
